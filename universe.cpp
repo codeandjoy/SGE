@@ -20,5 +20,12 @@ void Universe::loop(){
         }
 
         // Game updates/draws
+        RectangleShape *block = new RectangleShape(Vector2f(200, 200));
+        block->setPosition(Vector2f(10,10));
+        block->setOutlineColor(Color::Red);
+
+        windowPtr->draw(*block);
+    
+        windowPtr->display();
     }
 }
