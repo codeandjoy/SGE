@@ -1,18 +1,14 @@
 #include <SFML/Graphics.hpp>
 using namespace sf;
 
+#include "universe.h"
+
 int main(){
     RenderWindow window(VideoMode(1200, 800), "Test", Style::Fullscreen);
-    
-    while(window.isOpen()){
-        Event event;
-        while(window.pollEvent(event)){
-            if(
-                event.type == Event::Closed ||
-                event.type == Event::KeyPressed && event.key.code == Keyboard::Q
-                ) window.close();
-        }
-    }
+
+    Universe *universe = new Universe(window);
+
+    universe->loop();
 
     return 0;
 }
