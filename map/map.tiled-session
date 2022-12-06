@@ -1,0 +1,42 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "map.tmj",
+    "expandedProjectPaths": [
+        "."
+    ],
+    "fileStates": {
+        "map.tmj": {
+            "scale": 4,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 116,
+                "y": 80.875
+            }
+        },
+        "testMap.tsx": {
+            "scaleInDock": 8,
+            "scaleInEditor": 11
+        }
+    },
+    "last.imagePath": "/home/owner/Projects/SGE/map",
+    "map.lastUsedFormat": "json",
+    "map.tileHeight": 8,
+    "map.tileWidth": 8,
+    "openFiles": [
+        "map.tmj",
+        "testMap.tsx"
+    ],
+    "project": "map.tiled-project",
+    "recentFiles": [
+        "testMap.tsx",
+        "map.tmj"
+    ],
+    "tileset.lastUsedFormat": "tsx",
+    "tileset.tileSize": {
+        "height": 8,
+        "width": 8
+    }
+}
