@@ -1,12 +1,16 @@
 #include <SFML/Graphics.hpp>
 using namespace sf;
+using namespace std;
+
+
 
 class Universe{
     public:
-        Universe(RenderWindow &window);
-
+        void createMap(const string mapDataFileLocation);
+        void setupWindow(RenderWindow &window);
         void loop();
 
     private:
         RenderWindow *windowPtr;
+        vector<RectangleShape> map;
 };
