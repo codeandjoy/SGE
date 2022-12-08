@@ -1,14 +1,24 @@
 #include <fstream>
+#include <iostream>
 #include <jsoncpp/json/json.h>
 using namespace std;
 
 #include "readTiledMapData.h"
 
 Json::Value readTiledMapData(string mapDataFileLocation){
+    ifstream mapFile(mapDataFileLocation);
+    if(!mapFile.is_open()){
+        printf("Can not open file: %s", mapDataFileLocation.c_str());
+        exit(1);
+    }
+
+    Json::Reader reader;
     Json::Value mapData;
 
-    ifstream mapFile(mapDataFileLocation, ifstream::binary);
-    mapFile >> mapData;
+    if(!reader.parse(mapFile, mapData)){
+        printf("Can not parse file: %s", mapDataFileLocation.c_str());
+        exit(1);
+    }
 
     // Prepare data
     Json::Value cleanMapData;
@@ -18,7 +28,6 @@ Json::Value readTiledMapData(string mapDataFileLocation){
     cleanMapData["tileheight"] = mapData["tileheight"];
     cleanMapData["layers"] = mapData["layers"];
     // 
-    // printf("%s", cleanMapData.toStyledString().c_str());
 
     return cleanMapData;
 }

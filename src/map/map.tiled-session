@@ -21,7 +21,9 @@
             "scaleInEditor": 11
         }
     },
+    "last.exportedFilePath": "/home/owner/Projects/SGE/src/map",
     "last.imagePath": "/home/owner/Projects/SGE/map",
+    "map.lastUsedExportFilter": "JSON map files (*.tmj *.json)",
     "map.lastUsedFormat": "json",
     "map.tileHeight": 8,
     "map.tileWidth": 8,
