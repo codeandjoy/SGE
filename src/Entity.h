@@ -3,5 +3,7 @@ using namespace sf;
 
 class Entity: public RectangleShape{
     public:
-        Entity();  
+        Entity();
+
+        void move(Vector2f movement);
 };
