@@ -13,6 +13,13 @@ int main(){
     Entity *player = new Entity();
     universe->createPlayer(*player);
 
+    universe->addController([player](Event event){
+        if(event.type == Event::KeyPressed){
+            if(event.key.code == Keyboard::D) player->move(Vector2f(10, 0));
+            if(event.key.code == Keyboard::A) player->move(Vector2f(-10, 0));
+        }
+    });
+
     RenderWindow *window = new RenderWindow(VideoMode(1200, 800), "Test", Style::Fullscreen);
     universe->setupWindow(*window);
     

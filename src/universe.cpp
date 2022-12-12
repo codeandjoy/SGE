@@ -38,6 +38,10 @@ void Universe::setupWindow(RenderWindow &window){
     windowPtr = &window;
 }
 
+void Universe::addController(const function<void (Event event)> &lambdaController){
+    controllers.push_back(lambdaController);
+}
+
 void Universe::loop(){
     if(!windowPtr){
         printf("RenderWindow is not initialized. Use setupWindow method to initialize RenderWindow before(!) looping the Universe.\n");
@@ -50,8 +54,12 @@ void Universe::loop(){
             if (event.type == Event::Closed) windowPtr->close();
 
             // Controllers
-
+            for(function controller : controllers){
+                controller(event);
+            }
         }
+
+        windowPtr->clear();
 
         // Game updates/draws
         for(RectangleShape &block : map){
@@ -65,7 +73,7 @@ void Universe::loop(){
             windowPtr->draw(*playerPtr);
         }
         // 
-    
+
         windowPtr->display();
     }
 }
