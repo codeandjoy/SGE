@@ -10,6 +10,9 @@ int main(){
     Universe *universe = new Universe();
     universe->createMap(filesystem::current_path().string() + "/src/map/map.tmj");
 
+    Entity *player = new Entity();
+    universe->createPlayer(*player);
+
     RenderWindow *window = new RenderWindow(VideoMode(1200, 800), "Test", Style::Fullscreen);
     universe->setupWindow(*window);
     

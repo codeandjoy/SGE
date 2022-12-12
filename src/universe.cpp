@@ -30,6 +30,10 @@ void Universe::createMap(const string mapDataFileLocation){
     }
 }
 
+void Universe::createPlayer(Entity &player){
+    playerPtr = &player;
+}
+
 void Universe::setupWindow(RenderWindow &window){
     windowPtr = &window;
 }
@@ -52,6 +56,13 @@ void Universe::loop(){
         // Game updates/draws
         for(RectangleShape &block : map){
             windowPtr->draw(block);
+        }
+
+        if(!playerPtr){
+            printf("Player is not setup");
+        }
+        else{
+            windowPtr->draw(*playerPtr);
         }
         // 
     
