@@ -20,7 +20,9 @@ int main(){
         }
     });
 
-    RenderWindow *window = new RenderWindow(VideoMode(1200, 800), "Test", Style::Fullscreen);
+    RenderWindow *window = new RenderWindow(VideoMode::getDesktopMode(), "Test", Style::Fullscreen);
+    View *view = new View(Vector2f(50, 50), Vector2f(480, 270));
+    window->setView(*view);
     universe->setupWindow(*window);
     
     universe->loop();
