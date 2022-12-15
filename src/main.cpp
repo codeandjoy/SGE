@@ -15,8 +15,12 @@ int main(){
 
     universe->addController([player](Event event){
         if(event.type == Event::KeyPressed){
-            if(event.key.code == Keyboard::D) player->move(Vector2f(10, 0));
-            if(event.key.code == Keyboard::A) player->move(Vector2f(-10, 0));
+            if(event.key.code == Keyboard::D) player->setIsMovingRight(true);
+            if(event.key.code == Keyboard::A) player->setIsMovingLeft(true);
+        }
+        if(event.type == Event::KeyReleased){
+            if(event.key.code == Keyboard::D) player->setIsMovingRight(false);
+            if(event.key.code == Keyboard::A) player->setIsMovingLeft(false);
         }
     });
 

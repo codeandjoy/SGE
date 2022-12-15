@@ -61,7 +61,11 @@ void Universe::loop(){
 
         windowPtr->clear();
 
-        // Game updates/draws
+        // Game updates
+        playerPtr->update();
+        // 
+
+        // Game draws
         for(RectangleShape &block : map){
             windowPtr->draw(block);
         }
