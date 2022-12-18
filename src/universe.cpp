@@ -11,6 +11,7 @@ using namespace std;
 
 
 void Universe::createMap(const string mapDataFileLocation){
+    // TODO map borders == map size
     Json::Value mapData = readTiledMapData(mapDataFileLocation);
     
     int mapWidth = mapData["width"].asInt();
