@@ -3,7 +3,7 @@
 Entity::Entity(){
     // TODO hardcoded properties
     this->setSize(sf::Vector2f(40, 40));
-    this->setPosition(sf::Vector2f(100, 100));
+    this->setPosition(sf::Vector2f(100, 10));
     this->setFillColor(sf::Color::Red);
 }
 
