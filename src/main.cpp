@@ -1,31 +1,39 @@
 #include <stdio.h>
 #include <filesystem>
 #include <SFML/Graphics.hpp>
-using namespace sf;
-using namespace std;
 
 #include "universe.h"
+#include "PhysicalObject.h"
+#include "Gravity.h"
 
 int main(){
     Universe *universe = new Universe();
-    universe->createMap(filesystem::current_path().string() + "/src/map/map.tmj");
+    universe->createMap(std::filesystem::current_path().string() + "/src/map/map.tmj");
 
     Entity *player = new Entity();
     universe->createPlayer(*player);
 
-    universe->addController([player](Event event){
-        if(event.type == Event::KeyPressed){
-            if(event.key.code == Keyboard::D) player->setIsMovingRight(true);
-            if(event.key.code == Keyboard::A) player->setIsMovingLeft(true);
+    // Player physics
+    PhysicalObject *playerPhy = new PhysicalObject(player);
+    PhysicalProperty *entityGravity = new Gravity(sf::Vector2f(0, 0.1));
+    playerPhy->addPhysicalProperty(entityGravity);
+
+    universe->addPhysicalObject(playerPhy);
+    // 
+
+    universe->addController([player](sf::Event event){
+        if(event.type == sf::Event::KeyPressed){
+            if(event.key.code == sf::Keyboard::D) player->setIsMovingRight(true);
+            if(event.key.code == sf::Keyboard::A) player->setIsMovingLeft(true);
         }
-        if(event.type == Event::KeyReleased){
-            if(event.key.code == Keyboard::D) player->setIsMovingRight(false);
-            if(event.key.code == Keyboard::A) player->setIsMovingLeft(false);
+        if(event.type == sf::Event::KeyReleased){
+            if(event.key.code == sf::Keyboard::D) player->setIsMovingRight(false);
+            if(event.key.code == sf::Keyboard::A) player->setIsMovingLeft(false);
         }
     });
 
-    RenderWindow *window = new RenderWindow(VideoMode::getDesktopMode(), "Test", Style::Fullscreen);
-    View *view = new View(Vector2f(50, 50), Vector2f(480, 270));
+    sf::RenderWindow *window = new sf::RenderWindow(sf::VideoMode::getDesktopMode(), "Test", sf::Style::Fullscreen);
+    sf::View *view = new sf::View(sf::Vector2f(50, 50), sf::Vector2f(480, 270));
     window->setView(*view);
     universe->setupWindow(*window);
     

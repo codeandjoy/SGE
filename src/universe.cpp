@@ -43,6 +43,10 @@ void Universe::addController(const function<void (Event event)> &lambdaControlle
     controllers.push_back(lambdaController);
 }
 
+void Universe::addPhysicalObject(PhysicalObject *physicalObject){
+    physicalObjects.push_back(physicalObject);
+}
+
 void Universe::loop(){
     if(!windowPtr){
         printf("RenderWindow is not initialized. Use setupWindow method to initialize RenderWindow before(!) looping the Universe.\n");
@@ -64,6 +68,10 @@ void Universe::loop(){
 
         // Game updates
         playerPtr->update();
+
+        for(PhysicalObject *pObject : physicalObjects){
+            pObject->updatePhysics();
+        }
         // 
 
         // Game draws

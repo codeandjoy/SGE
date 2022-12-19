@@ -1,12 +1,11 @@
 #include <fstream>
 #include <iostream>
 #include <jsoncpp/json/json.h>
-using namespace std;
 
 #include "readTiledMapData.h"
 
-Json::Value readTiledMapData(string mapDataFileLocation){
-    ifstream mapFile(mapDataFileLocation);
+Json::Value readTiledMapData(std::string mapDataFileLocation){
+    std::ifstream mapFile(mapDataFileLocation);
     if(!mapFile.is_open()){
         printf("Can not open file: %s", mapDataFileLocation.c_str());
         exit(1);

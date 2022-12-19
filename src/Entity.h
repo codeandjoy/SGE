@@ -1,7 +1,10 @@
-#include <SFML/Graphics.hpp>
-using namespace sf;
+#ifndef ENTITY_H
+#define ENTITY_H
 
-class Entity: public RectangleShape{
+
+#include <SFML/Graphics.hpp>
+
+class Entity: public sf::RectangleShape{
     public:
         Entity();
 
@@ -11,7 +14,7 @@ class Entity: public RectangleShape{
         void setIsMovingLeft(bool is);
         
         void update();
-        void move(Vector2f movement);
+        void move(sf::Vector2f movement);
 
     private:
         bool isMovingTop;
@@ -19,3 +22,6 @@ class Entity: public RectangleShape{
         bool isMovingRight;
         bool isMovingLeft;
 };
+
+
+#endif

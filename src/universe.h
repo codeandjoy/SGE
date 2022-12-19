@@ -1,21 +1,28 @@
+#ifndef UNIVERSE_H
+#define UNIVERSE_H
+
+
 #include <SFML/Graphics.hpp>
 #include "Entity.h"
-using namespace sf;
-using namespace std;
-
+#include "PhysicalObject.h"
 
 
 class Universe{
     public:
-        void createMap(const string mapDataFileLocation);
+        void createMap(const std::string mapDataFileLocation);
         void createPlayer(Entity &player);
-        void setupWindow(RenderWindow &window);
-        void addController(const function<void (Event event)> &lambdaController);
+        void setupWindow(sf::RenderWindow &window);
+        void addController(const std::function<void (sf::Event event)> &lambdaController);
+        void addPhysicalObject(PhysicalObject *physicalObject);
         void loop();
 
     private:
-        RenderWindow *windowPtr;
-        vector<RectangleShape> map;
-        vector<function<void (Event event)>> controllers;
+        sf::RenderWindow *windowPtr;
+        std::vector<sf::RectangleShape> map;
+        std::vector<std::function<void (sf::Event event)>> controllers;
         Entity *playerPtr;
+        std::vector<PhysicalObject*> physicalObjects;
 };
+
+
+#endif
