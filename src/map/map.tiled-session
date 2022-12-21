@@ -9,12 +9,15 @@
     ],
     "fileStates": {
         "map.tmj": {
-            "scale": 4,
+            "scale": 5.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 116,
-                "y": 80.875
+                "x": 119.27272727272728,
+                "y": 87.18181818181819
             }
+        },
+        "pico_8_tiles.tsx": {
+            "scaleInDock": 3
         },
         "testMap.tsx": {
             "scaleInDock": 8,
