@@ -2,10 +2,10 @@
 
 OUT = build/main.out
 
-_src = main.cpp universe.cpp utils/readTiledMapData.cpp Entity.cpp PhysicalObject.cpp Gravity.cpp Spritesheet.cpp
+_src = main.cpp Universe.cpp utils/readTiledMapData.cpp Entity.cpp PhysicalObject.cpp Gravity.cpp Spritesheet.cpp
 src = $(addprefix src/,$(_src))
 
-_objects = main.o universe.o readTiledMapData.o Entity.o PhysicalObject.o Gravity.o Spritesheet.o
+_objects = main.o Universe.o readTiledMapData.o Entity.o PhysicalObject.o Gravity.o Spritesheet.o
 objects = $(addprefix build/obj/,$(_objects))
 
 lib = -ljsoncpp -lsfml-graphics -lsfml-window -lsfml-system

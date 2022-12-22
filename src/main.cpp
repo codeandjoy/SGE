@@ -2,7 +2,7 @@
 #include <filesystem>
 #include <SFML/Graphics.hpp>
 
-#include "universe.h"
+#include "Universe.h"
 #include "Spritesheet.h"
 #include "PhysicalObject.h"
 #include "Gravity.h"

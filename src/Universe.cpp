@@ -5,7 +5,7 @@
 using namespace sf;
 using namespace std;
 
-#include "universe.h"
+#include "Universe.h"
 #include "./utils/readTiledMapData.h"
 
 
