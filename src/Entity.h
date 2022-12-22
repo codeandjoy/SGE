@@ -4,7 +4,7 @@
 
 #include <SFML/Graphics.hpp>
 
-class Entity: public sf::RectangleShape{
+class Entity: public sf::Sprite{
     public:
         Entity();
 
