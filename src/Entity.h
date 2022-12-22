@@ -8,6 +8,7 @@ class Entity: public sf::RectangleShape{
     public:
         Entity();
 
+        // Todo setDirection(direction) ?
         void setIsMovingTop(bool is);
         void setIsMovingBottom(bool is);
         void setIsMovingRight(bool is);
