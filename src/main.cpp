@@ -18,7 +18,7 @@ int main(){
 
     // Player texture
     player->setTexture(*knightSpritesheet->getSpritesheet());
-    player->setTextureRect(knightSpritesheet->getCoordinates(34)); // TODO rename to getTextureRect ?
+    player->setTextureRect(knightSpritesheet->getTextureRect(34)); // TODO rename to getTextureRect ?
     // 
 
     // Player physics

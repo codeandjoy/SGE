@@ -9,11 +9,11 @@ class Spritesheet{
         Spritesheet(int textureSizeX, int textureSizeY, int numTexturesX, int numTexturesY, std::string spritesheetLocation);
 
         sf::Texture* getSpritesheet();
-        sf::IntRect getCoordinates(int n);
+        sf::IntRect getTextureRect(int textureN);
 
     private:
         sf::Texture spritesheet;
-        std::vector<sf::IntRect> coordinates;
+        std::vector<sf::IntRect> textureRects;
 };
 
 
