@@ -3,6 +3,7 @@
 #include <SFML/Graphics.hpp>
 
 #include "universe.h"
+#include "Spritesheet.h"
 #include "PhysicalObject.h"
 #include "Gravity.h"
 
@@ -10,8 +11,15 @@ int main(){
     Universe *universe = new Universe();
     universe->createMap(std::filesystem::current_path().string() + "/src/assets/map.tmj");
 
+    Spritesheet *knightSpritesheet = new Spritesheet(8, 8, 12, 12, std::filesystem::current_path().string() + "/src/assets/pico_8_knight_sprite.png");
+
     Entity *player = new Entity();
     universe->createPlayer(*player);
+
+    // Player texture
+    player->setTexture(*knightSpritesheet->getSpritesheet());
+    player->setTextureRect(knightSpritesheet->getCoordinates(34)); // TODO rename to getTextureRect ?
+    // 
 
     // Player physics
     PhysicalObject *playerPhy = new PhysicalObject(player);

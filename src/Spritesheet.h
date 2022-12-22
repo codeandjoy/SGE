@@ -8,7 +8,7 @@ class Spritesheet{
     public:
         Spritesheet(int textureSizeX, int textureSizeY, int numTexturesX, int numTexturesY, std::string spritesheetLocation);
 
-        sf::Texture getSpritesheet();
+        sf::Texture* getSpritesheet();
         sf::IntRect getCoordinates(int n);
 
     private:
