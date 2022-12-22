@@ -8,7 +8,7 @@
 
 int main(){
     Universe *universe = new Universe();
-    universe->createMap(std::filesystem::current_path().string() + "/src/map/map.tmj");
+    universe->createMap(std::filesystem::current_path().string() + "/src/assets/map.tmj");
 
     Entity *player = new Entity();
     universe->createPlayer(*player);
