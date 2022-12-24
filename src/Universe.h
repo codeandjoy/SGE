@@ -5,15 +5,17 @@
 #include <SFML/Graphics.hpp>
 #include "Entity.h"
 #include "PhysicalObject.h"
+#include "Animation.h"
 
 
 class Universe{
     public:
         void createMap(const std::string mapDataFileLocation);
-        void createPlayer(Entity &player);
-        void setupWindow(sf::RenderWindow &window);
+        void createPlayer(Entity *player);
+        void setupWindow(sf::RenderWindow *window);
         void addController(const std::function<void (sf::Event event)> &lambdaController);
         void addPhysicalObject(PhysicalObject *physicalObject);
+        void addAnimation(Animation *animation);
         void loop();
 
     private:
@@ -22,6 +24,7 @@ class Universe{
         std::vector<std::function<void (sf::Event event)>> controllers;
         Entity *playerPtr;
         std::vector<PhysicalObject*> physicalObjects;
+        std::vector<Animation*> animations;
 };
 
 

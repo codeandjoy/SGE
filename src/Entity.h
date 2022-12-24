@@ -18,10 +18,10 @@ class Entity: public sf::Sprite{
         void move(sf::Vector2f movement);
 
     private:
-        bool isMovingTop;
-        bool isMovingBottom;
-        bool isMovingRight;
-        bool isMovingLeft;
+        bool isMovingTop = false;
+        bool isMovingBottom = false;
+        bool isMovingRight = false;
+        bool isMovingLeft = false;
 };
 
 

@@ -31,12 +31,12 @@ void Universe::createMap(const string mapDataFileLocation){
     }
 }
 
-void Universe::createPlayer(Entity &player){
-    playerPtr = &player;
+void Universe::createPlayer(Entity *player){
+    playerPtr = player;
 }
 
-void Universe::setupWindow(RenderWindow &window){
-    windowPtr = &window;
+void Universe::setupWindow(RenderWindow *window){
+    windowPtr = window;
 }
 
 void Universe::addController(const function<void (Event event)> &lambdaController){
@@ -47,10 +47,21 @@ void Universe::addPhysicalObject(PhysicalObject *physicalObject){
     physicalObjects.push_back(physicalObject);
 }
 
+// ! does not add ?
+void Universe::addAnimation(Animation *animation){
+    animations.push_back(animation);
+}
+
 void Universe::loop(){
     if(!windowPtr){
         printf("RenderWindow is not initialized. Use setupWindow method to initialize RenderWindow before(!) looping the Universe.\n");
         exit(1);
+    }
+
+    if(!animations.empty()){
+        for(Animation *animation : animations){
+            animation->restartClock();
+        }
     }
 
     while(windowPtr->isOpen()){
@@ -67,10 +78,20 @@ void Universe::loop(){
         windowPtr->clear();
 
         // Game updates
-        playerPtr->update();
+        if(playerPtr){
+            playerPtr->update();
+        }
 
-        for(PhysicalObject *pObject : physicalObjects){
-            pObject->updatePhysics();
+        if(!physicalObjects.empty()){
+            for(PhysicalObject *pObject : physicalObjects){
+                pObject->updatePhysics();
+            }
+        }
+
+        if(!animations.empty()){
+            for(Animation *animation : animations){
+                animation->run();
+            }
         }
         // 
 
