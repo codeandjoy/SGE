@@ -22,7 +22,7 @@ int main(){
     playerAnimation->addAnimationSequence("idle", std::vector<int>{9});
     playerAnimation->addAnimationSequence("runRight", std::vector<int>{33, 34, 35});
     playerAnimation->addAnimationSequence("runLeft", std::vector<int>{45, 46, 47});
-    playerAnimation->setCurrentAnimation("idle");
+    playerAnimation->setCurrentAnimationSequence("idle");
 
     universe->addAnimation(playerAnimation);
     //
@@ -36,23 +36,21 @@ int main(){
     // // 
 
     universe->addController([player, playerAnimation](sf::Event event){
-        // playerAnimation->setCurrentAnimation("idle");        
-
         if(event.type == sf::Event::KeyPressed){
             if(event.key.code == sf::Keyboard::D){
                 player->setIsMovingRight(true);
-                playerAnimation->setCurrentAnimation("runRight");
+                playerAnimation->setCurrentAnimationSequence("runRight");
             }
             if(event.key.code == sf::Keyboard::A){
                 player->setIsMovingLeft(true);
-                playerAnimation->setCurrentAnimation("runLeft");
+                playerAnimation->setCurrentAnimationSequence("runLeft");
             }
         }
         if(event.type == sf::Event::KeyReleased){
             if(event.key.code == sf::Keyboard::D) player->setIsMovingRight(false);
             if(event.key.code == sf::Keyboard::A) player->setIsMovingLeft(false);
             
-            playerAnimation->setCurrentAnimation("idle");
+            playerAnimation->setCurrentAnimationSequence("idle");
         }
     });
 

@@ -9,8 +9,8 @@ Animation::Animation(Spritesheet *spritesheet, sf::Sprite *owner, int initialTex
 }
 
 void Animation::run(){
-    if(!currentAnimation.length()){
-        printf("Can not run animation if no currentAnimation is set.\n"); // ? Default to first added ?
+    if(!currentAnimationSequence.length()){
+        printf("Can not run animation if no currentAnimationSequence is set.\n"); // ? Default to first added ?
         if(animationSequences.size()){
             printf("Available animations:\n");
             for(auto const &pair: animationSequences){
@@ -24,9 +24,9 @@ void Animation::run(){
     }
 
     if(clock.getElapsedTime().asMilliseconds() > 100){
-        owner->setTextureRect(spritesheet->getTextureRect(animationSequences[currentAnimation].at(currentTextureN)));
+        owner->setTextureRect(spritesheet->getTextureRect(animationSequences[currentAnimationSequence].at(currentTextureN)));
         
-        if(currentTextureN+1 == animationSequences[currentAnimation].size()){
+        if(currentTextureN+1 == animationSequences[currentAnimationSequence].size()){
             currentTextureN = 0;
         }
         else currentTextureN++;
@@ -40,20 +40,20 @@ void Animation::restartClock(){
     clock.restart();
 }
 
-void Animation::setCurrentAnimation(std::string animationName){
-    if(currentAnimation != animationName){
-        currentAnimation = animationName;
+void Animation::setCurrentAnimationSequence(std::string sequenceName){
+    if(currentAnimationSequence != sequenceName){
+        currentAnimationSequence = sequenceName;
         currentTextureN = 0;
         clock.restart();
     }
 }
 
-void Animation::addAnimationSequence(std::string animationName, std::vector<int> textureSequence){
+void Animation::addAnimationSequence(std::string sequenceName, std::vector<int> textureSequence){
     // Ensure uniqueness
-    if(animationSequences.count(animationName)){
-        printf("Animation '%s' already exists.\n", animationName.c_str());
+    if(animationSequences.count(sequenceName)){
+        printf("Animation '%s' already exists.\n", sequenceName.c_str());
         return;
     }
     
-    animationSequences[animationName] = textureSequence;
+    animationSequences[sequenceName] = textureSequence;
 }

@@ -15,8 +15,8 @@ class Animation{
         // ?
         void run();
         void restartClock();
-        void setCurrentAnimation(std::string animationName);
-        void addAnimationSequence(std::string animationName, std::vector<int> textureSequence);
+        void setCurrentAnimationSequence(std::string sequenceName);
+        void addAnimationSequence(std::string sequenceName, std::vector<int> textureSequence);
 
     private:
         sf::Sprite *owner;
@@ -24,7 +24,7 @@ class Animation{
         
         sf::Clock clock;
         std::map<std::string, std::vector<int>> animationSequences; // e.g. "idle": [5, 6, 7, 8]
-        std::string currentAnimation;
+        std::string currentAnimationSequence;
         int currentTextureN = 0;
 
 };
