@@ -23,6 +23,7 @@ void Animation::run(){
         exit(1);
     }
 
+    // TODO dynamic animation delay (for each animation ?)
     if(clock.getElapsedTime().asMilliseconds() > 100){
         owner->setTextureRect(spritesheet->getTextureRect(animationSequences[currentAnimationSequence].at(currentTextureN)));
         
