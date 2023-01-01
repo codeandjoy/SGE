@@ -3,11 +3,11 @@
 
 
 #include <SFML/Graphics.hpp>
-#include "Spritesheet.h"
+#include "TextureSheet.h"
 
 class Animation{
     public:
-        Animation(Spritesheet *spritesheet, sf::Sprite *owner, int initialTextureN);
+        Animation(TextureSheet *spritesheet, sf::Sprite *owner, int initialTextureN);
     
         // ?
         // runForward -> 1,2,3,1,2,3
@@ -20,7 +20,7 @@ class Animation{
 
     private:
         sf::Sprite *owner;
-        Spritesheet *spritesheet;
+        TextureSheet *textureSheet;
         
         sf::Clock clock;
         std::map<std::string, std::vector<int>> animationSequences; // e.g. "idle": [5, 6, 7, 8]

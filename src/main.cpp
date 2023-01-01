@@ -2,23 +2,55 @@
 #include <filesystem>
 #include <SFML/Graphics.hpp>
 
+#include "tileson.hpp"
 #include "Universe.h"
-#include "Spritesheet.h"
+#include "TextureSheet.h"
 #include "Animation.h"
 #include "PhysicalObject.h"
 #include "Gravity.h"
 
+
 int main(){
     Universe *universe = new Universe();
+
+    // // Map
+    // // Map TextureSheet
+    // TextureSheet *picoTiles = new TextureSheet(8, 8, 12, 12, std::filesystem::current_path().string() + "/src/assets/pico_8)tiles.png");
+
+    // tson::Tileson t;
+    // std::unique_ptr<tson::Map> map = t.parse(fs::path("/src/assets/map.tmj"));
+    // // TODO init in Scene in the future (?)
+    // tson::Layer *surfaceLayer = map->getLayer("surface");
+    // // Vector of map surface sprites
+    // // To allow reuse in Universe, in PhysicsManager and possibly with Animation
+    // std::vector<sf::Sprite> mapSurfaceSprites;
+
+    // for(auto &[tileNum, tileObject] : surfaceLayer->getTileObjects()){
+    //     // create a sprite
+    //     // sf::Sprite surfaceTile(*picoTiles->getTextureSheet());
+
+    //     sf::Sprite surfaceTile();
+    //     // surfaceTile.setTexture(tileObject.getTile()->getTileset()->getImage()); // TODO write texture manager to not load textures twice but reuse
+
+
+
+    //     // get texture rect
+    //     // set sprite's position
+    // }
+
+    // // 
+
     universe->createMap(std::filesystem::current_path().string() + "/src/assets/map.tmj");
 
-    Spritesheet *knightSpritesheet = new Spritesheet(8, 8, 12, 12, std::filesystem::current_path().string() + "/src/assets/pico_8_knight_sprite.png");
+
+
+    TextureSheet *knightTextureSheet = new TextureSheet(8, 8, 12, 12, std::filesystem::current_path().string() + "/src/assets/pico_8_knight_sprite.png");
 
     Entity *player = new Entity();
     universe->createPlayer(player);
 
     // Player animation
-    Animation *playerAnimation = new Animation(knightSpritesheet, player, 9);
+    Animation *playerAnimation = new Animation(knightTextureSheet, player, 9);
     playerAnimation->addAnimationSequence("idle", std::vector<int>{9});
     playerAnimation->addAnimationSequence("runRight", std::vector<int>{33, 34, 35});
     playerAnimation->addAnimationSequence("runLeft", std::vector<int>{45, 46, 47});

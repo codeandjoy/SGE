@@ -1,10 +1,10 @@
 #include "Animation.h"
 
-Animation::Animation(Spritesheet *spritesheet, sf::Sprite *owner, int initialTextureN){
-    this->spritesheet = spritesheet;
+Animation::Animation(TextureSheet *spritesheet, sf::Sprite *owner, int initialTextureN){
+    this->textureSheet = spritesheet;
     this->owner = owner;
     
-    owner->setTexture(*spritesheet->getSpritesheet());
+    owner->setTexture(*spritesheet->getTextureSheet());
     owner->setTextureRect(spritesheet->getTextureRect(initialTextureN));
 }
 
@@ -25,7 +25,7 @@ void Animation::run(){
 
     // TODO dynamic animation delay (for each animation ?)
     if(clock.getElapsedTime().asMilliseconds() > 100){
-        owner->setTextureRect(spritesheet->getTextureRect(animationSequences[currentAnimationSequence].at(currentTextureN)));
+        owner->setTextureRect(textureSheet->getTextureRect(animationSequences[currentAnimationSequence].at(currentTextureN)));
         
         if(currentTextureN+1 == animationSequences[currentAnimationSequence].size()){
             currentTextureN = 0;
