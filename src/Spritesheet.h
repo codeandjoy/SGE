@@ -4,6 +4,7 @@
 
 #include <SFML/Graphics.hpp>
 
+// TODO spritesheet with gaps
 class Spritesheet{
     public:
         Spritesheet(int textureSizeX, int textureSizeY, int numTexturesX, int numTexturesY, std::string spritesheetLocation);
