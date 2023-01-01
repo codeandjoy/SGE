@@ -4,7 +4,9 @@
 
 #include "tileson.hpp"
 #include "Universe.h"
+#include "TextureManager.h"
 #include "TextureSheet.h"
+#include "TextureSheetSizes.h"
 #include "Animation.h"
 #include "PhysicalObject.h"
 #include "Gravity.h"
@@ -40,17 +42,18 @@ int main(){
 
     // // 
 
+    
+
     universe->createMap(std::filesystem::current_path().string() + "/src/assets/map.tmj");
 
-
-
-    TextureSheet *knightTextureSheet = new TextureSheet(8, 8, 12, 12, std::filesystem::current_path().string() + "/src/assets/pico_8_knight_sprite.png");
+    TextureManager *textureManager = new TextureManager();
+    textureManager->load(std::filesystem::current_path().string() + "/src/assets/pico_8_knight_sprite.png", TextureSheetSizes(8, 8, 12, 12), "knight");
 
     Entity *player = new Entity();
     universe->createPlayer(player);
 
     // Player animation
-    Animation *playerAnimation = new Animation(knightTextureSheet, player, 9);
+    Animation *playerAnimation = new Animation(textureManager->get("knight"), player, 9);
     playerAnimation->addAnimationSequence("idle", std::vector<int>{9});
     playerAnimation->addAnimationSequence("runRight", std::vector<int>{33, 34, 35});
     playerAnimation->addAnimationSequence("runLeft", std::vector<int>{45, 46, 47});
