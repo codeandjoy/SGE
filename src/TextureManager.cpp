@@ -10,14 +10,14 @@ void TextureManager::load(std::string textureLocation, TextureSheetSizes texture
     loadedTextures[textureName] = new TextureSheet(textureSheetSizes, textureLocation);
 }
 
-bool TextureManager::isLoaded(std::string textureLocation){
-    for(auto &[key, textureSheet] : loadedTextures){
-        if(textureSheet->getLocation() == textureLocation) return true;
-    }
-
-    return false;
-}
-
 TextureSheet* TextureManager::get(std::string textureName){
     return loadedTextures[textureName];
+}
+
+TextureSheet* TextureManager::getByLocation(std::string textureLocation){
+    for(auto &[key, textureSheet] : loadedTextures){
+        if(textureSheet->getLocation() == textureLocation) return textureSheet;
+    }
+
+    return nullptr;
 }

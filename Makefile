@@ -8,8 +8,7 @@ src = $(addprefix src/,$(_src))
 _objects = main.o Universe.o readTiledMapData.o Entity.o PhysicalObject.o Gravity.o TextureSheet.o Animation.o TextureManager.o
 objects = $(addprefix build/obj/,$(_objects))
 
-lib = -ljsoncpp -lsfml-graphics -lsfml-window -lsfml-system
-
+lib = -ltmxlite -ljsoncpp -lsfml-graphics -lsfml-window -lsfml-system
 
 all: $(OUT)
 

@@ -21,5 +21,6 @@ sf::Texture* TextureSheet::getTextureSheet(){
 }
 
 sf::IntRect TextureSheet::getTextureRect(int textureN){
+    // TODO check if out of bounds
     return textureRects[textureN];
 }

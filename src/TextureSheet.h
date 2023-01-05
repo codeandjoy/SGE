@@ -10,6 +10,7 @@ class TextureSheet{
     public:
         TextureSheet(TextureSheetSizes tss, std::string location);
 
+        // TODO make names shorter
         std::string getLocation();
         sf::Texture* getTextureSheet();
         sf::IntRect getTextureRect(int textureN);

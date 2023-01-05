@@ -9,26 +9,8 @@ using namespace std;
 #include "./utils/readTiledMapData.h"
 
 
-
-void Universe::createMap(const string mapDataFileLocation){
-    // TODO map borders == map size
-    Json::Value mapData = readTiledMapData(mapDataFileLocation);
-    
-    int mapWidth = mapData["width"].asInt();
-    int mapHeight = mapData["height"].asInt();
-    int tileWidth = mapData["tilewidth"].asInt();
-    int tileHeight = mapData["tileheight"].asInt();
-
-    for(int i = 0; i < mapHeight; i++){
-        for(int j = 0; j < mapWidth; j++){
-            if(mapData["layers"][0]["data"][mapWidth*i+j].asInt() == 1){
-                RectangleShape block(Vector2f(tileWidth, tileHeight));
-                block.setPosition(Vector2f(j*tileWidth, i*tileHeight));
-
-                map.push_back(block);
-            }
-        }
-    }
+void Universe::addMap(std::vector<sf::Sprite> *map){
+    mapPtr = map;
 }
 
 void Universe::createPlayer(Entity *player){
@@ -47,7 +29,6 @@ void Universe::addPhysicalObject(PhysicalObject *physicalObject){
     physicalObjects.push_back(physicalObject);
 }
 
-// ! does not add ?
 void Universe::addAnimation(Animation *animation){
     animations.push_back(animation);
 }
@@ -96,8 +77,8 @@ void Universe::loop(){
         // 
 
         // Game draws
-        for(RectangleShape &block : map){
-            windowPtr->draw(block);
+        for(sf::Sprite tileSprite : *mapPtr){
+            windowPtr->draw(tileSprite);
         }
 
         if(!playerPtr){

@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <filesystem>
 #include <SFML/Graphics.hpp>
+#include <tmxlite/Map.hpp>
+#include <tmxlite/TileLayer.hpp>
 
-#include "tileson.hpp"
 #include "Universe.h"
 #include "TextureManager.h"
 #include "TextureSheet.h"
@@ -15,42 +16,44 @@
 int main(){
     Universe *universe = new Universe();
 
-    // // Map
-    // // Map TextureSheet
-    // TextureSheet *picoTiles = new TextureSheet(8, 8, 12, 12, std::filesystem::current_path().string() + "/src/assets/pico_8)tiles.png");
-
-    // tson::Tileson t;
-    // std::unique_ptr<tson::Map> map = t.parse(fs::path("/src/assets/map.tmj"));
-    // // TODO init in Scene in the future (?)
-    // tson::Layer *surfaceLayer = map->getLayer("surface");
-    // // Vector of map surface sprites
-    // // To allow reuse in Universe, in PhysicsManager and possibly with Animation
-    // std::vector<sf::Sprite> mapSurfaceSprites;
-
-    // for(auto &[tileNum, tileObject] : surfaceLayer->getTileObjects()){
-    //     // create a sprite
-    //     // sf::Sprite surfaceTile(*picoTiles->getTextureSheet());
-
-    //     sf::Sprite surfaceTile();
-    //     // surfaceTile.setTexture(tileObject.getTile()->getTileset()->getImage()); // TODO write texture manager to not load textures twice but reuse
-
-
-
-    //     // get texture rect
-    //     // set sprite's position
-    // }
-
-    // // 
-
-    
-
-    universe->createMap(std::filesystem::current_path().string() + "/src/assets/map.tmj");
-
+    // Load all textures
     TextureManager *textureManager = new TextureManager();
     textureManager->load(std::filesystem::current_path().string() + "/src/assets/pico_8_knight_sprite.png", TextureSheetSizes(8, 8, 12, 12), "knight");
+    textureManager->load(std::filesystem::current_path().string() + "/src/assets/pico_8_tiles.png", TextureSheetSizes(8, 8, 12, 12), "picoTiles");
+    //
 
+    std::string s = std::filesystem::current_path().string() + "/src/assets/map.json";
+
+    // Map
+    // TODO init in / add to Scene in the future (?)
+    tmx::Map map;
+    if(!map.load(std::filesystem::current_path().string() + "/src/assets/map.tmx")){
+        printf("Can't load map");
+        exit(1);
+    }
+
+    const auto& layers = map.getLayers();
+    const auto& tiles = layers[0]->getLayerAs<tmx::TileLayer>().getTiles();
+
+    std::vector<sf::Sprite> mapTiles; // just sprites, not pointers
+
+    for(int i = 0; i < map.getTileCount().y; i++){
+        for(int j = 0; j < map.getTileCount().x; j++){
+            sf::Sprite tile;
+            tile.setTexture(*textureManager->get("picoTiles")->getTextureSheet());
+            tile.setTextureRect(textureManager->get("picoTiles")->getTextureRect(tiles[map.getTileCount().x*i+j].ID-1));
+            tile.setPosition(sf::Vector2f(j*map.getTileSize().x, i*map.getTileSize().y));
+            mapTiles.push_back(tile);
+        }
+    }
+    
+    universe->addMap(&mapTiles);
+    // 
+
+    // Player
     Entity *player = new Entity();
     universe->createPlayer(player);
+    //
 
     // Player animation
     Animation *playerAnimation = new Animation(textureManager->get("knight"), player, 9);

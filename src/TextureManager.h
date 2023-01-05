@@ -7,9 +7,11 @@
 
 class TextureManager{
     public:
+        // ? Rename get to getByName. getOrLoad -> getByNameOrLoad ?
+
         void load(std::string textureLocation, TextureSheetSizes textureSheetSizes, std::string textureName);
-        bool isLoaded(std::string textureLocation);
-        TextureSheet* get(std::string textureName);
+        TextureSheet* get(std::string textureName); // TODO check nonexistent data (return nullptr?)
+        TextureSheet* getByLocation(std::string textureLocation); // can be used to check whether texture at location has been loaded
 
     private:
         std::map<std::string, TextureSheet*> loadedTextures;
