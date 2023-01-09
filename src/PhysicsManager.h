@@ -12,7 +12,7 @@ class PhysicsManager{
         std::vector<SolidObject*>* getSolidObjects();
         void updatePhysics();
 
-        bool drawCollideRects = true; // ? Default == false ?
+        bool drawCollideRects = false;
 
     private:
         std::vector<PhysicalObject*> physicalObjects;

@@ -19,6 +19,7 @@ class SolidObject{
         sf::RectangleShape collisionRect;
         // bounce
         // friction force
+        // bottom transparent (can jump through bottom)
         // etc.
 };
 

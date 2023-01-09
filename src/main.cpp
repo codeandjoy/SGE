@@ -72,6 +72,7 @@ int main(){
     // Physics
     // PhysicsManager
     PhysicsManager *physicsManager = new PhysicsManager();
+    physicsManager->drawCollideRects = true;
 
     // Player physical object
     PhysicalObject *playerPhy = new PhysicalObject(player);
