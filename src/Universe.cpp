@@ -1,9 +1,6 @@
 #include <iostream>
 
 #include <jsoncpp/json/json.h>
-#include <SFML/Graphics.hpp>
-using namespace sf;
-using namespace std;
 
 #include "Universe.h"
 #include "./utils/readTiledMapData.h"
@@ -13,20 +10,20 @@ void Universe::addMap(std::vector<sf::Sprite> *map){
     mapPtr = map;
 }
 
-void Universe::createPlayer(Entity *player){
+void Universe::createPlayer(sf::Sprite *player){
     playerPtr = player;
 }
 
-void Universe::setupWindow(RenderWindow *window){
+void Universe::setupWindow(sf::RenderWindow *window){
     windowPtr = window;
 }
 
-void Universe::addController(const function<void (Event event)> &lambdaController){
+void Universe::addController(const std::function<void (sf::Event event)> &lambdaController){
     controllers.push_back(lambdaController);
 }
 
-void Universe::addPhysicalObject(PhysicalObject *physicalObject){
-    physicalObjects.push_back(physicalObject);
+void Universe::addPhysicsManger(PhysicsManager *physicsManager){
+    physicsManagerPtr = physicsManager;
 }
 
 void Universe::addAnimation(Animation *animation){
@@ -46,12 +43,12 @@ void Universe::loop(){
     }
 
     while(windowPtr->isOpen()){
-        Event event;
+        sf::Event event;
         while(windowPtr->pollEvent(event)){
-            if (event.type == Event::Closed) windowPtr->close();
+            if (event.type == sf::Event::Closed) windowPtr->close();
 
             // Controllers
-            for(function controller : controllers){
+            for(std::function controller : controllers){
                 controller(event);
             }
         }
@@ -59,14 +56,8 @@ void Universe::loop(){
         windowPtr->clear();
 
         // Game updates
-        if(playerPtr){
-            playerPtr->update();
-        }
-
-        if(!physicalObjects.empty()){
-            for(PhysicalObject *pObject : physicalObjects){
-                pObject->updatePhysics();
-            }
+        if(physicsManagerPtr){
+            physicsManagerPtr->updatePhysics();
         }
 
         if(!animations.empty()){

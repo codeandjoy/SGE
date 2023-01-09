@@ -9,7 +9,9 @@
 #include "TextureSheet.h"
 #include "TextureSheetSizes.h"
 #include "Animation.h"
+#include "PhysicsManager.h"
 #include "PhysicalObject.h"
+#include "Moveable.h"
 #include "Gravity.h"
 
 
@@ -51,7 +53,7 @@ int main(){
     // 
 
     // Player
-    Entity *player = new Entity();
+    sf::Sprite *player = new sf::Sprite();
     universe->createPlayer(player);
     //
 
@@ -65,28 +67,36 @@ int main(){
     universe->addAnimation(playerAnimation);
     //
 
-    // // Player physics
-    // PhysicalObject *playerPhy = new PhysicalObject(player);
-    // PhysicalProperty *entityGravity = new Gravity(sf::Vector2f(0, 0.1));
-    // playerPhy->addPhysicalProperty(entityGravity);
+    // Physics
+    // PhysicsManager
+    PhysicsManager *physicsManager = new PhysicsManager();
 
-    // universe->addPhysicalObject(playerPhy);
-    // // 
+    // Player physical object
+    PhysicalObject *playerPhy = new PhysicalObject(player);
+    Moveable *playerMoveable = new Moveable(); // set veloctiy here ?
+    
+    playerPhy->addPhysicalProperty(playerMoveable);
+    //
 
-    universe->addController([player, playerAnimation](sf::Event event){
+    physicsManager->addPhysicalObject(playerPhy);
+    //
+    universe->addPhysicsManger(physicsManager);
+    // 
+
+    universe->addController([playerMoveable, playerAnimation](sf::Event event){
         if(event.type == sf::Event::KeyPressed){
             if(event.key.code == sf::Keyboard::D){
-                player->setIsMovingRight(true);
+                playerMoveable->setIsMovingRight(true);
                 playerAnimation->setCurrentAnimationSequence("runRight");
             }
             if(event.key.code == sf::Keyboard::A){
-                player->setIsMovingLeft(true);
+                playerMoveable->setIsMovingLeft(true);
                 playerAnimation->setCurrentAnimationSequence("runLeft");
             }
         }
         if(event.type == sf::Event::KeyReleased){
-            if(event.key.code == sf::Keyboard::D) player->setIsMovingRight(false);
-            if(event.key.code == sf::Keyboard::A) player->setIsMovingLeft(false);
+            if(event.key.code == sf::Keyboard::D) playerMoveable->setIsMovingRight(false);
+            if(event.key.code == sf::Keyboard::A) playerMoveable->setIsMovingLeft(false);
             
             playerAnimation->setCurrentAnimationSequence("idle");
         }
