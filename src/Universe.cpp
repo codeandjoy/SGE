@@ -72,6 +72,13 @@ void Universe::loop(){
             windowPtr->draw(tileSprite);
         }
 
+        // Draw solid object's collision rects if set
+        if(physicsManagerPtr && physicsManagerPtr->drawCollideRects){
+            for(SolidObject *sObject : *physicsManagerPtr->getSolidObjects()){
+                windowPtr->draw(*sObject->getCollisionRect());
+            }
+        }
+
         if(!playerPtr){
             printf("Player is not setup");
         }

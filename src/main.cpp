@@ -11,6 +11,7 @@
 #include "Animation.h"
 #include "PhysicsManager.h"
 #include "PhysicalObject.h"
+#include "SolidObject.h"
 #include "Moveable.h"
 #include "Gravity.h"
 
@@ -54,6 +55,7 @@ int main(){
 
     // Player
     sf::Sprite *player = new sf::Sprite();
+    player->setPosition(sf::Vector2f(100, 50));
     universe->createPlayer(player);
     //
 
@@ -74,11 +76,18 @@ int main(){
     // Player physical object
     PhysicalObject *playerPhy = new PhysicalObject(player);
     Moveable *playerMoveable = new Moveable(); // set veloctiy here ?
+    Gravity *playerGravity = new Gravity(sf::Vector2f(0, .1));
     
     playerPhy->addPhysicalProperty(playerMoveable);
+    playerPhy->addPhysicalProperty(playerGravity);
+    //
+
+    // Player solid object
+    SolidObject *playerSolidObject = new SolidObject(player);
     //
 
     physicsManager->addPhysicalObject(playerPhy);
+    physicsManager->addSolidObject(playerSolidObject);
     //
     universe->addPhysicsManger(physicsManager);
     // 
