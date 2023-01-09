@@ -37,7 +37,7 @@ int main(){
     const auto& layers = map.getLayers();
     const auto& tiles = layers[0]->getLayerAs<tmx::TileLayer>().getTiles();
 
-    std::vector<sf::Sprite> mapTiles; // just sprites, not pointers
+    std::vector<sf::Sprite> mapTiles;
 
     for(int i = 0; i < map.getTileCount().y; i++){
         for(int j = 0; j < map.getTileCount().x; j++){
