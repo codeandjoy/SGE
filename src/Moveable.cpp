@@ -15,6 +15,5 @@ void Moveable::updatePhysicalProperty(sf::Transformable *owner){
 }
 
 void Moveable::move(sf::Transformable *owner, sf::Vector2f movement){
-    printf("MOVING\n");
     owner->setPosition(owner->getPosition() + movement);
 }
