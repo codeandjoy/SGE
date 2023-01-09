@@ -38,15 +38,17 @@ int main(){
     const auto& layers = map.getLayers();
     const auto& tiles = layers[0]->getLayerAs<tmx::TileLayer>().getTiles();
 
-    std::vector<sf::Sprite> mapTiles;
+    std::vector<sf::Sprite*> mapTiles;
 
     for(int i = 0; i < map.getTileCount().y; i++){
         for(int j = 0; j < map.getTileCount().x; j++){
-            sf::Sprite tile;
-            tile.setTexture(*textureManager->get("picoTiles")->getTextureSheet());
-            tile.setTextureRect(textureManager->get("picoTiles")->getTextureRect(tiles[map.getTileCount().x*i+j].ID-1));
-            tile.setPosition(sf::Vector2f(j*map.getTileSize().x, i*map.getTileSize().y));
-            mapTiles.push_back(tile);
+            if(tiles[map.getTileCount().x*i+j].ID != 0){
+                sf::Sprite *tile = new sf::Sprite();
+                tile->setTexture(*textureManager->get("picoTiles")->getTextureSheet());
+                tile->setTextureRect(textureManager->get("picoTiles")->getTextureRect(tiles[map.getTileCount().x*i+j].ID-1));
+                tile->setPosition(sf::Vector2f(j*map.getTileSize().x, i*map.getTileSize().y));
+                mapTiles.push_back(tile);
+            }
         }
     }
     
@@ -74,22 +76,40 @@ int main(){
     PhysicsManager *physicsManager = new PhysicsManager();
     physicsManager->drawCollideRects = true;
 
-    // Player physical object
+    // 
+    // Player
+    // 
+    // PhysicalObject
     PhysicalObject *playerPhy = new PhysicalObject(player);
     Moveable *playerMoveable = new Moveable(); // set veloctiy here ?
     Gravity *playerGravity = new Gravity(sf::Vector2f(0, .1));
     
     playerPhy->addPhysicalProperty(playerMoveable);
     playerPhy->addPhysicalProperty(playerGravity);
-    //
-
-    // Player solid object
+    // SolidObject
     SolidObject *playerSolidObject = new SolidObject(player);
-    //
 
     physicsManager->addPhysicalObject(playerPhy);
     physicsManager->addSolidObject(playerSolidObject);
     //
+    //
+    //
+
+    //
+    // Map
+    //
+    std::vector<SolidObject*> tileSolidObjects;
+    for(sf::Sprite *mapTile : mapTiles){
+        SolidObject *so = new SolidObject(mapTile);
+        tileSolidObjects.push_back(so);    
+    }
+    for(SolidObject *tso : tileSolidObjects){
+        physicsManager->addSolidObject(tso);
+    }
+    //
+    //
+    //
+
     universe->addPhysicsManger(physicsManager);
     // 
 

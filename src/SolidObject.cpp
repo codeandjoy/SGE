@@ -3,10 +3,12 @@
 SolidObject::SolidObject(sf::Sprite *owner){
     ownerPtr = owner;
     
-    updateSolidObject(); // Initialize
+    updateSolidObject(); // init
 
+    // TODO allow to set manually
+    collisionRect.setFillColor(sf::Color(0, 0, 0, 0));
     collisionRect.setOutlineColor(sf::Color::Red);
-    collisionRect.setOutlineThickness(1);
+    collisionRect.setOutlineThickness(.5);
 }
 
 void SolidObject::updateSolidObject(){

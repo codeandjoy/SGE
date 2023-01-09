@@ -6,7 +6,7 @@
 #include "./utils/readTiledMapData.h"
 
 
-void Universe::addMap(std::vector<sf::Sprite> *map){
+void Universe::addMap(std::vector<sf::Sprite*> *map){
     mapPtr = map;
 }
 
@@ -68,8 +68,15 @@ void Universe::loop(){
         // 
 
         // Game draws
-        for(sf::Sprite tileSprite : *mapPtr){
-            windowPtr->draw(tileSprite);
+        for(sf::Sprite *tileSprite : *mapPtr){
+            windowPtr->draw(*tileSprite);
+        }
+        
+        if(!playerPtr){
+            printf("Player is not setup");
+        }
+        else{
+            windowPtr->draw(*playerPtr);
         }
 
         // Draw solid object's collision rects if set
@@ -77,13 +84,6 @@ void Universe::loop(){
             for(SolidObject *sObject : *physicsManagerPtr->getSolidObjects()){
                 windowPtr->draw(*sObject->getCollisionRect());
             }
-        }
-
-        if(!playerPtr){
-            printf("Player is not setup");
-        }
-        else{
-            windowPtr->draw(*playerPtr);
         }
         // 
 
