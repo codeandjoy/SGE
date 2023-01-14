@@ -53,6 +53,7 @@ void Universe::loop(){
 
         // Game updates
         physicsManager.updatePhysics();
+        collisionManager.updateCollisions();
 
         if(!animations.empty()){
             for(Animation *animation : animations){

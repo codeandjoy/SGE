@@ -6,6 +6,7 @@
 #include "Entity.h"
 #include "PhysicalObject.h"
 #include "PhysicsManager.h"
+#include "CollisionManager.h"
 #include "Animation.h"
 
 
@@ -19,6 +20,7 @@ class Universe{
         void loop();
 
         PhysicsManager physicsManager;
+        CollisionManager collisionManager;
 
     private:
         sf::RenderWindow *windowPtr;

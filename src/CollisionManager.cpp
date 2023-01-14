@@ -2,19 +2,19 @@
 
 void CollisionManager::createCollisionGroup(std::string name, CollisionGroupType type, std::vector<sf::Sprite*> spriteVec){
     // TODO check if already exists (has length)
-    collisionGroups[name] = CollisionGroup(spriteVec, type);
+    collisionGroups[name] = CollisionGroup {type, spriteVec};
 }
 
 void CollisionManager::createCollisionPair(std::string name, std::string group1, std::string group2){
     // TODO Check if both groups exist in collisionGroups
-    collisionPairs[name] = CollisionPair(std::make_tuple(group1, group2));
+    collisionPairs[name] = CollisionPair{std::make_tuple(group1, group2)};
 }
 
 void CollisionManager::addCollisionResponse(std::string collisionPairName, const std::function<void()> &response){
     collisionPairs[collisionPairName].collisionResponses.push_back(response); // ! maybe pointer error here
 }
 
-void CollisionManager::run(){
+void CollisionManager::updateCollisions(){
     // TODO check if any collision pairs are added
 
     for(auto const& [name, pair] : collisionPairs){

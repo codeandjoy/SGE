@@ -6,14 +6,9 @@
 
 
 struct CollisionGroup{
-    std::vector<sf::Sprite*> spriteVec;
     CollisionGroupType collisionGroupType;
-
-    CollisionGroup(std::vector<sf::Sprite*> spriteVec_, CollisionGroupType collisionGroupType_){
-        spriteVec = spriteVec_;
-        collisionGroupType = collisionGroupType_;
-    }
+    std::vector<sf::Sprite*> spriteVec;
 };
 
 
-#endif COLLISION_GROUP_H
+#endif

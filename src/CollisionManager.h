@@ -13,7 +13,7 @@ class CollisionManager{
     void createCollisionPair(std::string name, std::string group1, std::string group2);
     void addCollisionResponse(std::string collisionPairName, const std::function<void()> &response);
 
-    void run();
+    void updateCollisions();
 
     private:
     std::map<std::string, CollisionGroup> collisionGroups;

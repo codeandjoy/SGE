@@ -14,6 +14,7 @@
 #include "SolidObject.h"
 #include "Moveable.h"
 #include "Gravity.h"
+#include "CollisionGroupType.h"
 
 
 int main(){
@@ -71,7 +72,6 @@ int main(){
     universe->addAnimation(playerAnimation);
     //
 
-    // Physics
     // PhysicsManager
     universe->physicsManager.drawCollideRects = true;
 
@@ -87,30 +87,42 @@ int main(){
     playerPhy->addPhysicalProperty(playerMoveable);
     playerPhy->addPhysicalProperty(playerGravity);
     
-    // SolidObject
-    SolidObject *playerSolidObject = new SolidObject(player);
+    // // SolidObject
+    // SolidObject *playerSolidObject = new SolidObject(player);
 
     universe->physicsManager.addPhysicalObject(playerPhy);
-    universe->physicsManager.addSolidObject(playerSolidObject);
+    // universe->physicsManager.addSolidObject(playerSolidObject);
 
     //
     //
     //
 
+    // //
+    // // Map
+    // //
+    // std::vector<SolidObject*> tileSolidObjects;
+    // for(sf::Sprite *mapTile : mapTiles){
+    //     SolidObject *so = new SolidObject(mapTile);
+    //     tileSolidObjects.push_back(so);    
+    // }
+    // for(SolidObject *tso : tileSolidObjects){
+    //     universe->physicsManager.addSolidObject(tso);
+    // }
+    // //
+    // //
+    // //
     //
-    // Map
-    //
-    std::vector<SolidObject*> tileSolidObjects;
-    for(sf::Sprite *mapTile : mapTiles){
-        SolidObject *so = new SolidObject(mapTile);
-        tileSolidObjects.push_back(so);    
-    }
-    for(SolidObject *tso : tileSolidObjects){
-        universe->physicsManager.addSolidObject(tso);
-    }
-    //
-    //
-    //
+
+    // CollisionManager
+
+    universe->collisionManager.createCollisionGroup("player", moveable, std::vector<sf::Sprite*>{player});
+    universe->collisionManager.createCollisionGroup("tiles", solid, mapTiles);
+    universe->collisionManager.createCollisionPair("PTCollisionPair", "player", "tiles");
+    int counter = 0;
+    universe->collisionManager.addCollisionResponse("PTCollisionPair", [&counter](){
+        printf("COLLISION%d\n", counter);
+        counter++;
+    });
     //
 
     universe->addController([playerMoveable, playerAnimation](sf::Event event){
