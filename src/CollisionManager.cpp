@@ -24,7 +24,7 @@ void CollisionManager::updateCollisions(){
         for(sf::Sprite *spriteCG0 : collisionGroups[std::get<0>(pair.collisionGroups)].spriteVec){
             for(sf::Sprite *spriteCG1 : collisionGroups[std::get<1>(pair.collisionGroups)].spriteVec){
                 if(spriteCG0->getGlobalBounds().intersects(spriteCG1->getGlobalBounds())){
-                    // TODO check if any collisionResponses exist
+                    // TODO check if any collisionResponses exist (print message?)
 
                     for(std::function collisionResponse : pair.collisionResponses){
                         collisionResponse();

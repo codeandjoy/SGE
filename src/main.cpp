@@ -73,50 +73,21 @@ int main(){
     //
 
     // PhysicsManager
-    universe->physicsManager.drawCollideRects = true;
+    universe->physicsManager.drawCollideRects = true; // TODO move to CollisionManager
 
-    // 
-    // Player
-    // 
-
-    // PhysicalObject
     PhysicalObject *playerPhy = new PhysicalObject(player);
-    Moveable *playerMoveable = new Moveable(); // set veloctiy here ?
+    Moveable *playerMoveable = new Moveable(); // ? set veloctiy here ?
     Gravity *playerGravity = new Gravity(sf::Vector2f(0, .1));
     
     playerPhy->addPhysicalProperty(playerMoveable);
     playerPhy->addPhysicalProperty(playerGravity);
     
-    // // SolidObject
-    // SolidObject *playerSolidObject = new SolidObject(player);
-
     universe->physicsManager.addPhysicalObject(playerPhy);
-    // universe->physicsManager.addSolidObject(playerSolidObject);
-
-    //
-    //
-    //
-
-    // //
-    // // Map
-    // //
-    // std::vector<SolidObject*> tileSolidObjects;
-    // for(sf::Sprite *mapTile : mapTiles){
-    //     SolidObject *so = new SolidObject(mapTile);
-    //     tileSolidObjects.push_back(so);    
-    // }
-    // for(SolidObject *tso : tileSolidObjects){
-    //     universe->physicsManager.addSolidObject(tso);
-    // }
-    // //
-    // //
-    // //
     //
 
     // CollisionManager
-
-    universe->collisionManager.createCollisionGroup("player", moveable, std::vector<sf::Sprite*>{player});
-    universe->collisionManager.createCollisionGroup("tiles", solid, mapTiles);
+    universe->collisionManager.createCollisionGroup("player", CollisionGroupType::moveable, std::vector<sf::Sprite*>{player});
+    universe->collisionManager.createCollisionGroup("tiles", CollisionGroupType::solid, mapTiles);
     universe->collisionManager.createCollisionPair("PTCollisionPair", "player", "tiles");
     int counter = 0;
     universe->collisionManager.addCollisionResponse("PTCollisionPair", [&counter](){
