@@ -16,15 +16,15 @@ class Universe{
         void setupWindow(sf::RenderWindow *window);
         void addController(const std::function<void (sf::Event event)> &lambdaController);
         void addAnimation(Animation *animation);
-        void addPhysicsManger(PhysicsManager *physicsManager);
         void loop();
+
+        PhysicsManager physicsManager;
 
     private:
         sf::RenderWindow *windowPtr;
         std::vector<sf::Sprite*> *mapPtr;
         std::vector<std::function<void (sf::Event event)>> controllers;
         sf::Sprite *playerPtr;
-        PhysicsManager *physicsManagerPtr;
         std::vector<Animation*> animations;
 };
 

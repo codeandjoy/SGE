@@ -73,12 +73,12 @@ int main(){
 
     // Physics
     // PhysicsManager
-    PhysicsManager *physicsManager = new PhysicsManager();
-    physicsManager->drawCollideRects = true;
+    universe->physicsManager.drawCollideRects = true;
 
     // 
     // Player
     // 
+
     // PhysicalObject
     PhysicalObject *playerPhy = new PhysicalObject(player);
     Moveable *playerMoveable = new Moveable(); // set veloctiy here ?
@@ -86,11 +86,13 @@ int main(){
     
     playerPhy->addPhysicalProperty(playerMoveable);
     playerPhy->addPhysicalProperty(playerGravity);
+    
     // SolidObject
     SolidObject *playerSolidObject = new SolidObject(player);
 
-    physicsManager->addPhysicalObject(playerPhy);
-    physicsManager->addSolidObject(playerSolidObject);
+    universe->physicsManager.addPhysicalObject(playerPhy);
+    universe->physicsManager.addSolidObject(playerSolidObject);
+
     //
     //
     //
@@ -104,14 +106,12 @@ int main(){
         tileSolidObjects.push_back(so);    
     }
     for(SolidObject *tso : tileSolidObjects){
-        physicsManager->addSolidObject(tso);
+        universe->physicsManager.addSolidObject(tso);
     }
     //
     //
     //
-
-    universe->addPhysicsManger(physicsManager);
-    // 
+    //
 
     universe->addController([playerMoveable, playerAnimation](sf::Event event){
         if(event.type == sf::Event::KeyPressed){

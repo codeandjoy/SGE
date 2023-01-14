@@ -22,10 +22,6 @@ void Universe::addController(const std::function<void (sf::Event event)> &lambda
     controllers.push_back(lambdaController);
 }
 
-void Universe::addPhysicsManger(PhysicsManager *physicsManager){
-    physicsManagerPtr = physicsManager;
-}
-
 void Universe::addAnimation(Animation *animation){
     animations.push_back(animation);
 }
@@ -56,9 +52,7 @@ void Universe::loop(){
         windowPtr->clear();
 
         // Game updates
-        if(physicsManagerPtr){
-            physicsManagerPtr->updatePhysics();
-        }
+        physicsManager.updatePhysics();
 
         if(!animations.empty()){
             for(Animation *animation : animations){
@@ -80,8 +74,8 @@ void Universe::loop(){
         }
 
         // Draw solid object's collision rects if set
-        if(physicsManagerPtr && physicsManagerPtr->drawCollideRects){
-            for(SolidObject *sObject : *physicsManagerPtr->getSolidObjects()){
+        if(physicsManager.drawCollideRects){
+            for(SolidObject *sObject : *physicsManager.getSolidObjects()){
                 windowPtr->draw(*sObject->getCollisionRect());
             }
         }
