@@ -11,7 +11,7 @@ void CollisionManager::createCollisionPair(std::string name, std::string group1,
 }
 
 void CollisionManager::addCollisionResponse(std::string collisionPairName, const std::function<void()> &response){
-    collisionPairs[collisionPairName].collisionResponses.push_back(response); // ! maybe pointer error here
+    collisionPairs[collisionPairName].collisionResponses.push_back(response);
 }
 
 void CollisionManager::updateCollisions(){
