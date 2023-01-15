@@ -3,7 +3,7 @@
 
 
 #include <SFML/Graphics.hpp>
-#include "PhysicalPropery.h"
+#include "PhysicalProperty.h"
 
 class Gravity : public PhysicalProperty{
     public:

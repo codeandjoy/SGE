@@ -2,7 +2,7 @@
 #define MOVEABLE_H
 
 #include "SFML/Graphics.hpp"
-#include "PhysicalPropery.h"
+#include "PhysicalProperty.h"
 
 class Moveable : public PhysicalProperty{
     public:
