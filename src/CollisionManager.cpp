@@ -20,7 +20,7 @@ void CollisionManager::updateCollisions(){
     for(auto const& [name, pair] : collisionPairs){
         // ! Hand coded bounding box collision detection
         // ? Expand with circle and pixel perfect
-        // Check collision between each sprite in pairs
+        // Check collision between each sprite in pairs of groups
         for(sf::Sprite *spriteCG0 : collisionGroups[std::get<0>(pair.collisionGroups)].spriteVec){
             for(sf::Sprite *spriteCG1 : collisionGroups[std::get<1>(pair.collisionGroups)].spriteVec){
                 if(spriteCG0->getGlobalBounds().intersects(spriteCG1->getGlobalBounds())){
@@ -32,8 +32,5 @@ void CollisionManager::updateCollisions(){
                 }
             }
         }
-
-        // check all in each group vector for collisions
     }
-    // if collision pair collides run every function in it's vector of responses
 }
