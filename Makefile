@@ -2,6 +2,9 @@
 
 OUT = build/main.out
 
+_headers = TextureSheetSizes.h PhysicalProperty.h CollisionGroup.h CollisionGroupType.h CollisionPair.h CollisionResponses.h
+headers = $(addprefix src/,$(_headers))
+
 _src = main.cpp Universe.cpp utils/readTiledMapData.cpp Entity.cpp PhysicalObject.cpp Gravity.cpp TextureSheet.cpp Animation.cpp TextureManager.cpp PhysicsManager.cpp Moveable.cpp SolidObject.cpp CollisionManager.cpp
 src = $(addprefix src/,$(_src))
 
@@ -15,7 +18,7 @@ all: $(OUT)
 $(OUT): $(objects)
 	g++ -o $(OUT) $(objects) $(lib)
 
-$(objects): $(src)
+$(objects): $(src) $(headers)
 	g++ -c $(src); \
 	mkdir -p ./build/obj; \
 	mv *.o ./build/obj;
