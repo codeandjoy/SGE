@@ -7,7 +7,7 @@
 
 
 // ? allow to add an 'area' where collisions get calculated 
-// ? addToGroup(...), removeFromGroup(...), reloadGroup(...) (checks if pointers are still valid), removePair(...)
+// ? addToGroup(...), removeFromGroup(...), reloadGroup(...) (checks if pointers are still valid), removePair(...), removeCOllisionResponse(...)
 class CollisionManager{
     public:
     void createCollisionGroup(std::string name, CollisionGroupType type, std::vector<sf::Sprite*> spriteVec); // TODO Overload 3rd argument with sf::Sprite *sprite (and automatically create a vector)

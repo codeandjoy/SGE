@@ -93,6 +93,7 @@ int main(){
     universe->collisionManager.addCollisionResponse("PTCollisionPair", [&counter](){
         printf("COLLISION%d\n", counter);
         counter++;
+        
     });
     //
 
