@@ -15,6 +15,7 @@
 #include "Moveable.h"
 #include "Gravity.h"
 #include "CollisionGroupType.h"
+#include "CollisionResponses.h"
 
 
 int main(){
@@ -89,12 +90,14 @@ int main(){
     universe->collisionManager.createCollisionGroup("player", CollisionGroupType::moveable, std::vector<sf::Sprite*>{player});
     universe->collisionManager.createCollisionGroup("tiles", CollisionGroupType::solid, mapTiles);
     universe->collisionManager.createCollisionPair("PTCollisionPair", "player", "tiles");
+   
     int counter = 0;
-    universe->collisionManager.addCollisionResponse("PTCollisionPair", [&counter](){
+    universe->collisionManager.addCollisionResponse("PTCollisionPair", [&counter](sf::Sprite *sprite1, sf::Sprite *sprite2){
         printf("COLLISION%d\n", counter);
         counter++;
-        
     });
+
+    universe->collisionManager.addCollisionResponse("PTCollisionPair", repel);
     //
 
     universe->addController([playerMoveable, playerAnimation](sf::Event event){

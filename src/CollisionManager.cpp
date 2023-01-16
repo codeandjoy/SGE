@@ -10,7 +10,7 @@ void CollisionManager::createCollisionPair(std::string name, std::string group1,
     collisionPairs[name] = CollisionPair{std::make_tuple(group1, group2)};
 }
 
-void CollisionManager::addCollisionResponse(std::string collisionPairName, const std::function<void()> &response){
+void CollisionManager::addCollisionResponse(std::string collisionPairName, const std::function<void(sf::Sprite *sprite1, sf::Sprite *sprite2)> &response){
     collisionPairs[collisionPairName].collisionResponses.push_back(response);
 }
 
@@ -27,7 +27,8 @@ void CollisionManager::updateCollisions(){
                     // TODO check if any collisionResponses exist (print message?)
 
                     for(std::function collisionResponse : pair.collisionResponses){
-                        collisionResponse();
+                        // ? passes 'informantion' structure to response with collision informantion (like side, depth etc.)
+                        collisionResponse(spriteCG0, spriteCG1);
                     }
                 }
             }
