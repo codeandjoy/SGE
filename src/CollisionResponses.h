@@ -6,21 +6,39 @@
 
 void repel(sf::Sprite *sprite1, sf::Sprite *sprite2){
     float y1 = sprite1->getPosition().y;
+    float x1 = sprite1->getPosition().x;
     float height1 = sprite1->getGlobalBounds().height;
+    float width1 = sprite1->getGlobalBounds().width;
     float y2 = sprite2->getPosition().y;
+    float x2 = sprite2->getPosition().x;
     float height2 = sprite2->getGlobalBounds().height;
+    float width2 = sprite2->getGlobalBounds().width;
 
-    if(y1 + height1 > y2){
-        sprite1->setPosition(sprite1->getPosition().x, y2-height1);
+    bool btm = false, lt = false, rt = false; // Collision side flags
+
+    // Bottom
+    if(y1 + height1 > y2 && y1 + height1 < y2 + 1){
+        sprite1->setPosition(sprite1->getPosition().x, y2 - height1);
+        btm = true;
     }
+
+    // TODO same as btm (1px)
+
+    // Left
+    if(x1 < x2 + width2 && x1 > x2 + width2 - 1 && btm == false){
+        sprite1->setPosition(x2 + width2, sprite1->getPosition().y);
+        lt = true;
+    }
+
+    // Right
+    if(x1 + width1 > x2 && x1 + width1 < x2 + 1 && btm == false){
+        sprite1->setPosition(x2 - width1, sprite1->getPosition().y);
+    }
+
 
     printf("%f\n", sprite1->getPosition().y);
     printf("%f\n", sprite1->getGlobalBounds().height);
     printf("%f\n", sprite2->getPosition().y);
-    // the one that's moveable should change it's position to the 'outside' of solid one
-        //      determine side on which collision occurred
-        //      determine offset
-        //      change moveable sprite's offset accordingly
 }
 
 

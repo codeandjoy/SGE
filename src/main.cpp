@@ -100,7 +100,7 @@ int main(){
     universe->collisionManager.addCollisionResponse("PTCollisionPair", repel);
     //
 
-    universe->addController([playerMoveable, playerAnimation](sf::Event event){
+    universe->addController([player, playerMoveable, playerAnimation](sf::Event event){
         if(event.type == sf::Event::KeyPressed){
             if(event.key.code == sf::Keyboard::D){
                 playerMoveable->setIsMovingRight(true);
