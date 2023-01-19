@@ -1,10 +1,11 @@
 #ifndef ANIMATION_H
 #define ANIMATION_H
 
-
 #include <SFML/Graphics.hpp>
 #include "TextureSheet.h"
 
+
+// TODO Animations should switch immediately
 class Animation{
     public:
         Animation(TextureSheet *spritesheet, sf::Sprite *owner, int initialTextureN);

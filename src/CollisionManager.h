@@ -3,8 +3,8 @@
 
 #include "SFML/Graphics.hpp"
 #include "CollisionGroup.h"
-#include "CollisionPair.h"
 #include "CollisionGroupType.h"
+#include "CollisionPair.h"
 
 
 // ? allow to add an 'area' where collisions get calculated 

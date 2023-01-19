@@ -1,11 +1,11 @@
 #ifndef TEXTURESHEET_H
 #define TEXTURESHEET_H
 
-
 #include <SFML/Graphics.hpp>
 #include "TextureSheetSizes.h"
 
-// TODO textureset with gaps
+
+// TODO texturesheet with gaps between textures
 class TextureSheet{
     public:
         TextureSheet(TextureSheetSizes tss, std::string location);
@@ -16,7 +16,7 @@ class TextureSheet{
         sf::IntRect getTextureRect(int textureN);
 
     private:
-        std::string location; // texture sheet image location
+        std::string location;
         sf::Texture textureSheet;
         std::vector<sf::IntRect> textureRects;
 };

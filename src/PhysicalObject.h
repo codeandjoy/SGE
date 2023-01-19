@@ -1,9 +1,9 @@
 #ifndef PHYSICAL_OBJECT_H
 #define PHYSICAL_OBJECT_H
 
-
 #include <SFML/Graphics.hpp>
 #include "PhysicalProperty.h"
+
 
 class PhysicalObject{
     public:

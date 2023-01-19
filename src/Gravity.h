@@ -1,9 +1,9 @@
 #ifndef GRAVITY_H
 #define GRAVITY_H
 
-
 #include <SFML/Graphics.hpp>
 #include "PhysicalProperty.h"
+
 
 class Gravity : public PhysicalProperty{
     public:

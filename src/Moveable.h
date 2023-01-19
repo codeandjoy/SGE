@@ -4,6 +4,7 @@
 #include "SFML/Graphics.hpp"
 #include "PhysicalProperty.h"
 
+
 class Moveable : public PhysicalProperty{
     public:
         void setIsMovingTop(bool is);

@@ -1,9 +1,6 @@
 #include <iostream>
 
-#include <jsoncpp/json/json.h>
-
 #include "Universe.h"
-#include "./utils/readTiledMapData.h"
 
 
 void Universe::addMap(std::vector<sf::Sprite*> *map){
@@ -67,18 +64,8 @@ void Universe::loop(){
             windowPtr->draw(*tileSprite);
         }
         
-        if(!playerPtr){
-            printf("Player is not setup");
-        }
-        else{
+        if(playerPtr){
             windowPtr->draw(*playerPtr);
-        }
-
-        // Draw solid object's collision rects if set
-        if(physicsManager.drawCollideRects){
-            for(SolidObject *sObject : *physicsManager.getSolidObjects()){
-                windowPtr->draw(*sObject->getCollisionRect());
-            }
         }
         // 
 

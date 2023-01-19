@@ -31,6 +31,7 @@ void repel(sf::Sprite *sprite1, sf::Sprite *sprite2){
     // Right
     if(x1 + width1 > x2 && x1 + width1 < x2 + 1 && btm == false){
         sprite1->setPosition(x2 - width1, sprite1->getPosition().y);
+        rt = true;
     }
 
 

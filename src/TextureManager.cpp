@@ -6,7 +6,6 @@ void TextureManager::load(std::string textureLocation, TextureSheetSizes texture
         exit(1);
     }
 
-    // TextureSheet ts(textureSheetSizes, textureLocation);
     loadedTextures[textureName] = new TextureSheet(textureSheetSizes, textureLocation);
 }
 

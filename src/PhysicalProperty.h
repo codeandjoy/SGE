@@ -1,8 +1,8 @@
 #ifndef PHYSICAL_PROPERTY_H
 #define PHYSICAL_PROPERTY_H
 
-
 #include <SFML/Graphics.hpp>
+
 
 class PhysicalProperty{
     public:
