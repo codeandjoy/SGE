@@ -3,7 +3,7 @@
 #include "Universe.h"
 
 
-void Universe::addMap(std::vector<sf::Sprite*> *map){
+void Universe::addMap(std::vector<PhysicalObject*> *map){
     mapPtr = map;
 }
 

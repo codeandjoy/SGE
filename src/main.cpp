@@ -41,12 +41,14 @@ int main(){
     const auto& layers = map.getLayers();
     const auto& tiles = layers[0]->getLayerAs<tmx::TileLayer>().getTiles();
 
-    std::vector<sf::Sprite*> mapTiles;
+    std::vector<PhysicalObject*> mapTiles;
 
     for(int i = 0; i < map.getTileCount().y; i++){
         for(int j = 0; j < map.getTileCount().x; j++){
             if(tiles[map.getTileCount().x*i+j].ID != 0){
-                sf::Sprite *tile = new sf::Sprite();
+                PhysicalObject *tile = new PhysicalObject();
+                tile->setIsFlying(true);
+
                 tile->setTexture(*textureManager->get("picoTiles")->getTextureSheet());
                 tile->setTextureRect(textureManager->get("picoTiles")->getTextureRect(tiles[map.getTileCount().x*i+j].ID-1));
                 tile->setPosition(sf::Vector2f(j*map.getTileSize().x, i*map.getTileSize().y));
@@ -59,9 +61,11 @@ int main(){
     // 
 
     // Player
-    sf::Sprite *player = new sf::Sprite();
+    PhysicalObject *player = new PhysicalObject();
+    player->setMass(.1);
     player->setPosition(sf::Vector2f(100, 50));
     universe->createPlayer(player);
+    universe->physicsManager.addPhysicalObject(player);
     //
 
     // Player animation
@@ -74,19 +78,8 @@ int main(){
     universe->addAnimation(playerAnimation);
     //
 
-    // PhysicsManager
-    PhysicalObject *playerPhy = new PhysicalObject(player);
-    Moveable *playerMoveable = new Moveable(); // ? set veloctiy here ?
-    Gravity *playerGravity = new Gravity(sf::Vector2f(0, .1));
-    
-    playerPhy->addPhysicalProperty(playerMoveable);
-    playerPhy->addPhysicalProperty(playerGravity);
-    
-    universe->physicsManager.addPhysicalObject(playerPhy);
-    //
-
     // CollisionManager
-    universe->collisionManager.createCollisionGroup("player", CollisionGroupType::moveable, std::vector<sf::Sprite*>{player});
+    universe->collisionManager.createCollisionGroup("player", CollisionGroupType::moveable, std::vector<PhysicalObject*>{player});
     universe->collisionManager.createCollisionGroup("tiles", CollisionGroupType::solid, mapTiles);
     universe->collisionManager.createCollisionPair("PTCollisionPair", "player", "tiles");
    
@@ -99,20 +92,21 @@ int main(){
     universe->collisionManager.addCollisionResponse("PTCollisionPair", repel);
     //
 
-    universe->addController([playerMoveable, playerAnimation](sf::Event event){
+    // TODO use movement functions on player PhysicalObject
+    universe->addController([player, playerAnimation](sf::Event event){
         if(event.type == sf::Event::KeyPressed){
             if(event.key.code == sf::Keyboard::D){
-                playerMoveable->setIsMovingRight(true);
+                player->setMovementVector(sf::Vector2f(.1, 0)); 
                 playerAnimation->setCurrentAnimationSequence("runRight");
             }
             if(event.key.code == sf::Keyboard::A){
-                playerMoveable->setIsMovingLeft(true);
+                player->setMovementVector(sf::Vector2f(-.1, 0));
                 playerAnimation->setCurrentAnimationSequence("runLeft");
             }
         }
         if(event.type == sf::Event::KeyReleased){
-            if(event.key.code == sf::Keyboard::D) playerMoveable->setIsMovingRight(false);
-            if(event.key.code == sf::Keyboard::A) playerMoveable->setIsMovingLeft(false);
+            if(event.key.code == sf::Keyboard::D) player->movementStopX(); // ! Lags
+            if(event.key.code == sf::Keyboard::A) player->movementStopX(); // ! Lags
             
             playerAnimation->setCurrentAnimationSequence("idle");
         }

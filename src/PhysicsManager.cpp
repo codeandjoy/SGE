@@ -7,6 +7,12 @@ void PhysicsManager::addPhysicalObject(PhysicalObject *physicalObject){
 void PhysicsManager::updatePhysics(){
     // TODO check if any physical objects exist
     for(PhysicalObject *pObject : physicalObjects){
-        pObject->updatePhysics();
+        // * Gravity
+        if(!pObject->getIsFlying()){
+            pObject->setMovementVectorY(pObject->getMass());
+        }
+        // *
+
+        pObject->update();
     }
 }

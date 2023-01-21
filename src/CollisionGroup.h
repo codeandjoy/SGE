@@ -7,7 +7,7 @@
 
 struct CollisionGroup{
     CollisionGroupType collisionGroupType;
-    std::vector<sf::Sprite*> spriteVec;
+    std::vector<PhysicalObject*> spriteVec;
 };
 
 

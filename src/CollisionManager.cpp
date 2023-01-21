@@ -1,6 +1,6 @@
 #include "CollisionManager.h"
 
-void CollisionManager::createCollisionGroup(std::string name, CollisionGroupType type, std::vector<sf::Sprite*> spriteVec){
+void CollisionManager::createCollisionGroup(std::string name, CollisionGroupType type, std::vector<PhysicalObject*> spriteVec){
     // TODO check if already exists (has length)
     collisionGroups[name] = CollisionGroup {type, spriteVec};
 }
