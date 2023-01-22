@@ -5,6 +5,18 @@ void PhysicalObject::setMovementVectorX(float x){ movementVector = sf::Vector2f(
 void PhysicalObject::setMovementVectorY(float y){ movementVector = sf::Vector2f(movementVector.x, y); }
 sf::Vector2f PhysicalObject::getMovementVector(){ return movementVector; }
 
+void PhysicalObject::createAction(std::string _name, std::function<void()> _action){
+    actions[_name] = _action;
+}
+
+void PhysicalObject::doAction(std::string actionName){
+    if(!actions.count(actionName)){
+        printf("Action '%s' does not exist\n", actionName.c_str());
+        return;
+    }
+
+    actions[actionName]();
+}
 
 void PhysicalObject::setMass(float _mass){ mass = _mass; }
 float PhysicalObject::getMass(){ return mass; }

@@ -62,6 +62,9 @@ int main(){
     PhysicalObject *player = new PhysicalObject();
     player->setMass(.1);
     player->setPosition(sf::Vector2f(100, 50));
+    player->createAction("jump", [](){
+        printf("Jumping\n");
+    });
     universe->createPlayer(player);
     universe->physicsManager.addPhysicalObject(player);
     //
@@ -80,12 +83,6 @@ int main(){
     universe->collisionManager.createCollisionGroup("player", CollisionGroupType::moveable, std::vector<PhysicalObject*>{player});
     universe->collisionManager.createCollisionGroup("tiles", CollisionGroupType::solid, mapTiles);
     universe->collisionManager.createCollisionPair("PTCollisionPair", "player", "tiles");
-   
-    int counter = 0;
-    universe->collisionManager.addCollisionResponse("PTCollisionPair", [&counter](sf::Sprite *sprite1, sf::Sprite *sprite2){
-        printf("COLLISION%d\n", counter);
-        counter++;
-    });
 
     universe->collisionManager.addCollisionResponse("PTCollisionPair", repel);
     //
@@ -100,6 +97,9 @@ int main(){
             if(event.key.code == sf::Keyboard::A){
                 player->setMovementVector(sf::Vector2f(-.1, 0));
                 playerAnimation->setCurrentAnimationSequence("runLeft");
+            }
+            if(event.key.code == sf::Keyboard::Space){
+                player->doAction("jump");
             }
         }
         if(event.type == sf::Event::KeyReleased){

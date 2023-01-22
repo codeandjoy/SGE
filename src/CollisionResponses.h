@@ -33,11 +33,6 @@ void repel(sf::Sprite *sprite1, sf::Sprite *sprite2){
         sprite1->setPosition(x2 - width1, sprite1->getPosition().y);
         rt = true;
     }
-
-
-    printf("%f\n", sprite1->getPosition().y);
-    printf("%f\n", sprite1->getGlobalBounds().height);
-    printf("%f\n", sprite2->getPosition().y);
 }
 
 
