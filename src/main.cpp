@@ -11,8 +11,6 @@
 #include "Animation.h"
 #include "PhysicsManager.h"
 #include "PhysicalObject.h"
-#include "Moveable.h"
-#include "Gravity.h"
 #include "CollisionGroupType.h"
 #include "CollisionResponses.h"
 

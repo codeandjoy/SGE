@@ -2,7 +2,6 @@
 #define PHYSICAL_OBJECT_H
 
 #include <SFML/Graphics.hpp>
-#include "PhysicalProperty.h"
 
 
 class PhysicalObject : public sf::Sprite{
