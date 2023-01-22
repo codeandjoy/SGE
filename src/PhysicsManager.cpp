@@ -4,7 +4,7 @@ void PhysicsManager::addPhysicalObject(PhysicalObject *physicalObject){
     physicalObjects.push_back(physicalObject);
 }
 
-void PhysicsManager::updatePhysics(){
+void PhysicsManager::updatePhysics(float dt){
     // TODO check if any physical objects exist
     for(PhysicalObject *pObject : physicalObjects){
         // * Gravity
@@ -13,6 +13,6 @@ void PhysicsManager::updatePhysics(){
         }
         // *
 
-        pObject->update();
+        pObject->update(dt);
     }
 }

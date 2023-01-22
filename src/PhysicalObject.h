@@ -27,7 +27,7 @@ class PhysicalObject : public sf::Sprite{
     void movementStopY();
     // ? void setVelocityCap(...) (sets max possible velocity vector values)
     // ? setMovementFunction(lambda) (sets movement algorithm (e.g. acceleration -> keeping velocity -> slowing down -> stop))
-    void update(); // TODO accepts delta time
+    void update(float dt);
 
     private:
     sf::Vector2f movementVector = sf::Vector2f(0, 0);

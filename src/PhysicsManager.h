@@ -7,7 +7,7 @@
 class PhysicsManager{
     public:
         void addPhysicalObject(PhysicalObject *physicalObject);
-        void updatePhysics();
+        void updatePhysics(float dt);
 
     private:
         std::vector<PhysicalObject*> physicalObjects;

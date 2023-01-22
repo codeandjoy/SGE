@@ -34,7 +34,9 @@ void PhysicalObject::movementStopY(){
     movementVector = sf::Vector2f(movementVector.x, 0);
 };
 
-void PhysicalObject::update(){
+void PhysicalObject::update(float dt){
     // Movement
-    setPosition(getPosition()+movementVector);
+    sf::Vector2f mvTemp = movementVector * dt;
+    printf("%f, %f\n", mvTemp.x, mvTemp.y);
+    setPosition(getPosition() + movementVector * dt);
 };

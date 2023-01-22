@@ -60,7 +60,7 @@ int main(){
 
     // Player
     PhysicalObject *player = new PhysicalObject();
-    player->setMass(.1);
+    player->setMass(100);
     player->setPosition(sf::Vector2f(100, 50));
     player->createAction("jump", [](){
         printf("Jumping\n");
@@ -91,11 +91,11 @@ int main(){
     universe->addController([player, playerAnimation](sf::Event event){
         if(event.type == sf::Event::KeyPressed){
             if(event.key.code == sf::Keyboard::D){
-                player->setMovementVector(sf::Vector2f(.1, 0)); 
+                player->setMovementVector(sf::Vector2f(100, 0)); 
                 playerAnimation->setCurrentAnimationSequence("runRight");
             }
             if(event.key.code == sf::Keyboard::A){
-                player->setMovementVector(sf::Vector2f(-.1, 0));
+                player->setMovementVector(sf::Vector2f(-100, 0));
                 playerAnimation->setCurrentAnimationSequence("runLeft");
             }
             if(event.key.code == sf::Keyboard::Space){

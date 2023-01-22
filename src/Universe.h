@@ -22,6 +22,7 @@ class Universe{
         CollisionManager collisionManager;
 
     private:
+        sf::Clock deltaClock;
         sf::RenderWindow *windowPtr;
         sf::Sprite *playerPtr; // ! for drawing
         std::vector<PhysicalObject*> *mapPtr; // ! for drawing

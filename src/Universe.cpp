@@ -29,11 +29,15 @@ void Universe::loop(){
         exit(1);
     }
 
+    // Clocks initialization
     if(!animations.empty()){
         for(Animation *animation : animations){
             animation->restartClock();
         }
     }
+
+    deltaClock.restart();
+    //
 
     while(windowPtr->isOpen()){
         sf::Event event;
@@ -48,8 +52,15 @@ void Universe::loop(){
 
         windowPtr->clear();
 
+        // Calculate dt
+        sf::Time deltaTime = deltaClock.restart();
+        float dt = deltaTime.asSeconds();
+        if(dt > 0.15f) dt = 0.15f;
+        //
+
+
         // Game updates
-        physicsManager.updatePhysics();
+        physicsManager.updatePhysics(dt);
         collisionManager.updateCollisions();
 
         if(!animations.empty()){
