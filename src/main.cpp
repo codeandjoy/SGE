@@ -88,25 +88,20 @@ int main(){
     //
 
     // TODO use movement functions on player PhysicalObject
-    universe->addController([player, playerAnimation](sf::Event event){
+    universe->addController([player, playerAnimation](){
         // ! TODO CHANGE TO ISKEYPRESSED !
-        if(event.type == sf::Event::KeyPressed){
-            if(event.key.code == sf::Keyboard::D){
-                player->setMovementVector(sf::Vector2f(100, 0)); 
-                playerAnimation->setCurrentAnimationSequence("runRight");
-            }
-            if(event.key.code == sf::Keyboard::A){
-                player->setMovementVector(sf::Vector2f(-100, 0));
-                playerAnimation->setCurrentAnimationSequence("runLeft");
-            }
-            if(event.key.code == sf::Keyboard::Space){
-                player->doAction("jump");
-            }
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::A)){
+            player->setMovementVector(sf::Vector2f(-100, 0));
+            playerAnimation->setCurrentAnimationSequence("runLeft");
         }
-        if(event.type == sf::Event::KeyReleased){
-            if(event.key.code == sf::Keyboard::D) player->movementStopX(); // ! Lags
-            if(event.key.code == sf::Keyboard::A) player->movementStopX(); // ! Lags
-            
+        else if(sf::Keyboard::isKeyPressed(sf::Keyboard::D)){
+            player->setMovementVector(sf::Vector2f(100, 0)); 
+            playerAnimation->setCurrentAnimationSequence("runRight");
+        }
+        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)){
+            player->doAction("jump");
+        }
+        else{
             playerAnimation->setCurrentAnimationSequence("idle");
         }
     });
