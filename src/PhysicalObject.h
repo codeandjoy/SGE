@@ -11,6 +11,10 @@ class PhysicalObject : public sf::Sprite{
     void setMovementVectorY(float y); // ? Use movement methods in the future?
     sf::Vector2f getMovementVector();
 
+    void setVelocityGoal(sf::Vector2f goal);
+    void setVelocityGoalX(float goalX);
+    void setVelocityGoalY(float goalY);
+
     void createAction(std::string _name, std::function<void()> _action);
     void doAction(std::string actionName);
 
@@ -31,7 +35,10 @@ class PhysicalObject : public sf::Sprite{
 
     private:
     sf::Vector2f movementVector = sf::Vector2f(0, 0);
+    sf::Vector2f velocityGoal;
+
     std::map<std::string, std::function<void()>> actions;
+    
     float mass = 0;
     bool isFlying = false;
 };

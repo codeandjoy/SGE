@@ -91,17 +91,18 @@ int main(){
     universe->addController([player, playerAnimation](){
         // ! TODO CHANGE TO ISKEYPRESSED !
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::A)){
-            player->setMovementVector(sf::Vector2f(-100, 0));
+            player->setVelocityGoalX(-100);
             playerAnimation->setCurrentAnimationSequence("runLeft");
         }
         else if(sf::Keyboard::isKeyPressed(sf::Keyboard::D)){
-            player->setMovementVector(sf::Vector2f(100, 0)); 
+            player->setVelocityGoalX(100);
             playerAnimation->setCurrentAnimationSequence("runRight");
         }
         else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)){
             player->doAction("jump");
         }
         else{
+            player->setVelocityGoalX(0);
             playerAnimation->setCurrentAnimationSequence("idle");
         }
     });

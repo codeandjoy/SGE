@@ -9,7 +9,7 @@ void PhysicsManager::updatePhysics(float dt){
     for(PhysicalObject *pObject : physicalObjects){
         // * Gravity
         if(!pObject->getIsFlying()){
-            pObject->setMovementVectorY(pObject->getMovementVector().y + dt * pObject->getMass()); // ?
+            pObject->setVelocityGoalY(pObject->getMass()); // ?
         }
         // *
 
