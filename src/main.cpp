@@ -89,6 +89,7 @@ int main(){
 
     // TODO use movement functions on player PhysicalObject
     universe->addController([player, playerAnimation](sf::Event event){
+        // ! TODO CHANGE TO ISKEYPRESSED !
         if(event.type == sf::Event::KeyPressed){
             if(event.key.code == sf::Keyboard::D){
                 player->setMovementVector(sf::Vector2f(100, 0)); 
