@@ -14,6 +14,10 @@ void CollisionManager::addCollisionResponse(std::string collisionPairName, const
     collisionPairs[collisionPairName].collisionResponses.push_back(response);
 }
 
+void CollisionManager::setCollisionDetectionAlgorithm(std::string collisionPairName, const std::function<bool(PhysicalObject *PO1, PhysicalObject *PO2)> &cda){
+    collisionPairs[collisionPairName].checkCollision = cda;
+}
+
 void CollisionManager::updateCollisions(){
     // TODO check if any collision pairs are added
 
@@ -23,7 +27,7 @@ void CollisionManager::updateCollisions(){
         // Check collision between each sprite in pairs of groups
         for(PhysicalObject *physicalObjectCG1 : collisionGroups[std::get<0>(pair.collisionGroups)].physicalObjects){
             for(PhysicalObject *physicalObjectCG2 : collisionGroups[std::get<1>(pair.collisionGroups)].physicalObjects){
-                if(physicalObjectCG1->getGlobalBounds().intersects(physicalObjectCG2->getGlobalBounds())){
+                if(pair.checkCollision(physicalObjectCG1, physicalObjectCG2)){
                     // TODO check if any collisionResponses exist (print message?)
 
                     for(std::function collisionResponse : pair.collisionResponses){

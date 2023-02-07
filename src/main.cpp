@@ -12,6 +12,7 @@
 #include "PhysicsManager.h"
 #include "PhysicalObject.h"
 #include "CollisionGroupType.h"
+#include "CollisionDetectionAlgorithms.h"
 #include "CollisionResponses.h"
 
 
@@ -83,6 +84,7 @@ int main(){
     universe->collisionManager.createCollisionGroup("player", CollisionGroupType::moveable, std::vector<PhysicalObject*>{player});
     universe->collisionManager.createCollisionGroup("tiles", CollisionGroupType::solid, mapTiles);
     universe->collisionManager.createCollisionPair("PTCollisionPair", "player", "tiles");
+    universe->collisionManager.setCollisionDetectionAlgorithm("PTCollisionPair", boundingBox);
 
     universe->collisionManager.addCollisionResponse("PTCollisionPair", repel);
     //

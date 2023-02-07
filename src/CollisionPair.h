@@ -9,6 +9,7 @@
 struct CollisionPair{
     std::tuple<std::string, std::string> collisionGroups;
     std::vector<std::function<void(PhysicalObject *physicalObjec1, PhysicalObject *physicalObject2)>> collisionResponses; // TODO allow function with and without parameters (struct || simply register different types of functions and use the one that exists (or all of them))
+    std::function<bool(PhysicalObject *PO1, PhysicalObject *PO2)> checkCollision;
 };
 
 
