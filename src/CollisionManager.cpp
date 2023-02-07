@@ -22,9 +22,6 @@ void CollisionManager::updateCollisions(){
     // TODO check if any collision pairs are added
 
     for(auto const& [name, pair] : collisionPairs){
-        // ! Hand coded bounding box collision detection
-        // ? Expand with circle and pixel perfect
-        // Check collision between each sprite in pairs of groups
         for(PhysicalObject *physicalObjectCG1 : collisionGroups[std::get<0>(pair.collisionGroups)].physicalObjects){
             for(PhysicalObject *physicalObjectCG2 : collisionGroups[std::get<1>(pair.collisionGroups)].physicalObjects){
                 if(pair.checkCollision(physicalObjectCG1, physicalObjectCG2)){
