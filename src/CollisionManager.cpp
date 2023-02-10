@@ -32,8 +32,8 @@ void CollisionManager::updateCollisions(){
             for(PhysicalObject *physicalObjectCG2 : collisionGroups[std::get<1>(pair.collisionGroups)].physicalObjects){
                 if(pair.checkCollision(physicalObjectCG1, physicalObjectCG2)){
                     Collision collision;
-                    collision.side = determineSide(physicalObjectCG1, physicalObjectCG2);
-                    collision.from = physicalObjectCG1;
+                    collision.side = determineCollisionSide(physicalObjectCG1, physicalObjectCG2);
+                    collision.from = physicalObjectCG1; // ! Assuming PO1 is always 'from' (moveable)
                     collision.with = physicalObjectCG2;
 
                     collisions.push_back(collision);

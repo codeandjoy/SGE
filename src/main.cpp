@@ -91,7 +91,6 @@ int main(){
 
     // TODO use movement functions on player PhysicalObject
     universe->addController([player, playerAnimation](){
-        // ! TODO CHANGE TO ISKEYPRESSED !
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::A)){
             player->setVelocityGoalX(-100);
             playerAnimation->setCurrentAnimationSequence("runLeft");

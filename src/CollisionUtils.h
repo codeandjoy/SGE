@@ -6,7 +6,7 @@
 #include "CollisionSide.h"
 
 
-float determineDepth(CollisionSide side, PhysicalObject *PO1, PhysicalObject *PO2){
+float determineCollisionDepth(CollisionSide side, PhysicalObject *PO1, PhysicalObject *PO2){
     auto [x1, y1, height1, width1] = PO1->getPositionData();
     auto [x2, y2, height2, width2] = PO2->getPositionData();
     
@@ -17,7 +17,7 @@ float determineDepth(CollisionSide side, PhysicalObject *PO1, PhysicalObject *PO
     return 0;
 }
 
-CollisionSide determineSide(PhysicalObject *PO1, PhysicalObject *PO2){
+CollisionSide determineCollisionSide(PhysicalObject *PO1, PhysicalObject *PO2){
     std::vector<CollisionSide> allCollisionSides;
 
     // ! Order matters 
@@ -30,7 +30,7 @@ CollisionSide determineSide(PhysicalObject *PO1, PhysicalObject *PO2){
     float lowestDepth = std::numeric_limits<float>::infinity();
     
     for(CollisionSide collisionSide : allCollisionSides){
-        float depth = determineDepth(collisionSide, PO1, PO2);
+        float depth = determineCollisionDepth(collisionSide, PO1, PO2);
         if(depth <= lowestDepth){
             lowestDepthSide = collisionSide;
             lowestDepth = depth;
