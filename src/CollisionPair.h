@@ -3,12 +3,13 @@
 
 #include <SFML/Graphics.hpp> 
 #include "PhysicalObject.h"
+#include "Collision.h"
 
 
 // ? add collision type specifier (rectangle, circle etc.)
 struct CollisionPair{
     std::tuple<std::string, std::string> collisionGroups;
-    std::vector<std::function<void(PhysicalObject *physicalObjec1, PhysicalObject *physicalObject2)>> collisionResponses; // TODO allow function with and without parameters (struct || simply register different types of functions and use the one that exists (or all of them))
+    std::vector<std::function<void(std::vector<Collision>)>> collisionResponses; // TODO allow function with and without parameters (struct || simply register different types of functions and use the one that exists (or all of them))
     std::function<bool(PhysicalObject *PO1, PhysicalObject *PO2)> checkCollision;
 };
 

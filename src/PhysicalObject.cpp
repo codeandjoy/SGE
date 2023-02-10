@@ -1,6 +1,10 @@
 #include "PhysicalObject.h"
 #include "utils/approach.h"
 
+PhysicalObjectPositionData PhysicalObject::getPositionData(){
+    return { this->getPosition().x, this->getPosition().y, this->getGlobalBounds().height, this->getGlobalBounds().width };
+}
+
 void PhysicalObject::setMovementVector(sf::Vector2f _movementVector){ movementVector = _movementVector; }
 void PhysicalObject::setMovementVectorX(float x){ movementVector = sf::Vector2f(x, movementVector.y); }
 void PhysicalObject::setMovementVectorY(float y){ movementVector = sf::Vector2f(movementVector.x, y); }

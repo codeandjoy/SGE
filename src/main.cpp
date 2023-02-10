@@ -86,7 +86,7 @@ int main(){
     universe->collisionManager.createCollisionPair("PTCollisionPair", "player", "tiles");
     universe->collisionManager.setCollisionDetectionAlgorithm("PTCollisionPair", boundingBox);
 
-    universe->collisionManager.addCollisionResponse("PTCollisionPair", repel);
+    universe->collisionManager.addCollisionResponse("PTCollisionPair", resolveAABB);
     //
 
     // TODO use movement functions on player PhysicalObject
@@ -109,8 +109,10 @@ int main(){
         }
     });
 
-    sf::RenderWindow *window = new sf::RenderWindow(sf::VideoMode::getDesktopMode(), "Test", sf::Style::Fullscreen);
-    sf::View *view = new sf::View(sf::Vector2f(50, 50), sf::Vector2f(480, 270));
+    // sf::RenderWindow *window = new sf::RenderWindow(sf::VideoMode::getDesktopMode(), "Test", sf::Style::Fullscreen);
+    // sf::View *view = new sf::View(sf::Vector2f(50, 50), sf::Vector2f(480, 270));
+    sf::RenderWindow *window = new sf::RenderWindow(sf::VideoMode(1000, 600), "Test");
+    sf::View *view = new sf::View(sf::Vector2f(100, 100), sf::Vector2f(250, 150));
     window->setView(*view);
     universe->setupWindow(window);
     

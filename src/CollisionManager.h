@@ -6,6 +6,7 @@
 #include "CollisionGroup.h"
 #include "CollisionGroupType.h"
 #include "CollisionPair.h"
+#include "Collision.h"
 
 
 // ? allow to add an 'area' where collisions get calculated 
@@ -14,7 +15,7 @@ class CollisionManager{
     public:
     void createCollisionGroup(std::string name, CollisionGroupType type, std::vector<PhysicalObject*> physicalObjectsVec); // TODO Overload 3rd argument with sf::Sprite *sprite (and automatically create a vector)
     void createCollisionPair(std::string name, std::string group1, std::string group2);
-    void addCollisionResponse(std::string collisionPairName, const std::function<void(PhysicalObject *physicalObject1, PhysicalObject *physicalObject2)> &response);
+    void addCollisionResponse(std::string collisionPairName, const std::function<void(std::vector<Collision>)> &response);
     void setCollisionDetectionAlgorithm(std::string collisionPairName, const std::function<bool(PhysicalObject *PO1, PhysicalObject *PO2)> &cda);
 
     void updateCollisions();

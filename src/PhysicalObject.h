@@ -2,10 +2,13 @@
 #define PHYSICAL_OBJECT_H
 
 #include <SFML/Graphics.hpp>
+#include "PhysicalObjectPositionData.h"
 
 
 class PhysicalObject : public sf::Sprite{
     public:
+    PhysicalObjectPositionData getPositionData();
+    
     void setMovementVector(sf::Vector2f _movementVector); // ? Use movement methods in the future?
     void setMovementVectorX(float x); // ? Use movement methods in the future?
     void setMovementVectorY(float y); // ? Use movement methods in the future?
