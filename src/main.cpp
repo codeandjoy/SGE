@@ -73,8 +73,6 @@ int main(){
             player->setIsFlying(false);
             player->stopContinuousAction("jump");
         }
-
-        printf("%f\n", player->getMovementVector().y);        
     });
 
     universe->createPlayer(player);

@@ -37,7 +37,6 @@ void PhysicalObject::runContinuousAction(std::string continousActionName){
 
 void PhysicalObject::stopContinuousAction(std::string continousActionName){
     continuousActions[continousActionName].shouldRun = false;
-    printf("Action stopped\n");
 }
 
 
