@@ -17,6 +17,9 @@ void resolveAABB(std::vector<Collision> collisions){
         else if(collision.side == CollisionSide::right){
             from->setPosition(with->getPosition().x - from->getGlobalBounds().width, from->getPosition().y);
         }
+        else if(collision.side == CollisionSide::top){
+            from->setPosition(from->getPosition().x, with->getPosition().y + with->getGlobalBounds().height);
+        }
         else if(collision.side == CollisionSide::bottom){
             from->setPosition(from->getPosition().x, with->getPosition().y - from->getGlobalBounds().height);
         }
