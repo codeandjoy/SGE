@@ -3,6 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 #include "PhysicalObjectPositionData.h"
+#include "ContinuousAction.h"
 
 
 class PhysicalObject : public sf::Sprite{
@@ -20,6 +21,10 @@ class PhysicalObject : public sf::Sprite{
 
     void createAction(std::string _name, std::function<void()> _action);
     void doAction(std::string actionName);
+
+    void createContinuousAction(std::string _name, std::function<void(float dt)> _action);
+    void runContinuousAction(std::string continuousActonName);
+    void stopContinuousAction(std::string continuousActonName);
 
     void setMass(float _mass);
     float getMass();
@@ -41,6 +46,7 @@ class PhysicalObject : public sf::Sprite{
     sf::Vector2f velocityGoal;
 
     std::map<std::string, std::function<void()>> actions;
+    std::map<std::string, ContinuousAction> continuousActions;
     
     float mass = 0;
     bool isFlying = false;

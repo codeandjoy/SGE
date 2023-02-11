@@ -63,9 +63,20 @@ int main(){
     PhysicalObject *player = new PhysicalObject();
     player->setMass(100);
     player->setPosition(sf::Vector2f(100, 50));
-    player->createAction("jump", [](){
-        printf("Jumping\n");
+    player->createContinuousAction("jump", [player](float dt){
+        if(!player->getIsFlying()){
+            player->setIsFlying(true);
+            player->setVelocityGoalY(-300);
+        }
+
+        if(player->getMovementVector().y <= -300){
+            player->setIsFlying(false);
+            player->stopContinuousAction("jump");
+        }
+
+        printf("%f\n", player->getMovementVector().y);        
     });
+
     universe->createPlayer(player);
     universe->physicsManager.addPhysicalObject(player);
     //
@@ -99,12 +110,14 @@ int main(){
             player->setVelocityGoalX(100);
             playerAnimation->setCurrentAnimationSequence("runRight");
         }
-        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)){
-            player->doAction("jump");
-        }
         else{
             player->setVelocityGoalX(0);
             playerAnimation->setCurrentAnimationSequence("idle");
+        }
+    });
+    universe->addEventHandler([player](sf::Event event){
+        if(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space){
+            player->runContinuousAction("jump");
         }
     });
 
@@ -113,6 +126,7 @@ int main(){
     sf::RenderWindow *window = new sf::RenderWindow(sf::VideoMode(1000, 600), "Test");
     sf::View *view = new sf::View(sf::Vector2f(100, 100), sf::Vector2f(250, 150));
     window->setView(*view);
+    window->setKeyRepeatEnabled(false); // for proper keyboard events handling (like jumping)
     universe->setupWindow(window);
     
     universe->loop();

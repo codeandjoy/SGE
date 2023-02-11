@@ -15,8 +15,12 @@ void Universe::setupWindow(sf::RenderWindow *window){
     windowPtr = window;
 }
 
-void Universe::addController(const std::function<void()> &lambdaController){
-    controllers.push_back(lambdaController);
+void Universe::addController(std::function<void()> controller){
+    controllers.push_back(controller);
+}
+
+void Universe::addEventHandler(std::function<void(sf::Event event)> eventHandler){
+    eventHandlers.push_back(eventHandler);
 }
 
 void Universe::addAnimation(Animation *animation){
@@ -43,6 +47,10 @@ void Universe::loop(){
         sf::Event event;
         while(windowPtr->pollEvent(event)){
             if (event.type == sf::Event::Closed) windowPtr->close();
+        
+            for(std::function eventHandler : eventHandlers){
+                eventHandler(event);
+            }
         }
 
         // Controllers

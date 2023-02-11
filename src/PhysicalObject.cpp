@@ -27,6 +27,20 @@ void PhysicalObject::doAction(std::string actionName){
     actions[actionName]();
 }
 
+void PhysicalObject::createContinuousAction(std::string _name, std::function<void(float dt)> _action){
+    continuousActions[_name] = { false, _action };
+}
+
+void PhysicalObject::runContinuousAction(std::string continousActionName){
+    continuousActions[continousActionName].shouldRun = true;
+}
+
+void PhysicalObject::stopContinuousAction(std::string continousActionName){
+    continuousActions[continousActionName].shouldRun = false;
+    printf("Action stopped\n");
+}
+
+
 void PhysicalObject::setMass(float _mass){ mass = _mass; }
 float PhysicalObject::getMass(){ return mass; }
 
@@ -44,7 +58,12 @@ void PhysicalObject::movementStopY(){
 };
 
 void PhysicalObject::update(float dt){
+    // ? Movement is a ContinuousAction ? 
     movementVector.x = approach(velocityGoal.x, movementVector.x, dt*5000);
     movementVector.y = approach(velocityGoal.y, movementVector.y, dt*5000);
     setPosition(getPosition() + movementVector * dt);
+
+    for(auto const& [name, continuousAction] : continuousActions){
+        if(continuousAction.shouldRun) continuousAction.runAction(dt);
+    }
 };

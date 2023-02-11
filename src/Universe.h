@@ -13,7 +13,8 @@ class Universe{
         void setupWindow(sf::RenderWindow *window);
         void createPlayer(sf::Sprite *player);
         void addMap(std::vector<PhysicalObject*> *map); // TODO managed in Scene in the future(?)
-        void addController(const std::function<void()> &lambdaController);
+        void addController(std::function<void()> controller);
+        void addEventHandler(std::function<void(sf::Event event)> eventHandler);
         void addAnimation(Animation *animation);
 
         void loop();
@@ -27,6 +28,7 @@ class Universe{
         sf::Sprite *playerPtr; // ! for drawing
         std::vector<PhysicalObject*> *mapPtr; // ! for drawing
         std::vector<std::function<void()>> controllers;
+        std::vector<std::function<void(sf::Event event)>> eventHandlers;
         std::vector<Animation*> animations;
 };
 
