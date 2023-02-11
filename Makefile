@@ -2,7 +2,7 @@
 
 OUT = build/main.out
 
-_headers = TextureSheetSizes.h CollisionGroup.h CollisionGroupType.h CollisionPair.h CollisionResponses.h CollisionDetectionAlgorithms.h Collision.h CollisionUtils.h
+_headers = TextureSheetSizes.h CollisionGroup.h CollisionGroupType.h CollisionPair.h CollisionResponses.h CollisionDetectionAlgorithms.h Collision.h CollisionUtils.h ContinuousAction.h
 headers = $(addprefix src/,$(_headers))
 
 _src = main.cpp Universe.cpp PhysicalObject.cpp TextureSheet.cpp Animation.cpp TextureManager.cpp PhysicsManager.cpp CollisionManager.cpp
