@@ -1,7 +1,7 @@
 #ifndef COLLISION_MANAGER_H
 #define COLLISION_MANAGER_H
 
-#include "SFML/Graphics.hpp"
+#include <SFML/Graphics.hpp>
 #include "PhysicalObject.h"
 #include "CollisionGroup.h"
 #include "CollisionGroupType.h"

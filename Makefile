@@ -1,27 +1,35 @@
 .PHONY: clean
 
-OUT = build/main.out
 
-_headers = TextureSheetSizes.h CollisionGroup.h CollisionGroupType.h CollisionPair.h CollisionResponses.h CollisionDetectionAlgorithms.h Collision.h CollisionUtils.h ContinuousAction.h
-headers = $(addprefix src/,$(_headers))
-
-_src = main.cpp Universe.cpp PhysicalObject.cpp TextureSheet.cpp Animation.cpp TextureManager.cpp PhysicsManager.cpp CollisionManager.cpp
-src = $(addprefix src/,$(_src))
-
-_objects = main.o Universe.o PhysicalObject.o TextureSheet.o Animation.o TextureManager.o PhysicsManager.o CollisionManager.o
-objects = $(addprefix build/obj/,$(_objects))
 
 lib = -ltmxlite -ljsoncpp -lsfml-graphics -lsfml-window -lsfml-system
+obj_directory = build/obj
 
-all: $(OUT)
+#
+# Dev
+#
+dev_directory = ./examples/dev
+dev = $(dev_directory)/build/dev.out
 
-$(OUT): $(objects)
-	g++ -o $(OUT) $(objects) $(lib)
+_dev_src = dev.cpp
+dev_src = $(addprefix $(dev_directory)/,$(_dev_src))
 
-$(objects): $(src) $(headers)
-	g++ -c $(src); \
-	mkdir -p ./build/obj; \
-	mv *.o ./build/obj;
+_dev_obj = dev.o
+dev_obj = $(addprefix $(dev_directory)/$(obj_directory)/,$(_dev_obj))
+
+
+dev: $(dev)
+
+$(dev): $(dev_obj)
+	g++ -o $(dev) $(dev_obj) $(lib)
+
+$(dev_obj): $(dev_src) SGE.hpp
+	g++ -c $(dev_src); \
+	mkdir -p $(dev_directory)/$(obj_directory); \
+	mv *.o $(dev_directory)/$(obj_directory);
+#
+#
+#
 
 clean:
-	rm -rf build
+	rm -rf $(dev_directory)/build

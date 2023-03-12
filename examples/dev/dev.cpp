@@ -4,17 +4,7 @@
 #include <tmxlite/Map.hpp>
 #include <tmxlite/TileLayer.hpp>
 
-#include "Universe.h"
-#include "TextureManager.h"
-#include "TextureSheet.h"
-#include "TextureSheetSizes.h"
-#include "Animation.h"
-#include "PhysicsManager.h"
-#include "PhysicalObject.h"
-#include "CollisionGroupType.h"
-#include "CollisionDetectionAlgorithms.h"
-#include "CollisionResponses.h"
-
+#include "../../SGE.hpp"
 
 int main(){
     printf(".▄▄ ·  ▄▄ • ▄▄▄ .\n▐█ ▀. ▐█ ▀ ▪▀▄.▀·\n▄▀▀▀█▄▄█ ▀█▄▐▀▀▪▄\n▐█▄▪▐█▐█▄▪▐█▐█▄▄▌\n ▀▀▀▀ ·▀▀▀▀  ▀▀▀ \n");
