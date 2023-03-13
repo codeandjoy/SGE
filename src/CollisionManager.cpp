@@ -42,8 +42,10 @@ void CollisionManager::updateCollisions(){
 
             // Run responses
             // TODO check if any collisionResponses exist (print message?)
-            for(std::function collisionResponse : pair.collisionResponses){
-                collisionResponse(collisions);
+            if(collisions.size()){
+                for(std::function collisionResponse : pair.collisionResponses){
+                    collisionResponse(collisions);
+                }
             }
 
             // Reset
