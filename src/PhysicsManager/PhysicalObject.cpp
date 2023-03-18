@@ -39,6 +39,8 @@ void PhysicalObject::doAction(std::string actionName){
 void PhysicalObject::createContinuousAction(std::string _name, std::function<void(float dt)> _action){ continuousActions[_name] = { false, _action }; }
 void PhysicalObject::runContinuousAction(std::string continousActionName){ continuousActions[continousActionName].shouldRun = true; }
 void PhysicalObject::stopContinuousAction(std::string continousActionName){ continuousActions[continousActionName].shouldRun = false; }
+
+void PhysicalObject::createConditionalAction(std::string _name, std::function<bool()> _condition, std::function<void()> _action){ conditionalActions[_name] = { _condition, _action }; }
 // *
 
 
@@ -59,5 +61,11 @@ void PhysicalObject::update(float dt){
 
     for(auto const& [name, continuousAction] : continuousActions){
         if(continuousAction.shouldRun) continuousAction.runAction(dt);
+    }
+
+    for(auto const& [name, conditionalAction] : conditionalActions){
+        if(conditionalAction.condition()){
+            conditionalAction.runAction();
+        }
     }
 };

@@ -15,6 +15,7 @@
 #include "./src/PhysicsManager/PhysicalObjectPositionData.h"
 #include "./src/PhysicsManager/PhysicalObject.h"
 #include "./src/PhysicsManager/ContinuousAction.h"
+#include "./src/PhysicsManager/ConditionalAction.h"
 
 #include "./src/CollisionManager/CollisionManager.h"
 #include "./src/CollisionManager/CollisionGroup.h"

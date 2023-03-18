@@ -41,6 +41,9 @@ class PhysicalObject : public sf::Sprite{
         void createContinuousAction(std::string _name, std::function<void(float dt)> _action);
         void runContinuousAction(std::string continuousActonName);
         void stopContinuousAction(std::string continuousActonName);
+        
+        void createConditionalAction(std::string _name, std::function<bool()> _condition, std::function<void()> _action);
+        // removeConditionalAction(...)
         // *
 
 

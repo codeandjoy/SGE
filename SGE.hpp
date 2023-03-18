@@ -34,51 +34,74 @@ struct ContinuousAction{
 };
 
 #endif
+#ifndef CONDITIONAL_ACTION_H
+#define CONDITIONAL_ACTION_H
+
+struct ConditionalAction{
+    std::function<bool()> condition;
+    std::function<void()> runAction;
+};
+
+#endif
 
 class PhysicalObject : public sf::Sprite{
     public:
-    PhysicalObjectPositionData getPositionData();
-    
-    void setMovementVector(sf::Vector2f _movementVector); // ? Use movement methods in the future?
-    void setMovementVectorX(float x); // ? Use movement methods in the future?
-    void setMovementVectorY(float y); // ? Use movement methods in the future?
-    sf::Vector2f getMovementVector();
+        // * Utils
+        PhysicalObjectPositionData getPositionData();
+        // *
 
-    void setVelocityGoal(sf::Vector2f goal);
-    void setVelocityGoalX(float goalX);
-    void setVelocityGoalY(float goalY);
+        // * Movement
+        void setMovementVector(sf::Vector2f _movementVector); // ? Use movement methods in the future?
+        void setMovementVectorX(float x); // ? Use movement methods in the future?
+        void setMovementVectorY(float y); // ? Use movement methods in the future?
+        sf::Vector2f getMovementVector();
 
-    void createAction(std::string _name, std::function<void()> _action);
-    void doAction(std::string actionName);
+        void setVelocityGoal(sf::Vector2f goal);
+        void setVelocityGoalX(float goalX);
+        void setVelocityGoalY(float goalY);
+        
+        void movementStop();
+        void movementStopX();
+        void movementStopY();
+        // void movementAccelerate();
+        // void movementSlacken();
+        // ? void setVelocityCap(...) (sets max possible velocity vector values)
+        // ? setMovementFunction(lambda) (sets movement algorithm (e.g. acceleration -> keeping velocity -> slowing down -> stop))
+        // *
 
-    void createContinuousAction(std::string _name, std::function<void(float dt)> _action);
-    void runContinuousAction(std::string continuousActonName);
-    void stopContinuousAction(std::string continuousActonName);
+        // * Actions
+        void createAction(std::string _name, std::function<void()> _action);
+        void doAction(std::string actionName);
 
-    void setMass(float _mass);
-    float getMass();
-    
-    void setIsFlying(bool is); // ? Use just mass = 0 to 'fly' ?
-    bool getIsFlying();
+        void createContinuousAction(std::string _name, std::function<void(float dt)> _action);
+        void runContinuousAction(std::string continuousActonName);
+        void stopContinuousAction(std::string continuousActonName);
+        
+        void createConditionalAction(std::string _name, std::function<bool()> _condition, std::function<void()> _action);
+        // removeConditionalAction(...)
+        // *
 
-    // void movementAccelerate();
-    // void movementSlacken();
-    void movementStop();
-    void movementStopX();
-    void movementStopY();
-    // ? void setVelocityCap(...) (sets max possible velocity vector values)
-    // ? setMovementFunction(lambda) (sets movement algorithm (e.g. acceleration -> keeping velocity -> slowing down -> stop))
-    void update(float dt);
+        // * Physical properties
+        void setMass(float _mass);
+        float getMass();
+        
+        void setIsFlying(bool is); // ? Use just mass = 0 to 'fly' ?
+        bool getIsFlying();
+        // *
+        
+
+        void update(float dt);
 
     private:
-    sf::Vector2f movementVector = sf::Vector2f(0, 0);
-    sf::Vector2f velocityGoal;
+        sf::Vector2f movementVector = sf::Vector2f(0, 0);
+        sf::Vector2f velocityGoal;
 
-    std::map<std::string, std::function<void()>> actions;
-    std::map<std::string, ContinuousAction> continuousActions;
-    
-    float mass = 0;
-    bool isFlying = false;
+        std::map<std::string, std::function<void()>> actions;
+        std::map<std::string, ContinuousAction> continuousActions;
+        std::map<std::string, ConditionalAction> conditionalActions;
+        
+        float mass = 0;
+        bool isFlying = false;
 };
 
 #endif
@@ -377,10 +400,13 @@ float approach(float goal, float current, float dt){
 
 #endif
 
+// * Utils
 PhysicalObjectPositionData PhysicalObject::getPositionData(){
     return { this->getPosition().x, this->getPosition().y, this->getGlobalBounds().height, this->getGlobalBounds().width };
 }
+// *
 
+// * Movement
 void PhysicalObject::setMovementVector(sf::Vector2f _movementVector){ movementVector = _movementVector; }
 void PhysicalObject::setMovementVectorX(float x){ movementVector = sf::Vector2f(x, movementVector.y); }
 void PhysicalObject::setMovementVectorY(float y){ movementVector = sf::Vector2f(movementVector.x, y); }
@@ -390,9 +416,13 @@ void PhysicalObject::setVelocityGoal(sf::Vector2f goal){ velocityGoal = goal; }
 void PhysicalObject::setVelocityGoalX(float goalX){ velocityGoal.x = goalX; }
 void PhysicalObject::setVelocityGoalY(float goalY){ velocityGoal.y = goalY; }
 
-void PhysicalObject::createAction(std::string _name, std::function<void()> _action){
-    actions[_name] = _action;
-}
+void PhysicalObject::movementStop(){ movementVector = sf::Vector2f(0, 0);  };
+void PhysicalObject::movementStopX(){ movementVector = sf::Vector2f(0, movementVector.y); };
+void PhysicalObject::movementStopY(){ movementVector = sf::Vector2f(movementVector.x, 0); };
+// *
+
+// * Actions
+void PhysicalObject::createAction(std::string _name, std::function<void()> _action){ actions[_name] = _action; }
 
 void PhysicalObject::doAction(std::string actionName){
     if(!actions.count(actionName)){
@@ -403,33 +433,20 @@ void PhysicalObject::doAction(std::string actionName){
     actions[actionName]();
 }
 
-void PhysicalObject::createContinuousAction(std::string _name, std::function<void(float dt)> _action){
-    continuousActions[_name] = { false, _action };
-}
+void PhysicalObject::createContinuousAction(std::string _name, std::function<void(float dt)> _action){ continuousActions[_name] = { false, _action }; }
+void PhysicalObject::runContinuousAction(std::string continousActionName){ continuousActions[continousActionName].shouldRun = true; }
+void PhysicalObject::stopContinuousAction(std::string continousActionName){ continuousActions[continousActionName].shouldRun = false; }
 
-void PhysicalObject::runContinuousAction(std::string continousActionName){
-    continuousActions[continousActionName].shouldRun = true;
-}
+void PhysicalObject::createConditionalAction(std::string _name, std::function<bool()> _condition, std::function<void()> _action){ conditionalActions[_name] = { _condition, _action }; }
+// *
 
-void PhysicalObject::stopContinuousAction(std::string continousActionName){
-    continuousActions[continousActionName].shouldRun = false;
-}
-
+// * Physical properties
 void PhysicalObject::setMass(float _mass){ mass = _mass; }
 float PhysicalObject::getMass(){ return mass; }
 
 void PhysicalObject::setIsFlying(bool is){ isFlying = is; }
 bool PhysicalObject::getIsFlying(){ return isFlying ;}
-
-void PhysicalObject::movementStop(){
-    movementVector = sf::Vector2f(0, 0); 
-};
-void PhysicalObject::movementStopX(){
-    movementVector = sf::Vector2f(0, movementVector.y);
-};
-void PhysicalObject::movementStopY(){
-    movementVector = sf::Vector2f(movementVector.x, 0);
-};
+// *
 
 void PhysicalObject::update(float dt){
     // ? Movement is a ContinuousAction ? 
@@ -439,6 +456,12 @@ void PhysicalObject::update(float dt){
 
     for(auto const& [name, continuousAction] : continuousActions){
         if(continuousAction.shouldRun) continuousAction.runAction(dt);
+    }
+
+    for(auto const& [name, conditionalAction] : conditionalActions){
+        if(conditionalAction.condition()){
+            conditionalAction.runAction();
+        }
     }
 };
 
