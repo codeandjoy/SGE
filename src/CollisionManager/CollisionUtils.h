@@ -2,7 +2,7 @@
 #define COLLISION_UTILS_H
 
 #include <limits>
-#include "PhysicalObject.h"
+#include "../PhysicsManager/PhysicalObject.h"
 #include "CollisionSide.h"
 
 

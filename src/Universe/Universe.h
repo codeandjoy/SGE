@@ -2,10 +2,10 @@
 #define UNIVERSE_H
 
 #include <SFML/Graphics.hpp>
-#include "PhysicsManager.h"
-#include "CollisionManager.h"
-#include "PhysicalObject.h"
-#include "Animation.h"
+#include "../PhysicsManager/PhysicsManager.h"
+#include "../PhysicsManager/PhysicalObject.h"
+#include "../CollisionManager/CollisionManager.h"
+#include "../Animation/Animation.h"
 
 
 class Universe{

@@ -2,7 +2,7 @@
 #define COLLISION_PAIR_H
 
 #include <SFML/Graphics.hpp> 
-#include "PhysicalObject.h"
+#include "../PhysicsManager/PhysicalObject.h"
 #include "Collision.h"
 
 

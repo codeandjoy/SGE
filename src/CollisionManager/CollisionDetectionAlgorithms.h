@@ -1,7 +1,7 @@
 #ifndef COLLISION_DETECTION_ALGORITHMS_H
 #define COLLISION_DETECTION_ALGORITHMS_H
 
-#include "PhysicalObject.h"
+#include "../PhysicsManager/PhysicalObject.h"
 
 
 bool boundingBox(PhysicalObject *PO1, PhysicalObject *PO2){

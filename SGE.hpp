@@ -93,6 +93,7 @@ class PhysicsManager{
 };
 
 #endif
+
 #ifndef COLLISION_MANAGER_H
 #define COLLISION_MANAGER_H
 
@@ -166,7 +167,6 @@ class CollisionManager{
 };
 
 #endif
-
 #ifndef ANIMATION_H
 #define ANIMATION_H
 
@@ -501,8 +501,10 @@ void CollisionManager::updateCollisions(){
 
             // Run responses
             // TODO check if any collisionResponses exist (print message?)
-            for(std::function collisionResponse : pair.collisionResponses){
-                collisionResponse(collisions);
+            if(collisions.size()){
+                for(std::function collisionResponse : pair.collisionResponses){
+                    collisionResponse(collisions);
+                }
             }
 
             // Reset

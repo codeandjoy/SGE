@@ -1,7 +1,7 @@
 #ifndef COLLISION_RESPONSES_H
 #define COLLISION_RESPONSES_H
 
-#include "PhysicalObject.h"
+#include "../PhysicsManager/PhysicalObject.h"
 #include "CollisionSide.h"
 #include "Collision.h"
 

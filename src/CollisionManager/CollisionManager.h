@@ -2,7 +2,7 @@
 #define COLLISION_MANAGER_H
 
 #include <SFML/Graphics.hpp>
-#include "PhysicalObject.h"
+#include "../PhysicsManager/PhysicalObject.h"
 #include "CollisionGroup.h"
 #include "CollisionGroupType.h"
 #include "CollisionPair.h"
