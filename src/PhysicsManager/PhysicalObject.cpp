@@ -44,6 +44,14 @@ void PhysicalObject::createConditionalAction(std::string _name, std::function<bo
 // *
 
 
+// * Flags
+// ! check if flags exist before returning
+void PhysicalObject::createFlag(std::string _name){ flags[_name] = false; }
+bool PhysicalObject::getFlag(std::string flagName){ return flags[flagName]; }
+void PhysicalObject::setFlag(std::string flagName, bool value){ flags[flagName] = value; }
+//*
+
+
 // * Physical properties
 void PhysicalObject::setMass(float _mass){ mass = _mass; }
 float PhysicalObject::getMass(){ return mass; }

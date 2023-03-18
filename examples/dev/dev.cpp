@@ -54,12 +54,20 @@ int main(){
     player->setMass(100);
     player->setPosition(sf::Vector2f(100, 50));
 
+    player->createFlag("canJump");
+
     player->createAction("jumpStart", [player](){
         player->setIsFlying(true);
         player->setVelocityGoalY(-300);
+
+        player->setFlag("canJump", false);
     });
 
-    player->createConditionalAction("jumpEnd",
+    player->createAction("jumpReset", [player](){
+        player->setFlag("canJump", true);
+    });
+
+    player->createConditionalAction("jumpFall",
         [player](){
             return player->getMovementVector().y <= -300;
         },
@@ -67,18 +75,6 @@ int main(){
             player->setIsFlying(false);
         }
     );
-
-    // player->createContinuousAction("jump", [player](float dt){
-    //     if(!player->getIsFlying()){
-    //         player->setIsFlying(true);
-    //         player->setVelocityGoalY(-300);
-    //     }
-
-    //     if(player->getMovementVector().y <= -300){
-    //         player->setIsFlying(false);
-    //         player->stopContinuousAction("jump");
-    //     }
-    // });
 
     universe->createPlayer(player);
     universe->physicsManager.addPhysicalObject(player);
@@ -101,6 +97,9 @@ int main(){
     universe->collisionManager.setCollisionDetectionAlgorithm("PTCollisionPair", boundingBox);
 
     universe->collisionManager.addCollisionResponse("PTCollisionPair", resolveAABB);
+    universe->collisionManager.addCollisionResponse("PTCollisionPair", [player](std::vector<Collision> collisions){
+        player->doAction("jumpReset");
+    });
     //
 
     // TODO use movement functions on player PhysicalObject
@@ -120,8 +119,9 @@ int main(){
     });
     universe->addEventHandler([player](sf::Event event){
         if(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space){
-            player->doAction("jumpStart");
-            // player->runContinuousAction("jump");
+            if(player->getFlag("canJump")){
+                player->doAction("jumpStart");
+            }
         }
     });
 

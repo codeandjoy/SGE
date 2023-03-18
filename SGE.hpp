@@ -81,6 +81,13 @@ class PhysicalObject : public sf::Sprite{
         // removeConditionalAction(...)
         // *
 
+        // * Flags
+        void createFlag(std::string _name);
+        bool getFlag(std::string flagName);
+        void setFlag(std::string flagName, bool value);        
+        // removeflag()
+        // *
+
         // * Physical properties
         void setMass(float _mass);
         float getMass();
@@ -99,6 +106,7 @@ class PhysicalObject : public sf::Sprite{
         std::map<std::string, std::function<void()>> actions;
         std::map<std::string, ContinuousAction> continuousActions;
         std::map<std::string, ConditionalAction> conditionalActions;
+        std::map<std::string, bool> flags;
         
         float mass = 0;
         bool isFlying = false;
@@ -439,6 +447,13 @@ void PhysicalObject::stopContinuousAction(std::string continousActionName){ cont
 
 void PhysicalObject::createConditionalAction(std::string _name, std::function<bool()> _condition, std::function<void()> _action){ conditionalActions[_name] = { _condition, _action }; }
 // *
+
+// * Flags
+// ! check if flags exist before returning
+void PhysicalObject::createFlag(std::string _name){ flags[_name] = false; }
+bool PhysicalObject::getFlag(std::string flagName){ return flags[flagName]; }
+void PhysicalObject::setFlag(std::string flagName, bool value){ flags[flagName] = value; }
+//*
 
 // * Physical properties
 void PhysicalObject::setMass(float _mass){ mass = _mass; }

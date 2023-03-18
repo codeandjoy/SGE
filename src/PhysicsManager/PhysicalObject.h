@@ -47,6 +47,14 @@ class PhysicalObject : public sf::Sprite{
         // *
 
 
+        // * Flags
+        void createFlag(std::string _name);
+        bool getFlag(std::string flagName);
+        void setFlag(std::string flagName, bool value);        
+        // removeflag()
+        // *
+
+
         // * Physical properties
         void setMass(float _mass);
         float getMass();
@@ -65,6 +73,7 @@ class PhysicalObject : public sf::Sprite{
         std::map<std::string, std::function<void()>> actions;
         std::map<std::string, ContinuousAction> continuousActions;
         std::map<std::string, ConditionalAction> conditionalActions;
+        std::map<std::string, bool> flags;
         
         float mass = 0;
         bool isFlying = false;
