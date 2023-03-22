@@ -140,10 +140,50 @@ class PhysicsManager{
 enum CollisionGroupType{ solid, moveable };
 
 #endif
+#ifndef COLLISION_SHAPE_H
+#define COLLISION_SHAPE_H
+
+#include <SFML/Graphics.hpp>
+#ifndef COLLISION_SHAPE_POSITION_DATA_H
+#define COLLISION_SHAPE_POSITION_DATA_H
+
+struct CollisionShapePositionData{
+    float x;
+    float y;
+    float height;
+    float width;
+};
+
+#endif
+
+class CollisionShape : public sf::RectangleShape{
+    public:
+        CollisionShape(PhysicalObject *_owner);
+
+        PhysicalObject* getOwner();
+
+        CollisionShapePositionData getPositionData();
+
+        bool getIsVisible();
+        void setIsVisible(bool is);
+
+        sf::Vector2f getOffset();
+        void setOffset(sf::Vector2f _offset);
+
+        void align();
+
+    private:
+        PhysicalObject *owner;
+
+        bool isVisible = true;
+        sf::Vector2f offset = sf::Vector2f(0, 0);
+};
+
+#endif
 
 struct CollisionGroup{
     CollisionGroupType collisionGroupType;
-    std::vector<PhysicalObject*> physicalObjects;
+    std::vector<CollisionShape*> collisionShapes;
 };
 
 #endif
@@ -152,7 +192,6 @@ struct CollisionGroup{
 #define COLLISION_PAIR_H
 
 #include <SFML/Graphics.hpp> 
-
 #ifndef COLLISION_H
 #define COLLISION_H
 
@@ -165,8 +204,8 @@ enum CollisionSide{ left, right, top, bottom };
 
 struct Collision{
     CollisionSide side;
-    PhysicalObject *from;
-    PhysicalObject *with;
+    CollisionShape *from;
+    CollisionShape *with;
     // ? detectionAlgorithm (string?)
 };
 
@@ -176,7 +215,7 @@ struct Collision{
 struct CollisionPair{
     std::tuple<std::string, std::string> collisionGroups;
     std::vector<std::function<void(std::vector<Collision>)>> collisionResponses; // TODO allow function with and without parameters (struct || simply register different types of functions and use the one that exists (or all of them))
-    std::function<bool(PhysicalObject *PO1, PhysicalObject *PO2)> checkCollision;
+    std::function<bool(CollisionShape *CS1, CollisionShape *CS2)> checkCollision;
 };
 
 #endif
@@ -185,10 +224,12 @@ struct CollisionPair{
 // ? addToGroup(...), removeFromGroup(...), reloadGroup(...) (checks if pointers are still valid), removePair(...), removeCOllisionResponse(...)
 class CollisionManager{
     public:
-    void createCollisionGroup(std::string name, CollisionGroupType type, std::vector<PhysicalObject*> physicalObjectsVec); // TODO Overload 3rd argument with sf::Sprite *sprite (and automatically create a vector)
+    void createCollisionGroup(std::string name, CollisionGroupType type, std::vector<CollisionShape*> collisionShapes);
     void createCollisionPair(std::string name, std::string group1, std::string group2);
     void addCollisionResponse(std::string collisionPairName, const std::function<void(std::vector<Collision>)> &response);
-    void setCollisionDetectionAlgorithm(std::string collisionPairName, const std::function<bool(PhysicalObject *PO1, PhysicalObject *PO2)> &cda);
+    void setCollisionDetectionAlgorithm(std::string collisionPairName, const std::function<bool(CollisionShape *CS1, CollisionShape *CS2)> &cda);
+
+    std::map<std::string, CollisionGroup> getCollisionGroups();
 
     void updateCollisions();
 
@@ -318,20 +359,20 @@ class TextureManager{
 
 void resolveAABB(std::vector<Collision> collisions){
     for(Collision collision : collisions){
-        PhysicalObject *from = collision.from;
-        PhysicalObject *with = collision.with;
+        PhysicalObject *fromOwner = collision.from->getOwner();
+        PhysicalObject *withOwner = collision.with->getOwner();
         
         if(collision.side == CollisionSide::left){
-            from->setPosition(with->getPosition().x + with->getGlobalBounds().width, from->getPosition().y);
+            fromOwner->setPosition(withOwner->getPosition().x + withOwner->getGlobalBounds().width, fromOwner->getPosition().y);
         }
         else if(collision.side == CollisionSide::right){
-            from->setPosition(with->getPosition().x - from->getGlobalBounds().width, from->getPosition().y);
+            fromOwner->setPosition(withOwner->getPosition().x - fromOwner->getGlobalBounds().width, fromOwner->getPosition().y);
         }
         else if(collision.side == CollisionSide::top){
-            from->setPosition(from->getPosition().x, with->getPosition().y + with->getGlobalBounds().height);
+            fromOwner->setPosition(fromOwner->getPosition().x, withOwner->getPosition().y + withOwner->getGlobalBounds().height);
         }
         else if(collision.side == CollisionSide::bottom){
-            from->setPosition(from->getPosition().x, with->getPosition().y - from->getGlobalBounds().height);
+            fromOwner->setPosition(fromOwner->getPosition().x, withOwner->getPosition().y - fromOwner->getGlobalBounds().height);
         }
     }
 }
@@ -340,8 +381,8 @@ void resolveAABB(std::vector<Collision> collisions){
 #ifndef COLLISION_DETECTION_ALGORITHMS_H
 #define COLLISION_DETECTION_ALGORITHMS_H
 
-bool boundingBox(PhysicalObject *PO1, PhysicalObject *PO2){
-    return PO1->getGlobalBounds().intersects(PO2->getGlobalBounds());
+bool boundingBox(CollisionShape *CS1, CollisionShape *CS2){
+    return CS1->getGlobalBounds().intersects(CS2->getGlobalBounds());
 }
 
 // TODO
@@ -354,9 +395,9 @@ bool boundingBox(PhysicalObject *PO1, PhysicalObject *PO2){
 
 #include <limits>
 
-float determineCollisionDepth(CollisionSide side, PhysicalObject *PO1, PhysicalObject *PO2){
-    auto [x1, y1, height1, width1] = PO1->getPositionData();
-    auto [x2, y2, height2, width2] = PO2->getPositionData();
+float determineCollisionDepth(CollisionSide side, CollisionShape *CS1, CollisionShape *CS2){
+    auto [x1, y1, height1, width1] = CS1->getPositionData();
+    auto [x2, y2, height2, width2] = CS2->getPositionData();
     
     if(side == CollisionSide::left) return x2 + width2 - x1;
     if(side == CollisionSide::right) return x1 + width1 - x2;
@@ -366,20 +407,20 @@ float determineCollisionDepth(CollisionSide side, PhysicalObject *PO1, PhysicalO
     return 0;
 }
 
-CollisionSide determineCollisionSide(PhysicalObject *PO1, PhysicalObject *PO2){
+CollisionSide determineCollisionSide(CollisionShape *CS1, CollisionShape *CS2){
     std::vector<CollisionSide> allCollisionSides;
 
     // ! Order matters 
-    if(PO1->getMovementVector().x < 0) allCollisionSides.push_back(CollisionSide::left);
-    if(PO1->getMovementVector().x > 0) allCollisionSides.push_back(CollisionSide::right);
-    if(PO1->getMovementVector().y < 0) allCollisionSides.push_back(CollisionSide::top);
-    if(PO1->getMovementVector().y > 0) allCollisionSides.push_back(CollisionSide::bottom);
+    if(CS1->getOwner()->getMovementVector().x < 0) allCollisionSides.push_back(CollisionSide::left);
+    if(CS1->getOwner()->getMovementVector().x > 0) allCollisionSides.push_back(CollisionSide::right);
+    if(CS1->getOwner()->getMovementVector().y < 0) allCollisionSides.push_back(CollisionSide::top);
+    if(CS1->getOwner()->getMovementVector().y > 0) allCollisionSides.push_back(CollisionSide::bottom);
 
     CollisionSide lowestDepthSide;
     float lowestDepth = std::numeric_limits<float>::infinity();
     
     for(CollisionSide collisionSide : allCollisionSides){
-        float depth = determineCollisionDepth(collisionSide, PO1, PO2);
+        float depth = determineCollisionDepth(collisionSide, CS1, CS2);
         if(depth <= lowestDepth){
             lowestDepthSide = collisionSide;
             lowestDepth = depth;
@@ -499,9 +540,35 @@ void PhysicsManager::updatePhysics(float dt){
 }
 
 
-void CollisionManager::createCollisionGroup(std::string name, CollisionGroupType type, std::vector<PhysicalObject*> physicalObjectVec){
+CollisionShape::CollisionShape(PhysicalObject *_owner){
+    owner = _owner;
+
+    this->setFillColor(sf::Color(0,0,0,0));
+    this->setSize(sf::Vector2f(_owner->getGlobalBounds().width, _owner->getGlobalBounds().height));
+    this->setOutlineColor(sf::Color::Blue);
+    this->setOutlineThickness(.5);
+}
+
+PhysicalObject* CollisionShape::getOwner(){ return owner; }
+
+CollisionShapePositionData CollisionShape::getPositionData(){
+    return { this->getPosition().x, this->getPosition().y, this->getGlobalBounds().height, this->getGlobalBounds().width };
+}
+
+bool CollisionShape::getIsVisible(){ return isVisible; }
+void CollisionShape::setIsVisible(bool is){ isVisible = is; }
+
+sf::Vector2f CollisionShape::getOffset(){ return offset; }
+void CollisionShape::setOffset(sf::Vector2f _offset){ offset = _offset; }
+
+void CollisionShape::align(){
+    this->setPosition(owner->getPosition() + offset);
+}
+
+
+void CollisionManager::createCollisionGroup(std::string name, CollisionGroupType type, std::vector<CollisionShape*> collisionShapes){
     // TODO check if already exists (has length)
-    collisionGroups[name] = CollisionGroup {type, physicalObjectVec};
+    collisionGroups[name] = CollisionGroup {type, collisionShapes};
 }
 
 void CollisionManager::createCollisionPair(std::string name, std::string group1, std::string group2){
@@ -513,11 +580,21 @@ void CollisionManager::addCollisionResponse(std::string collisionPairName, const
     collisionPairs[collisionPairName].collisionResponses.push_back(response);
 }
 
-void CollisionManager::setCollisionDetectionAlgorithm(std::string collisionPairName, const std::function<bool(PhysicalObject *PO1, PhysicalObject *PO2)> &cda){
+void CollisionManager::setCollisionDetectionAlgorithm(std::string collisionPairName, const std::function<bool(CollisionShape *CS1, CollisionShape *CS2)> &cda){
     collisionPairs[collisionPairName].checkCollision = cda;
 }
 
+std::map<std::string, CollisionGroup> CollisionManager::getCollisionGroups(){ return collisionGroups; }
+
 void CollisionManager::updateCollisions(){
+    // Aligh collision shapes
+    for(auto& [key, collisionGroup] : collisionGroups){
+        for(CollisionShape *collisionShape : collisionGroup.collisionShapes){
+            collisionShape->align();
+        }
+    }
+    //
+
     // TODO check if any collision pairs are added
 
     std::vector<Collision> collisions;
@@ -525,13 +602,13 @@ void CollisionManager::updateCollisions(){
     // TODO refactor ?
     for(auto const& [name, pair] : collisionPairs){
         // Determine all collisions
-        for(PhysicalObject *physicalObjectCG1 : collisionGroups[std::get<0>(pair.collisionGroups)].physicalObjects){
-            for(PhysicalObject *physicalObjectCG2 : collisionGroups[std::get<1>(pair.collisionGroups)].physicalObjects){
-                if(pair.checkCollision(physicalObjectCG1, physicalObjectCG2)){
+        for(CollisionShape *collisionShape_Group1 : collisionGroups[std::get<0>(pair.collisionGroups)].collisionShapes){
+            for(CollisionShape *collisionShape_Group2 : collisionGroups[std::get<1>(pair.collisionGroups)].collisionShapes){
+                if(pair.checkCollision(collisionShape_Group1, collisionShape_Group2)){
                     Collision collision;
-                    collision.side = determineCollisionSide(physicalObjectCG1, physicalObjectCG2);
-                    collision.from = physicalObjectCG1; // ! Assuming PO1 is always 'from' (moveable)
-                    collision.with = physicalObjectCG2;
+                    collision.side = determineCollisionSide(collisionShape_Group1, collisionShape_Group2);
+                    collision.from = collisionShape_Group1; // ! Assuming CS1 is always 'from' (moveable)
+                    collision.with = collisionShape_Group2;
 
                     collisions.push_back(collision);
                 }
@@ -719,6 +796,14 @@ void Universe::loop(){
         
         if(playerPtr){
             windowPtr->draw(*playerPtr);
+        }
+
+        for(auto& [key, collisionGroup] : collisionManager.getCollisionGroups()){
+            for(CollisionShape *collisionShape : collisionGroup.collisionShapes){
+                if(collisionShape->getIsVisible()){
+                    windowPtr->draw(*collisionShape);
+                }
+            }
         }
         // 
 

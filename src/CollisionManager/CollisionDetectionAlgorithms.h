@@ -1,11 +1,11 @@
 #ifndef COLLISION_DETECTION_ALGORITHMS_H
 #define COLLISION_DETECTION_ALGORITHMS_H
 
-#include "../PhysicsManager/PhysicalObject.h"
+#include "./CollisionShapes/CollisionShape.h"
 
 
-bool boundingBox(PhysicalObject *PO1, PhysicalObject *PO2){
-    return PO1->getGlobalBounds().intersects(PO2->getGlobalBounds());
+bool boundingBox(CollisionShape *CS1, CollisionShape *CS2){
+    return CS1->getGlobalBounds().intersects(CS2->getGlobalBounds());
 }
 
 // TODO

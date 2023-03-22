@@ -3,11 +3,12 @@
 
 #include <SFML/Graphics.hpp>
 #include "CollisionGroupType.h"
+#include "./CollisionShapes/CollisionShape.h"
 
 
 struct CollisionGroup{
     CollisionGroupType collisionGroupType;
-    std::vector<PhysicalObject*> physicalObjects;
+    std::vector<CollisionShape*> collisionShapes;
 };
 
 

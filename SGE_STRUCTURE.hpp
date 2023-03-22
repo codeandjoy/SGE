@@ -26,6 +26,8 @@
 #include "./src/CollisionManager/CollisionSide.h"
 #include "./src/CollisionManager/Collision.h"
 #include "./src/CollisionManager/CollisionUtils.h"
+#include "./src/CollisionManager/CollisionShapes/CollisionShape.h"
+#include "./src/CollisionManager/CollisionShapes/CollisionShapePositionData.h"
 
 #endif
 

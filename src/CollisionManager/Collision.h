@@ -1,14 +1,14 @@
 #ifndef COLLISION_H
 #define COLLISION_H
 
-#include "../PhysicsManager/PhysicalObject.h"
 #include "CollisionSide.h"
+#include "./CollisionShapes/CollisionShape.h"
 
 
 struct Collision{
     CollisionSide side;
-    PhysicalObject *from;
-    PhysicalObject *with;
+    CollisionShape *from;
+    CollisionShape *with;
     // ? detectionAlgorithm (string?)
 };
 

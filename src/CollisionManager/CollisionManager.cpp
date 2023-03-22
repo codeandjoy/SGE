@@ -2,9 +2,9 @@
 #include "Collision.h"
 #include "CollisionUtils.h"
 
-void CollisionManager::createCollisionGroup(std::string name, CollisionGroupType type, std::vector<PhysicalObject*> physicalObjectVec){
+void CollisionManager::createCollisionGroup(std::string name, CollisionGroupType type, std::vector<CollisionShape*> collisionShapes){
     // TODO check if already exists (has length)
-    collisionGroups[name] = CollisionGroup {type, physicalObjectVec};
+    collisionGroups[name] = CollisionGroup {type, collisionShapes};
 }
 
 void CollisionManager::createCollisionPair(std::string name, std::string group1, std::string group2){
@@ -16,11 +16,21 @@ void CollisionManager::addCollisionResponse(std::string collisionPairName, const
     collisionPairs[collisionPairName].collisionResponses.push_back(response);
 }
 
-void CollisionManager::setCollisionDetectionAlgorithm(std::string collisionPairName, const std::function<bool(PhysicalObject *PO1, PhysicalObject *PO2)> &cda){
+void CollisionManager::setCollisionDetectionAlgorithm(std::string collisionPairName, const std::function<bool(CollisionShape *CS1, CollisionShape *CS2)> &cda){
     collisionPairs[collisionPairName].checkCollision = cda;
 }
 
+std::map<std::string, CollisionGroup> CollisionManager::getCollisionGroups(){ return collisionGroups; }
+
 void CollisionManager::updateCollisions(){
+    // Aligh collision shapes
+    for(auto& [key, collisionGroup] : collisionGroups){
+        for(CollisionShape *collisionShape : collisionGroup.collisionShapes){
+            collisionShape->align();
+        }
+    }
+    //
+
     // TODO check if any collision pairs are added
 
     std::vector<Collision> collisions;
@@ -28,13 +38,13 @@ void CollisionManager::updateCollisions(){
     // TODO refactor ?
     for(auto const& [name, pair] : collisionPairs){
         // Determine all collisions
-        for(PhysicalObject *physicalObjectCG1 : collisionGroups[std::get<0>(pair.collisionGroups)].physicalObjects){
-            for(PhysicalObject *physicalObjectCG2 : collisionGroups[std::get<1>(pair.collisionGroups)].physicalObjects){
-                if(pair.checkCollision(physicalObjectCG1, physicalObjectCG2)){
+        for(CollisionShape *collisionShape_Group1 : collisionGroups[std::get<0>(pair.collisionGroups)].collisionShapes){
+            for(CollisionShape *collisionShape_Group2 : collisionGroups[std::get<1>(pair.collisionGroups)].collisionShapes){
+                if(pair.checkCollision(collisionShape_Group1, collisionShape_Group2)){
                     Collision collision;
-                    collision.side = determineCollisionSide(physicalObjectCG1, physicalObjectCG2);
-                    collision.from = physicalObjectCG1; // ! Assuming PO1 is always 'from' (moveable)
-                    collision.with = physicalObjectCG2;
+                    collision.side = determineCollisionSide(collisionShape_Group1, collisionShape_Group2);
+                    collision.from = collisionShape_Group1; // ! Assuming CS1 is always 'from' (moveable)
+                    collision.with = collisionShape_Group2;
 
                     collisions.push_back(collision);
                 }

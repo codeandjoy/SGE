@@ -90,9 +90,19 @@ int main(){
     universe->addAnimation(playerAnimation);
     //
 
-    // CollisionManager
-    universe->collisionManager.createCollisionGroup("player", CollisionGroupType::moveable, std::vector<PhysicalObject*>{player});
-    universe->collisionManager.createCollisionGroup("tiles", CollisionGroupType::solid, mapTiles);
+
+    // * CollisionManager
+    CollisionShape *playerCollisionShape = new CollisionShape(player);
+
+    std::vector<CollisionShape*> mapTileCollisionShapes;
+    for(PhysicalObject *tile : mapTiles){
+        CollisionShape *tileCS = new CollisionShape(tile);
+        mapTileCollisionShapes.push_back(tileCS);
+    }
+
+
+    universe->collisionManager.createCollisionGroup("player", CollisionGroupType::moveable, std::vector<CollisionShape*>{playerCollisionShape});
+    universe->collisionManager.createCollisionGroup("tiles", CollisionGroupType::solid, mapTileCollisionShapes);
     universe->collisionManager.createCollisionPair("PTCollisionPair", "player", "tiles");
     universe->collisionManager.setCollisionDetectionAlgorithm("PTCollisionPair", boundingBox);
 
@@ -100,7 +110,7 @@ int main(){
     universe->collisionManager.addCollisionResponse("PTCollisionPair", [player](std::vector<Collision> collisions){
         player->doAction("jumpReset");
     });
-    //
+    // *
 
     // TODO use movement functions on player PhysicalObject
     universe->addController([player, playerAnimation](){
