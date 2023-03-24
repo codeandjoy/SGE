@@ -3,7 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 #include "CollisionGroupType.h"
-#include "./CollisionShapes/CollisionShape.h"
+#include "CollisionShape.h"
 
 
 struct CollisionGroup{

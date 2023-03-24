@@ -3,7 +3,7 @@
 
 #include <SFML/Graphics.hpp> 
 #include "Collision.h"
-#include "./CollisionShapes/CollisionShape.h"
+#include "CollisionShape.h"
 
 
 // ? add collision type specifier (rectangle, circle etc.)

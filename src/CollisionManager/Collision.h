@@ -2,7 +2,7 @@
 #define COLLISION_H
 
 #include "CollisionSide.h"
-#include "./CollisionShapes/CollisionShape.h"
+#include "CollisionShape.h"
 
 
 struct Collision{

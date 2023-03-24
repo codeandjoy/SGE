@@ -1,7 +1,7 @@
 #ifndef COLLISION_DETECTION_ALGORITHMS_H
 #define COLLISION_DETECTION_ALGORITHMS_H
 
-#include "./CollisionShapes/CollisionShape.h"
+#include "CollisionShape.h"
 
 
 bool boundingBox(CollisionShape *CS1, CollisionShape *CS2){

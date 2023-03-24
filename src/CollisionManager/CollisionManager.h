@@ -2,12 +2,12 @@
 #define COLLISION_MANAGER_H
 
 #include <SFML/Graphics.hpp>
-#include "../PhysicsManager/PhysicalObject.h"
+#include "../Physics/PhysicalObject.h"
 #include "CollisionGroup.h"
 #include "CollisionGroupType.h"
 #include "CollisionPair.h"
 #include "Collision.h"
-#include "./CollisionShapes/CollisionShape.h"
+#include "CollisionShape.h"
 
 
 // ? allow to add an 'area' where collisions get calculated 

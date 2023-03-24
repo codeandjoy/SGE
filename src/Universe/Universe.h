@@ -2,8 +2,8 @@
 #define UNIVERSE_H
 
 #include <SFML/Graphics.hpp>
-#include "../PhysicsManager/PhysicsManager.h"
-#include "../PhysicsManager/PhysicalObject.h"
+#include "../Physics/PhysicsManager.h"
+#include "../Physics/PhysicalObject.h"
 #include "../CollisionManager/CollisionManager.h"
 #include "../Animation/Animation.h"
 

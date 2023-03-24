@@ -11,11 +11,11 @@
 
 #include "./src/Animation/Animation.h"
 
-#include "./src/PhysicsManager/PhysicsManager.h"
-#include "./src/PhysicsManager/PhysicalObjectPositionData.h"
-#include "./src/PhysicsManager/PhysicalObject.h"
-#include "./src/PhysicsManager/ContinuousAction.h"
-#include "./src/PhysicsManager/ConditionalAction.h"
+#include "./src/Physics/PhysicsManager.h"
+#include "./src/Physics/PhysicalObjectPositionData.h"
+#include "./src/Physics/PhysicalObject.h"
+#include "./src/Physics/ContinuousAction.h"
+#include "./src/Physics/ConditionalAction.h"
 
 #include "./src/CollisionManager/CollisionManager.h"
 #include "./src/CollisionManager/CollisionGroup.h"
@@ -26,8 +26,8 @@
 #include "./src/CollisionManager/CollisionSide.h"
 #include "./src/CollisionManager/Collision.h"
 #include "./src/CollisionManager/CollisionUtils.h"
-#include "./src/CollisionManager/CollisionShapes/CollisionShape.h"
-#include "./src/CollisionManager/CollisionShapes/CollisionShapePositionData.h"
+#include "./src/CollisionManager/CollisionShape.h"
+#include "./src/CollisionManager/CollisionShapePositionData.h"
 
 #endif
 

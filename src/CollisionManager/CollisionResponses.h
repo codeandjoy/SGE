@@ -3,8 +3,8 @@
 
 #include "CollisionSide.h"
 #include "Collision.h"
-#include "./CollisionShapes/CollisionShape.h"
-#include "../PhysicsManager/PhysicalObject.h"
+#include "CollisionShape.h"
+#include "../Physics/PhysicalObject.h"
 
 
 void resolveAABB(std::vector<Collision> collisions){

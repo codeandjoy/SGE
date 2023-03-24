@@ -3,7 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 #include "CollisionShapePositionData.h"
-#include "../../PhysicsManager/PhysicalObject.h"
+#include "../Physics/PhysicalObject.h"
 
 
 class CollisionShape : public sf::RectangleShape{

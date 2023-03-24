@@ -2,7 +2,7 @@
 #define COLLISION_UTILS_H
 
 #include <limits>
-#include "./CollisionShapes/CollisionShape.h"
+#include "CollisionShape.h"
 #include "CollisionSide.h"
 
 
