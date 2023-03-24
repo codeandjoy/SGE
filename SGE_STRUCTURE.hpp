@@ -17,17 +17,17 @@
 #include "./src/Physics/ContinuousAction.h"
 #include "./src/Physics/ConditionalAction.h"
 
-#include "./src/CollisionManager/CollisionManager.h"
-#include "./src/CollisionManager/CollisionGroup.h"
-#include "./src/CollisionManager/CollisionGroupType.h"
-#include "./src/CollisionManager/CollisionPair.h"
-#include "./src/CollisionManager/CollisionResponses.h"
-#include "./src/CollisionManager/CollisionDetectionAlgorithms.h"
-#include "./src/CollisionManager/CollisionSide.h"
-#include "./src/CollisionManager/Collision.h"
-#include "./src/CollisionManager/CollisionUtils.h"
-#include "./src/CollisionManager/CollisionShape.h"
-#include "./src/CollisionManager/CollisionShapePositionData.h"
+#include "./src/Collision/CollisionManager.h"
+#include "./src/Collision/CollisionGroup.h"
+#include "./src/Collision/CollisionGroupType.h"
+#include "./src/Collision/CollisionPair.h"
+#include "./src/Collision/CollisionResponses.h"
+#include "./src/Collision/CollisionDetectionAlgorithms.h"
+#include "./src/Collision/CollisionSide.h"
+#include "./src/Collision/Collision.h"
+#include "./src/Collision/CollisionUtils.h"
+#include "./src/Collision/CollisionShape.h"
+#include "./src/Collision/CollisionShapePositionData.h"
 
 #endif
 

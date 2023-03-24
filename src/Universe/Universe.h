@@ -4,7 +4,7 @@
 #include <SFML/Graphics.hpp>
 #include "../Physics/PhysicsManager.h"
 #include "../Physics/PhysicalObject.h"
-#include "../CollisionManager/CollisionManager.h"
+#include "../Collision/CollisionManager.h"
 #include "../Animation/Animation.h"
 
 
