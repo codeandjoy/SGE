@@ -6,11 +6,13 @@
 
 class PhysicsManager{
     public:
-        void addPhysicalObject(PhysicalObject *physicalObject);
+        void addPhysicalObject(std::string _name, PhysicalObject* _physicalObject);
+        void removePhysicalObject(std::string _name);
+
         void updatePhysics(float dt);
 
     private:
-        std::vector<PhysicalObject*> physicalObjects;
+        std::map<std::string, PhysicalObject*> physicalObjects;
 };
 
 

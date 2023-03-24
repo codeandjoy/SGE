@@ -116,11 +116,13 @@ class PhysicalObject : public sf::Sprite{
 
 class PhysicsManager{
     public:
-        void addPhysicalObject(PhysicalObject *physicalObject);
+        void addPhysicalObject(std::string _name, PhysicalObject* _physicalObject);
+        void removePhysicalObject(std::string _name);
+
         void updatePhysics(float dt);
 
     private:
-        std::vector<PhysicalObject*> physicalObjects;
+        std::map<std::string, PhysicalObject*> physicalObjects;
 };
 
 #endif
@@ -522,20 +524,19 @@ void PhysicalObject::update(float dt){
 };
 
 
-void PhysicsManager::addPhysicalObject(PhysicalObject *physicalObject){
-    physicalObjects.push_back(physicalObject);
-}
+void PhysicsManager::addPhysicalObject(std::string _name, PhysicalObject* _physicalObject){ physicalObjects[_name] = _physicalObject; }
+
+void PhysicsManager::removePhysicalObject(std::string _name){ physicalObjects.erase(_name); }
 
 void PhysicsManager::updatePhysics(float dt){
     // TODO check if any physical objects exist
-    for(PhysicalObject *pObject : physicalObjects){
-        // * Gravity
-        if(!pObject->getIsFlying()){
-            pObject->setVelocityGoalY(pObject->getMass()); // ?
+    for(auto& [key, physicalObject] : physicalObjects){
+        // Gravity
+        if(!physicalObject->getIsFlying()){
+            physicalObject->setVelocityGoalY(physicalObject->getMass());
         }
-        // *
 
-        pObject->update(dt);
+        physicalObject->update(dt);
     }
 }
 
