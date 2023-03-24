@@ -5,6 +5,7 @@
 #include "../Physics/PhysicsManager.h"
 #include "../Physics/PhysicalObject.h"
 #include "../Collision/CollisionManager.h"
+#include "../Texture/TextureManager.h"
 #include "../Animation/Animation.h"
 
 
@@ -21,6 +22,7 @@ class Universe{
 
         PhysicsManager physicsManager;
         CollisionManager collisionManager;
+        TextureManager textureManager;
 
     private:
         sf::Clock deltaClock;

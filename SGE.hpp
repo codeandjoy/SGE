@@ -241,14 +241,9 @@ class CollisionManager{
 };
 
 #endif
-#ifndef ANIMATION_H
-#define ANIMATION_H
+#ifndef TEXTURE_MANAGER_H
+#define TEXTURE_MANAGER_H
 
-#include <SFML/Graphics.hpp>
-#ifndef TEXTURESHEET_H
-#define TEXTURESHEET_H
-
-#include <SFML/Graphics.hpp>
 #ifndef TEXTURE_SHEET_SIZES_H
 #define TEXTURE_SHEET_SIZES_H
 
@@ -268,6 +263,10 @@ struct TextureSheetSizes{
 };
 
 #endif
+#ifndef TEXTURESHEET_H
+#define TEXTURESHEET_H
+
+#include <SFML/Graphics.hpp>
 
 // TODO texturesheet with gaps between textures
 class TextureSheet{
@@ -286,6 +285,23 @@ class TextureSheet{
 };
 
 #endif
+
+class TextureManager{
+    public:
+        void load(std::string textureLocation, TextureSheetSizes textureSheetSizes, std::string textureName);
+        TextureSheet* get(std::string textureName); // TODO check nonexistent data (return nullptr?)
+        // ? not needed
+        TextureSheet* getByLocation(std::string textureLocation); // can be used to check whether texture at location has been loaded
+
+    private:
+        std::map<std::string, TextureSheet*> loadedTextures;
+};
+
+#endif
+#ifndef ANIMATION_H
+#define ANIMATION_H
+
+#include <SFML/Graphics.hpp>
 
 // TODO Animations should switch immediately
 class Animation{
@@ -327,6 +343,7 @@ class Universe{
 
         PhysicsManager physicsManager;
         CollisionManager collisionManager;
+        TextureManager textureManager;
 
     private:
         sf::Clock deltaClock;
@@ -336,22 +353,6 @@ class Universe{
         std::vector<std::function<void()>> controllers;
         std::vector<std::function<void(sf::Event event)>> eventHandlers;
         std::vector<Animation*> animations;
-};
-
-#endif
-
-#ifndef TEXTURE_MANAGER_H
-#define TEXTURE_MANAGER_H
-
-class TextureManager{
-    public:
-        void load(std::string textureLocation, TextureSheetSizes textureSheetSizes, std::string textureName);
-        TextureSheet* get(std::string textureName); // TODO check nonexistent data (return nullptr?)
-        // ? not needed
-        TextureSheet* getByLocation(std::string textureLocation); // can be used to check whether texture at location has been loaded
-
-    private:
-        std::map<std::string, TextureSheet*> loadedTextures;
 };
 
 #endif
@@ -656,6 +657,28 @@ sf::IntRect TextureSheet::getTextureRect(int textureN){
 }
 
 
+void TextureManager::load(std::string textureLocation, TextureSheetSizes textureSheetSizes, std::string textureName){
+    if(loadedTextures.count(textureName)){
+        printf("Can't load already existing texture '%s'\n", textureName.c_str());
+        exit(1);
+    }
+
+    loadedTextures[textureName] = new TextureSheet(textureSheetSizes, textureLocation);
+}
+
+TextureSheet* TextureManager::get(std::string textureName){
+    return loadedTextures[textureName];
+}
+
+TextureSheet* TextureManager::getByLocation(std::string textureLocation){
+    for(auto &[key, textureSheet] : loadedTextures){
+        if(textureSheet->getLocation() == textureLocation) return textureSheet;
+    }
+
+    return nullptr;
+}
+
+
 Animation::Animation(TextureSheet *spritesheet, sf::Sprite *owner, int initialTextureN){
     this->textureSheet = spritesheet;
     this->owner = owner;
@@ -810,28 +833,6 @@ void Universe::loop(){
 
         windowPtr->display();
     }
-}
-
-
-void TextureManager::load(std::string textureLocation, TextureSheetSizes textureSheetSizes, std::string textureName){
-    if(loadedTextures.count(textureName)){
-        printf("Can't load already existing texture '%s'\n", textureName.c_str());
-        exit(1);
-    }
-
-    loadedTextures[textureName] = new TextureSheet(textureSheetSizes, textureLocation);
-}
-
-TextureSheet* TextureManager::get(std::string textureName){
-    return loadedTextures[textureName];
-}
-
-TextureSheet* TextureManager::getByLocation(std::string textureLocation){
-    for(auto &[key, textureSheet] : loadedTextures){
-        if(textureSheet->getLocation() == textureLocation) return textureSheet;
-    }
-
-    return nullptr;
 }
 
 
