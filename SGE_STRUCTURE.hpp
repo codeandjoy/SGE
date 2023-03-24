@@ -5,9 +5,9 @@
 
 #include "./src/Universe/Universe.h"
 
-#include "./src/TextureManager/TextureSheet.h"
-#include "./src/TextureManager/TextureSheetSizes.h"
-#include "./src/TextureManager/TextureManager.h"
+#include "./src/Texture/TextureSheet.h"
+#include "./src/Texture/TextureSheetSizes.h"
+#include "./src/Texture/TextureManager.h"
 
 #include "./src/Animation/Animation.h"
 
