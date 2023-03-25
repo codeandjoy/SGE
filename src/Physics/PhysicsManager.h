@@ -6,8 +6,8 @@
 
 class PhysicsManager{
     public:
-        void addPhysicalObject(PhysicalObject* _physicalObject);
-        void removePhysicalObject(PhysicalObject* _physicalObject);
+        void registerPhysicalObject(PhysicalObject* _physicalObject);
+        void deregisterPhysicalObject(PhysicalObject* _physicalObject);
 
         void updatePhysics(float dt);
 

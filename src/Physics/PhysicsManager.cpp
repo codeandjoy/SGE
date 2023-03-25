@@ -1,8 +1,8 @@
 #include "PhysicsManager.h"
 
-void PhysicsManager::addPhysicalObject(PhysicalObject* _physicalObject){ physicalObjects.push_back(_physicalObject); }
+void PhysicsManager::registerPhysicalObject(PhysicalObject* _physicalObject){ physicalObjects.push_back(_physicalObject); }
 
-void PhysicsManager::removePhysicalObject(PhysicalObject* _physicalObject){ physicalObjects.erase(std::remove(physicalObjects.begin(), physicalObjects.end(), _physicalObject), physicalObjects.end()); }
+void PhysicsManager::deregisterPhysicalObject(PhysicalObject* _physicalObject){ physicalObjects.erase(std::remove(physicalObjects.begin(), physicalObjects.end(), _physicalObject), physicalObjects.end()); }
 
 void PhysicsManager::updatePhysics(float dt){
     // TODO check if any physical objects exist
