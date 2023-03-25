@@ -14,9 +14,8 @@ class TextureManager{
         // *
 
         // * Animations
-        void addAnimation(std::string name, Animation* animation);
-        Animation* getAnimation(std::string name);
-        void deleteAnimation(std::string name);
+        void registerAnimation(Animation* animation);
+        void deregisterAnimation(Animation* animation);
         // *
 
         void initAnimationClocks();
@@ -24,7 +23,7 @@ class TextureManager{
 
     private:
         std::map<std::string, TextureSheet*> loadedTextures;
-        std::map<std::string, Animation*> animations;
+        std::vector<Animation*> animations;
 };
 
 

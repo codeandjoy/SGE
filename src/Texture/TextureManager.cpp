@@ -6,19 +6,18 @@ TextureSheet* TextureManager::getTexture(std::string name){ return loadedTexture
 // *
 
 // * Animations
-void TextureManager::addAnimation(std::string name, Animation* animation){ animations[name] = animation; }
-Animation* TextureManager::getAnimation(std::string name){ return animations[name]; }
-void TextureManager::deleteAnimation(std::string name){ animations.erase(name); }
+void TextureManager::registerAnimation(Animation* animation){ animations.push_back(animation); }
+void TextureManager::deregisterAnimation(Animation* animation){ animations.erase(std::remove(animations.begin(), animations.end(), animation), animations.end()); }
 // *
 
 void TextureManager::initAnimationClocks(){
-    for(auto& [key, animation] : animations){
+    for(Animation* animation : animations){
         animation->restartClock();
     }
 }
 
 void TextureManager::updateAnimations(){
-    for(auto& [key, animation] : animations){
+    for(Animation* animation : animations){
         animation->run();
     }
 }

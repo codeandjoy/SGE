@@ -86,7 +86,7 @@ int main(){
     playerAnimation->addAnimationSequence("runLeft", std::vector<int>{45, 46, 47});
     playerAnimation->setCurrentAnimationSequence("idle");
 
-    universe->textureManager.addAnimation("playerAnimation", playerAnimation);
+    universe->textureManager.registerAnimation(playerAnimation);
     //
 
     // * CollisionManager
