@@ -116,13 +116,13 @@ class PhysicalObject : public sf::Sprite{
 
 class PhysicsManager{
     public:
-        void addPhysicalObject(std::string _name, PhysicalObject* _physicalObject);
-        void removePhysicalObject(std::string _name);
+        void addPhysicalObject(PhysicalObject* _physicalObject);
+        void removePhysicalObject(PhysicalObject* _physicalObject);
 
         void updatePhysics(float dt);
 
     private:
-        std::map<std::string, PhysicalObject*> physicalObjects;
+        std::vector<PhysicalObject*> physicalObjects;
 };
 
 #endif
@@ -300,9 +300,11 @@ class Animation{
         // runCycle -> 1,2,3,2,1,2
         // ?
         void run();
+        
         void restartClock();
-        void setCurrentAnimationSequence(std::string sequenceName);
+        
         void addAnimationSequence(std::string sequenceName, std::vector<int> textureSequence);
+        void setCurrentAnimationSequence(std::string sequenceName);
 
     private:
         sf::Sprite *owner;
@@ -540,13 +542,13 @@ void PhysicalObject::update(float dt){
 };
 
 
-void PhysicsManager::addPhysicalObject(std::string _name, PhysicalObject* _physicalObject){ physicalObjects[_name] = _physicalObject; }
+void PhysicsManager::addPhysicalObject(PhysicalObject* _physicalObject){ physicalObjects.push_back(_physicalObject); }
 
-void PhysicsManager::removePhysicalObject(std::string _name){ physicalObjects.erase(_name); }
+void PhysicsManager::removePhysicalObject(PhysicalObject* _physicalObject){ physicalObjects.erase(std::remove(physicalObjects.begin(), physicalObjects.end(), _physicalObject), physicalObjects.end()); }
 
 void PhysicsManager::updatePhysics(float dt){
     // TODO check if any physical objects exist
-    for(auto& [key, physicalObject] : physicalObjects){
+    for(PhysicalObject* physicalObject : physicalObjects){
         // Gravity
         if(!physicalObject->getIsFlying()){
             physicalObject->setVelocityGoalY(physicalObject->getMass());
@@ -713,14 +715,6 @@ void Animation::restartClock(){
     clock.restart();
 }
 
-void Animation::setCurrentAnimationSequence(std::string sequenceName){
-    if(currentAnimationSequence != sequenceName){
-        currentAnimationSequence = sequenceName;
-        currentTextureN = 0;
-        clock.restart();
-    }
-}
-
 void Animation::addAnimationSequence(std::string sequenceName, std::vector<int> textureSequence){
     // Ensure uniqueness
     if(animationSequences.count(sequenceName)){
@@ -731,6 +725,13 @@ void Animation::addAnimationSequence(std::string sequenceName, std::vector<int> 
     animationSequences[sequenceName] = textureSequence;
 }
 
+void Animation::setCurrentAnimationSequence(std::string sequenceName){
+    if(currentAnimationSequence != sequenceName){
+        currentAnimationSequence = sequenceName;
+        currentTextureN = 0;
+        clock.restart();
+    }
+}
 
 // * Textures
 void TextureManager::loadTexture(std::string location, std::string name, TextureSheetSizes textureSheetSizes){ loadedTextures[name] = new TextureSheet(textureSheetSizes, location); }

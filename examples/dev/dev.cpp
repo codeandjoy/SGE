@@ -76,7 +76,7 @@ int main(){
     );
 
     universe->createPlayer(player);
-    universe->physicsManager.addPhysicalObject("player", player);
+    universe->physicsManager.addPhysicalObject(player);
     //
 
     // Player animation

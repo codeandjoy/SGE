@@ -1,12 +1,12 @@
 #include "PhysicsManager.h"
 
-void PhysicsManager::addPhysicalObject(std::string _name, PhysicalObject* _physicalObject){ physicalObjects[_name] = _physicalObject; }
+void PhysicsManager::addPhysicalObject(PhysicalObject* _physicalObject){ physicalObjects.push_back(_physicalObject); }
 
-void PhysicsManager::removePhysicalObject(std::string _name){ physicalObjects.erase(_name); }
+void PhysicsManager::removePhysicalObject(PhysicalObject* _physicalObject){ physicalObjects.erase(std::remove(physicalObjects.begin(), physicalObjects.end(), _physicalObject), physicalObjects.end()); }
 
 void PhysicsManager::updatePhysics(float dt){
     // TODO check if any physical objects exist
-    for(auto& [key, physicalObject] : physicalObjects){
+    for(PhysicalObject* physicalObject : physicalObjects){
         // Gravity
         if(!physicalObject->getIsFlying()){
             physicalObject->setVelocityGoalY(physicalObject->getMass());
