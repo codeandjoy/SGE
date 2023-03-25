@@ -14,18 +14,22 @@
 // ? addToGroup(...), removeFromGroup(...), reloadGroup(...) (checks if pointers are still valid), removePair(...), removeCOllisionResponse(...)
 class CollisionManager{
     public:
-    void createCollisionGroup(std::string name, CollisionGroupType type, std::vector<CollisionShape*> collisionShapes);
-    void createCollisionPair(std::string name, std::string group1, std::string group2);
-    void addCollisionResponse(std::string collisionPairName, const std::function<void(std::vector<Collision>)> &response);
-    void setCollisionDetectionAlgorithm(std::string collisionPairName, const std::function<bool(CollisionShape *CS1, CollisionShape *CS2)> &cda);
+        void registerCollisionGroup(std::string name, CollisionGroup* _collisionGroup);
+        void deregisterCollisionGroup(std::string name);
+        void registerCollisionGroups(std::map<std::string, CollisionGroup*> _groupsToRegister);
+        void deregisterCollisionGroups(std::map<std::string, CollisionGroup*> _groupsToDeregister);
+        
+        void createCollisionPair(std::string name, std::string group1, std::string group2);
+        void addCollisionResponse(std::string collisionPairName, const std::function<void(std::vector<Collision>)> &response);
+        void setCollisionDetectionAlgorithm(std::string collisionPairName, const std::function<bool(CollisionShape *CS1, CollisionShape *CS2)> &cda);
 
-    std::map<std::string, CollisionGroup> getCollisionGroups();
+        std::map<std::string, CollisionGroup*> getCollisionGroups();
 
-    void updateCollisions();
+        void updateCollisions();
 
     private:
-    std::map<std::string, CollisionGroup> collisionGroups;
-    std::map<std::string, CollisionPair> collisionPairs;
+        std::map<std::string, CollisionGroup*> collisionGroups;
+        std::map<std::string, CollisionPair> collisionPairs;
 };
 
 

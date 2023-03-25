@@ -2,10 +2,19 @@
 #include "Collision.h"
 #include "CollisionUtils.h"
 
-void CollisionManager::createCollisionGroup(std::string name, CollisionGroupType type, std::vector<CollisionShape*> collisionShapes){
-    // TODO check if already exists (has length)
-    collisionGroups[name] = CollisionGroup {type, collisionShapes};
+void CollisionManager::registerCollisionGroup(std::string name, CollisionGroup* _collisionGroup){ collisionGroups[name] = _collisionGroup; } 
+
+void CollisionManager::deregisterCollisionGroup(std::string name){ collisionGroups.erase(name); }
+
+void CollisionManager::registerCollisionGroups(std::map<std::string, CollisionGroup*> _groupsToRegister){ collisionGroups.insert(_groupsToRegister.begin(), _groupsToRegister.end()); }
+
+void CollisionManager::deregisterCollisionGroups(std::map<std::string, CollisionGroup*> _groupsToDeregister){
+    for(auto& [name, _] : _groupsToDeregister){
+        deregisterCollisionGroup(name);
+    }
 }
+
+
 
 void CollisionManager::createCollisionPair(std::string name, std::string group1, std::string group2){
     // TODO Check if both groups exist in collisionGroups
@@ -20,12 +29,12 @@ void CollisionManager::setCollisionDetectionAlgorithm(std::string collisionPairN
     collisionPairs[collisionPairName].checkCollision = cda;
 }
 
-std::map<std::string, CollisionGroup> CollisionManager::getCollisionGroups(){ return collisionGroups; }
+std::map<std::string, CollisionGroup*> CollisionManager::getCollisionGroups(){ return collisionGroups; }
 
 void CollisionManager::updateCollisions(){
     // Aligh collision shapes
     for(auto& [key, collisionGroup] : collisionGroups){
-        for(CollisionShape *collisionShape : collisionGroup.collisionShapes){
+        for(CollisionShape *collisionShape : collisionGroup->collisionShapes){
             collisionShape->align();
         }
     }
@@ -38,8 +47,8 @@ void CollisionManager::updateCollisions(){
     // TODO refactor ?
     for(auto const& [name, pair] : collisionPairs){
         // Determine all collisions
-        for(CollisionShape *collisionShape_Group1 : collisionGroups[std::get<0>(pair.collisionGroups)].collisionShapes){
-            for(CollisionShape *collisionShape_Group2 : collisionGroups[std::get<1>(pair.collisionGroups)].collisionShapes){
+        for(CollisionShape *collisionShape_Group1 : collisionGroups[std::get<0>(pair.collisionGroups)]->collisionShapes){
+            for(CollisionShape *collisionShape_Group2 : collisionGroups[std::get<1>(pair.collisionGroups)]->collisionShapes){
                 if(pair.checkCollision(collisionShape_Group1, collisionShape_Group2)){
                     Collision collision;
                     collision.side = determineCollisionSide(collisionShape_Group1, collisionShape_Group2);

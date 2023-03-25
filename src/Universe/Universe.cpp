@@ -67,7 +67,7 @@ void Universe::loop(){
         }
 
         for(auto& [key, collisionGroup] : collisionManager.getCollisionGroups()){
-            for(CollisionShape *collisionShape : collisionGroup.collisionShapes){
+            for(CollisionShape *collisionShape : collisionGroup->collisionShapes){
                 if(collisionShape->getIsVisible()){
                     windowPtr->draw(*collisionShape);
                 }

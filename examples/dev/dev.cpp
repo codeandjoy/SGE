@@ -99,8 +99,8 @@ int main(){
     }
 
 
-    universe->collisionManager.createCollisionGroup("player", CollisionGroupType::moveable, std::vector<CollisionShape*>{playerCollisionShape});
-    universe->collisionManager.createCollisionGroup("tiles", CollisionGroupType::solid, mapTileCollisionShapes);
+    universe->collisionManager.registerCollisionGroup("player", new CollisionGroup{CollisionGroupType::moveable, std::vector<CollisionShape*>{playerCollisionShape}});
+    universe->collisionManager.registerCollisionGroup("tiles", new CollisionGroup{CollisionGroupType::solid, mapTileCollisionShapes});
     universe->collisionManager.createCollisionPair("PTCollisionPair", "player", "tiles");
     universe->collisionManager.setCollisionDetectionAlgorithm("PTCollisionPair", boundingBox);
 
