@@ -8,8 +8,7 @@
 #include "./src/Texture/TextureSheet.h"
 #include "./src/Texture/TextureSheetSizes.h"
 #include "./src/Texture/TextureManager.h"
-
-#include "./src/Animation/Animation.h"
+#include "./src/Texture/Animation.h"
 
 #include "./src/Physics/PhysicsManager.h"
 #include "./src/Physics/PhysicalObjectPositionData.h"

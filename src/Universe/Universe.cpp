@@ -1,15 +1,5 @@
-#include <iostream>
-
 #include "Universe.h"
 
-
-void Universe::addMap(std::vector<PhysicalObject*> *map){
-    mapPtr = map;
-}
-
-void Universe::createPlayer(sf::Sprite *player){
-    playerPtr = player;
-}
 
 void Universe::setupWindow(sf::RenderWindow *window){
     windowPtr = window;
@@ -23,10 +13,6 @@ void Universe::addEventHandler(std::function<void(sf::Event event)> eventHandler
     eventHandlers.push_back(eventHandler);
 }
 
-void Universe::addAnimation(Animation *animation){
-    animations.push_back(animation);
-}
-
 void Universe::loop(){
     if(!windowPtr){
         printf("RenderWindow is not initialized. Use setupWindow method to initialize RenderWindow before(!) looping the Universe.\n");
@@ -34,11 +20,9 @@ void Universe::loop(){
     }
 
     // Clocks initialization
-    if(!animations.empty()){
-        for(Animation *animation : animations){
-            animation->restartClock();
-        }
-    }
+    // ! Remove in the future (init on animation creation?)
+    textureManager.initAnimationClocks();
+    // !
 
     deltaClock.restart();
     //
@@ -70,12 +54,7 @@ void Universe::loop(){
         // Game updates
         physicsManager.updatePhysics(dt);
         collisionManager.updateCollisions();
-
-        if(!animations.empty()){
-            for(Animation *animation : animations){
-                animation->run();
-            }
-        }
+        textureManager.updateAnimations();
         // 
 
         // Game draws
@@ -98,4 +77,12 @@ void Universe::loop(){
 
         windowPtr->display();
     }
+}
+
+void Universe::addMap(std::vector<PhysicalObject*> *map){
+    mapPtr = map;
+}
+
+void Universe::createPlayer(sf::Sprite *player){
+    playerPtr = player;
 }

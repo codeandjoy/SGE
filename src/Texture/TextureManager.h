@@ -3,17 +3,28 @@
 
 #include "TextureSheetSizes.h"
 #include "TextureSheet.h"
+#include "Animation.h"
 
 
 class TextureManager{
     public:
-        void load(std::string textureLocation, TextureSheetSizes textureSheetSizes, std::string textureName);
-        TextureSheet* get(std::string textureName); // TODO check nonexistent data (return nullptr?)
-        // ? not needed
-        TextureSheet* getByLocation(std::string textureLocation); // can be used to check whether texture at location has been loaded
+        // * Textures
+        void loadTexture(std::string location, std::string name, TextureSheetSizes textureSheetSizes);
+        TextureSheet* getTexture(std::string name); // TODO check nonexistent data (return nullptr?)
+        // *
+
+        // * Animations
+        void addAnimation(std::string name, Animation* animation);
+        Animation* getAnimation(std::string name);
+        void deleteAnimation(std::string name);
+        // *
+
+        void initAnimationClocks();
+        void updateAnimations();
 
     private:
         std::map<std::string, TextureSheet*> loadedTextures;
+        std::map<std::string, Animation*> animations;
 };
 
 

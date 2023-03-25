@@ -1,22 +1,24 @@
 #include "TextureManager.h"
 
-void TextureManager::load(std::string textureLocation, TextureSheetSizes textureSheetSizes, std::string textureName){
-    if(loadedTextures.count(textureName)){
-        printf("Can't load already existing texture '%s'\n", textureName.c_str());
-        exit(1);
-    }
+// * Textures
+void TextureManager::loadTexture(std::string location, std::string name, TextureSheetSizes textureSheetSizes){ loadedTextures[name] = new TextureSheet(textureSheetSizes, location); }
+TextureSheet* TextureManager::getTexture(std::string name){ return loadedTextures[name]; }
+// *
 
-    loadedTextures[textureName] = new TextureSheet(textureSheetSizes, textureLocation);
+// * Animations
+void TextureManager::addAnimation(std::string name, Animation* animation){ animations[name] = animation; }
+Animation* TextureManager::getAnimation(std::string name){ return animations[name]; }
+void TextureManager::deleteAnimation(std::string name){ animations.erase(name); }
+// *
+
+void TextureManager::initAnimationClocks(){
+    for(auto& [key, animation] : animations){
+        animation->restartClock();
+    }
 }
 
-TextureSheet* TextureManager::get(std::string textureName){
-    return loadedTextures[textureName];
-}
-
-TextureSheet* TextureManager::getByLocation(std::string textureLocation){
-    for(auto &[key, textureSheet] : loadedTextures){
-        if(textureSheet->getLocation() == textureLocation) return textureSheet;
+void TextureManager::updateAnimations(){
+    for(auto& [key, animation] : animations){
+        animation->run();
     }
-
-    return nullptr;
 }

@@ -6,17 +6,14 @@
 #include "../Physics/PhysicalObject.h"
 #include "../Collision/CollisionManager.h"
 #include "../Texture/TextureManager.h"
-#include "../Animation/Animation.h"
 
 
 class Universe{
     public:
         void setupWindow(sf::RenderWindow *window);
-        void createPlayer(sf::Sprite *player);
-        void addMap(std::vector<PhysicalObject*> *map); // TODO managed in Scene in the future(?)
+
         void addController(std::function<void()> controller);
         void addEventHandler(std::function<void(sf::Event event)> eventHandler);
-        void addAnimation(Animation *animation);
 
         void loop();
 
@@ -24,14 +21,21 @@ class Universe{
         CollisionManager collisionManager;
         TextureManager textureManager;
 
+        // ! remove
+        void createPlayer(sf::Sprite *player);
+        void addMap(std::vector<PhysicalObject*> *map); // TODO managed in Scene in the future(?)
+
     private:
-        sf::Clock deltaClock;
         sf::RenderWindow *windowPtr;
-        sf::Sprite *playerPtr; // ! for drawing
-        std::vector<PhysicalObject*> *mapPtr; // ! for drawing
+
+        sf::Clock deltaClock;
+        
         std::vector<std::function<void()>> controllers;
         std::vector<std::function<void(sf::Event event)>> eventHandlers;
-        std::vector<Animation*> animations;
+        
+        // ! remove
+        sf::Sprite *playerPtr; // ! for drawing
+        std::vector<PhysicalObject*> *mapPtr; // ! for drawing
 };
 
 

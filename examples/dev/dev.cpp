@@ -12,8 +12,8 @@ int main(){
     Universe *universe = new Universe();
 
     // Load all textures
-    universe->textureManager.load(std::filesystem::current_path().string() + "/src/assets/pico_8_knight_sprite.png", TextureSheetSizes(8, 8, 12, 12), "knight");
-    universe->textureManager.load(std::filesystem::current_path().string() + "/src/assets/pico_8_tiles.png", TextureSheetSizes(8, 8, 12, 12), "picoTiles");
+    universe->textureManager.loadTexture(std::filesystem::current_path().string() + "/src/assets/pico_8_knight_sprite.png", "knight", TextureSheetSizes(8, 8, 12, 12));
+    universe->textureManager.loadTexture(std::filesystem::current_path().string() + "/src/assets/pico_8_tiles.png", "picoTiles", TextureSheetSizes(8, 8, 12, 12));
     //
 
     std::string s = std::filesystem::current_path().string() + "/src/assets/map.json";
@@ -37,8 +37,8 @@ int main(){
                 PhysicalObject *tile = new PhysicalObject();
                 tile->setIsFlying(true);
 
-                tile->setTexture(*universe->textureManager.get("picoTiles")->getTextureSheet());
-                tile->setTextureRect(universe->textureManager.get("picoTiles")->getTextureRect(tiles[map.getTileCount().x*i+j].ID-1));
+                tile->setTexture(*universe->textureManager.getTexture("picoTiles")->getTextureSheet());
+                tile->setTextureRect(universe->textureManager.getTexture("picoTiles")->getTextureRect(tiles[map.getTileCount().x*i+j].ID-1));
                 tile->setPosition(sf::Vector2f(j*map.getTileSize().x, i*map.getTileSize().y));
                 mapTiles.push_back(tile);
             }
@@ -80,15 +80,14 @@ int main(){
     //
 
     // Player animation
-    Animation *playerAnimation = new Animation(universe->textureManager.get("knight"), player, 9);
+    Animation *playerAnimation = new Animation(universe->textureManager.getTexture("knight"), player, 9);
     playerAnimation->addAnimationSequence("idle", std::vector<int>{9});
     playerAnimation->addAnimationSequence("runRight", std::vector<int>{33, 34, 35});
     playerAnimation->addAnimationSequence("runLeft", std::vector<int>{45, 46, 47});
     playerAnimation->setCurrentAnimationSequence("idle");
 
-    universe->addAnimation(playerAnimation);
+    universe->textureManager.addAnimation("playerAnimation", playerAnimation);
     //
-
 
     // * CollisionManager
     CollisionShape *playerCollisionShape = new CollisionShape(player);

@@ -285,19 +285,6 @@ class TextureSheet{
 };
 
 #endif
-
-class TextureManager{
-    public:
-        void load(std::string textureLocation, TextureSheetSizes textureSheetSizes, std::string textureName);
-        TextureSheet* get(std::string textureName); // TODO check nonexistent data (return nullptr?)
-        // ? not needed
-        TextureSheet* getByLocation(std::string textureLocation); // can be used to check whether texture at location has been loaded
-
-    private:
-        std::map<std::string, TextureSheet*> loadedTextures;
-};
-
-#endif
 #ifndef ANIMATION_H
 #define ANIMATION_H
 
@@ -330,14 +317,35 @@ class Animation{
 
 #endif
 
+class TextureManager{
+    public:
+        // * Textures
+        void loadTexture(std::string location, std::string name, TextureSheetSizes textureSheetSizes);
+        TextureSheet* getTexture(std::string name); // TODO check nonexistent data (return nullptr?)
+        // *
+
+        // * Animations
+        void addAnimation(std::string name, Animation* animation);
+        Animation* getAnimation(std::string name);
+        void deleteAnimation(std::string name);
+        // *
+
+        void initAnimationClocks();
+        void updateAnimations();
+
+    private:
+        std::map<std::string, TextureSheet*> loadedTextures;
+        std::map<std::string, Animation*> animations;
+};
+
+#endif
+
 class Universe{
     public:
         void setupWindow(sf::RenderWindow *window);
-        void createPlayer(sf::Sprite *player);
-        void addMap(std::vector<PhysicalObject*> *map); // TODO managed in Scene in the future(?)
+
         void addController(std::function<void()> controller);
         void addEventHandler(std::function<void(sf::Event event)> eventHandler);
-        void addAnimation(Animation *animation);
 
         void loop();
 
@@ -345,14 +353,21 @@ class Universe{
         CollisionManager collisionManager;
         TextureManager textureManager;
 
+        // ! remove
+        void createPlayer(sf::Sprite *player);
+        void addMap(std::vector<PhysicalObject*> *map); // TODO managed in Scene in the future(?)
+
     private:
-        sf::Clock deltaClock;
         sf::RenderWindow *windowPtr;
-        sf::Sprite *playerPtr; // ! for drawing
-        std::vector<PhysicalObject*> *mapPtr; // ! for drawing
+
+        sf::Clock deltaClock;
+        
         std::vector<std::function<void()>> controllers;
         std::vector<std::function<void(sf::Event event)>> eventHandlers;
-        std::vector<Animation*> animations;
+        
+        // ! remove
+        sf::Sprite *playerPtr; // ! for drawing
+        std::vector<PhysicalObject*> *mapPtr; // ! for drawing
 };
 
 #endif
@@ -657,28 +672,6 @@ sf::IntRect TextureSheet::getTextureRect(int textureN){
 }
 
 
-void TextureManager::load(std::string textureLocation, TextureSheetSizes textureSheetSizes, std::string textureName){
-    if(loadedTextures.count(textureName)){
-        printf("Can't load already existing texture '%s'\n", textureName.c_str());
-        exit(1);
-    }
-
-    loadedTextures[textureName] = new TextureSheet(textureSheetSizes, textureLocation);
-}
-
-TextureSheet* TextureManager::get(std::string textureName){
-    return loadedTextures[textureName];
-}
-
-TextureSheet* TextureManager::getByLocation(std::string textureLocation){
-    for(auto &[key, textureSheet] : loadedTextures){
-        if(textureSheet->getLocation() == textureLocation) return textureSheet;
-    }
-
-    return nullptr;
-}
-
-
 Animation::Animation(TextureSheet *spritesheet, sf::Sprite *owner, int initialTextureN){
     this->textureSheet = spritesheet;
     this->owner = owner;
@@ -737,15 +730,31 @@ void Animation::addAnimationSequence(std::string sequenceName, std::vector<int> 
     
     animationSequences[sequenceName] = textureSequence;
 }
-#include <iostream>
 
-void Universe::addMap(std::vector<PhysicalObject*> *map){
-    mapPtr = map;
+
+// * Textures
+void TextureManager::loadTexture(std::string location, std::string name, TextureSheetSizes textureSheetSizes){ loadedTextures[name] = new TextureSheet(textureSheetSizes, location); }
+TextureSheet* TextureManager::getTexture(std::string name){ return loadedTextures[name]; }
+// *
+
+// * Animations
+void TextureManager::addAnimation(std::string name, Animation* animation){ animations[name] = animation; }
+Animation* TextureManager::getAnimation(std::string name){ return animations[name]; }
+void TextureManager::deleteAnimation(std::string name){ animations.erase(name); }
+// *
+
+void TextureManager::initAnimationClocks(){
+    for(auto& [key, animation] : animations){
+        animation->restartClock();
+    }
 }
 
-void Universe::createPlayer(sf::Sprite *player){
-    playerPtr = player;
+void TextureManager::updateAnimations(){
+    for(auto& [key, animation] : animations){
+        animation->run();
+    }
 }
+
 
 void Universe::setupWindow(sf::RenderWindow *window){
     windowPtr = window;
@@ -759,10 +768,6 @@ void Universe::addEventHandler(std::function<void(sf::Event event)> eventHandler
     eventHandlers.push_back(eventHandler);
 }
 
-void Universe::addAnimation(Animation *animation){
-    animations.push_back(animation);
-}
-
 void Universe::loop(){
     if(!windowPtr){
         printf("RenderWindow is not initialized. Use setupWindow method to initialize RenderWindow before(!) looping the Universe.\n");
@@ -770,11 +775,9 @@ void Universe::loop(){
     }
 
     // Clocks initialization
-    if(!animations.empty()){
-        for(Animation *animation : animations){
-            animation->restartClock();
-        }
-    }
+    // ! Remove in the future (init on animation creation?)
+    textureManager.initAnimationClocks();
+    // !
 
     deltaClock.restart();
     //
@@ -805,12 +808,7 @@ void Universe::loop(){
         // Game updates
         physicsManager.updatePhysics(dt);
         collisionManager.updateCollisions();
-
-        if(!animations.empty()){
-            for(Animation *animation : animations){
-                animation->run();
-            }
-        }
+        textureManager.updateAnimations();
         // 
 
         // Game draws
@@ -833,6 +831,14 @@ void Universe::loop(){
 
         windowPtr->display();
     }
+}
+
+void Universe::addMap(std::vector<PhysicalObject*> *map){
+    mapPtr = map;
+}
+
+void Universe::createPlayer(sf::Sprite *player){
+    playerPtr = player;
 }
 
 
