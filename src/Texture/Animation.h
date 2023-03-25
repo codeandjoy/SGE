@@ -15,9 +15,11 @@ class Animation{
         // runCycle -> 1,2,3,2,1,2
         // ?
         void run();
+        
         void restartClock();
-        void setCurrentAnimationSequence(std::string sequenceName);
+        
         void addAnimationSequence(std::string sequenceName, std::vector<int> textureSequence);
+        void setCurrentAnimationSequence(std::string sequenceName);
 
     private:
         sf::Sprite *owner;

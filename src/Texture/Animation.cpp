@@ -41,14 +41,6 @@ void Animation::restartClock(){
     clock.restart();
 }
 
-void Animation::setCurrentAnimationSequence(std::string sequenceName){
-    if(currentAnimationSequence != sequenceName){
-        currentAnimationSequence = sequenceName;
-        currentTextureN = 0;
-        clock.restart();
-    }
-}
-
 void Animation::addAnimationSequence(std::string sequenceName, std::vector<int> textureSequence){
     // Ensure uniqueness
     if(animationSequences.count(sequenceName)){
@@ -57,4 +49,12 @@ void Animation::addAnimationSequence(std::string sequenceName, std::vector<int> 
     }
     
     animationSequences[sequenceName] = textureSequence;
+}
+
+void Animation::setCurrentAnimationSequence(std::string sequenceName){
+    if(currentAnimationSequence != sequenceName){
+        currentAnimationSequence = sequenceName;
+        currentTextureN = 0;
+        clock.restart();
+    }
 }
