@@ -24,7 +24,7 @@ $(dev): $(dev_obj)
 	g++ -o $(dev) $(dev_obj) $(lib)
 
 $(dev_obj): $(dev_src) SGE.hpp
-	g++ -c $(dev_src); \
+	g++ -c -g $(dev_src); \
 	mkdir -p $(dev_directory)/$(obj_directory); \
 	mv *.o $(dev_directory)/$(obj_directory);
 #

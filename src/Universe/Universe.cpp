@@ -70,7 +70,7 @@ void Universe::loop(){
         }
 
         for(CollisionShape* collisionShape : collisionManager->getAllCollisionShapes()){
-            windowPtr->draw(*collisionShape);
+            if(collisionShape->getIsVisible()) windowPtr->draw(*collisionShape);
         }
 
         windowPtr->display();

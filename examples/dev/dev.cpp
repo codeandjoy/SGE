@@ -29,6 +29,32 @@ int main(){
 
 
 
+    // PhysicalObject* playerPO = new PhysicalObject();
+    // playerPO->setPosition(sf::Vector2f(100, 50));
+
+
+
+    // std::map<std::string, CollisionShape*> playerCSs;
+    // CollisionShape* playerGlobalBoundsCS = new CollisionShape(playerPO);
+    // playerCSs["globalBounds"] = playerGlobalBoundsCS;
+
+
+
+    // playerPO->setTexture(*universe->textureManager->getTexture("knight")->getTextureSheet());
+    // playerPO->setTextureRect(universe->textureManager->getTexture("knight")->getTextureRect(0));
+
+
+
+    // std::vector<Entity*> playerEG;
+    // Entity* playerEntity = new Entity{playerPO, playerCSs};
+    // playerEG.push_back(playerEntity);
+
+
+
+    // universe->entityManager->registerEntityGroup("player", playerEG);
+
+
+
     // *
     // * Map
     // *
@@ -94,37 +120,27 @@ int main(){
     // * Player
     // *
     
+    // * Init EntityGroup
+    std::vector<Entity*> playerEntityGroup;
+    // *
+
     // * Physical object
     PhysicalObject *playerPhysicalObject = new PhysicalObject();
     playerPhysicalObject->setMass(100);
     playerPhysicalObject->setPosition(sf::Vector2f(100, 50));
+    // *
 
-    playerPhysicalObject->createFlag("canJump");
+    // * SET TEXTURE!
+    playerPhysicalObject->setTexture(*universe->textureManager->getTexture("knight")->getTextureSheet());
+    playerPhysicalObject->setTextureRect(universe->textureManager->getTexture("knight")->getTextureRect(9));
+    // *
 
-    playerPhysicalObject->createAction("jumpStart", [playerPhysicalObject](){
-        playerPhysicalObject->setIsFlying(true);
-        playerPhysicalObject->setVelocityGoalY(-300);
-
-        playerPhysicalObject->setFlag("canJump", false);
-    });
-
-    playerPhysicalObject->createAction("jumpReset", [playerPhysicalObject](){
-        playerPhysicalObject->setFlag("canJump", true);
-    });
-
-    playerPhysicalObject->createConditionalAction("jumpFall",
-        [playerPhysicalObject](){
-            return playerPhysicalObject->getMovementVector().y <= -300;
-        },
-        [playerPhysicalObject](){
-            playerPhysicalObject->setIsFlying(false);
-        }
-    );
+    // * Init Entity
+    playerEntityGroup.push_back(new Entity{playerPhysicalObject});
     // *
 
     // * Collision shape
-    std::map<std::string, CollisionShape*> playerCollisionShapes;
-    playerCollisionShapes["globalBounds"] = new CollisionShape(playerPhysicalObject);    
+    playerEntityGroup[0]->collisionShapes = std::map<std::string, CollisionShape*>{{"globalBounds", new CollisionShape(playerPhysicalObject)}};
     // *
 
     // * Animation
@@ -133,14 +149,15 @@ int main(){
     playerAnimation->addAnimationSequence("runRight", std::vector<int>{33, 34, 35});
     playerAnimation->addAnimationSequence("runLeft", std::vector<int>{45, 46, 47});
     playerAnimation->setCurrentAnimationSequence("idle");
+
+    playerEntityGroup[0]->animation = playerAnimation;
     // *
 
-    // * Entity
-    std::vector<Entity*> playerEntityGroup;
-    playerEntityGroup.push_back(new Entity{playerPhysicalObject, playerCollisionShapes, playerAnimation});
-    // *
-
+    // * Register player entity
+    // 1 PhysicalObject, 1 CollisionShape, Animation present
     universe->entityManager->registerEntityGroup("playerPhysicalObject", playerEntityGroup); // ? Pass vector by reference ?
+    // *
+
     // *
     // *
     // *
@@ -182,9 +199,6 @@ int main(){
     universe->collisionManager->setCollisionDetectionAlgorithm("PTCollisionPair", boundingBox);
 
     universe->collisionManager->addCollisionResponse("PTCollisionPair", resolveAABB);
-    universe->collisionManager->addCollisionResponse("PTCollisionPair", [playerPhysicalObject](std::vector<Collision> collisions){
-        playerPhysicalObject->doAction("jumpReset");
-    });
 
     // *
     // *
@@ -207,13 +221,6 @@ int main(){
         else{
             playerPhysicalObject->setVelocityGoalX(0);
             playerAnimation->setCurrentAnimationSequence("idle");
-        }
-    });
-    universe->addEventHandler([playerPhysicalObject](sf::Event event){
-        if(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space){
-            if(playerPhysicalObject->getFlag("canJump")){
-                playerPhysicalObject->doAction("jumpStart");
-            }
         }
     });
 
