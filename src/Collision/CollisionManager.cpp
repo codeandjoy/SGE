@@ -2,6 +2,20 @@
 #include "Collision.h"
 #include "CollisionUtils.h"
 
+void CollisionManager::registerCollisionShape(CollisionShape* _collisionShape){ allCollisionShapes.push_back(_collisionShape); }
+
+void CollisionManager::deregisterCollisionShape(CollisionShape* _collisionShape){ allCollisionShapes.erase(std::remove(allCollisionShapes.begin(), allCollisionShapes.end(), _collisionShape), allCollisionShapes.end()); }
+
+void CollisionManager::registerCollisionShapes(std::vector<CollisionShape*> _collisionShapes){ allCollisionShapes.insert(allCollisionShapes.end(), _collisionShapes.begin(), _collisionShapes.end()); }
+
+void CollisionManager::degisterCollisionShapes(std::vector<CollisionShape*> _collisionShapes){
+    for(CollisionShape* collisionShape : _collisionShapes){
+        deregisterCollisionShape(collisionShape);
+    }
+}
+
+
+
 void CollisionManager::registerCollisionGroup(std::string name, CollisionGroup* _collisionGroup){ collisionGroups[name] = _collisionGroup; } 
 
 void CollisionManager::deregisterCollisionGroup(std::string name){ collisionGroups.erase(name); }
@@ -29,17 +43,17 @@ void CollisionManager::setCollisionDetectionAlgorithm(std::string collisionPairN
     collisionPairs[collisionPairName].checkCollision = cda;
 }
 
+std::vector<CollisionShape*> CollisionManager::getAllCollisionShapes(){ return allCollisionShapes; }
+
 std::map<std::string, CollisionGroup*> CollisionManager::getCollisionGroups(){ return collisionGroups; }
 
-void CollisionManager::updateCollisions(){
-    // Aligh collision shapes
-    for(auto& [key, collisionGroup] : collisionGroups){
-        for(CollisionShape *collisionShape : collisionGroup->collisionShapes){
-            collisionShape->align();
-        }
+void CollisionManager::alignCollisionShapes(){
+    for(CollisionShape* collisionShape : allCollisionShapes){
+        collisionShape->align();
     }
-    //
+}
 
+void CollisionManager::updateCollisions(){
     // TODO check if any collision pairs are added
 
     std::vector<Collision> collisions;

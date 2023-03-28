@@ -6,10 +6,12 @@
 #include "../Physics/PhysicalObject.h"
 #include "../Collision/CollisionManager.h"
 #include "../Texture/TextureManager.h"
-
+#include "../Entity/EntityManager.h"
 
 class Universe{
     public:
+        Universe(PhysicsManager* _physicsManager, CollisionManager* _collisionManager, TextureManager* _textureManager, EntityManager* _entityManager);
+
         void setupWindow(sf::RenderWindow *window);
 
         void addController(std::function<void()> controller);
@@ -17,13 +19,10 @@ class Universe{
 
         void loop();
 
-        PhysicsManager physicsManager;
-        CollisionManager collisionManager;
-        TextureManager textureManager;
-
-        // ! remove
-        void createPlayer(sf::Sprite *player);
-        void addMap(std::vector<PhysicalObject*> *map); // TODO managed in Scene in the future(?)
+        PhysicsManager* physicsManager;
+        CollisionManager* collisionManager;
+        TextureManager* textureManager;
+        EntityManager* entityManager;
 
     private:
         sf::RenderWindow *windowPtr;
@@ -32,10 +31,6 @@ class Universe{
         
         std::vector<std::function<void()>> controllers;
         std::vector<std::function<void(sf::Event event)>> eventHandlers;
-        
-        // ! remove
-        sf::Sprite *playerPtr; // ! for drawing
-        std::vector<PhysicalObject*> *mapPtr; // ! for drawing
 };
 
 

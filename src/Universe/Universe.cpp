@@ -1,5 +1,12 @@
 #include "Universe.h"
 
+Universe::Universe(PhysicsManager* _physicsManager, CollisionManager* _collisionManager, TextureManager* _textureManager, EntityManager* _entityManager){
+    physicsManager = _physicsManager;
+    collisionManager = _collisionManager;
+    textureManager = _textureManager;
+    entityManager = _entityManager;
+}
+
 
 void Universe::setupWindow(sf::RenderWindow *window){
     windowPtr = window;
@@ -21,7 +28,7 @@ void Universe::loop(){
 
     // Clocks initialization
     // ! Remove in the future (init on animation creation?)
-    textureManager.initAnimationClocks();
+    textureManager->initAnimationClocks();
     // !
 
     deltaClock.restart();
@@ -52,24 +59,21 @@ void Universe::loop(){
 
 
         // Game updates
-        physicsManager.updatePhysics(dt);
-        collisionManager.updateCollisions();
-        textureManager.updateAnimations();
+        physicsManager->updatePhysics(dt);
+        collisionManager->alignCollisionShapes();
+        collisionManager->updateCollisions();
+        textureManager->updateAnimations();
         // 
 
         // Game draws
-        for(sf::Sprite *tileSprite : *mapPtr){
-            windowPtr->draw(*tileSprite);
-        }
-        
-        if(playerPtr){
-            windowPtr->draw(*playerPtr);
-        }
+        for(auto& [_, entityGroup] : entityManager->getAllEntityGroups()){
+            for(Entity* entity : entityGroup){
+                windowPtr->draw(*entity->physicalObject);
 
-        for(auto& [key, collisionGroup] : collisionManager.getCollisionGroups()){
-            for(CollisionShape *collisionShape : collisionGroup->collisionShapes){
-                if(collisionShape->getIsVisible()){
-                    windowPtr->draw(*collisionShape);
+                for(auto& [_, collisionShape] : entity->collisionShapes){
+                    if(collisionShape->getIsVisible()){
+                        windowPtr->draw(*collisionShape);
+                    }
                 }
             }
         }
@@ -77,12 +81,4 @@ void Universe::loop(){
 
         windowPtr->display();
     }
-}
-
-void Universe::addMap(std::vector<PhysicalObject*> *map){
-    mapPtr = map;
-}
-
-void Universe::createPlayer(sf::Sprite *player){
-    playerPtr = player;
 }

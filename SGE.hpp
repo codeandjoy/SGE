@@ -182,10 +182,96 @@ class CollisionShape : public sf::RectangleShape{
 };
 
 #endif
+#ifndef ENTITY_H
+#define ENTITY_H
+
+#ifndef ANIMATION_H
+#define ANIMATION_H
+
+#include <SFML/Graphics.hpp>
+#ifndef TEXTURESHEET_H
+#define TEXTURESHEET_H
+
+#include <SFML/Graphics.hpp>
+#ifndef TEXTURE_SHEET_SIZES_H
+#define TEXTURE_SHEET_SIZES_H
+
+struct TextureSheetSizes{
+    int textureSizeX;
+    int textureSizeY;
+    int numTexturesX;
+    int numTexturesY;
+
+    TextureSheetSizes(int textureSizeX_, int textureSizeY_, int numTexturesX_, int numTexturesY_){
+        textureSizeX = textureSizeX_;
+        textureSizeY = textureSizeY_;
+        numTexturesX = numTexturesX_;
+        numTexturesY = numTexturesY_;
+    }
+
+};
+
+#endif
+
+// TODO texturesheet with gaps between textures
+class TextureSheet{
+    public:
+        TextureSheet(TextureSheetSizes tss, std::string location);
+
+        // TODO make names shorter
+        std::string getLocation();
+        sf::Texture* getTextureSheet();
+        sf::IntRect getTextureRect(int textureN);
+
+    private:
+        std::string location;
+        sf::Texture textureSheet;
+        std::vector<sf::IntRect> textureRects;
+};
+
+#endif
+
+// TODO Animations should switch immediately
+class Animation{
+    public:
+        Animation(TextureSheet *spritesheet, sf::Sprite *owner, int initialTextureN);
+    
+        // ?
+        // runForward -> 1,2,3,1,2,3
+        // runCycle -> 1,2,3,2,1,2
+        // ?
+        void run();
+        
+        void restartClock();
+        
+        void addAnimationSequence(std::string sequenceName, std::vector<int> textureSequence);
+        void setCurrentAnimationSequence(std::string sequenceName);
+
+    private:
+        sf::Sprite *owner;
+        TextureSheet *textureSheet;
+        
+        sf::Clock clock;
+        std::map<std::string, std::vector<int>> animationSequences; // e.g. "idle": [5, 6, 7, 8]
+        std::string currentAnimationSequence;
+        int currentTextureN = 0;
+
+};
+
+#endif
+
+struct Entity{
+    PhysicalObject* physicalObject;
+    std::map<std::string, CollisionShape*> collisionShapes; 
+    Animation* animation = nullptr;
+};
+
+#endif
 
 struct CollisionGroup{
     CollisionGroupType collisionGroupType;
     std::vector<CollisionShape*> collisionShapes;
+    std::vector<Entity*> ownerEntities;
 };
 
 #endif
@@ -226,6 +312,11 @@ struct CollisionPair{
 // ? addToGroup(...), removeFromGroup(...), reloadGroup(...) (checks if pointers are still valid), removePair(...), removeCOllisionResponse(...)
 class CollisionManager{
     public:
+        void registerCollisionShape(CollisionShape* _collisionShape);
+        void deregisterCollisionShape(CollisionShape* _collisionShape);
+        void registerCollisionShapes(std::vector<CollisionShape*> _collisionShapes);
+        void degisterCollisionShapes(std::vector<CollisionShape*> _collisionShapes);
+
         void registerCollisionGroup(std::string name, CollisionGroup* _collisionGroup);
         void deregisterCollisionGroup(std::string name);
         void registerCollisionGroups(std::map<std::string, CollisionGroup*> _groupsToRegister);
@@ -235,11 +326,14 @@ class CollisionManager{
         void addCollisionResponse(std::string collisionPairName, const std::function<void(std::vector<Collision>)> &response);
         void setCollisionDetectionAlgorithm(std::string collisionPairName, const std::function<bool(CollisionShape *CS1, CollisionShape *CS2)> &cda);
 
+        std::vector<CollisionShape*> getAllCollisionShapes();
         std::map<std::string, CollisionGroup*> getCollisionGroups();
 
+        void alignCollisionShapes();
         void updateCollisions();
 
     private:
+        std::vector<CollisionShape*> allCollisionShapes;
         std::map<std::string, CollisionGroup*> collisionGroups;
         std::map<std::string, CollisionPair> collisionPairs;
 };
@@ -247,81 +341,6 @@ class CollisionManager{
 #endif
 #ifndef TEXTURE_MANAGER_H
 #define TEXTURE_MANAGER_H
-
-#ifndef TEXTURE_SHEET_SIZES_H
-#define TEXTURE_SHEET_SIZES_H
-
-struct TextureSheetSizes{
-    int textureSizeX;
-    int textureSizeY;
-    int numTexturesX;
-    int numTexturesY;
-
-    TextureSheetSizes(int textureSizeX_, int textureSizeY_, int numTexturesX_, int numTexturesY_){
-        textureSizeX = textureSizeX_;
-        textureSizeY = textureSizeY_;
-        numTexturesX = numTexturesX_;
-        numTexturesY = numTexturesY_;
-    }
-
-};
-
-#endif
-#ifndef TEXTURESHEET_H
-#define TEXTURESHEET_H
-
-#include <SFML/Graphics.hpp>
-
-// TODO texturesheet with gaps between textures
-class TextureSheet{
-    public:
-        TextureSheet(TextureSheetSizes tss, std::string location);
-
-        // TODO make names shorter
-        std::string getLocation();
-        sf::Texture* getTextureSheet();
-        sf::IntRect getTextureRect(int textureN);
-
-    private:
-        std::string location;
-        sf::Texture textureSheet;
-        std::vector<sf::IntRect> textureRects;
-};
-
-#endif
-#ifndef ANIMATION_H
-#define ANIMATION_H
-
-#include <SFML/Graphics.hpp>
-
-// TODO Animations should switch immediately
-class Animation{
-    public:
-        Animation(TextureSheet *spritesheet, sf::Sprite *owner, int initialTextureN);
-    
-        // ?
-        // runForward -> 1,2,3,1,2,3
-        // runCycle -> 1,2,3,2,1,2
-        // ?
-        void run();
-        
-        void restartClock();
-        
-        void addAnimationSequence(std::string sequenceName, std::vector<int> textureSequence);
-        void setCurrentAnimationSequence(std::string sequenceName);
-
-    private:
-        sf::Sprite *owner;
-        TextureSheet *textureSheet;
-        
-        sf::Clock clock;
-        std::map<std::string, std::vector<int>> animationSequences; // e.g. "idle": [5, 6, 7, 8]
-        std::string currentAnimationSequence;
-        int currentTextureN = 0;
-
-};
-
-#endif
 
 class TextureManager{
     public:
@@ -344,9 +363,33 @@ class TextureManager{
 };
 
 #endif
+#ifndef ENTITY_MANAGER_H
+#define ENTITY_MANAGER_H
+
+class EntityManager{
+    public:
+        EntityManager(PhysicsManager* _physicsManager, CollisionManager* _collisionManager, TextureManager* _textureManager);
+
+        void registerEntityGroup(std::string name, std::vector<Entity*> _entityGroup);
+        std::map<std::string, std::vector<Entity*>> getAllEntityGroups();
+        void destroyEntityGroup(std::string name);
+        void destroyEntity(std::string memberEntityGroup, Entity* entity);
+
+    private:
+        std::map<std::string, std::vector<Entity*>> entityGroups;
+
+        PhysicsManager* physicsManagerPtr;
+        CollisionManager* collisionManagerPtr;
+        TextureManager* textureManagerPtr;
+
+};
+
+#endif
 
 class Universe{
     public:
+        Universe(PhysicsManager* _physicsManager, CollisionManager* _collisionManager, TextureManager* _textureManager, EntityManager* _entityManager);
+
         void setupWindow(sf::RenderWindow *window);
 
         void addController(std::function<void()> controller);
@@ -354,13 +397,10 @@ class Universe{
 
         void loop();
 
-        PhysicsManager physicsManager;
-        CollisionManager collisionManager;
-        TextureManager textureManager;
-
-        // ! remove
-        void createPlayer(sf::Sprite *player);
-        void addMap(std::vector<PhysicalObject*> *map); // TODO managed in Scene in the future(?)
+        PhysicsManager* physicsManager;
+        CollisionManager* collisionManager;
+        TextureManager* textureManager;
+        EntityManager* entityManager;
 
     private:
         sf::RenderWindow *windowPtr;
@@ -369,10 +409,6 @@ class Universe{
         
         std::vector<std::function<void()>> controllers;
         std::vector<std::function<void(sf::Event event)>> eventHandlers;
-        
-        // ! remove
-        sf::Sprite *playerPtr; // ! for drawing
-        std::vector<PhysicalObject*> *mapPtr; // ! for drawing
 };
 
 #endif
@@ -588,76 +624,6 @@ void CollisionShape::align(){
 }
 
 
-void CollisionManager::registerCollisionGroup(std::string name, CollisionGroup* _collisionGroup){ collisionGroups[name] = _collisionGroup; } 
-
-void CollisionManager::deregisterCollisionGroup(std::string name){ collisionGroups.erase(name); }
-
-void CollisionManager::registerCollisionGroups(std::map<std::string, CollisionGroup*> _groupsToRegister){ collisionGroups.insert(_groupsToRegister.begin(), _groupsToRegister.end()); }
-
-void CollisionManager::deregisterCollisionGroups(std::map<std::string, CollisionGroup*> _groupsToDeregister){
-    for(auto& [name, _] : _groupsToDeregister){
-        deregisterCollisionGroup(name);
-    }
-}
-
-void CollisionManager::createCollisionPair(std::string name, std::string group1, std::string group2){
-    // TODO Check if both groups exist in collisionGroups
-    collisionPairs[name] = CollisionPair{std::make_tuple(group1, group2)};
-}
-
-void CollisionManager::addCollisionResponse(std::string collisionPairName, const std::function<void(std::vector<Collision>)> &response){
-    collisionPairs[collisionPairName].collisionResponses.push_back(response);
-}
-
-void CollisionManager::setCollisionDetectionAlgorithm(std::string collisionPairName, const std::function<bool(CollisionShape *CS1, CollisionShape *CS2)> &cda){
-    collisionPairs[collisionPairName].checkCollision = cda;
-}
-
-std::map<std::string, CollisionGroup*> CollisionManager::getCollisionGroups(){ return collisionGroups; }
-
-void CollisionManager::updateCollisions(){
-    // Aligh collision shapes
-    for(auto& [key, collisionGroup] : collisionGroups){
-        for(CollisionShape *collisionShape : collisionGroup->collisionShapes){
-            collisionShape->align();
-        }
-    }
-    //
-
-    // TODO check if any collision pairs are added
-
-    std::vector<Collision> collisions;
-
-    // TODO refactor ?
-    for(auto const& [name, pair] : collisionPairs){
-        // Determine all collisions
-        for(CollisionShape *collisionShape_Group1 : collisionGroups[std::get<0>(pair.collisionGroups)]->collisionShapes){
-            for(CollisionShape *collisionShape_Group2 : collisionGroups[std::get<1>(pair.collisionGroups)]->collisionShapes){
-                if(pair.checkCollision(collisionShape_Group1, collisionShape_Group2)){
-                    Collision collision;
-                    collision.side = determineCollisionSide(collisionShape_Group1, collisionShape_Group2);
-                    collision.from = collisionShape_Group1; // ! Assuming CS1 is always 'from' (moveable)
-                    collision.with = collisionShape_Group2;
-
-                    collisions.push_back(collision);
-                }
-            }
-
-            // Run responses
-            // TODO check if any collisionResponses exist (print message?)
-            if(collisions.size()){
-                for(std::function collisionResponse : pair.collisionResponses){
-                    collisionResponse(collisions);
-                }
-            }
-
-            // Reset
-            collisions.clear();
-        }
-    }
-}
-
-
 TextureSheet::TextureSheet(TextureSheetSizes tss, std::string location){
     this->location = location;
     textureSheet.loadFromFile(location);
@@ -743,6 +709,88 @@ void Animation::setCurrentAnimationSequence(std::string sequenceName){
     }
 }
 
+void CollisionManager::registerCollisionShape(CollisionShape* _collisionShape){ allCollisionShapes.push_back(_collisionShape); }
+
+void CollisionManager::deregisterCollisionShape(CollisionShape* _collisionShape){ allCollisionShapes.erase(std::remove(allCollisionShapes.begin(), allCollisionShapes.end(), _collisionShape), allCollisionShapes.end()); }
+
+void CollisionManager::registerCollisionShapes(std::vector<CollisionShape*> _collisionShapes){ allCollisionShapes.insert(allCollisionShapes.end(), _collisionShapes.begin(), _collisionShapes.end()); }
+
+void CollisionManager::degisterCollisionShapes(std::vector<CollisionShape*> _collisionShapes){
+    for(CollisionShape* collisionShape : _collisionShapes){
+        deregisterCollisionShape(collisionShape);
+    }
+}
+
+void CollisionManager::registerCollisionGroup(std::string name, CollisionGroup* _collisionGroup){ collisionGroups[name] = _collisionGroup; } 
+
+void CollisionManager::deregisterCollisionGroup(std::string name){ collisionGroups.erase(name); }
+
+void CollisionManager::registerCollisionGroups(std::map<std::string, CollisionGroup*> _groupsToRegister){ collisionGroups.insert(_groupsToRegister.begin(), _groupsToRegister.end()); }
+
+void CollisionManager::deregisterCollisionGroups(std::map<std::string, CollisionGroup*> _groupsToDeregister){
+    for(auto& [name, _] : _groupsToDeregister){
+        deregisterCollisionGroup(name);
+    }
+}
+
+void CollisionManager::createCollisionPair(std::string name, std::string group1, std::string group2){
+    // TODO Check if both groups exist in collisionGroups
+    collisionPairs[name] = CollisionPair{std::make_tuple(group1, group2)};
+}
+
+void CollisionManager::addCollisionResponse(std::string collisionPairName, const std::function<void(std::vector<Collision>)> &response){
+    collisionPairs[collisionPairName].collisionResponses.push_back(response);
+}
+
+void CollisionManager::setCollisionDetectionAlgorithm(std::string collisionPairName, const std::function<bool(CollisionShape *CS1, CollisionShape *CS2)> &cda){
+    collisionPairs[collisionPairName].checkCollision = cda;
+}
+
+std::vector<CollisionShape*> CollisionManager::getAllCollisionShapes(){ return allCollisionShapes; }
+
+std::map<std::string, CollisionGroup*> CollisionManager::getCollisionGroups(){ return collisionGroups; }
+
+void CollisionManager::alignCollisionShapes(){
+    for(CollisionShape* collisionShape : allCollisionShapes){
+        collisionShape->align();
+    }
+}
+
+void CollisionManager::updateCollisions(){
+    // TODO check if any collision pairs are added
+
+    std::vector<Collision> collisions;
+
+    // TODO refactor ?
+    for(auto const& [name, pair] : collisionPairs){
+        // Determine all collisions
+        for(CollisionShape *collisionShape_Group1 : collisionGroups[std::get<0>(pair.collisionGroups)]->collisionShapes){
+            for(CollisionShape *collisionShape_Group2 : collisionGroups[std::get<1>(pair.collisionGroups)]->collisionShapes){
+                if(pair.checkCollision(collisionShape_Group1, collisionShape_Group2)){
+                    Collision collision;
+                    collision.side = determineCollisionSide(collisionShape_Group1, collisionShape_Group2);
+                    collision.from = collisionShape_Group1; // ! Assuming CS1 is always 'from' (moveable)
+                    collision.with = collisionShape_Group2;
+
+                    collisions.push_back(collision);
+                }
+            }
+
+            // Run responses
+            // TODO check if any collisionResponses exist (print message?)
+            if(collisions.size()){
+                for(std::function collisionResponse : pair.collisionResponses){
+                    collisionResponse(collisions);
+                }
+            }
+
+            // Reset
+            collisions.clear();
+        }
+    }
+}
+
+
 // * Textures
 void TextureManager::loadTexture(std::string location, std::string name, TextureSheetSizes textureSheetSizes){ loadedTextures[name] = new TextureSheet(textureSheetSizes, location); }
 TextureSheet* TextureManager::getTexture(std::string name){ return loadedTextures[name]; }
@@ -766,6 +814,44 @@ void TextureManager::updateAnimations(){
 }
 
 
+EntityManager::EntityManager(PhysicsManager* _physicsManager, CollisionManager* _collisionManager, TextureManager* _textureManager){
+    physicsManagerPtr = _physicsManager;
+    collisionManagerPtr = _collisionManager;
+    textureManagerPtr = _textureManager;
+}
+
+void EntityManager::registerEntityGroup(std::string name, std::vector<Entity*> _entityGroup){
+    
+    for(Entity* entity : _entityGroup){
+        physicsManagerPtr->registerPhysicalObject(entity->physicalObject);
+        
+        // Map to vector
+        std::vector<CollisionShape*> entityCollisionShapes;
+        for(auto& [_, collisionShape] : entity->collisionShapes){
+            entityCollisionShapes.push_back(collisionShape);
+        }
+        //
+        collisionManagerPtr->registerCollisionShapes(entityCollisionShapes);
+        
+        if(entity->animation){
+            textureManagerPtr->registerAnimation(entity->animation);
+        }
+    }
+
+    entityGroups[name] = _entityGroup;    
+}
+
+std::map<std::string, std::vector<Entity*>> EntityManager::getAllEntityGroups(){ return entityGroups; }
+
+// TODO destroy
+
+Universe::Universe(PhysicsManager* _physicsManager, CollisionManager* _collisionManager, TextureManager* _textureManager, EntityManager* _entityManager){
+    physicsManager = _physicsManager;
+    collisionManager = _collisionManager;
+    textureManager = _textureManager;
+    entityManager = _entityManager;
+}
+
 void Universe::setupWindow(sf::RenderWindow *window){
     windowPtr = window;
 }
@@ -786,7 +872,7 @@ void Universe::loop(){
 
     // Clocks initialization
     // ! Remove in the future (init on animation creation?)
-    textureManager.initAnimationClocks();
+    textureManager->initAnimationClocks();
     // !
 
     deltaClock.restart();
@@ -816,24 +902,21 @@ void Universe::loop(){
         //
 
         // Game updates
-        physicsManager.updatePhysics(dt);
-        collisionManager.updateCollisions();
-        textureManager.updateAnimations();
+        physicsManager->updatePhysics(dt);
+        collisionManager->alignCollisionShapes();
+        collisionManager->updateCollisions();
+        textureManager->updateAnimations();
         // 
 
         // Game draws
-        for(sf::Sprite *tileSprite : *mapPtr){
-            windowPtr->draw(*tileSprite);
-        }
-        
-        if(playerPtr){
-            windowPtr->draw(*playerPtr);
-        }
+        for(auto& [_, entityGroup] : entityManager->getAllEntityGroups()){
+            for(Entity* entity : entityGroup){
+                windowPtr->draw(*entity->physicalObject);
 
-        for(auto& [key, collisionGroup] : collisionManager.getCollisionGroups()){
-            for(CollisionShape *collisionShape : collisionGroup->collisionShapes){
-                if(collisionShape->getIsVisible()){
-                    windowPtr->draw(*collisionShape);
+                for(auto& [_, collisionShape] : entity->collisionShapes){
+                    if(collisionShape->getIsVisible()){
+                        windowPtr->draw(*collisionShape);
+                    }
                 }
             }
         }
@@ -841,14 +924,6 @@ void Universe::loop(){
 
         windowPtr->display();
     }
-}
-
-void Universe::addMap(std::vector<PhysicalObject*> *map){
-    mapPtr = map;
-}
-
-void Universe::createPlayer(sf::Sprite *player){
-    playerPtr = player;
 }
 
 

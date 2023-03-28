@@ -4,11 +4,13 @@
 #include <SFML/Graphics.hpp>
 #include "CollisionGroupType.h"
 #include "CollisionShape.h"
+#include "../Entity/Entity.h" 
 
 
 struct CollisionGroup{
     CollisionGroupType collisionGroupType;
     std::vector<CollisionShape*> collisionShapes;
+    std::vector<Entity*> ownerEntities;
 };
 
 

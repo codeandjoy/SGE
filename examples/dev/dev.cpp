@@ -9,17 +9,31 @@
 int main(){
     printf(".▄▄ ·  ▄▄ • ▄▄▄ .\n▐█ ▀. ▐█ ▀ ▪▀▄.▀·\n▄▀▀▀█▄▄█ ▀█▄▐▀▀▪▄\n▐█▄▪▐█▐█▄▪▐█▐█▄▄▌\n ▀▀▀▀ ·▀▀▀▀  ▀▀▀ \n");
 
-    Universe *universe = new Universe();
 
-    // Load all textures
-    universe->textureManager.loadTexture(std::filesystem::current_path().string() + "/src/assets/pico_8_knight_sprite.png", "knight", TextureSheetSizes(8, 8, 12, 12));
-    universe->textureManager.loadTexture(std::filesystem::current_path().string() + "/src/assets/pico_8_tiles.png", "picoTiles", TextureSheetSizes(8, 8, 12, 12));
-    //
 
-    std::string s = std::filesystem::current_path().string() + "/src/assets/map.json";
+    // * Init
+    PhysicsManager* physicsManager = new PhysicsManager();
+    CollisionManager* collisionManager = new CollisionManager();
+    TextureManager* textureManager = new TextureManager();
+    EntityManager* entityManager = new EntityManager(physicsManager, collisionManager, textureManager);
 
-    // Map
-    // TODO init in / add to Scene in the future (?)
+    Universe *universe = new Universe(physicsManager, collisionManager, textureManager, entityManager);
+    // *
+
+
+
+    // * Load all textures
+    universe->textureManager->loadTexture(std::filesystem::current_path().string() + "/src/assets/pico_8_knight_sprite.png", "knight", TextureSheetSizes(8, 8, 12, 12));
+    universe->textureManager->loadTexture(std::filesystem::current_path().string() + "/src/assets/pico_8_tiles.png", "picoTiles", TextureSheetSizes(8, 8, 12, 12));
+    // *
+
+
+
+    // *
+    // * Map
+    // *
+
+    // * Read
     tmx::Map map;
     if(!map.load(std::filesystem::current_path().string() + "/src/assets/map.tmx")){
         printf("Can't load map");
@@ -28,8 +42,14 @@ int main(){
 
     const auto& layers = map.getLayers();
     const auto& tiles = layers[0]->getLayerAs<tmx::TileLayer>().getTiles();
+    // *
 
-    std::vector<PhysicalObject*> mapTiles;
+    // * Init EntityGroup
+    std::vector<Entity*> mapTilesEntityGroup;
+    // *
+
+    // * Physical objects
+    std::vector<PhysicalObject*> mapTilesPhysicalObjects;
 
     for(int i = 0; i < map.getTileCount().y; i++){
         for(int j = 0; j < map.getTileCount().x; j++){
@@ -37,108 +57,179 @@ int main(){
                 PhysicalObject *tile = new PhysicalObject();
                 tile->setIsFlying(true);
 
-                tile->setTexture(*universe->textureManager.getTexture("picoTiles")->getTextureSheet());
-                tile->setTextureRect(universe->textureManager.getTexture("picoTiles")->getTextureRect(tiles[map.getTileCount().x*i+j].ID-1));
+                tile->setTexture(*universe->textureManager->getTexture("picoTiles")->getTextureSheet());
+                tile->setTextureRect(universe->textureManager->getTexture("picoTiles")->getTextureRect(tiles[map.getTileCount().x*i+j].ID-1));
                 tile->setPosition(sf::Vector2f(j*map.getTileSize().x, i*map.getTileSize().y));
-                mapTiles.push_back(tile);
+                mapTilesPhysicalObjects.push_back(tile);
             }
         }
     }
+    // *
+
+    // * Init Entities and their physical objects
+    for(PhysicalObject* physicalObject : mapTilesPhysicalObjects){
+        mapTilesEntityGroup.push_back(new Entity{physicalObject});
+    }
+    // *
+
+    // * Collision shapes
+    // Each tile entity has 1 collision shape ("globalBounds")
+    for(int i = 0; i < mapTilesEntityGroup.size(); i++){
+        mapTilesEntityGroup[i]->collisionShapes = std::map<std::string, CollisionShape*>{{"globalBounds", new CollisionShape(mapTilesPhysicalObjects[i])}};
+    }
+    // *
+
+    // * Register map tile entities
+    // 1 PhysicalObject, 1 CollisionShape, no Animation
+    universe->entityManager->registerEntityGroup("mapTiles", mapTilesEntityGroup);
+    // *
+
+    // *
+    // *
+    // *
+
+
+
+    // *
+    // * Player
+    // *
     
-    universe->addMap(&mapTiles);
-    // 
+    // * Physical object
+    PhysicalObject *playerPhysicalObject = new PhysicalObject();
+    playerPhysicalObject->setMass(100);
+    playerPhysicalObject->setPosition(sf::Vector2f(100, 50));
 
-    // Player
-    PhysicalObject *player = new PhysicalObject();
-    player->setMass(100);
-    player->setPosition(sf::Vector2f(100, 50));
+    playerPhysicalObject->createFlag("canJump");
 
-    player->createFlag("canJump");
+    playerPhysicalObject->createAction("jumpStart", [playerPhysicalObject](){
+        playerPhysicalObject->setIsFlying(true);
+        playerPhysicalObject->setVelocityGoalY(-300);
 
-    player->createAction("jumpStart", [player](){
-        player->setIsFlying(true);
-        player->setVelocityGoalY(-300);
-
-        player->setFlag("canJump", false);
+        playerPhysicalObject->setFlag("canJump", false);
     });
 
-    player->createAction("jumpReset", [player](){
-        player->setFlag("canJump", true);
+    playerPhysicalObject->createAction("jumpReset", [playerPhysicalObject](){
+        playerPhysicalObject->setFlag("canJump", true);
     });
 
-    player->createConditionalAction("jumpFall",
-        [player](){
-            return player->getMovementVector().y <= -300;
+    playerPhysicalObject->createConditionalAction("jumpFall",
+        [playerPhysicalObject](){
+            return playerPhysicalObject->getMovementVector().y <= -300;
         },
-        [player](){
-            player->setIsFlying(false);
+        [playerPhysicalObject](){
+            playerPhysicalObject->setIsFlying(false);
         }
     );
+    // *
 
-    universe->createPlayer(player);
-    universe->physicsManager.registerPhysicalObject(player);
-    //
+    // * Collision shape
+    std::map<std::string, CollisionShape*> playerCollisionShapes;
+    playerCollisionShapes["globalBounds"] = new CollisionShape(playerPhysicalObject);    
+    // *
 
-    // Player animation
-    Animation *playerAnimation = new Animation(universe->textureManager.getTexture("knight"), player, 9);
+    // * Animation
+    Animation* playerAnimation = new Animation(universe->textureManager->getTexture("knight"), playerPhysicalObject, 9);
     playerAnimation->addAnimationSequence("idle", std::vector<int>{9});
     playerAnimation->addAnimationSequence("runRight", std::vector<int>{33, 34, 35});
     playerAnimation->addAnimationSequence("runLeft", std::vector<int>{45, 46, 47});
     playerAnimation->setCurrentAnimationSequence("idle");
-
-    universe->textureManager.registerAnimation(playerAnimation);
-    //
-
-    // * CollisionManager
-    CollisionShape *playerCollisionShape = new CollisionShape(player);
-
-    std::vector<CollisionShape*> mapTileCollisionShapes;
-    for(PhysicalObject *tile : mapTiles){
-        CollisionShape *tileCS = new CollisionShape(tile);
-        mapTileCollisionShapes.push_back(tileCS);
-    }
-
-
-    universe->collisionManager.registerCollisionGroup("player", new CollisionGroup{CollisionGroupType::moveable, std::vector<CollisionShape*>{playerCollisionShape}});
-    universe->collisionManager.registerCollisionGroup("tiles", new CollisionGroup{CollisionGroupType::solid, mapTileCollisionShapes});
-    universe->collisionManager.createCollisionPair("PTCollisionPair", "player", "tiles");
-    universe->collisionManager.setCollisionDetectionAlgorithm("PTCollisionPair", boundingBox);
-
-    universe->collisionManager.addCollisionResponse("PTCollisionPair", resolveAABB);
-    universe->collisionManager.addCollisionResponse("PTCollisionPair", [player](std::vector<Collision> collisions){
-        player->doAction("jumpReset");
-    });
     // *
 
-    // TODO use movement functions on player PhysicalObject
-    universe->addController([player, playerAnimation](){
+    // * Entity
+    std::vector<Entity*> playerEntityGroup;
+    playerEntityGroup.push_back(new Entity{playerPhysicalObject, playerCollisionShapes, playerAnimation});
+    // *
+
+    universe->entityManager->registerEntityGroup("playerPhysicalObject", playerEntityGroup); // ? Pass vector by reference ?
+    // *
+    // *
+    // *
+
+
+
+    // *
+    // * Collision groups
+    // *
+
+    // * PlayerPhysicalObject
+    std::vector<CollisionShape*> playerCollisionShapesVec =  {playerEntityGroup[0]->collisionShapes["globalBounds"]};
+    CollisionGroup* playerCollisionGroup = new CollisionGroup{CollisionGroupType::moveable, playerCollisionShapesVec, playerEntityGroup};
+    // *
+    
+    // * Map
+    std::vector<CollisionShape*> mapCollisionShapes;
+    for(Entity* mapTileEntity : mapTilesEntityGroup){
+        mapCollisionShapes.push_back(mapTileEntity->collisionShapes["globalBounds"]);
+    }
+
+    CollisionGroup* mapTilesCollisionGroup = new CollisionGroup{CollisionGroupType::solid, mapCollisionShapes, mapTilesEntityGroup};
+    // *
+
+    // *
+    // *
+    // *
+
+
+
+    // *
+    // * Collision management
+    // *
+    
+    universe->collisionManager->registerCollisionGroup("playerPhysicalObject", playerCollisionGroup);
+    universe->collisionManager->registerCollisionGroup("tiles", mapTilesCollisionGroup);
+
+    universe->collisionManager->createCollisionPair("PTCollisionPair", "playerPhysicalObject", "tiles");
+    universe->collisionManager->setCollisionDetectionAlgorithm("PTCollisionPair", boundingBox);
+
+    universe->collisionManager->addCollisionResponse("PTCollisionPair", resolveAABB);
+    universe->collisionManager->addCollisionResponse("PTCollisionPair", [playerPhysicalObject](std::vector<Collision> collisions){
+        playerPhysicalObject->doAction("jumpReset");
+    });
+
+    // *
+    // *
+    // *
+
+
+    // *
+    // * Controllers and events
+    // *
+
+    universe->addController([playerPhysicalObject, playerAnimation](){
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::A)){
-            player->setVelocityGoalX(-100);
+            playerPhysicalObject->setVelocityGoalX(-100);
             playerAnimation->setCurrentAnimationSequence("runLeft");
         }
         else if(sf::Keyboard::isKeyPressed(sf::Keyboard::D)){
-            player->setVelocityGoalX(100);
+            playerPhysicalObject->setVelocityGoalX(100);
             playerAnimation->setCurrentAnimationSequence("runRight");
         }
         else{
-            player->setVelocityGoalX(0);
+            playerPhysicalObject->setVelocityGoalX(0);
             playerAnimation->setCurrentAnimationSequence("idle");
         }
     });
-    universe->addEventHandler([player](sf::Event event){
+    universe->addEventHandler([playerPhysicalObject](sf::Event event){
         if(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space){
-            if(player->getFlag("canJump")){
-                player->doAction("jumpStart");
+            if(playerPhysicalObject->getFlag("canJump")){
+                playerPhysicalObject->doAction("jumpStart");
             }
         }
     });
+
+    // *
+    // *
+    // *
+
 
     // sf::RenderWindow *window = new sf::RenderWindow(sf::VideoMode::getDesktopMode(), "Test", sf::Style::Fullscreen);
     // sf::View *view = new sf::View(sf::Vector2f(50, 50), sf::Vector2f(480, 270));
     sf::RenderWindow *window = new sf::RenderWindow(sf::VideoMode(1000, 600), "Test");
     sf::View *view = new sf::View(sf::Vector2f(100, 100), sf::Vector2f(250, 150));
     window->setView(*view);
+
     window->setKeyRepeatEnabled(false); // for proper keyboard events handling (like jumping)
+    
     universe->setupWindow(window);
     
     universe->loop();
