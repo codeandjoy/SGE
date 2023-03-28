@@ -57,7 +57,6 @@ void Universe::loop(){
         if(dt > 0.15f) dt = 0.15f;
         //
 
-
         // Game updates
         physicsManager->updatePhysics(dt);
         collisionManager->alignCollisionShapes();
@@ -66,18 +65,13 @@ void Universe::loop(){
         // 
 
         // Game draws
-        for(auto& [_, entityGroup] : entityManager->getAllEntityGroups()){
-            for(Entity* entity : entityGroup){
-                windowPtr->draw(*entity->physicalObject);
-
-                for(auto& [_, collisionShape] : entity->collisionShapes){
-                    if(collisionShape->getIsVisible()){
-                        windowPtr->draw(*collisionShape);
-                    }
-                }
-            }
+        for(PhysicalObject* physicalObject : physicsManager->getAllPhysicalObjects()){
+            windowPtr->draw(*physicalObject);
         }
-        // 
+
+        for(CollisionShape* collisionShape : collisionManager->getAllCollisionShapes()){
+            windowPtr->draw(*collisionShape);
+        }
 
         windowPtr->display();
     }

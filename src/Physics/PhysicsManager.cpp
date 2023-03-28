@@ -4,6 +4,8 @@ void PhysicsManager::registerPhysicalObject(PhysicalObject* _physicalObject){ ph
 
 void PhysicsManager::deregisterPhysicalObject(PhysicalObject* _physicalObject){ physicalObjects.erase(std::remove(physicalObjects.begin(), physicalObjects.end(), _physicalObject), physicalObjects.end()); }
 
+std::vector<PhysicalObject*> PhysicsManager::getAllPhysicalObjects(){ return physicalObjects; }
+
 void PhysicsManager::updatePhysics(float dt){
     // TODO check if any physical objects exist
     for(PhysicalObject* physicalObject : physicalObjects){

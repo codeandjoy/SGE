@@ -175,10 +175,10 @@ int main(){
     // * Collision management
     // *
     
-    universe->collisionManager->registerCollisionGroup("playerPhysicalObject", playerCollisionGroup);
+    universe->collisionManager->registerCollisionGroup("player", playerCollisionGroup);
     universe->collisionManager->registerCollisionGroup("tiles", mapTilesCollisionGroup);
 
-    universe->collisionManager->createCollisionPair("PTCollisionPair", "playerPhysicalObject", "tiles");
+    universe->collisionManager->createCollisionPair("PTCollisionPair", "player", "tiles");
     universe->collisionManager->setCollisionDetectionAlgorithm("PTCollisionPair", boundingBox);
 
     universe->collisionManager->addCollisionResponse("PTCollisionPair", resolveAABB);

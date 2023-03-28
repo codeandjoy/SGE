@@ -118,6 +118,7 @@ class PhysicsManager{
     public:
         void registerPhysicalObject(PhysicalObject* _physicalObject);
         void deregisterPhysicalObject(PhysicalObject* _physicalObject);
+        std::vector<PhysicalObject*> getAllPhysicalObjects();
 
         void updatePhysics(float dt);
 
@@ -585,6 +586,8 @@ void PhysicsManager::registerPhysicalObject(PhysicalObject* _physicalObject){ ph
 
 void PhysicsManager::deregisterPhysicalObject(PhysicalObject* _physicalObject){ physicalObjects.erase(std::remove(physicalObjects.begin(), physicalObjects.end(), _physicalObject), physicalObjects.end()); }
 
+std::vector<PhysicalObject*> PhysicsManager::getAllPhysicalObjects(){ return physicalObjects; }
+
 void PhysicsManager::updatePhysics(float dt){
     // TODO check if any physical objects exist
     for(PhysicalObject* physicalObject : physicalObjects){
@@ -763,9 +766,8 @@ void CollisionManager::updateCollisions(){
 
     // TODO refactor ?
     for(auto const& [name, pair] : collisionPairs){
-        // Determine all collisions
-        for(CollisionShape *collisionShape_Group1 : collisionGroups[std::get<0>(pair.collisionGroups)]->collisionShapes){
-            for(CollisionShape *collisionShape_Group2 : collisionGroups[std::get<1>(pair.collisionGroups)]->collisionShapes){
+        for(CollisionShape* collisionShape_Group1 : collisionGroups[std::get<0>(pair.collisionGroups)]->collisionShapes){
+            for(CollisionShape* collisionShape_Group2 : collisionGroups[std::get<1>(pair.collisionGroups)]->collisionShapes){
                 if(pair.checkCollision(collisionShape_Group1, collisionShape_Group2)){
                     Collision collision;
                     collision.side = determineCollisionSide(collisionShape_Group1, collisionShape_Group2);
@@ -909,18 +911,13 @@ void Universe::loop(){
         // 
 
         // Game draws
-        for(auto& [_, entityGroup] : entityManager->getAllEntityGroups()){
-            for(Entity* entity : entityGroup){
-                windowPtr->draw(*entity->physicalObject);
-
-                for(auto& [_, collisionShape] : entity->collisionShapes){
-                    if(collisionShape->getIsVisible()){
-                        windowPtr->draw(*collisionShape);
-                    }
-                }
-            }
+        for(PhysicalObject* physicalObject : physicsManager->getAllPhysicalObjects()){
+            windowPtr->draw(*physicalObject);
         }
-        // 
+
+        for(CollisionShape* collisionShape : collisionManager->getAllCollisionShapes()){
+            windowPtr->draw(*collisionShape);
+        }
 
         windowPtr->display();
     }

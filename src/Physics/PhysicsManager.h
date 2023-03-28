@@ -8,6 +8,7 @@ class PhysicsManager{
     public:
         void registerPhysicalObject(PhysicalObject* _physicalObject);
         void deregisterPhysicalObject(PhysicalObject* _physicalObject);
+        std::vector<PhysicalObject*> getAllPhysicalObjects();
 
         void updatePhysics(float dt);
 

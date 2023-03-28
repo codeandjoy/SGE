@@ -60,9 +60,8 @@ void CollisionManager::updateCollisions(){
 
     // TODO refactor ?
     for(auto const& [name, pair] : collisionPairs){
-        // Determine all collisions
-        for(CollisionShape *collisionShape_Group1 : collisionGroups[std::get<0>(pair.collisionGroups)]->collisionShapes){
-            for(CollisionShape *collisionShape_Group2 : collisionGroups[std::get<1>(pair.collisionGroups)]->collisionShapes){
+        for(CollisionShape* collisionShape_Group1 : collisionGroups[std::get<0>(pair.collisionGroups)]->collisionShapes){
+            for(CollisionShape* collisionShape_Group2 : collisionGroups[std::get<1>(pair.collisionGroups)]->collisionShapes){
                 if(pair.checkCollision(collisionShape_Group1, collisionShape_Group2)){
                     Collision collision;
                     collision.side = determineCollisionSide(collisionShape_Group1, collisionShape_Group2);
