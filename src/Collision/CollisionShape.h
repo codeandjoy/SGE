@@ -14,19 +14,29 @@ class CollisionShape : public sf::RectangleShape{
 
         CollisionShapePositionData getPositionData();
 
+        sf::Vector2f getOffset();
+        void setOffset(sf::Vector2f _offset);
+
+        void setSize(const sf::Vector2f& size);
+
+        // Border
         bool getIsVisible();
         void setIsVisible(bool is);
 
-        sf::Vector2f getOffset();
-        void setOffset(sf::Vector2f _offset);
+        sf::RectangleShape* getBorder();
+        void setBorderThickness(float thickness);
+        void setBorderColor(const sf::Color& color);
+        //
 
         void align();
 
     private:
         PhysicalObject *owner;
 
-        bool isVisible = true;
         sf::Vector2f offset = sf::Vector2f(0, 0);
+
+        bool isVisible = true;
+        sf::RectangleShape border;
 };
 
 

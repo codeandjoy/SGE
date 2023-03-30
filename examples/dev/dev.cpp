@@ -102,7 +102,7 @@ int main(){
     CollisionShape* playerCS = new CollisionShape(playerPO);
     playerCS->setSize(sf::Vector2f(playerPO->getGlobalBounds().width, 4));
     playerCS->setOffset(sf::Vector2f(0, 4));
-    playerCS->setOutlineColor(sf::Color::Red);
+    playerCS->setBorderColor(sf::Color::Red);
 
     playerCSs["globalBounds"] = playerCS;
     //
