@@ -417,39 +417,6 @@ class Universe{
 #ifndef COLLISION_RESPONSES_H
 #define COLLISION_RESPONSES_H
 
-void resolveAABB(std::vector<Collision> collisions){
-    for(Collision collision : collisions){
-        PhysicalObject *fromOwner = collision.from->getOwner();
-        PhysicalObject *withOwner = collision.with->getOwner();
-        
-        if(collision.side == CollisionSide::left){
-            fromOwner->setPosition(withOwner->getPosition().x + withOwner->getGlobalBounds().width, fromOwner->getPosition().y);
-        }
-        else if(collision.side == CollisionSide::right){
-            fromOwner->setPosition(withOwner->getPosition().x - fromOwner->getGlobalBounds().width, fromOwner->getPosition().y);
-        }
-        else if(collision.side == CollisionSide::top){
-            fromOwner->setPosition(fromOwner->getPosition().x, withOwner->getPosition().y + withOwner->getGlobalBounds().height);
-        }
-        else if(collision.side == CollisionSide::bottom){
-            fromOwner->setPosition(fromOwner->getPosition().x, withOwner->getPosition().y - fromOwner->getGlobalBounds().height);
-        }
-    }
-}
-
-#endif
-#ifndef COLLISION_DETECTION_ALGORITHMS_H
-#define COLLISION_DETECTION_ALGORITHMS_H
-
-bool boundingBox(CollisionShape *CS1, CollisionShape *CS2){
-    return CS1->getGlobalBounds().intersects(CS2->getGlobalBounds());
-}
-
-// TODO
-// bool rayRect(){}
-
-#endif
-
 #ifndef COLLISION_UTILS_H
 #define COLLISION_UTILS_H
 
@@ -489,6 +456,51 @@ CollisionSide determineCollisionSide(CollisionShape *CS1, CollisionShape *CS2){
 
     return lowestDepthSide;
 }
+
+#endif
+
+void resolveAABB(std::vector<Collision> collisions){
+    for(Collision collision : collisions){
+        PhysicalObject *fromOwner = collision.from->getOwner();
+        PhysicalObject *withOwner = collision.with->getOwner();
+        
+        if(collision.side == CollisionSide::left){
+            fromOwner->setPosition(
+                withOwner->getPosition().x + withOwner->getGlobalBounds().width - collision.from->getOffset().x,
+                fromOwner->getPosition().y
+            );
+        }
+        else if(collision.side == CollisionSide::right){
+            fromOwner->setPosition(
+                withOwner->getPosition().x - collision.from->getGlobalBounds().width - collision.from->getOffset().x,
+                fromOwner->getPosition().y
+            );
+        }
+        else if(collision.side == CollisionSide::top){
+            fromOwner->setPosition(
+                fromOwner->getPosition().x,
+                withOwner->getPosition().y + withOwner->getGlobalBounds().height - collision.from->getOffset().y
+            );
+        }
+        else if(collision.side == CollisionSide::bottom){
+            fromOwner->setPosition(
+                fromOwner->getPosition().x,
+                withOwner->getPosition().y - collision.from->getGlobalBounds().height - collision.from->getOffset().y
+            );
+        }
+    }
+}
+
+#endif
+#ifndef COLLISION_DETECTION_ALGORITHMS_H
+#define COLLISION_DETECTION_ALGORITHMS_H
+
+bool boundingBox(CollisionShape *CS1, CollisionShape *CS2){
+    return CS1->getGlobalBounds().intersects(CS2->getGlobalBounds());
+}
+
+// TODO
+// bool rayRect(){}
 
 #endif
 
