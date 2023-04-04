@@ -49,7 +49,6 @@ int main(){
         for(int j = 0; j < map.getTileCount().x; j++){
             if(tiles[map.getTileCount().x*i+j].ID != 0){
                 PhysicalObject *tile = new PhysicalObject();
-                tile->setIsFlying(true);
 
                 tile->setTexture(*universe->textureManager->getTexture("picoTiles")->getTextureSheet());
                 tile->setTextureRect(universe->textureManager->getTexture("picoTiles")->getTextureRect(tiles[map.getTileCount().x*i+j].ID-1));
@@ -91,10 +90,11 @@ int main(){
     
     // Physical object
     PhysicalObject *playerPO = new PhysicalObject();
-    playerPO->setMass(100);
     playerPO->setPosition(sf::Vector2f(100, 50));
     playerPO->setTexture(*universe->textureManager->getTexture("knight")->getTextureSheet());
     playerPO->setTextureRect(universe->textureManager->getTexture("knight")->getTextureRect(9));
+    
+    playerPO->acceleration.y = .2; // gravity
     //
 
     // Collision shape
@@ -166,6 +166,9 @@ int main(){
     universe->collisionManager->setCollisionDetectionAlgorithm("PTCollisionPair", boundingBox);
 
     universe->collisionManager->addCollisionResponse("PTCollisionPair", resolveAABB);
+    universe->collisionManager->addCollisionResponse("PTCollisionPair", [playerPO](std::vector<Collision> collisions){
+        playerPO->velocity.y = 0;
+    });
 
     //
     //
@@ -179,18 +182,24 @@ int main(){
 
     universe->addController([playerPO, playerAnimation](){
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::A)){
-            playerPO->setVelocityGoalX(-100);
+            playerPO->velocity.x = -100;
             playerAnimation->setCurrentAnimationSequence("runLeft");
         }
         else if(sf::Keyboard::isKeyPressed(sf::Keyboard::D)){
-            playerPO->setVelocityGoalX(100);
+            playerPO->velocity.x = 100;
             playerAnimation->setCurrentAnimationSequence("runRight");
         }
         else{
-            playerPO->setVelocityGoalX(0);
+            playerPO->velocity.x = 0;
             playerAnimation->setCurrentAnimationSequence("idle");
         }
     });
+
+    universe->addEventHandler([playerPO](sf::Event event){
+        if(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space){
+            playerPO->velocity.y = -100;
+        }
+    }); 
 
     //
     //

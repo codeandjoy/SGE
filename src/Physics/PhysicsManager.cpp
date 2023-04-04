@@ -7,12 +7,22 @@ void PhysicsManager::deregisterPhysicalObject(PhysicalObject* _physicalObject){ 
 std::vector<PhysicalObject*> PhysicsManager::getAllPhysicalObjects(){ return physicalObjects; }
 
 void PhysicsManager::updatePhysics(float dt){
-    // TODO check if any physical objects exist
     for(PhysicalObject* physicalObject : physicalObjects){
-        // Gravity
-        if(!physicalObject->getIsFlying()){
-            physicalObject->setVelocityGoalY(physicalObject->getMass());
+        // Accelerate (approach with step)
+        if(abs(physicalObject->velocity.x) >= physicalObject->speedLimit.x){
+            physicalObject->velocity.x = physicalObject->speedLimit.x;
         }
+        else{
+            physicalObject->velocity.x += physicalObject->acceleration.x;
+        }
+
+        if(abs(physicalObject->velocity.y) >= physicalObject->speedLimit.y){
+            physicalObject->velocity.y = physicalObject->speedLimit.y;
+        }
+        else{
+            physicalObject->velocity.y += physicalObject->acceleration.y;
+        }
+        //
 
         physicalObject->update(dt);
     }

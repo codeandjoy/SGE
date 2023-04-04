@@ -22,10 +22,10 @@ CollisionSide determineCollisionSide(CollisionShape *CS1, CollisionShape *CS2){
     std::vector<CollisionSide> allCollisionSides;
 
     // ! Order matters 
-    if(CS1->getOwner()->getMovementVector().x < 0) allCollisionSides.push_back(CollisionSide::left);
-    if(CS1->getOwner()->getMovementVector().x > 0) allCollisionSides.push_back(CollisionSide::right);
-    if(CS1->getOwner()->getMovementVector().y < 0) allCollisionSides.push_back(CollisionSide::top);
-    if(CS1->getOwner()->getMovementVector().y > 0) allCollisionSides.push_back(CollisionSide::bottom);
+    if(CS1->getOwner()->velocity.x < 0) allCollisionSides.push_back(CollisionSide::left);
+    if(CS1->getOwner()->velocity.x > 0) allCollisionSides.push_back(CollisionSide::right);
+    if(CS1->getOwner()->velocity.y < 0) allCollisionSides.push_back(CollisionSide::top);
+    if(CS1->getOwner()->velocity.y > 0) allCollisionSides.push_back(CollisionSide::bottom);
 
 
     CollisionSide lowestDepthSide;

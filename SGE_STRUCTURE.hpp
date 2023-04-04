@@ -11,7 +11,6 @@
 #include "./src/Texture/Animation.h"
 
 #include "./src/Physics/PhysicsManager.h"
-#include "./src/Physics/PhysicalObjectPositionData.h"
 #include "./src/Physics/PhysicalObject.h"
 #include "./src/Physics/ContinuousAction.h"
 #include "./src/Physics/ConditionalAction.h"

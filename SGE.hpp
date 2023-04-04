@@ -14,17 +14,6 @@
 #define PHYSICAL_OBJECT_H
 
 #include <SFML/Graphics.hpp>
-#ifndef PHYSICAL_OBJECT_POSITION_DATA_H
-#define PHYSICAL_OBJECT_POSITION_DATA_H
-
-struct PhysicalObjectPositionData{
-    float x;
-    float y;
-    float height;
-    float width;
-};
-
-#endif
 #ifndef CONTINUOUS_ACTION_H
 #define CONTINUOUS_ACTION_H
 
@@ -46,28 +35,9 @@ struct ConditionalAction{
 
 class PhysicalObject : public sf::Sprite{
     public:
-        // * Utils
-        PhysicalObjectPositionData getPositionData();
-        // *
-
-        // * Movement
-        void setMovementVector(sf::Vector2f _movementVector); // ? Use movement methods in the future?
-        void setMovementVectorX(float x); // ? Use movement methods in the future?
-        void setMovementVectorY(float y); // ? Use movement methods in the future?
-        sf::Vector2f getMovementVector();
-
-        void setVelocityGoal(sf::Vector2f goal);
-        void setVelocityGoalX(float goalX);
-        void setVelocityGoalY(float goalY);
-        
-        void movementStop();
-        void movementStopX();
-        void movementStopY();
-        // void movementAccelerate();
-        // void movementSlacken();
-        // ? void setVelocityCap(...) (sets max possible velocity vector values)
-        // ? setMovementFunction(lambda) (sets movement algorithm (e.g. acceleration -> keeping velocity -> slowing down -> stop))
-        // *
+        sf::Vector2f velocity = sf::Vector2f(0, 0);
+        sf::Vector2f acceleration = sf::Vector2f(0, 0);
+        sf::Vector2f speedLimit = sf::Vector2f(9999,9999);
 
         // * Actions
         void createAction(std::string _name, std::function<void()> _action);
@@ -88,28 +58,14 @@ class PhysicalObject : public sf::Sprite{
         // removeflag()
         // *
 
-        // * Physical properties
-        void setMass(float _mass);
-        float getMass();
-        
-        void setIsFlying(bool is); // ? Use just mass = 0 to 'fly' ?
-        bool getIsFlying();
-        // *
-        
-
         void update(float dt);
 
     private:
-        sf::Vector2f movementVector = sf::Vector2f(0, 0);
-        sf::Vector2f velocityGoal;
-
         std::map<std::string, std::function<void()>> actions;
         std::map<std::string, ContinuousAction> continuousActions;
         std::map<std::string, ConditionalAction> conditionalActions;
         std::map<std::string, bool> flags;
         
-        float mass = 0;
-        bool isFlying = false;
 };
 
 #endif
@@ -448,10 +404,10 @@ CollisionSide determineCollisionSide(CollisionShape *CS1, CollisionShape *CS2){
     std::vector<CollisionSide> allCollisionSides;
 
     // ! Order matters 
-    if(CS1->getOwner()->getMovementVector().x < 0) allCollisionSides.push_back(CollisionSide::left);
-    if(CS1->getOwner()->getMovementVector().x > 0) allCollisionSides.push_back(CollisionSide::right);
-    if(CS1->getOwner()->getMovementVector().y < 0) allCollisionSides.push_back(CollisionSide::top);
-    if(CS1->getOwner()->getMovementVector().y > 0) allCollisionSides.push_back(CollisionSide::bottom);
+    if(CS1->getOwner()->velocity.x < 0) allCollisionSides.push_back(CollisionSide::left);
+    if(CS1->getOwner()->velocity.x > 0) allCollisionSides.push_back(CollisionSide::right);
+    if(CS1->getOwner()->velocity.y < 0) allCollisionSides.push_back(CollisionSide::top);
+    if(CS1->getOwner()->velocity.y > 0) allCollisionSides.push_back(CollisionSide::bottom);
 
     CollisionSide lowestDepthSide;
     float lowestDepth = std::numeric_limits<float>::infinity();
@@ -518,40 +474,6 @@ bool boundingBox(CollisionShape *CS1, CollisionShape *CS2){
 
 #ifndef SGE_MAIN
 
-#ifndef APPROACH_H
-#define APPROACH_H
-
-float approach(float goal, float current, float dt){
-    float diff = goal - current;
-
-    if(diff > dt) return current + dt;
-    if(diff < -dt) return current - dt;
-    return goal;
-}
-
-#endif
-
-// * Utils
-PhysicalObjectPositionData PhysicalObject::getPositionData(){
-    return { this->getPosition().x, this->getPosition().y, this->getGlobalBounds().height, this->getGlobalBounds().width };
-}
-// *
-
-// * Movement
-void PhysicalObject::setMovementVector(sf::Vector2f _movementVector){ movementVector = _movementVector; }
-void PhysicalObject::setMovementVectorX(float x){ movementVector = sf::Vector2f(x, movementVector.y); }
-void PhysicalObject::setMovementVectorY(float y){ movementVector = sf::Vector2f(movementVector.x, y); }
-sf::Vector2f PhysicalObject::getMovementVector(){ return movementVector; }
-
-void PhysicalObject::setVelocityGoal(sf::Vector2f goal){ velocityGoal = goal; }
-void PhysicalObject::setVelocityGoalX(float goalX){ velocityGoal.x = goalX; }
-void PhysicalObject::setVelocityGoalY(float goalY){ velocityGoal.y = goalY; }
-
-void PhysicalObject::movementStop(){ movementVector = sf::Vector2f(0, 0);  };
-void PhysicalObject::movementStopX(){ movementVector = sf::Vector2f(0, movementVector.y); };
-void PhysicalObject::movementStopY(){ movementVector = sf::Vector2f(movementVector.x, 0); };
-// *
-
 // * Actions
 void PhysicalObject::createAction(std::string _name, std::function<void()> _action){ actions[_name] = _action; }
 
@@ -578,20 +500,7 @@ bool PhysicalObject::getFlag(std::string flagName){ return flags[flagName]; }
 void PhysicalObject::setFlag(std::string flagName, bool value){ flags[flagName] = value; }
 //*
 
-// * Physical properties
-void PhysicalObject::setMass(float _mass){ mass = _mass; }
-float PhysicalObject::getMass(){ return mass; }
-
-void PhysicalObject::setIsFlying(bool is){ isFlying = is; }
-bool PhysicalObject::getIsFlying(){ return isFlying ;}
-// *
-
 void PhysicalObject::update(float dt){
-    // ? Movement is a ContinuousAction ? 
-    movementVector.x = approach(velocityGoal.x, movementVector.x, dt*5000);
-    movementVector.y = approach(velocityGoal.y, movementVector.y, dt*5000);
-    setPosition(getPosition() + movementVector * dt);
-
     for(auto const& [name, continuousAction] : continuousActions){
         if(continuousAction.shouldRun) continuousAction.runAction(dt);
     }
@@ -601,6 +510,8 @@ void PhysicalObject::update(float dt){
             conditionalAction.runAction();
         }
     }
+
+    setPosition(getPosition() + velocity * dt);
 };
 
 
@@ -611,12 +522,22 @@ void PhysicsManager::deregisterPhysicalObject(PhysicalObject* _physicalObject){ 
 std::vector<PhysicalObject*> PhysicsManager::getAllPhysicalObjects(){ return physicalObjects; }
 
 void PhysicsManager::updatePhysics(float dt){
-    // TODO check if any physical objects exist
     for(PhysicalObject* physicalObject : physicalObjects){
-        // Gravity
-        if(!physicalObject->getIsFlying()){
-            physicalObject->setVelocityGoalY(physicalObject->getMass());
+        // Accelerate (approach with step)
+        if(abs(physicalObject->velocity.x) >= physicalObject->speedLimit.x){
+            physicalObject->velocity.x = physicalObject->speedLimit.x;
         }
+        else{
+            physicalObject->velocity.x += physicalObject->acceleration.x;
+        }
+
+        if(abs(physicalObject->velocity.y) >= physicalObject->speedLimit.y){
+            physicalObject->velocity.y = physicalObject->speedLimit.y;
+        }
+        else{
+            physicalObject->velocity.y += physicalObject->acceleration.y;
+        }
+        //
 
         physicalObject->update(dt);
     }
