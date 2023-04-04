@@ -21,8 +21,8 @@ int main(){
     //
 
     // Load all textures
-    universe->textureManager->loadTexture(std::filesystem::current_path().string() + "/src/assets/pico_8_knight_sprite.png", "knight", TextureSheetSizes(8, 8, 12, 12));
-    universe->textureManager->loadTexture(std::filesystem::current_path().string() + "/src/assets/pico_8_tiles.png", "picoTiles", TextureSheetSizes(8, 8, 12, 12));
+    universe->textureManager->loadTexture(std::filesystem::current_path().string() + "/examples/dev/assets/pico_8_knight_sprite.png", "knight", TextureSheetSizes(8, 8, 12, 12));
+    universe->textureManager->loadTexture(std::filesystem::current_path().string() + "/examples/dev/assets/pico_8_tiles.png", "picoTiles", TextureSheetSizes(8, 8, 12, 12));
     //
 
 
@@ -33,7 +33,7 @@ int main(){
 
     // Read
     tmx::Map map;
-    if(!map.load(std::filesystem::current_path().string() + "/src/assets/map.tmx")){
+    if(!map.load(std::filesystem::current_path().string() + "/examples/dev/assets/map.tmx")){
         printf("Can't load map");
         exit(1);
     }

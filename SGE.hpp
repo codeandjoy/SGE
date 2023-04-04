@@ -65,7 +65,6 @@ class PhysicalObject : public sf::Sprite{
         std::map<std::string, ContinuousAction> continuousActions;
         std::map<std::string, ConditionalAction> conditionalActions;
         std::map<std::string, bool> flags;
-        
 };
 
 #endif
