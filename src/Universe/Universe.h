@@ -11,6 +11,7 @@
 
 class Universe{
     public:
+        Universe(PhysicsManager* _physicsManager, CollisionManager* _collisionManager, TextureManager* _textureManager, EntityManager* _entityManager);
         Universe(PhysicsManager* _physicsManager, CollisionManager* _collisionManager, TextureManager* _textureManager, EntityManager* _entityManager, DebugManager* _debugManager);
 
         void setupWindow(sf::RenderWindow *window);

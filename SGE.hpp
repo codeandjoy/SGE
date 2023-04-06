@@ -403,6 +403,7 @@ class DebugManager{
 
 class Universe{
     public:
+        Universe(PhysicsManager* _physicsManager, CollisionManager* _collisionManager, TextureManager* _textureManager, EntityManager* _entityManager);
         Universe(PhysicsManager* _physicsManager, CollisionManager* _collisionManager, TextureManager* _textureManager, EntityManager* _entityManager, DebugManager* _debugManager);
 
         void setupWindow(sf::RenderWindow *window);
@@ -886,6 +887,13 @@ void DebugManager::showDebugInfo(sf::RenderWindow* windowPtr){
 }
 
 
+Universe::Universe(PhysicsManager* _physicsManager, CollisionManager* _collisionManager, TextureManager* _textureManager, EntityManager* _entityManager){
+    physicsManager = _physicsManager;
+    collisionManager = _collisionManager;
+    textureManager = _textureManager;
+    entityManager = _entityManager;
+}
+
 Universe::Universe(PhysicsManager* _physicsManager, CollisionManager* _collisionManager, TextureManager* _textureManager, EntityManager* _entityManager, DebugManager* _debugManager){
     physicsManager = _physicsManager;
     collisionManager = _collisionManager;
@@ -959,7 +967,9 @@ void Universe::loop(){
         //     if(collisionShape->getIsVisible()) windowPtr->draw(*collisionShape->getBorder());
         // }
 
-        debugManager->showDebugInfo(windowPtr);
+        if(debugManager){
+            debugManager->showDebugInfo(windowPtr);
+        }
 
         windowPtr->display();
     }
