@@ -17,26 +17,14 @@ class CollisionShape : public sf::RectangleShape{
         sf::Vector2f getOffset();
         void setOffset(sf::Vector2f _offset);
 
-        void setSize(const sf::Vector2f& size);
-
-        // Border
-        bool getIsVisible();
-        void setIsVisible(bool is);
-
-        sf::RectangleShape* getBorder();
-        void setBorderThickness(float thickness);
-        void setBorderColor(const sf::Color& color);
-        //
-
         void align();
 
     private:
         PhysicalObject *owner;
 
-        sf::Vector2f offset = sf::Vector2f(0, 0);
+        sf::Vector2f offset = sf::Vector2f(0, 0); // TODO make not encapsulated for convenience
 
         bool isVisible = true;
-        sf::RectangleShape border;
 };
 
 
