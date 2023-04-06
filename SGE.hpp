@@ -376,10 +376,15 @@ class DebugEntity{
 
         std::vector<CollisionShapeBorder*> generateCollisionShapeBorders();
 
+        void addExtraDebugFunction(std::function<void(sf::RenderWindow* windowPtr)> edf);
+        std::vector<std::function<void(sf::RenderWindow* windowPtr)>> getExtraDebugFunctions();
+
     private:
         Entity* relatedEntity;
 
         CollisionShapeBorderSettings defaultCollisionShapeBorderSettings = CollisionShapeBorderSettings();
+
+        std::vector<std::function<void(sf::RenderWindow* windowPtr)>> extraDebugFunctions;
 };
 
 #endif
@@ -388,7 +393,7 @@ class DebugManager{
     public:
         void registerDebugEntity(DebugEntity* de);
 
-        void drawDebugInfo(sf::RenderWindow* windowPtr);
+        void showDebugInfo(sf::RenderWindow* windowPtr);
 
     private:
         std::vector<DebugEntity*> debugEntities;
@@ -857,11 +862,21 @@ std::vector<CollisionShapeBorder*> DebugEntity::generateCollisionShapeBorders(){
     return collisionShapeBorders;
 }
 
+void DebugEntity::addExtraDebugFunction(std::function<void(sf::RenderWindow* windowPtr)> edf){ extraDebugFunctions.push_back(edf); }
+
+std::vector<std::function<void(sf::RenderWindow* windowPtr)>> DebugEntity::getExtraDebugFunctions(){ return extraDebugFunctions; }
+
 
 void DebugManager::registerDebugEntity(DebugEntity* de){ debugEntities.push_back(de); }
 
-void DebugManager::drawDebugInfo(sf::RenderWindow* windowPtr){
+void DebugManager::showDebugInfo(sf::RenderWindow* windowPtr){
     for(DebugEntity* debugEntity : debugEntities){
+        // Run extraDebugFunctions
+        for(std::function<void(sf::RenderWindow* rw)> edf : debugEntity->getExtraDebugFunctions()){
+            edf(windowPtr);
+        }
+
+        // Collision shape borders
         if(debugEntity->drawCollisionShapeBorders){
             for(CollisionShapeBorder* csb : debugEntity->generateCollisionShapeBorders()){
                 windowPtr->draw(*csb);
@@ -944,7 +959,7 @@ void Universe::loop(){
         //     if(collisionShape->getIsVisible()) windowPtr->draw(*collisionShape->getBorder());
         // }
 
-        debugManager->drawDebugInfo(windowPtr);
+        debugManager->showDebugInfo(windowPtr);
 
         windowPtr->display();
     }

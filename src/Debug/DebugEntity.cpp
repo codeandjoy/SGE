@@ -16,3 +16,7 @@ std::vector<CollisionShapeBorder*> DebugEntity::generateCollisionShapeBorders(){
 
     return collisionShapeBorders;
 }
+
+void DebugEntity::addExtraDebugFunction(std::function<void(sf::RenderWindow* windowPtr)> edf){ extraDebugFunctions.push_back(edf); }
+
+std::vector<std::function<void(sf::RenderWindow* windowPtr)>> DebugEntity::getExtraDebugFunctions(){ return extraDebugFunctions; }

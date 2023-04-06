@@ -74,7 +74,7 @@ void Universe::loop(){
         //     if(collisionShape->getIsVisible()) windowPtr->draw(*collisionShape->getBorder());
         // }
 
-        debugManager->drawDebugInfo(windowPtr);
+        debugManager->showDebugInfo(windowPtr);
 
         windowPtr->display();
     }

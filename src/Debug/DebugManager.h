@@ -8,7 +8,7 @@ class DebugManager{
     public:
         void registerDebugEntity(DebugEntity* de);
 
-        void drawDebugInfo(sf::RenderWindow* windowPtr);
+        void showDebugInfo(sf::RenderWindow* windowPtr);
 
     private:
         std::vector<DebugEntity*> debugEntities;

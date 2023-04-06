@@ -15,10 +15,15 @@ class DebugEntity{
 
         std::vector<CollisionShapeBorder*> generateCollisionShapeBorders();
 
+        void addExtraDebugFunction(std::function<void(sf::RenderWindow* windowPtr)> edf);
+        std::vector<std::function<void(sf::RenderWindow* windowPtr)>> getExtraDebugFunctions();
+
     private:
         Entity* relatedEntity;
 
         CollisionShapeBorderSettings defaultCollisionShapeBorderSettings = CollisionShapeBorderSettings();
+
+        std::vector<std::function<void(sf::RenderWindow* windowPtr)>> extraDebugFunctions;
 };
 
 

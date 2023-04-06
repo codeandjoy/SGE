@@ -127,6 +127,11 @@ int main(){
     // Register debug entity
     DebugEntity* playerDE = new DebugEntity(playerEntityGroup[0]);
     playerDE->customCollisionShapeBorderSettings["globalBounds"] = CollisionShapeBorderSettings{sf::Color::Red};
+    // Extra debug function example
+    // playerDE->addExtraDebugFunction([playerPO](auto _){
+    //     printf("%f, %f\n", playerPO->getPosition().x, playerPO->getPosition().y);
+    // });
+
     universe->debugManager->registerDebugEntity(playerDE);
     //
 
