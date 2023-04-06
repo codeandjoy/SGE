@@ -1,10 +1,11 @@
 #include "Universe.h"
 
-Universe::Universe(PhysicsManager* _physicsManager, CollisionManager* _collisionManager, TextureManager* _textureManager, EntityManager* _entityManager){
+Universe::Universe(PhysicsManager* _physicsManager, CollisionManager* _collisionManager, TextureManager* _textureManager, EntityManager* _entityManager, DebugManager* _debugManager){
     physicsManager = _physicsManager;
     collisionManager = _collisionManager;
     textureManager = _textureManager;
     entityManager = _entityManager;
+    debugManager = _debugManager;
 }
 
 
@@ -69,9 +70,11 @@ void Universe::loop(){
             windowPtr->draw(*physicalObject);
         }
 
-        for(CollisionShape* collisionShape : collisionManager->getAllCollisionShapes()){
-            if(collisionShape->getIsVisible()) windowPtr->draw(*collisionShape->getBorder());
-        }
+        // for(CollisionShape* collisionShape : collisionManager->getAllCollisionShapes()){
+        //     if(collisionShape->getIsVisible()) windowPtr->draw(*collisionShape->getBorder());
+        // }
+
+        debugManager->drawDebugInfo(windowPtr);
 
         windowPtr->display();
     }

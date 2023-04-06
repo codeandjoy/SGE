@@ -7,10 +7,11 @@
 #include "../Collision/CollisionManager.h"
 #include "../Texture/TextureManager.h"
 #include "../Entity/EntityManager.h"
+#include "../Debug/DebugManager.h"
 
 class Universe{
     public:
-        Universe(PhysicsManager* _physicsManager, CollisionManager* _collisionManager, TextureManager* _textureManager, EntityManager* _entityManager);
+        Universe(PhysicsManager* _physicsManager, CollisionManager* _collisionManager, TextureManager* _textureManager, EntityManager* _entityManager, DebugManager* _debugManager);
 
         void setupWindow(sf::RenderWindow *window);
 
@@ -23,6 +24,7 @@ class Universe{
         CollisionManager* collisionManager;
         TextureManager* textureManager;
         EntityManager* entityManager;
+        DebugManager* debugManager;
 
     private:
         sf::RenderWindow *windowPtr;

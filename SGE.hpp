@@ -351,10 +351,66 @@ class EntityManager{
 };
 
 #endif
+#ifndef DEBUG_MANAGER_H
+#define DEBUG_MANAGER_H
+
+#ifndef DEBUG_ENTITY_H
+#define DEBUG_ENTITY_H
+
+#ifndef COLLISION_SHAPE_BORDER_H
+#define COLLISION_SHAPE_BORDER_H
+
+#ifndef COLLISION_SHAPE_BORDER_SETTINGS_H
+#define COLLISION_SHAPE_BORDER_SETTINGS_H
+
+#include <SFML/Graphics.hpp>
+
+struct CollisionShapeBorderSettings{
+    sf::Color color = sf::Color::Blue;
+    float thickness = .5;
+};
+
+#endif
+
+class CollisionShapeBorder : public sf::RectangleShape{
+    public:
+        CollisionShapeBorder(CollisionShape* owner, CollisionShapeBorderSettings settings);
+};
+
+#endif
+
+class DebugEntity{
+    public:
+        DebugEntity(Entity* _relatedEntity);
+
+        bool drawCollisionShapeBorders = true;
+        std::map<std::string, CollisionShapeBorderSettings> customCollisionShapeBorderSettings;
+
+        std::vector<CollisionShapeBorder*> generateCollisionShapeBorders();
+
+    private:
+        Entity* relatedEntity;
+
+        CollisionShapeBorderSettings defaultCollisionShapeBorderSettings = CollisionShapeBorderSettings();
+};
+
+#endif
+
+class DebugManager{
+    public:
+        void registerDebugEntity(DebugEntity* de);
+
+        void drawDebugInfo(sf::RenderWindow* windowPtr);
+
+    private:
+        std::vector<DebugEntity*> debugEntities;
+};
+
+#endif
 
 class Universe{
     public:
-        Universe(PhysicsManager* _physicsManager, CollisionManager* _collisionManager, TextureManager* _textureManager, EntityManager* _entityManager);
+        Universe(PhysicsManager* _physicsManager, CollisionManager* _collisionManager, TextureManager* _textureManager, EntityManager* _entityManager, DebugManager* _debugManager);
 
         void setupWindow(sf::RenderWindow *window);
 
@@ -367,6 +423,7 @@ class Universe{
         CollisionManager* collisionManager;
         TextureManager* textureManager;
         EntityManager* entityManager;
+        DebugManager* debugManager;
 
     private:
         sf::RenderWindow *windowPtr;
@@ -806,11 +863,54 @@ std::map<std::string, std::vector<Entity*>> EntityManager::getAllEntityGroups(){
 
 // TODO destroy
 
-Universe::Universe(PhysicsManager* _physicsManager, CollisionManager* _collisionManager, TextureManager* _textureManager, EntityManager* _entityManager){
+CollisionShapeBorder::CollisionShapeBorder(CollisionShape* owner, CollisionShapeBorderSettings settings){
+    this->setFillColor(sf::Color(0,0,0,0));
+
+    this->setOutlineColor(settings.color);
+    this->setOutlineThickness(settings.thickness);
+
+    this->setPosition(sf::Vector2f(owner->getPosition().x + settings.thickness, owner->getPosition().y + settings.thickness));
+    this->setSize(sf::Vector2f(owner->getSize().x - settings.thickness*2, owner->getSize().y - settings.thickness*2));
+}
+
+
+DebugEntity::DebugEntity(Entity* _relatedEntity){ relatedEntity = _relatedEntity; }
+
+std::vector<CollisionShapeBorder*> DebugEntity::generateCollisionShapeBorders(){
+    std::vector<CollisionShapeBorder*> collisionShapeBorders;
+
+    for(auto &[name, collisionShape] : relatedEntity->collisionShapes){
+        if(customCollisionShapeBorderSettings.count(name)){
+            collisionShapeBorders.push_back(new CollisionShapeBorder(collisionShape, customCollisionShapeBorderSettings[name]));
+        }
+        else{
+            collisionShapeBorders.push_back(new CollisionShapeBorder(collisionShape, defaultCollisionShapeBorderSettings));
+        }
+    }
+
+    return collisionShapeBorders;
+}
+
+
+void DebugManager::registerDebugEntity(DebugEntity* de){ debugEntities.push_back(de); }
+
+void DebugManager::drawDebugInfo(sf::RenderWindow* windowPtr){
+    for(DebugEntity* debugEntity : debugEntities){
+        if(debugEntity->drawCollisionShapeBorders){
+            for(CollisionShapeBorder* csb : debugEntity->generateCollisionShapeBorders()){
+                windowPtr->draw(*csb);
+            }
+        }
+    }
+}
+
+
+Universe::Universe(PhysicsManager* _physicsManager, CollisionManager* _collisionManager, TextureManager* _textureManager, EntityManager* _entityManager, DebugManager* _debugManager){
     physicsManager = _physicsManager;
     collisionManager = _collisionManager;
     textureManager = _textureManager;
     entityManager = _entityManager;
+    debugManager = _debugManager;
 }
 
 void Universe::setupWindow(sf::RenderWindow *window){
@@ -874,9 +974,11 @@ void Universe::loop(){
             windowPtr->draw(*physicalObject);
         }
 
-        for(CollisionShape* collisionShape : collisionManager->getAllCollisionShapes()){
-            if(collisionShape->getIsVisible()) windowPtr->draw(*collisionShape->getBorder());
-        }
+        // for(CollisionShape* collisionShape : collisionManager->getAllCollisionShapes()){
+        //     if(collisionShape->getIsVisible()) windowPtr->draw(*collisionShape->getBorder());
+        // }
+
+        debugManager->drawDebugInfo(windowPtr);
 
         windowPtr->display();
     }

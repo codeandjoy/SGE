@@ -16,8 +16,9 @@ int main(){
     CollisionManager* CM = new CollisionManager();
     TextureManager* TM = new TextureManager();
     EntityManager* EM = new EntityManager(PM, CM, TM);
+    DebugManager* DM = new DebugManager();
 
-    Universe *universe = new Universe(PM, CM, TM, EM);
+    Universe *universe = new Universe(PM, CM, TM, EM, DM);
     //
 
     // Load all textures
@@ -123,6 +124,7 @@ int main(){
     // Register player entity
     // 1 PhysicalObject, 1 CollisionShape, Animation present
     universe->entityManager->registerEntityGroup("playerPhysicalObject", playerEntityGroup);
+    universe->debugManager->registerDebugEntity(new DebugEntity(playerEntityGroup[0]));
     //
 
     //
