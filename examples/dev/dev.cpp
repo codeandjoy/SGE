@@ -123,7 +123,11 @@ int main(){
     // Register player entity
     // 1 PhysicalObject, 1 CollisionShape, Animation present
     universe->entityManager->registerEntityGroup("playerPhysicalObject", playerEntityGroup);
-    universe->debugManager->registerDebugEntity(new DebugEntity(playerEntityGroup[0]));
+
+    // Register debug entity
+    DebugEntity* playerDE = new DebugEntity(playerEntityGroup[0]);
+    playerDE->customCollisionShapeBorderSettings["globalBounds"] = CollisionShapeBorderSettings{sf::Color::Red};
+    universe->debugManager->registerDebugEntity(playerDE);
     //
 
     //
