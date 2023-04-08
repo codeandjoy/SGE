@@ -157,7 +157,7 @@ int main(){
 
     // Register player entity
     // 1 PhysicalObject, 1 CollisionShape, Animation present
-    universe->entityManager->registerEntityGroup("playerPhysicalObject", playerEntityGroup);
+    universe->entityManager->registerEntityGroup("player", playerEntityGroup);
 
     // Register debug entity
     DebugEntity* playerDE = new DebugEntity(playerEntityGroup[0]);
@@ -180,7 +180,7 @@ int main(){
     // Collision groups
     //
 
-    // PlayerPhysicalObject
+    // Player
     std::vector<CollisionShape*> playerCollisionShapesVec =  {playerEntityGroup[0]->collisionShapes["globalBounds"]};
     CollisionGroup* playerCollisionGroup = new CollisionGroup{CollisionGroupType::moveable, playerCollisionShapesVec, playerEntityGroup};
     //
