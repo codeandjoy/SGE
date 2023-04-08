@@ -192,6 +192,14 @@ int main(){
     // Box
     std::vector<CollisionShape*> boxCollisionGroup = {boxEntityGroup[0]->collisionShapes["globalBounds"]};
 
+    // Map tiles + Box for player AABB
+    std::vector<CollisionShape*> tilesAndBoxCollisionGroup = mapCollisionGroup;
+    tilesAndBoxCollisionGroup.insert(tilesAndBoxCollisionGroup.end(), boxCollisionGroup.begin(), boxCollisionGroup.end());
+
+    // Map tiles + Player for box AABB
+    std::vector<CollisionShape*> tilesAndPlayerCollisionGroup = mapCollisionGroup;
+    tilesAndPlayerCollisionGroup.insert(tilesAndPlayerCollisionGroup.end(), playerCollisionGroup.begin(), playerCollisionGroup.end());
+
     //
     //
     //
@@ -201,56 +209,53 @@ int main(){
     //
     // Collision management
     //
+
+    // * Notes:
+    // ! The collision shape CAN NOT be the initiator AND the recepient of the AABB response
+    // ! To work properly, all AABB recipients with common initiator should be located in the SAME collision group
+
     
     universe->collisionManager->registerCollisionGroup("player", playerCollisionGroup);
     universe->collisionManager->registerCollisionGroup("tiles", mapCollisionGroup);
     universe->collisionManager->registerCollisionGroup("box", boxCollisionGroup);
+    universe->collisionManager->registerCollisionGroup("tiles+box", tilesAndBoxCollisionGroup);
+    universe->collisionManager->registerCollisionGroup("tiles+player", tilesAndPlayerCollisionGroup);
+    // ? change collision pair to accept multiple groups, for convenience:
+    // ? e.g.
+    // ? createCollisionPair("name", vecInitiatorGroups{"g1name"}, vecRecipientGroups{"g2name", "g3name", "g4name"});
+    // ? then loop through all initiator and recipient groups respectively when checking collisions
+    // ?
+    // ? to remove the need of creating extra collision groups like "tiles+box"
 
 
 
-    universe->collisionManager->createCollisionPair("PTCollisionPair", "player", "tiles");
-    universe->collisionManager->setCollisionDetectionAlgorithm("PTCollisionPair", boundingBox);
-
-    universe->collisionManager->addCollisionResponse("PTCollisionPair", resolveAABB);
-    universe->collisionManager->addCollisionResponse("PTCollisionPair", [playerPO](std::vector<Collision> collisions){
-        for(Collision collision : collisions){
-            if(collision.initiatorImpactSide == CollisionSide::bottom){
-                playerPO->velocity.y = 0;
-            }
-        }
-    });
+    // To work properly, all AABB shapes should be checked together
+    universe->collisionManager->createCollisionPair("playerAABB", "player", "tiles+box");
+    universe->collisionManager->setCollisionDetectionAlgorithm("playerAABB", boundingBox);
+    universe->collisionManager->addCollisionResponse("playerAABB", resolveAABB);
+    universe->collisionManager->addCollisionResponse("playerAABB", initiatorStandOnTopOfRecipient);
 
 
 
-    universe->collisionManager->createCollisionPair("BTCollisionPair", "box", "tiles");
-    universe->collisionManager->setCollisionDetectionAlgorithm("BTCollisionPair", boundingBox);
-
-    universe->collisionManager->addCollisionResponse("BTCollisionPair", resolveAABB);
-    universe->collisionManager->addCollisionResponse("BTCollisionPair", [boxPO](std::vector<Collision> collisions){
-        for(Collision collision : collisions){
-            if(collision.initiatorImpactSide == CollisionSide::bottom){
-                boxPO->velocity.y = 0;
-            }
-        }
-    });
+    // To work properly, all AABB shapes should be checked together
+    universe->collisionManager->createCollisionPair("boxAABB", "box", "tiles");
+    universe->collisionManager->setCollisionDetectionAlgorithm("boxAABB", boundingBox);
+    universe->collisionManager->addCollisionResponse("boxAABB", resolveAABB);
+    universe->collisionManager->addCollisionResponse("boxAABB", initiatorStandOnTopOfRecipient);
 
 
 
     universe->collisionManager->createCollisionPair("PB", "player", "box");
     universe->collisionManager->setCollisionDetectionAlgorithm("PB", boundingBox);
-
-    universe->collisionManager->addCollisionResponse("PB", resolveAABB);
-    universe->collisionManager->addCollisionResponse("PB", [playerPO](std::vector<Collision> collisions){
-        if(collisions[0].initiatorImpactSide == CollisionSide::bottom){
-            playerPO->velocity.y = 0;
-        }
-    });
-    universe->collisionManager->addCollisionResponse("PB", [boxPO](std::vector<Collision> collisions){
-        if(collisions[0].initiatorImpactSide == CollisionSide::left){
-            boxPO->velocity.x = -10;
-        }
-        else if(collisions[0].initiatorImpactSide == CollisionSide::right){
-            boxPO->velocity.x = 10;
+    universe->collisionManager->addCollisionResponse("PB", [](std::vector<Collision> collisions){
+        // Refactor as pushRecipient(float velocity);
+        for(Collision collision : collisions){
+            if(collision.recipientImpactSide == CollisionSide::right){
+                collision.recipient->getOwner()->velocity.x = -10;
+            }
+            else if(collision.recipientImpactSide == CollisionSide::left){
+                collision.recipient->getOwner()->velocity.x = 10;
+            }
         }
     });
 

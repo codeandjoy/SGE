@@ -39,5 +39,13 @@ void resolveAABB(std::vector<Collision> collisions){
     }
 }
 
+void initiatorStandOnTopOfRecipient(std::vector<Collision> collisions){
+    for(Collision collision : collisions){
+        if(collision.initiatorImpactSide == CollisionSide::bottom){
+            collision.initiator->getOwner()->velocity.y = 0;
+        }
+    }
+}
+
 
 #endif

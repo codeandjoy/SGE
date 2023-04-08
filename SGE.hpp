@@ -440,6 +440,14 @@ void resolveAABB(std::vector<Collision> collisions){
     }
 }
 
+void initiatorStandOnTopOfRecipient(std::vector<Collision> collisions){
+    for(Collision collision : collisions){
+        if(collision.initiatorImpactSide == CollisionSide::bottom){
+            collision.initiator->getOwner()->velocity.y = 0;
+        }
+    }
+}
+
 #endif
 #ifndef COLLISION_DETECTION_ALGORITHMS_H
 #define COLLISION_DETECTION_ALGORITHMS_H
