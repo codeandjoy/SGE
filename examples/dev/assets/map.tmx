@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.9" tiledversion="1.9.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="8" tileheight="8" infinite="0" backgroundcolor="#000000" nextlayerid="3" nextobjectid="1">
+<map version="1.10" tiledversion="git" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="8" tileheight="8" infinite="0" backgroundcolor="#000000" nextlayerid="4" nextobjectid="2">
  <tileset firstgid="1" source="pico_8_tiles.tsx"/>
  <layer id="2" name="surface" width="30" height="20">
   <data encoding="csv">
@@ -25,4 +25,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
+ <objectgroup id="3" name="box">
+  <object id="1" gid="137" x="153.091" y="77.2727" width="8" height="8"/>
+ </objectgroup>
 </map>

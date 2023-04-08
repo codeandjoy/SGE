@@ -41,6 +41,11 @@ int main(){
 
     const auto& layers = map.getLayers();
     const auto& tiles = layers[0]->getLayerAs<tmx::TileLayer>().getTiles();
+    const auto& boxes = layers[1]->getLayerAs<tmx::ObjectGroup>().getObjects();
+    //
+
+    //
+    // Tile layer
     //
 
     // Init physical objects
@@ -77,6 +82,36 @@ int main(){
     // Register map tile entities
     // 1 PhysicalObject, 1 CollisionShape, no Animation
     universe->entityManager->registerEntityGroup("mapTiles", mapTilesEntityGroup);
+    //
+    
+    //
+    //
+    //
+
+    //
+    // Object layer
+    //
+
+    auto& box = boxes[0];
+
+    PhysicalObject* boxPO = new PhysicalObject();
+    boxPO->setTexture(*universe->textureManager->getTexture("picoTiles")->getTextureSheet());
+    boxPO->setTextureRect(universe->textureManager->getTexture("picoTiles")->getTextureRect(box.getTileID()-1));
+    boxPO->setPosition(sf::Vector2f(box.getPosition().x, box.getPosition().y));
+
+    boxPO->acceleration = sf::Vector2f(0, .1);
+
+    std::map<std::string, CollisionShape*> boxCSs = {{"globalBounds", new CollisionShape(boxPO)}};
+
+    std::vector<Entity*> boxEntityGroup = {new Entity{boxPO, boxCSs}};
+
+    universe->entityManager->registerEntityGroup("boxes", boxEntityGroup);
+
+    DebugEntity* boxDE = new DebugEntity(boxEntityGroup[0]);
+    boxDE->customCollisionShapeBorderSettings["globalBounds"] = CollisionShapeBorderSettings{sf::Color::Green};
+    universe->debugManager->registerDebugEntity(boxDE); // ? make it registerDebugEntityGroup for consistency
+    //
+    //
     //
 
     //
@@ -159,6 +194,11 @@ int main(){
     CollisionGroup* mapTilesCollisionGroup = new CollisionGroup{CollisionGroupType::solid, mapCollisionShapes, mapTilesEntityGroup};
     //
 
+    // Box
+    std::vector<CollisionShape*> boxCollisionShapesVec = {boxEntityGroup[0]->collisionShapes["globalBounds"]};
+    CollisionGroup* boxCollisionGroup = new CollisionGroup{CollisionGroupType::moveable, boxCollisionShapesVec, boxEntityGroup};
+    //
+
     //
     //
     //
@@ -171,14 +211,61 @@ int main(){
     
     universe->collisionManager->registerCollisionGroup("player", playerCollisionGroup);
     universe->collisionManager->registerCollisionGroup("tiles", mapTilesCollisionGroup);
+    universe->collisionManager->registerCollisionGroup("box", boxCollisionGroup);
+
+
 
     universe->collisionManager->createCollisionPair("PTCollisionPair", "player", "tiles");
     universe->collisionManager->setCollisionDetectionAlgorithm("PTCollisionPair", boundingBox);
 
     universe->collisionManager->addCollisionResponse("PTCollisionPair", resolveAABB);
     universe->collisionManager->addCollisionResponse("PTCollisionPair", [playerPO](std::vector<Collision> collisions){
-        playerPO->velocity.y = 0;
+        for(Collision collision : collisions){
+            if(collision.side == CollisionSide::bottom){
+                playerPO->velocity.y = 0;
+            }
+        }
     });
+
+
+
+    universe->collisionManager->createCollisionPair("BTCollisionPair", "box", "tiles");
+    universe->collisionManager->setCollisionDetectionAlgorithm("BTCollisionPair", boundingBox);
+
+    universe->collisionManager->addCollisionResponse("BTCollisionPair", resolveAABB);
+    universe->collisionManager->addCollisionResponse("BTCollisionPair", [boxPO](std::vector<Collision> collisions){
+        for(Collision collision : collisions){
+            if(collision.side == CollisionSide::bottom){
+                boxPO->velocity.y = 0;
+            }
+        }
+    });
+
+
+
+    universe->collisionManager->createCollisionPair("PB", "player", "box");
+    universe->collisionManager->setCollisionDetectionAlgorithm("PB", boundingBox);
+
+    universe->collisionManager->addCollisionResponse("PB", resolveAABB);
+    universe->collisionManager->addCollisionResponse("PB", [playerPO](std::vector<Collision> collisions){
+        // !
+        // TODO make better collision side description (which object's side is unclear)
+        // !
+        if(collisions[0].side == CollisionSide::bottom){
+            playerPO->velocity.y = 0;
+        }
+    });
+    universe->collisionManager->addCollisionResponse("PB", [boxPO](std::vector<Collision> collisions){
+        if(collisions[0].side == CollisionSide::left){
+            boxPO->velocity.x = -10;
+        }
+        else if(collisions[0].side == CollisionSide::right){
+            boxPO->velocity.x = 10;
+        }
+    });
+    // universe->collisionManager->addCollisionResponse("PB", [](std::vector<Collision> collisions){
+    //     collisions[0].
+    // });
 
     //
     //
