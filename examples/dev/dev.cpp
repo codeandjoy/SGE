@@ -137,7 +137,7 @@ int main(){
     std::map<std::string, CollisionShape*> playerCSs;
     CollisionShape* playerCS = new CollisionShape(playerPO);
     playerCS->setSize(sf::Vector2f(playerPO->getGlobalBounds().width, 4));
-    playerCS->setOffset(sf::Vector2f(0, 4));
+    playerCS->offset = sf::Vector2f(0, 4);
 
     playerCSs["globalBounds"] = playerCS;
     //
@@ -181,23 +181,16 @@ int main(){
     //
 
     // Player
-    std::vector<CollisionShape*> playerCollisionShapesVec =  {playerEntityGroup[0]->collisionShapes["globalBounds"]};
-    CollisionGroup* playerCollisionGroup = new CollisionGroup{CollisionGroupType::moveable, playerCollisionShapesVec, playerEntityGroup};
-    //
+    std::vector<CollisionShape*> playerCollisionGroup =  {playerEntityGroup[0]->collisionShapes["globalBounds"]};
     
     // Map
-    std::vector<CollisionShape*> mapCollisionShapes;
+    std::vector<CollisionShape*> mapCollisionGroup;
     for(Entity* mapTileEntity : mapTilesEntityGroup){
-        mapCollisionShapes.push_back(mapTileEntity->collisionShapes["globalBounds"]);
+        mapCollisionGroup.push_back(mapTileEntity->collisionShapes["globalBounds"]);
     }
 
-    CollisionGroup* mapTilesCollisionGroup = new CollisionGroup{CollisionGroupType::solid, mapCollisionShapes, mapTilesEntityGroup};
-    //
-
     // Box
-    std::vector<CollisionShape*> boxCollisionShapesVec = {boxEntityGroup[0]->collisionShapes["globalBounds"]};
-    CollisionGroup* boxCollisionGroup = new CollisionGroup{CollisionGroupType::moveable, boxCollisionShapesVec, boxEntityGroup};
-    //
+    std::vector<CollisionShape*> boxCollisionGroup = {boxEntityGroup[0]->collisionShapes["globalBounds"]};
 
     //
     //
@@ -210,7 +203,7 @@ int main(){
     //
     
     universe->collisionManager->registerCollisionGroup("player", playerCollisionGroup);
-    universe->collisionManager->registerCollisionGroup("tiles", mapTilesCollisionGroup);
+    universe->collisionManager->registerCollisionGroup("tiles", mapCollisionGroup);
     universe->collisionManager->registerCollisionGroup("box", boxCollisionGroup);
 
 
@@ -221,7 +214,7 @@ int main(){
     universe->collisionManager->addCollisionResponse("PTCollisionPair", resolveAABB);
     universe->collisionManager->addCollisionResponse("PTCollisionPair", [playerPO](std::vector<Collision> collisions){
         for(Collision collision : collisions){
-            if(collision.side == CollisionSide::bottom){
+            if(collision.initiatorImpactSide == CollisionSide::bottom){
                 playerPO->velocity.y = 0;
             }
         }
@@ -235,7 +228,7 @@ int main(){
     universe->collisionManager->addCollisionResponse("BTCollisionPair", resolveAABB);
     universe->collisionManager->addCollisionResponse("BTCollisionPair", [boxPO](std::vector<Collision> collisions){
         for(Collision collision : collisions){
-            if(collision.side == CollisionSide::bottom){
+            if(collision.initiatorImpactSide == CollisionSide::bottom){
                 boxPO->velocity.y = 0;
             }
         }
@@ -248,24 +241,18 @@ int main(){
 
     universe->collisionManager->addCollisionResponse("PB", resolveAABB);
     universe->collisionManager->addCollisionResponse("PB", [playerPO](std::vector<Collision> collisions){
-        // !
-        // TODO make better collision side description (which object's side is unclear)
-        // !
-        if(collisions[0].side == CollisionSide::bottom){
+        if(collisions[0].initiatorImpactSide == CollisionSide::bottom){
             playerPO->velocity.y = 0;
         }
     });
     universe->collisionManager->addCollisionResponse("PB", [boxPO](std::vector<Collision> collisions){
-        if(collisions[0].side == CollisionSide::left){
+        if(collisions[0].initiatorImpactSide == CollisionSide::left){
             boxPO->velocity.x = -10;
         }
-        else if(collisions[0].side == CollisionSide::right){
+        else if(collisions[0].initiatorImpactSide == CollisionSide::right){
             boxPO->velocity.x = 10;
         }
     });
-    // universe->collisionManager->addCollisionResponse("PB", [](std::vector<Collision> collisions){
-    //     collisions[0].
-    // });
 
     //
     //

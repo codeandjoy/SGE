@@ -9,13 +9,9 @@ CollisionShape::CollisionShape(PhysicalObject *_owner){
 
 PhysicalObject* CollisionShape::getOwner(){ return owner; }
 
-CollisionShapePositionData CollisionShape::getPositionData(){
+Measurements CollisionShape::getMeasurements(){
     return { this->getPosition().x, this->getPosition().y, this->getGlobalBounds().height, this->getGlobalBounds().width };
 }
-
-sf::Vector2f CollisionShape::getOffset(){ return offset; }
-void CollisionShape::setOffset(sf::Vector2f _offset){ offset = _offset; }
-
 
 void CollisionShape::align(){
     this->setPosition(owner->getPosition() + offset);

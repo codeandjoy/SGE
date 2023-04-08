@@ -16,13 +16,13 @@ void CollisionManager::degisterCollisionShapes(std::vector<CollisionShape*> _col
 
 
 
-void CollisionManager::registerCollisionGroup(std::string name, CollisionGroup* _collisionGroup){ collisionGroups[name] = _collisionGroup; } 
+void CollisionManager::registerCollisionGroup(std::string name, std::vector<CollisionShape*> _collisionGroup){ collisionGroups[name] = _collisionGroup; } 
 
 void CollisionManager::deregisterCollisionGroup(std::string name){ collisionGroups.erase(name); }
 
-void CollisionManager::registerCollisionGroups(std::map<std::string, CollisionGroup*> _groupsToRegister){ collisionGroups.insert(_groupsToRegister.begin(), _groupsToRegister.end()); }
+void CollisionManager::registerCollisionGroups(std::map<std::string, std::vector<CollisionShape*>> _groupsToRegister){ collisionGroups.insert(_groupsToRegister.begin(), _groupsToRegister.end()); }
 
-void CollisionManager::deregisterCollisionGroups(std::map<std::string, CollisionGroup*> _groupsToDeregister){
+void CollisionManager::deregisterCollisionGroups(std::map<std::string, std::vector<CollisionShape*>> _groupsToDeregister){
     for(auto& [name, _] : _groupsToDeregister){
         deregisterCollisionGroup(name);
     }
@@ -45,7 +45,7 @@ void CollisionManager::setCollisionDetectionAlgorithm(std::string collisionPairN
 
 std::vector<CollisionShape*> CollisionManager::getAllCollisionShapes(){ return allCollisionShapes; }
 
-std::map<std::string, CollisionGroup*> CollisionManager::getCollisionGroups(){ return collisionGroups; }
+std::map<std::string, std::vector<CollisionShape*>> CollisionManager::getCollisionGroups(){ return collisionGroups; }
 
 void CollisionManager::alignCollisionShapes(){
     for(CollisionShape* collisionShape : allCollisionShapes){
@@ -54,26 +54,24 @@ void CollisionManager::alignCollisionShapes(){
 }
 
 void CollisionManager::updateCollisions(){
-    // TODO check if any collision pairs are added
-
     std::vector<Collision> collisions;
 
-    // TODO refactor ?
     for(auto const& [name, pair] : collisionPairs){
-        for(CollisionShape* collisionShape_Group1 : collisionGroups[std::get<0>(pair.collisionGroups)]->collisionShapes){
-            for(CollisionShape* collisionShape_Group2 : collisionGroups[std::get<1>(pair.collisionGroups)]->collisionShapes){
-                if(pair.checkCollision(collisionShape_Group1, collisionShape_Group2)){
-                    Collision collision;
-                    collision.side = determineCollisionSide(collisionShape_Group1, collisionShape_Group2);
-                    collision.from = collisionShape_Group1; // ! Assuming CS1 is always 'from' (moveable)
-                    collision.with = collisionShape_Group2;
+        for(CollisionShape* initiator : collisionGroups[std::get<0>(pair.collisionGroups)]){
+            for(CollisionShape* recipient : collisionGroups[std::get<1>(pair.collisionGroups)]){
+                if(pair.checkCollision(initiator, recipient)){
+                    CollisionSide initiatorImpactSide = determineInitiatorImpactSide(initiator, recipient);
 
-                    collisions.push_back(collision);
+                    collisions.push_back(Collision{
+                        initiator,
+                        recipient,
+                        initiatorImpactSide,
+                        flipInitiatorImpactSide(initiatorImpactSide)
+                    });
                 }
             }
 
-            // Run responses
-            // TODO check if any collisionResponses exist (print message?)
+            // Run collision responses
             if(collisions.size()){
                 for(std::function collisionResponse : pair.collisionResponses){
                     collisionResponse(collisions);

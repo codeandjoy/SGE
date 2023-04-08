@@ -87,25 +87,27 @@ class PhysicsManager{
 #define COLLISION_MANAGER_H
 
 #include <SFML/Graphics.hpp>
+#ifndef COLLISION_PAIR_H
+#define COLLISION_PAIR_H
 
-#ifndef COLLISION_GROUP_H
-#define COLLISION_GROUP_H
+#include <SFML/Graphics.hpp> 
+#ifndef COLLISION_H
+#define COLLISION_H
 
-#include <SFML/Graphics.hpp>
-#ifndef COLLISION_GROUP_TYPE
-#define COLLISION_GROUP_TYPE
+#ifndef COLLISION_SIDE_H
+#define COLLISION_SIDE_H
 
-enum CollisionGroupType{ solid, moveable };
+enum CollisionSide{ left, right, top, bottom };
 
 #endif
 #ifndef COLLISION_SHAPE_H
 #define COLLISION_SHAPE_H
 
 #include <SFML/Graphics.hpp>
-#ifndef COLLISION_SHAPE_POSITION_DATA_H
-#define COLLISION_SHAPE_POSITION_DATA_H
+#ifndef MEASUREMENTS_H
+#define MEASUREMENTS_H
 
-struct CollisionShapePositionData{
+struct Measurements{
     float x;
     float y;
     float height;
@@ -118,35 +120,70 @@ class CollisionShape : public sf::RectangleShape{
     public:
         CollisionShape(PhysicalObject *_owner);
 
+        sf::Vector2f offset = sf::Vector2f(0, 0);
+
         PhysicalObject* getOwner();
-
-        CollisionShapePositionData getPositionData();
-
-        sf::Vector2f getOffset();
-        void setOffset(sf::Vector2f _offset);
-
+        Measurements getMeasurements();
         void align();
 
     private:
         PhysicalObject *owner;
-
-        sf::Vector2f offset = sf::Vector2f(0, 0); // TODO make not encapsulated for convenience
-
-        bool isVisible = true;
 };
 
 #endif
-#ifndef ENTITY_H
-#define ENTITY_H
 
-#ifndef ANIMATION_H
-#define ANIMATION_H
+struct Collision{
+    CollisionShape *initiator;
+    CollisionShape *recipient;
+    CollisionSide initiatorImpactSide;
+    CollisionSide recipientImpactSide;
+    // ? detectionAlgorithm (string?)
+};
 
-#include <SFML/Graphics.hpp>
-#ifndef TEXTURESHEET_H
-#define TEXTURESHEET_H
+#endif
 
-#include <SFML/Graphics.hpp>
+struct CollisionPair{
+    std::tuple<std::string, std::string> collisionGroups;
+    std::vector<std::function<void(std::vector<Collision>)>> collisionResponses;
+    std::function<bool(CollisionShape *initiator, CollisionShape *recipient)> checkCollision;
+};
+
+#endif
+
+// ? allow to add an 'area' where collisions get calculated 
+// ? addToGroup(...), removeFromGroup(...), reloadGroup(...) (checks if pointers are still valid), removePair(...), removeCOllisionResponse(...)
+class CollisionManager{
+    public:
+        void registerCollisionShape(CollisionShape* _collisionShape);
+        void deregisterCollisionShape(CollisionShape* _collisionShape);
+        void registerCollisionShapes(std::vector<CollisionShape*> _collisionShapes);
+        void degisterCollisionShapes(std::vector<CollisionShape*> _collisionShapes);
+
+        void registerCollisionGroup(std::string name, std::vector<CollisionShape*> _collisionGroup);
+        void deregisterCollisionGroup(std::string name);
+        void registerCollisionGroups(std::map<std::string, std::vector<CollisionShape*>> _groupsToRegister);
+        void deregisterCollisionGroups(std::map<std::string, std::vector<CollisionShape*>> _groupsToDeregister);
+        
+        void createCollisionPair(std::string name, std::string group1, std::string group2);
+        void addCollisionResponse(std::string collisionPairName, const std::function<void(std::vector<Collision>)> &response);
+        void setCollisionDetectionAlgorithm(std::string collisionPairName, const std::function<bool(CollisionShape* initiator, CollisionShape* recipient)> &cda);
+
+        std::vector<CollisionShape*> getAllCollisionShapes();
+        std::map<std::string, std::vector<CollisionShape*>> getCollisionGroups();
+
+        void alignCollisionShapes();
+        void updateCollisions();
+
+    private:
+        std::vector<CollisionShape*> allCollisionShapes;
+        std::map<std::string, std::vector<CollisionShape*>> collisionGroups;
+        std::map<std::string, CollisionPair> collisionPairs;
+};
+
+#endif
+#ifndef TEXTURE_MANAGER_H
+#define TEXTURE_MANAGER_H
+
 #ifndef TEXTURE_SHEET_SIZES_H
 #define TEXTURE_SHEET_SIZES_H
 
@@ -166,6 +203,10 @@ struct TextureSheetSizes{
 };
 
 #endif
+#ifndef TEXTURESHEET_H
+#define TEXTURESHEET_H
+
+#include <SFML/Graphics.hpp>
 
 // TODO texturesheet with gaps between textures
 class TextureSheet{
@@ -184,6 +225,10 @@ class TextureSheet{
 };
 
 #endif
+#ifndef ANIMATION_H
+#define ANIMATION_H
+
+#include <SFML/Graphics.hpp>
 
 // TODO Animations should switch immediately
 class Animation{
@@ -214,88 +259,6 @@ class Animation{
 
 #endif
 
-struct Entity{
-    PhysicalObject* physicalObject;
-    std::map<std::string, CollisionShape*> collisionShapes; 
-    Animation* animation = nullptr;
-};
-
-#endif
-
-struct CollisionGroup{
-    CollisionGroupType collisionGroupType;
-    std::vector<CollisionShape*> collisionShapes;
-    std::vector<Entity*> ownerEntities;
-};
-
-#endif
-
-#ifndef COLLISION_PAIR_H
-#define COLLISION_PAIR_H
-
-#include <SFML/Graphics.hpp> 
-#ifndef COLLISION_H
-#define COLLISION_H
-
-#ifndef COLLISION_SIDE_H
-#define COLLISION_SIDE_H
-
-enum CollisionSide{ left, right, top, bottom };
-
-#endif
-
-struct Collision{
-    CollisionSide side;
-    CollisionShape *from;
-    CollisionShape *with;
-    // ? detectionAlgorithm (string?)
-};
-
-#endif
-
-// ? add collision type specifier (rectangle, circle etc.)
-struct CollisionPair{
-    std::tuple<std::string, std::string> collisionGroups;
-    std::vector<std::function<void(std::vector<Collision>)>> collisionResponses; // TODO allow function with and without parameters (struct || simply register different types of functions and use the one that exists (or all of them))
-    std::function<bool(CollisionShape *CS1, CollisionShape *CS2)> checkCollision;
-};
-
-#endif
-
-// ? allow to add an 'area' where collisions get calculated 
-// ? addToGroup(...), removeFromGroup(...), reloadGroup(...) (checks if pointers are still valid), removePair(...), removeCOllisionResponse(...)
-class CollisionManager{
-    public:
-        void registerCollisionShape(CollisionShape* _collisionShape);
-        void deregisterCollisionShape(CollisionShape* _collisionShape);
-        void registerCollisionShapes(std::vector<CollisionShape*> _collisionShapes);
-        void degisterCollisionShapes(std::vector<CollisionShape*> _collisionShapes);
-
-        void registerCollisionGroup(std::string name, CollisionGroup* _collisionGroup);
-        void deregisterCollisionGroup(std::string name);
-        void registerCollisionGroups(std::map<std::string, CollisionGroup*> _groupsToRegister);
-        void deregisterCollisionGroups(std::map<std::string, CollisionGroup*> _groupsToDeregister);
-        
-        void createCollisionPair(std::string name, std::string group1, std::string group2);
-        void addCollisionResponse(std::string collisionPairName, const std::function<void(std::vector<Collision>)> &response);
-        void setCollisionDetectionAlgorithm(std::string collisionPairName, const std::function<bool(CollisionShape *CS1, CollisionShape *CS2)> &cda);
-
-        std::vector<CollisionShape*> getAllCollisionShapes();
-        std::map<std::string, CollisionGroup*> getCollisionGroups();
-
-        void alignCollisionShapes();
-        void updateCollisions();
-
-    private:
-        std::vector<CollisionShape*> allCollisionShapes;
-        std::map<std::string, CollisionGroup*> collisionGroups;
-        std::map<std::string, CollisionPair> collisionPairs;
-};
-
-#endif
-#ifndef TEXTURE_MANAGER_H
-#define TEXTURE_MANAGER_H
-
 class TextureManager{
     public:
         // * Textures
@@ -319,6 +282,17 @@ class TextureManager{
 #endif
 #ifndef ENTITY_MANAGER_H
 #define ENTITY_MANAGER_H
+
+#ifndef ENTITY_H
+#define ENTITY_H
+
+struct Entity{
+    PhysicalObject* physicalObject;
+    std::map<std::string, CollisionShape*> collisionShapes; 
+    Animation* animation = nullptr;
+};
+
+#endif
 
 class EntityManager{
     public:
@@ -433,75 +407,34 @@ class Universe{
 #ifndef COLLISION_RESPONSES_H
 #define COLLISION_RESPONSES_H
 
-#ifndef COLLISION_UTILS_H
-#define COLLISION_UTILS_H
-
-#include <limits>
-
-float determineCollisionDepth(CollisionSide side, CollisionShape *CS1, CollisionShape *CS2){
-    auto [x1, y1, height1, width1] = CS1->getPositionData();
-    auto [x2, y2, height2, width2] = CS2->getPositionData();
-    
-    if(side == CollisionSide::left) return x2 + width2 - x1;
-    if(side == CollisionSide::right) return x1 + width1 - x2;
-    if(side == CollisionSide::top) return y2 + height2 - y1;
-    if(side == CollisionSide::bottom) return y1 + height1 - y2;
-
-    return 0;
-}
-
-CollisionSide determineCollisionSide(CollisionShape *CS1, CollisionShape *CS2){
-    std::vector<CollisionSide> allCollisionSides;
-
-    // ! Order matters 
-    if(CS1->getOwner()->velocity.x < 0) allCollisionSides.push_back(CollisionSide::left);
-    if(CS1->getOwner()->velocity.x > 0) allCollisionSides.push_back(CollisionSide::right);
-    if(CS1->getOwner()->velocity.y < 0) allCollisionSides.push_back(CollisionSide::top);
-    if(CS1->getOwner()->velocity.y > 0) allCollisionSides.push_back(CollisionSide::bottom);
-
-    CollisionSide lowestDepthSide;
-    float lowestDepth = std::numeric_limits<float>::infinity();
-    
-    for(CollisionSide collisionSide : allCollisionSides){
-        float depth = determineCollisionDepth(collisionSide, CS1, CS2);
-        if(depth <= lowestDepth){
-            lowestDepthSide = collisionSide;
-            lowestDepth = depth;
-        }
-    }
-
-    return lowestDepthSide;
-}
-
-#endif
-
 void resolveAABB(std::vector<Collision> collisions){
     for(Collision collision : collisions){
-        PhysicalObject *fromOwner = collision.from->getOwner();
-        PhysicalObject *withOwner = collision.with->getOwner();
+        PhysicalObject *initiatorOwner = collision.initiator->getOwner();
+        PhysicalObject *recipientOwner = collision.recipient->getOwner();
         
-        if(collision.side == CollisionSide::left){
-            fromOwner->setPosition(
-                withOwner->getPosition().x + withOwner->getGlobalBounds().width - collision.from->getOffset().x,
-                fromOwner->getPosition().y
+        // Align initiator based on impact side
+        if(collision.initiatorImpactSide == CollisionSide::left){
+            initiatorOwner->setPosition(
+                recipientOwner->getPosition().x + recipientOwner->getGlobalBounds().width - collision.initiator->offset.x,
+                initiatorOwner->getPosition().y
             );
         }
-        else if(collision.side == CollisionSide::right){
-            fromOwner->setPosition(
-                withOwner->getPosition().x - collision.from->getGlobalBounds().width - collision.from->getOffset().x,
-                fromOwner->getPosition().y
+        else if(collision.initiatorImpactSide == CollisionSide::right){
+            initiatorOwner->setPosition(
+                recipientOwner->getPosition().x - collision.initiator->getGlobalBounds().width - collision.initiator->offset.x,
+                initiatorOwner->getPosition().y
             );
         }
-        else if(collision.side == CollisionSide::top){
-            fromOwner->setPosition(
-                fromOwner->getPosition().x,
-                withOwner->getPosition().y + withOwner->getGlobalBounds().height - collision.from->getOffset().y
+        else if(collision.initiatorImpactSide == CollisionSide::top){
+            initiatorOwner->setPosition(
+                initiatorOwner->getPosition().x,
+                recipientOwner->getPosition().y + recipientOwner->getGlobalBounds().height - collision.initiator->offset.y
             );
         }
-        else if(collision.side == CollisionSide::bottom){
-            fromOwner->setPosition(
-                fromOwner->getPosition().x,
-                withOwner->getPosition().y - collision.from->getGlobalBounds().height - collision.from->getOffset().y
+        else if(collision.initiatorImpactSide == CollisionSide::bottom){
+            initiatorOwner->setPosition(
+                initiatorOwner->getPosition().x,
+                recipientOwner->getPosition().y - collision.initiator->getGlobalBounds().height - collision.initiator->offset.y
             );
         }
     }
@@ -511,12 +444,76 @@ void resolveAABB(std::vector<Collision> collisions){
 #ifndef COLLISION_DETECTION_ALGORITHMS_H
 #define COLLISION_DETECTION_ALGORITHMS_H
 
-bool boundingBox(CollisionShape *CS1, CollisionShape *CS2){
-    return CS1->getGlobalBounds().intersects(CS2->getGlobalBounds());
+bool boundingBox(CollisionShape *initiator, CollisionShape *recipient){
+    return initiator->getGlobalBounds().intersects(recipient->getGlobalBounds());
 }
 
 // TODO
 // bool rayRect(){}
+
+#endif
+
+#ifndef COLLISION_UTILS_H
+#define COLLISION_UTILS_H
+
+#include <limits>
+
+float determineCollisionDepth(CollisionSide initiatorImpactSide, CollisionShape *initiator, CollisionShape *recipient){
+    auto [x1, y1, height1, width1] = initiator->getMeasurements();
+    auto [x2, y2, height2, width2] = recipient->getMeasurements();
+    
+    if(initiatorImpactSide == CollisionSide::left) return x2 + width2 - x1;
+    if(initiatorImpactSide == CollisionSide::right) return x1 + width1 - x2;
+    if(initiatorImpactSide == CollisionSide::top) return y2 + height2 - y1;
+    if(initiatorImpactSide == CollisionSide::bottom) return y1 + height1 - y2;
+
+    return 0;
+}
+
+CollisionSide determineInitiatorImpactSide(CollisionShape *initiator, CollisionShape *recipient){
+    std::vector<CollisionSide> allImpactSides;
+
+    // ! Order matters 
+    if(initiator->getOwner()->velocity.x < 0) allImpactSides.push_back(CollisionSide::left);
+    if(initiator->getOwner()->velocity.x > 0) allImpactSides.push_back(CollisionSide::right);
+    if(initiator->getOwner()->velocity.y < 0) allImpactSides.push_back(CollisionSide::top);
+    if(initiator->getOwner()->velocity.y > 0) allImpactSides.push_back(CollisionSide::bottom);
+
+    CollisionSide lowestDepthSide;
+    float lowestDepth = std::numeric_limits<float>::infinity();
+    
+    for(CollisionSide collisionSide : allImpactSides){
+        float depth = determineCollisionDepth(collisionSide, initiator, recipient);
+        if(depth <= lowestDepth){
+            lowestDepthSide = collisionSide;
+            lowestDepth = depth;
+        }
+    }
+
+    return lowestDepthSide;
+}
+
+CollisionSide flipInitiatorImpactSide(CollisionSide initiatorImpactSide){
+    if(initiatorImpactSide == CollisionSide::top) return CollisionSide::bottom;
+    if(initiatorImpactSide == CollisionSide::bottom) return CollisionSide::top;
+    if(initiatorImpactSide == CollisionSide::right) return CollisionSide::left;
+    if(initiatorImpactSide == CollisionSide::left) return CollisionSide::right;
+
+    return CollisionSide::bottom;
+}
+
+#endif
+
+#ifndef APPROACH_H
+#define APPROACH_H
+
+float approach(float goal, float current, float dt){
+    float diff = goal - current;
+
+    if(diff > dt) return current + dt;
+    if(diff < -dt) return current - dt;
+    return goal;
+}
 
 #endif
 
@@ -603,15 +600,91 @@ CollisionShape::CollisionShape(PhysicalObject *_owner){
 
 PhysicalObject* CollisionShape::getOwner(){ return owner; }
 
-CollisionShapePositionData CollisionShape::getPositionData(){
+Measurements CollisionShape::getMeasurements(){
     return { this->getPosition().x, this->getPosition().y, this->getGlobalBounds().height, this->getGlobalBounds().width };
 }
 
-sf::Vector2f CollisionShape::getOffset(){ return offset; }
-void CollisionShape::setOffset(sf::Vector2f _offset){ offset = _offset; }
-
 void CollisionShape::align(){
     this->setPosition(owner->getPosition() + offset);
+}
+
+
+void CollisionManager::registerCollisionShape(CollisionShape* _collisionShape){ allCollisionShapes.push_back(_collisionShape); }
+
+void CollisionManager::deregisterCollisionShape(CollisionShape* _collisionShape){ allCollisionShapes.erase(std::remove(allCollisionShapes.begin(), allCollisionShapes.end(), _collisionShape), allCollisionShapes.end()); }
+
+void CollisionManager::registerCollisionShapes(std::vector<CollisionShape*> _collisionShapes){ allCollisionShapes.insert(allCollisionShapes.end(), _collisionShapes.begin(), _collisionShapes.end()); }
+
+void CollisionManager::degisterCollisionShapes(std::vector<CollisionShape*> _collisionShapes){
+    for(CollisionShape* collisionShape : _collisionShapes){
+        deregisterCollisionShape(collisionShape);
+    }
+}
+
+void CollisionManager::registerCollisionGroup(std::string name, std::vector<CollisionShape*> _collisionGroup){ collisionGroups[name] = _collisionGroup; } 
+
+void CollisionManager::deregisterCollisionGroup(std::string name){ collisionGroups.erase(name); }
+
+void CollisionManager::registerCollisionGroups(std::map<std::string, std::vector<CollisionShape*>> _groupsToRegister){ collisionGroups.insert(_groupsToRegister.begin(), _groupsToRegister.end()); }
+
+void CollisionManager::deregisterCollisionGroups(std::map<std::string, std::vector<CollisionShape*>> _groupsToDeregister){
+    for(auto& [name, _] : _groupsToDeregister){
+        deregisterCollisionGroup(name);
+    }
+}
+
+void CollisionManager::createCollisionPair(std::string name, std::string group1, std::string group2){
+    // TODO Check if both groups exist in collisionGroups
+    collisionPairs[name] = CollisionPair{std::make_tuple(group1, group2)};
+}
+
+void CollisionManager::addCollisionResponse(std::string collisionPairName, const std::function<void(std::vector<Collision>)> &response){
+    collisionPairs[collisionPairName].collisionResponses.push_back(response);
+}
+
+void CollisionManager::setCollisionDetectionAlgorithm(std::string collisionPairName, const std::function<bool(CollisionShape *CS1, CollisionShape *CS2)> &cda){
+    collisionPairs[collisionPairName].checkCollision = cda;
+}
+
+std::vector<CollisionShape*> CollisionManager::getAllCollisionShapes(){ return allCollisionShapes; }
+
+std::map<std::string, std::vector<CollisionShape*>> CollisionManager::getCollisionGroups(){ return collisionGroups; }
+
+void CollisionManager::alignCollisionShapes(){
+    for(CollisionShape* collisionShape : allCollisionShapes){
+        collisionShape->align();
+    }
+}
+
+void CollisionManager::updateCollisions(){
+    std::vector<Collision> collisions;
+
+    for(auto const& [name, pair] : collisionPairs){
+        for(CollisionShape* initiator : collisionGroups[std::get<0>(pair.collisionGroups)]){
+            for(CollisionShape* recipient : collisionGroups[std::get<1>(pair.collisionGroups)]){
+                if(pair.checkCollision(initiator, recipient)){
+                    CollisionSide initiatorImpactSide = determineInitiatorImpactSide(initiator, recipient);
+
+                    collisions.push_back(Collision{
+                        initiator,
+                        recipient,
+                        initiatorImpactSide,
+                        flipInitiatorImpactSide(initiatorImpactSide)
+                    });
+                }
+            }
+
+            // Run collision responses
+            if(collisions.size()){
+                for(std::function collisionResponse : pair.collisionResponses){
+                    collisionResponse(collisions);
+                }
+            }
+
+            // Reset
+            collisions.clear();
+        }
+    }
 }
 
 
@@ -700,87 +773,6 @@ void Animation::setCurrentAnimationSequence(std::string sequenceName){
     }
 }
 
-void CollisionManager::registerCollisionShape(CollisionShape* _collisionShape){ allCollisionShapes.push_back(_collisionShape); }
-
-void CollisionManager::deregisterCollisionShape(CollisionShape* _collisionShape){ allCollisionShapes.erase(std::remove(allCollisionShapes.begin(), allCollisionShapes.end(), _collisionShape), allCollisionShapes.end()); }
-
-void CollisionManager::registerCollisionShapes(std::vector<CollisionShape*> _collisionShapes){ allCollisionShapes.insert(allCollisionShapes.end(), _collisionShapes.begin(), _collisionShapes.end()); }
-
-void CollisionManager::degisterCollisionShapes(std::vector<CollisionShape*> _collisionShapes){
-    for(CollisionShape* collisionShape : _collisionShapes){
-        deregisterCollisionShape(collisionShape);
-    }
-}
-
-void CollisionManager::registerCollisionGroup(std::string name, CollisionGroup* _collisionGroup){ collisionGroups[name] = _collisionGroup; } 
-
-void CollisionManager::deregisterCollisionGroup(std::string name){ collisionGroups.erase(name); }
-
-void CollisionManager::registerCollisionGroups(std::map<std::string, CollisionGroup*> _groupsToRegister){ collisionGroups.insert(_groupsToRegister.begin(), _groupsToRegister.end()); }
-
-void CollisionManager::deregisterCollisionGroups(std::map<std::string, CollisionGroup*> _groupsToDeregister){
-    for(auto& [name, _] : _groupsToDeregister){
-        deregisterCollisionGroup(name);
-    }
-}
-
-void CollisionManager::createCollisionPair(std::string name, std::string group1, std::string group2){
-    // TODO Check if both groups exist in collisionGroups
-    collisionPairs[name] = CollisionPair{std::make_tuple(group1, group2)};
-}
-
-void CollisionManager::addCollisionResponse(std::string collisionPairName, const std::function<void(std::vector<Collision>)> &response){
-    collisionPairs[collisionPairName].collisionResponses.push_back(response);
-}
-
-void CollisionManager::setCollisionDetectionAlgorithm(std::string collisionPairName, const std::function<bool(CollisionShape *CS1, CollisionShape *CS2)> &cda){
-    collisionPairs[collisionPairName].checkCollision = cda;
-}
-
-std::vector<CollisionShape*> CollisionManager::getAllCollisionShapes(){ return allCollisionShapes; }
-
-std::map<std::string, CollisionGroup*> CollisionManager::getCollisionGroups(){ return collisionGroups; }
-
-void CollisionManager::alignCollisionShapes(){
-    for(CollisionShape* collisionShape : allCollisionShapes){
-        collisionShape->align();
-    }
-}
-
-void CollisionManager::updateCollisions(){
-    // TODO check if any collision pairs are added
-
-    std::vector<Collision> collisions;
-
-    // TODO refactor ?
-    for(auto const& [name, pair] : collisionPairs){
-        for(CollisionShape* collisionShape_Group1 : collisionGroups[std::get<0>(pair.collisionGroups)]->collisionShapes){
-            for(CollisionShape* collisionShape_Group2 : collisionGroups[std::get<1>(pair.collisionGroups)]->collisionShapes){
-                if(pair.checkCollision(collisionShape_Group1, collisionShape_Group2)){
-                    Collision collision;
-                    collision.side = determineCollisionSide(collisionShape_Group1, collisionShape_Group2);
-                    collision.from = collisionShape_Group1; // ! Assuming CS1 is always 'from' (moveable)
-                    collision.with = collisionShape_Group2;
-
-                    collisions.push_back(collision);
-                }
-            }
-
-            // Run responses
-            // TODO check if any collisionResponses exist (print message?)
-            if(collisions.size()){
-                for(std::function collisionResponse : pair.collisionResponses){
-                    collisionResponse(collisions);
-                }
-            }
-
-            // Reset
-            collisions.clear();
-        }
-    }
-}
-
-
 // * Textures
 void TextureManager::loadTexture(std::string location, std::string name, TextureSheetSizes textureSheetSizes){ loadedTextures[name] = new TextureSheet(textureSheetSizes, location); }
 TextureSheet* TextureManager::getTexture(std::string name){ return loadedTextures[name]; }
@@ -802,6 +794,7 @@ void TextureManager::updateAnimations(){
         animation->run();
     }
 }
+
 
 
 EntityManager::EntityManager(PhysicsManager* _physicsManager, CollisionManager* _collisionManager, TextureManager* _textureManager){

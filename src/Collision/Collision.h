@@ -6,9 +6,10 @@
 
 
 struct Collision{
-    CollisionSide side;
-    CollisionShape *from;
-    CollisionShape *with;
+    CollisionShape *initiator;
+    CollisionShape *recipient;
+    CollisionSide initiatorImpactSide;
+    CollisionSide recipientImpactSide;
     // ? detectionAlgorithm (string?)
 };
 

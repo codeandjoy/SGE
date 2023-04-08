@@ -2,11 +2,7 @@
 #define COLLISION_MANAGER_H
 
 #include <SFML/Graphics.hpp>
-#include "../Physics/PhysicalObject.h"
-#include "CollisionGroup.h"
-#include "CollisionGroupType.h"
 #include "CollisionPair.h"
-#include "Collision.h"
 #include "CollisionShape.h"
 
 
@@ -19,24 +15,24 @@ class CollisionManager{
         void registerCollisionShapes(std::vector<CollisionShape*> _collisionShapes);
         void degisterCollisionShapes(std::vector<CollisionShape*> _collisionShapes);
 
-        void registerCollisionGroup(std::string name, CollisionGroup* _collisionGroup);
+        void registerCollisionGroup(std::string name, std::vector<CollisionShape*> _collisionGroup);
         void deregisterCollisionGroup(std::string name);
-        void registerCollisionGroups(std::map<std::string, CollisionGroup*> _groupsToRegister);
-        void deregisterCollisionGroups(std::map<std::string, CollisionGroup*> _groupsToDeregister);
+        void registerCollisionGroups(std::map<std::string, std::vector<CollisionShape*>> _groupsToRegister);
+        void deregisterCollisionGroups(std::map<std::string, std::vector<CollisionShape*>> _groupsToDeregister);
         
         void createCollisionPair(std::string name, std::string group1, std::string group2);
         void addCollisionResponse(std::string collisionPairName, const std::function<void(std::vector<Collision>)> &response);
-        void setCollisionDetectionAlgorithm(std::string collisionPairName, const std::function<bool(CollisionShape *CS1, CollisionShape *CS2)> &cda);
+        void setCollisionDetectionAlgorithm(std::string collisionPairName, const std::function<bool(CollisionShape* initiator, CollisionShape* recipient)> &cda);
 
         std::vector<CollisionShape*> getAllCollisionShapes();
-        std::map<std::string, CollisionGroup*> getCollisionGroups();
+        std::map<std::string, std::vector<CollisionShape*>> getCollisionGroups();
 
         void alignCollisionShapes();
         void updateCollisions();
 
     private:
         std::vector<CollisionShape*> allCollisionShapes;
-        std::map<std::string, CollisionGroup*> collisionGroups;
+        std::map<std::string, std::vector<CollisionShape*>> collisionGroups;
         std::map<std::string, CollisionPair> collisionPairs;
 };
 

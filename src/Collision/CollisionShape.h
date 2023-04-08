@@ -2,7 +2,7 @@
 #define COLLISION_SHAPE_H
 
 #include <SFML/Graphics.hpp>
-#include "CollisionShapePositionData.h"
+#include "../utils/Measurements.h"
 #include "../Physics/PhysicalObject.h"
 
 
@@ -10,21 +10,14 @@ class CollisionShape : public sf::RectangleShape{
     public:
         CollisionShape(PhysicalObject *_owner);
 
+        sf::Vector2f offset = sf::Vector2f(0, 0);
+
         PhysicalObject* getOwner();
-
-        CollisionShapePositionData getPositionData();
-
-        sf::Vector2f getOffset();
-        void setOffset(sf::Vector2f _offset);
-
+        Measurements getMeasurements();
         void align();
 
     private:
         PhysicalObject *owner;
-
-        sf::Vector2f offset = sf::Vector2f(0, 0); // TODO make not encapsulated for convenience
-
-        bool isVisible = true;
 };
 
 

@@ -16,8 +16,6 @@
 #include "./src/Physics/ConditionalAction.h"
 
 #include "./src/Collision/CollisionManager.h"
-#include "./src/Collision/CollisionGroup.h"
-#include "./src/Collision/CollisionGroupType.h"
 #include "./src/Collision/CollisionPair.h"
 #include "./src/Collision/CollisionResponses.h"
 #include "./src/Collision/CollisionDetectionAlgorithms.h"
@@ -25,7 +23,9 @@
 #include "./src/Collision/Collision.h"
 #include "./src/Collision/CollisionUtils.h"
 #include "./src/Collision/CollisionShape.h"
-#include "./src/Collision/CollisionShapePositionData.h"
+
+#include "./src/utils/approach.h"
+#include "./src/utils/Measurements.h"
 
 #endif
 

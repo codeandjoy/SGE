@@ -4,8 +4,8 @@
 #include "CollisionShape.h"
 
 
-bool boundingBox(CollisionShape *CS1, CollisionShape *CS2){
-    return CS1->getGlobalBounds().intersects(CS2->getGlobalBounds());
+bool boundingBox(CollisionShape *initiator, CollisionShape *recipient){
+    return initiator->getGlobalBounds().intersects(recipient->getGlobalBounds());
 }
 
 // TODO
