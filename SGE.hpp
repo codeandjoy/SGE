@@ -143,7 +143,7 @@ struct Collision{
 #endif
 
 struct CollisionPair{
-    std::tuple<std::string, std::string> collisionGroups;
+    std::pair<std::string, std::string> collisionGroups;
     std::vector<std::function<void(std::vector<Collision>)>> collisionResponses;
     std::function<bool(CollisionShape *initiator, CollisionShape *recipient)> checkCollision;
 };
@@ -643,7 +643,7 @@ void CollisionManager::deregisterCollisionGroups(std::map<std::string, std::vect
 
 void CollisionManager::createCollisionPair(std::string name, std::string group1, std::string group2){
     // TODO Check if both groups exist in collisionGroups
-    collisionPairs[name] = CollisionPair{std::make_tuple(group1, group2)};
+    collisionPairs[name] = CollisionPair{std::make_pair(group1, group2)};
 }
 
 void CollisionManager::addCollisionResponse(std::string collisionPairName, const std::function<void(std::vector<Collision>)> &response){
@@ -668,8 +668,8 @@ void CollisionManager::updateCollisions(){
     std::vector<Collision> collisions;
 
     for(auto const& [name, pair] : collisionPairs){
-        for(CollisionShape* initiator : collisionGroups[std::get<0>(pair.collisionGroups)]){
-            for(CollisionShape* recipient : collisionGroups[std::get<1>(pair.collisionGroups)]){
+        for(CollisionShape* initiator : collisionGroups[pair.collisionGroups.first]){
+            for(CollisionShape* recipient : collisionGroups[pair.collisionGroups.second]){
                 if(pair.checkCollision(initiator, recipient)){
                     CollisionSide initiatorImpactSide = determineInitiatorImpactSide(initiator, recipient);
 

@@ -7,7 +7,7 @@
 
 
 struct CollisionPair{
-    std::tuple<std::string, std::string> collisionGroups;
+    std::pair<std::string, std::string> collisionGroups;
     std::vector<std::function<void(std::vector<Collision>)>> collisionResponses;
     std::function<bool(CollisionShape *initiator, CollisionShape *recipient)> checkCollision;
 };
