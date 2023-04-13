@@ -21,8 +21,8 @@ class CollisionManager{
         void deregisterCollisionGroups(std::map<std::string, std::vector<CollisionShape*>> _groupsToDeregister);
         
         void createCollisionPair(std::string name, std::string group1, std::string group2);
-        void addCollisionResponse(std::string collisionPairName, const std::function<void(std::vector<Collision>)> &response);
-        void setCollisionDetectionAlgorithm(std::string collisionPairName, const std::function<bool(CollisionShape* initiator, CollisionShape* recipient)> &cda);
+        void setCollisionResponse(std::string collisionPairName, std::string collisionPhase, std::function<void(std::vector<Collision>)> response);
+        void setCollisionDetectionAlgorithm(std::string collisionPairName, std::function<bool(CollisionShape* initiator, CollisionShape* recipient)> cda);
 
         std::vector<CollisionShape*> getAllCollisionShapes();
         std::map<std::string, std::vector<CollisionShape*>> getCollisionGroups();

@@ -232,22 +232,32 @@ int main(){
     // To work properly, all AABB shapes should be checked together
     universe->collisionManager->createCollisionPair("playerAABB", "player", "tiles+box");
     universe->collisionManager->setCollisionDetectionAlgorithm("playerAABB", boundingBox);
-    universe->collisionManager->addCollisionResponse("playerAABB", resolveAABB);
-    universe->collisionManager->addCollisionResponse("playerAABB", initiatorStandOnTopOfRecipient);
-
+    universe->collisionManager->setCollisionResponse("playerAABB", "start_phase", [](std::vector<Collision> collisions){
+        printf("start_phase\n");
+    });
+    universe->collisionManager->setCollisionResponse("playerAABB", "continuous_phase", [](std::vector<Collision> collisions){
+        printf("continuous_phase\n");
+        resolveAABB(collisions);
+        initiatorStandOnTopOfRecipient(collisions);
+    });
+    universe->collisionManager->setCollisionResponse("playerAABB", "end_phase", [](std::vector<Collision> collisions){
+        printf("end_phase\n");
+    });
 
 
     // To work properly, all AABB shapes should be checked together
     universe->collisionManager->createCollisionPair("boxAABB", "box", "tiles");
     universe->collisionManager->setCollisionDetectionAlgorithm("boxAABB", boundingBox);
-    universe->collisionManager->addCollisionResponse("boxAABB", resolveAABB);
-    universe->collisionManager->addCollisionResponse("boxAABB", initiatorStandOnTopOfRecipient);
+    universe->collisionManager->setCollisionResponse("boxAABB", "continuous_phase", [](std::vector<Collision> collisions){
+        resolveAABB(collisions);
+        initiatorStandOnTopOfRecipient(collisions);
+    });
 
 
 
     universe->collisionManager->createCollisionPair("PB", "player", "box");
     universe->collisionManager->setCollisionDetectionAlgorithm("PB", boundingBox);
-    universe->collisionManager->addCollisionResponse("PB", [](std::vector<Collision> collisions){
+    universe->collisionManager->setCollisionResponse("PB", "start_phase", [](std::vector<Collision> collisions){
         // Refactor as pushRecipient(float velocity);
         for(Collision collision : collisions){
             if(collision.recipientImpactSide == CollisionSide::right){
@@ -256,6 +266,13 @@ int main(){
             else if(collision.recipientImpactSide == CollisionSide::left){
                 collision.recipient->getOwner()->velocity.x = 10;
             }
+        }
+    });
+    universe->collisionManager->setCollisionResponse("PB", "end_phase", [](std::vector<Collision> collisions){
+        // Refactor as pushRecipient(float velocity);
+        for(Collision collision : collisions){
+            // TODO remove (minus) push force in the future
+            collision.recipient->getOwner()->velocity.x = 0;
         }
     });
 

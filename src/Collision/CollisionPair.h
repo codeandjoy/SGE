@@ -8,7 +8,14 @@
 
 struct CollisionPair{
     std::pair<std::string, std::string> collisionGroups;
-    std::vector<std::function<void(std::vector<Collision>)>> collisionResponses;
+    
+    std::function<void(std::vector<Collision>)> startPhaseCollisionResponse;
+    std::function<void(std::vector<Collision>)> continuousPhaseCollisionResponse;
+    std::function<void(std::vector<Collision>)> endPhaseCollisionResponse;
+
+    // std::map<CollisionShape*, std::vector<Collision>*> pastCollisions;
+    std::map<CollisionShape*, std::vector<Collision>> pastCollisions;
+    
     std::function<bool(CollisionShape *initiator, CollisionShape *recipient)> checkCollision;
 };
 
