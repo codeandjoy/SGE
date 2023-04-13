@@ -83,6 +83,16 @@ int main(){
     // 1 PhysicalObject, 1 CollisionShape, no Animation
     universe->entityManager->registerEntityGroup("mapTiles", mapTilesEntityGroup);
     //
+
+    // Register map tile debug entitites
+    std::vector<DebugEntity*> mapTilesDebugEntities;
+    for(Entity* tileEntity : mapTilesEntityGroup){
+        DebugEntity* de = new DebugEntity(tileEntity);
+
+        mapTilesDebugEntities.push_back(de);
+        universe->debugManager->registerDebugEntity(de);
+    }
+    //
     
     //
     //
@@ -235,12 +245,12 @@ int main(){
     universe->collisionManager->setCollisionResponse("playerAABB", "start_phase", [](std::vector<Collision> collisions){
         printf("start_phase\n");
     });
-    universe->collisionManager->setCollisionResponse("playerAABB", "continuous_phase", [](std::vector<Collision> collisions){
+    universe->collisionManager->setCollisionResponse("playerAABB", "continuous_phase", [mapTilesEntityGroup, mapTilesDebugEntities](std::vector<Collision> collisions){
         printf("continuous_phase\n");
         resolveAABB(collisions);
         initiatorStandOnTopOfRecipient(collisions);
     });
-    universe->collisionManager->setCollisionResponse("playerAABB", "end_phase", [](std::vector<Collision> collisions){
+    universe->collisionManager->setCollisionResponse("playerAABB", "end_phase", [mapTilesEntityGroup, mapTilesDebugEntities](std::vector<Collision> collisions){
         printf("end_phase\n");
     });
 
@@ -257,7 +267,9 @@ int main(){
 
     universe->collisionManager->createCollisionPair("PB", "player", "box");
     universe->collisionManager->setCollisionDetectionAlgorithm("PB", boundingBox);
-    universe->collisionManager->setCollisionResponse("PB", "start_phase", [](std::vector<Collision> collisions){
+    universe->collisionManager->setCollisionResponse("PB", "start_phase", [boxDE](std::vector<Collision> collisions){
+        boxDE->customCollisionShapeBorderSettings["globalBounds"] = CollisionShapeBorderSettings{sf::Color::Red};
+
         // Refactor as pushRecipient(float velocity);
         for(Collision collision : collisions){
             if(collision.recipientImpactSide == CollisionSide::right){
@@ -268,8 +280,9 @@ int main(){
             }
         }
     });
-    universe->collisionManager->setCollisionResponse("PB", "end_phase", [](std::vector<Collision> collisions){
-        // Refactor as pushRecipient(float velocity);
+    universe->collisionManager->setCollisionResponse("PB", "end_phase", [boxDE](std::vector<Collision> collisions){
+        boxDE->customCollisionShapeBorderSettings["globalBounds"] = CollisionShapeBorderSettings{sf::Color::Green};
+        
         for(Collision collision : collisions){
             // TODO remove (minus) push force in the future
             collision.recipient->getOwner()->velocity.x = 0;
