@@ -4,7 +4,7 @@
 
 struct ConditionalAction{
     std::function<bool()> condition;
-    std::function<void()> runAction;
+    std::function<void()> runAction; // ? Make function variadic ?
 };
 
 

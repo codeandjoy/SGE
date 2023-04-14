@@ -6,14 +6,15 @@
 
 class PhysicsManager{
     public:
-        void registerPhysicalObject(PhysicalObject* _physicalObject);
-        void deregisterPhysicalObject(PhysicalObject* _physicalObject);
+        void registerPhysicalObject(PhysicalObject* physicalObject);
+        void deregisterPhysicalObject(PhysicalObject* physicalObject);
         std::vector<PhysicalObject*> getAllPhysicalObjects();
+
 
         void updatePhysics(float dt);
 
     private:
-        std::vector<PhysicalObject*> physicalObjects;
+        std::vector<PhysicalObject*> m_physicalObjects;
 };
 
 
