@@ -1,15 +1,15 @@
 #include "EntityManager.h"
 
-EntityManager::EntityManager(PhysicsManager* _physicsManager, CollisionManager* _collisionManager, TextureManager* _textureManager){
-    physicsManagerPtr = _physicsManager;
-    collisionManagerPtr = _collisionManager;
-    textureManagerPtr = _textureManager;
+EntityManager::EntityManager(PhysicsManager* physicsManager, CollisionManager* collisionManager, TextureManager* textureManager){
+    m_physicsManagerPtr = physicsManager;
+    m_collisionManagerPtr = collisionManager;
+    m_textureManagerPtr = textureManager;
 }
 
-void EntityManager::registerEntityGroup(std::string name, std::vector<Entity*> _entityGroup){
+void EntityManager::registerEntityGroup(std::string name, std::vector<Entity*> entityGroup){
     
-    for(Entity* entity : _entityGroup){
-        physicsManagerPtr->registerPhysicalObject(entity->physicalObject);
+    for(Entity* entity : entityGroup){
+        m_physicsManagerPtr->registerPhysicalObject(entity->physicalObject);
         
         // Map to vector
         std::vector<CollisionShape*> entityCollisionShapes;
@@ -17,17 +17,17 @@ void EntityManager::registerEntityGroup(std::string name, std::vector<Entity*> _
             entityCollisionShapes.push_back(collisionShape);
         }
         //
-        collisionManagerPtr->registerCollisionShapes(entityCollisionShapes);
+        m_collisionManagerPtr->registerCollisionShapes(entityCollisionShapes);
         
         if(entity->animation){
-            textureManagerPtr->registerAnimation(entity->animation);
+            m_textureManagerPtr->registerAnimation(entity->animation);
         }
     }
 
 
-    entityGroups[name] = _entityGroup;    
+    m_entityGroups[name] = entityGroup;    
 }
 
-std::map<std::string, std::vector<Entity*>> EntityManager::getAllEntityGroups(){ return entityGroups; }
+std::map<std::string, std::vector<Entity*>> EntityManager::getAllEntityGroups(){ return m_entityGroups; }
 
 // TODO destroy

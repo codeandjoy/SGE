@@ -9,19 +9,19 @@
 
 class EntityManager{
     public:
-        EntityManager(PhysicsManager* _physicsManager, CollisionManager* _collisionManager, TextureManager* _textureManager);
+        EntityManager(PhysicsManager* physicsManager, CollisionManager* collisionManager, TextureManager* textureManager);
 
-        void registerEntityGroup(std::string name, std::vector<Entity*> _entityGroup);
+        void registerEntityGroup(std::string name, std::vector<Entity*> entityGroup);
         std::map<std::string, std::vector<Entity*>> getAllEntityGroups();
         void destroyEntityGroup(std::string name);
         void destroyEntity(std::string memberEntityGroup, Entity* entity);
 
     private:
-        std::map<std::string, std::vector<Entity*>> entityGroups;
+        std::map<std::string, std::vector<Entity*>> m_entityGroups;
 
-        PhysicsManager* physicsManagerPtr;
-        CollisionManager* collisionManagerPtr;
-        TextureManager* textureManagerPtr;
+        PhysicsManager* m_physicsManagerPtr;
+        CollisionManager* m_collisionManagerPtr;
+        TextureManager* m_textureManagerPtr;
 
 };
 
