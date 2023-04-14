@@ -6,34 +6,35 @@
 #include "CollisionShape.h"
 
 
-// ? allow to add an 'area' where collisions get calculated 
 // ? addToGroup(...), removeFromGroup(...), reloadGroup(...) (checks if pointers are still valid), removePair(...), removeCOllisionResponse(...)
 class CollisionManager{
     public:
-        void registerCollisionShape(CollisionShape* _collisionShape);
-        void deregisterCollisionShape(CollisionShape* _collisionShape);
-        void registerCollisionShapes(std::vector<CollisionShape*> _collisionShapes);
-        void degisterCollisionShapes(std::vector<CollisionShape*> _collisionShapes);
-
-        void registerCollisionGroup(std::string name, std::vector<CollisionShape*> _collisionGroup);
-        void deregisterCollisionGroup(std::string name);
-        void registerCollisionGroups(std::map<std::string, std::vector<CollisionShape*>> _groupsToRegister);
-        void deregisterCollisionGroups(std::map<std::string, std::vector<CollisionShape*>> _groupsToDeregister);
-        
-        void createCollisionPair(std::string name, std::string group1, std::string group2);
-        void setCollisionResponse(std::string collisionPairName, std::string collisionPhase, std::function<void(std::vector<Collision>)> response);
-        void setCollisionDetectionAlgorithm(std::string collisionPairName, std::function<bool(CollisionShape* initiator, CollisionShape* recipient)> cda);
-
+        void registerCollisionShape(CollisionShape* collisionShape);
+        void deregisterCollisionShape(CollisionShape* collisionShape);
+        void registerCollisionShapes(std::vector<CollisionShape*> collisionShapes);
+        void degisterCollisionShapes(std::vector<CollisionShape*> collisionShapes);
         std::vector<CollisionShape*> getAllCollisionShapes();
+        void alignCollisionShapes();
+
+
+        void registerCollisionGroup(std::string name, std::vector<CollisionShape*> collisionGroup);
+        void deregisterCollisionGroup(std::string name);
+        void registerCollisionGroups(std::map<std::string, std::vector<CollisionShape*>> collisionGroups);
+        void deregisterCollisionGroups(std::map<std::string, std::vector<CollisionShape*>> collisionGroups);
         std::map<std::string, std::vector<CollisionShape*>> getCollisionGroups();
 
-        void alignCollisionShapes();
+
+        void createCollisionPair(std::string name, std::string initiatorGroup, std::string recipientGroup);
+        void setPairCollisionDetectionAlgorithm(std::string collisionPairName, std::function<bool(CollisionShape* initiator, CollisionShape* recipient)> collisionDetectionAlgorithm);
+        void setPairCollisionResponse(std::string collisionPairName, std::string collisionPhase, std::function<void(std::vector<Collision>)> response);
+
+
         void updateCollisions();
 
     private:
-        std::vector<CollisionShape*> allCollisionShapes;
-        std::map<std::string, std::vector<CollisionShape*>> collisionGroups;
-        std::map<std::string, CollisionPair> collisionPairs;
+        std::vector<CollisionShape*> m_allCollisionShapes;
+        std::map<std::string, std::vector<CollisionShape*>> m_collisionGroups;
+        std::map<std::string, CollisionPair> m_collisionPairs;
 };
 
 

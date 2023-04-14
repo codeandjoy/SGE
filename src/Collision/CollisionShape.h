@@ -8,7 +8,7 @@
 
 class CollisionShape : public sf::RectangleShape{
     public:
-        CollisionShape(PhysicalObject *_owner);
+        CollisionShape(PhysicalObject *owner);
 
         sf::Vector2f offset = sf::Vector2f(0, 0);
 
@@ -17,7 +17,7 @@ class CollisionShape : public sf::RectangleShape{
         void align();
 
     private:
-        PhysicalObject *owner;
+        PhysicalObject *m_owner;
 };
 
 

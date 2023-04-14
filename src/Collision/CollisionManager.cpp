@@ -2,80 +2,76 @@
 #include "Collision.h"
 #include "CollisionUtils.h"
 
-void CollisionManager::registerCollisionShape(CollisionShape* _collisionShape){ allCollisionShapes.push_back(_collisionShape); }
 
-void CollisionManager::deregisterCollisionShape(CollisionShape* _collisionShape){ allCollisionShapes.erase(std::remove(allCollisionShapes.begin(), allCollisionShapes.end(), _collisionShape), allCollisionShapes.end()); }
 
-void CollisionManager::registerCollisionShapes(std::vector<CollisionShape*> _collisionShapes){ allCollisionShapes.insert(allCollisionShapes.end(), _collisionShapes.begin(), _collisionShapes.end()); }
-
-void CollisionManager::degisterCollisionShapes(std::vector<CollisionShape*> _collisionShapes){
-    for(CollisionShape* collisionShape : _collisionShapes){
+void CollisionManager::registerCollisionShape(CollisionShape* collisionShape){ m_allCollisionShapes.push_back(collisionShape); }
+void CollisionManager::deregisterCollisionShape(CollisionShape* collisionShape){ m_allCollisionShapes.erase(std::remove(m_allCollisionShapes.begin(), m_allCollisionShapes.end(), collisionShape), m_allCollisionShapes.end()); }
+void CollisionManager::registerCollisionShapes(std::vector<CollisionShape*> collisionShapes){ m_allCollisionShapes.insert(m_allCollisionShapes.end(), collisionShapes.begin(), collisionShapes.end()); }
+void CollisionManager::degisterCollisionShapes(std::vector<CollisionShape*> collisionShapes){
+    for(CollisionShape* collisionShape : collisionShapes){
         deregisterCollisionShape(collisionShape);
     }
 }
-
-
-
-void CollisionManager::registerCollisionGroup(std::string name, std::vector<CollisionShape*> _collisionGroup){ collisionGroups[name] = _collisionGroup; } 
-
-void CollisionManager::deregisterCollisionGroup(std::string name){ collisionGroups.erase(name); }
-
-void CollisionManager::registerCollisionGroups(std::map<std::string, std::vector<CollisionShape*>> _groupsToRegister){ collisionGroups.insert(_groupsToRegister.begin(), _groupsToRegister.end()); }
-
-void CollisionManager::deregisterCollisionGroups(std::map<std::string, std::vector<CollisionShape*>> _groupsToDeregister){
-    for(auto& [name, _] : _groupsToDeregister){
-        deregisterCollisionGroup(name);
-    }
-}
-
-
-
-void CollisionManager::createCollisionPair(std::string name, std::string group1, std::string group2){
-    // TODO Check if both groups exist in collisionGroups
-    CollisionPair collisionPair = CollisionPair{std::make_pair(group1, group2)}; 
-
-    for(CollisionShape* initiator : collisionGroups[group1]){
-        collisionPair.pastCollisions[initiator] = std::vector<Collision>();
-    }
-
-    collisionPairs[name] = collisionPair;
-}
-
-void CollisionManager::setCollisionResponse(std::string collisionPairName, std::string collisionPhase, std::function<void(std::vector<Collision>)> response){
-    if(collisionPhase == "start_phase"){
-        collisionPairs[collisionPairName].startPhaseCollisionResponse = response;
-    }
-    else if(collisionPhase == "continuous_phase"){
-        collisionPairs[collisionPairName].continuousPhaseCollisionResponse = response;
-    }
-    else if(collisionPhase == "end_phase"){
-        collisionPairs[collisionPairName].endPhaseCollisionResponse = response;
-    }
-}
-
-void CollisionManager::setCollisionDetectionAlgorithm(std::string collisionPairName, std::function<bool(CollisionShape *CS1, CollisionShape *CS2)> cda){
-    collisionPairs[collisionPairName].checkCollision = cda;
-}
-
-std::vector<CollisionShape*> CollisionManager::getAllCollisionShapes(){ return allCollisionShapes; }
-
-std::map<std::string, std::vector<CollisionShape*>> CollisionManager::getCollisionGroups(){ return collisionGroups; }
-
+std::vector<CollisionShape*> CollisionManager::getAllCollisionShapes(){ return m_allCollisionShapes; }
 void CollisionManager::alignCollisionShapes(){
-    for(CollisionShape* collisionShape : allCollisionShapes){
+    for(CollisionShape* collisionShape : m_allCollisionShapes){
         collisionShape->align();
     }
 }
 
+
+
+void CollisionManager::registerCollisionGroup(std::string name, std::vector<CollisionShape*> collisionGroup){ m_collisionGroups[name] = collisionGroup; } 
+void CollisionManager::deregisterCollisionGroup(std::string name){ m_collisionGroups.erase(name); }
+void CollisionManager::registerCollisionGroups(std::map<std::string, std::vector<CollisionShape*>> collisionGroups){ m_collisionGroups.insert(collisionGroups.begin(), collisionGroups.end()); }
+void CollisionManager::deregisterCollisionGroups(std::map<std::string, std::vector<CollisionShape*>> collisionGroups){
+    for(auto& [name, _] : collisionGroups){
+        deregisterCollisionGroup(name);
+    }
+}
+std::map<std::string, std::vector<CollisionShape*>> CollisionManager::getCollisionGroups(){ return m_collisionGroups; }
+
+
+
+void CollisionManager::createCollisionPair(std::string name, std::string initiatorGroup, std::string recipientGroup){
+    if(!m_collisionGroups.count(initiatorGroup) && !m_collisionGroups.count(recipientGroup)){
+        printf("Can not create %s - %s collision collisionPair.", initiatorGroup.c_str(), recipientGroup.c_str());
+        exit(1);
+    }
+    
+    CollisionPair collisionPair = CollisionPair{std::make_pair(initiatorGroup, recipientGroup)}; 
+
+    for(CollisionShape* initiator : m_collisionGroups[initiatorGroup]){
+        collisionPair.pastCollisions[initiator] = std::vector<Collision>();
+    }
+
+    m_collisionPairs[name] = collisionPair;
+}
+void CollisionManager::setPairCollisionDetectionAlgorithm(std::string collisionPairName, std::function<bool(CollisionShape *CS1, CollisionShape *CS2)> collisionDetectionAlgorithm){ m_collisionPairs[collisionPairName].checkCollision = collisionDetectionAlgorithm; }
+void CollisionManager::setPairCollisionResponse(std::string collisionPairName, std::string collisionPhase, std::function<void(std::vector<Collision>)> response){
+    if(collisionPhase == "start_phase"){
+        m_collisionPairs[collisionPairName].startPhaseCollisionResponse = response;
+    }
+    else if(collisionPhase == "continuous_phase"){
+        m_collisionPairs[collisionPairName].continuousPhaseCollisionResponse = response;
+    }
+    else if(collisionPhase == "end_phase"){
+        m_collisionPairs[collisionPairName].endPhaseCollisionResponse = response;
+    }
+}
+
+
+
+
+
 void CollisionManager::updateCollisions(){
     std::vector<Collision> presentCollisions;
 
-    for(auto& [name, pair] : collisionPairs){
-
-        for(CollisionShape* initiator : collisionGroups[pair.collisionGroups.first]){
+    for(auto& [_, collisionPair] : m_collisionPairs){
+        for(CollisionShape* initiator : m_collisionGroups[collisionPair.collisionGroups.first]){
             // Register all present collisions
-            for(CollisionShape* recipient : collisionGroups[pair.collisionGroups.second]){
-                if(pair.checkCollision(initiator, recipient)){
+            for(CollisionShape* recipient : m_collisionGroups[collisionPair.collisionGroups.second]){
+                if(collisionPair.checkCollision(initiator, recipient)){
                     CollisionSide initiatorImpactSide = determineInitiatorImpactSide(initiator, recipient);
 
                     presentCollisions.push_back(Collision{
@@ -86,9 +82,10 @@ void CollisionManager::updateCollisions(){
                     });
                 }
             }
+            //
 
 
-            std::vector<Collision> pastCollisions = pair.pastCollisions[initiator];
+            std::vector<Collision> pastCollisions = collisionPair.pastCollisions[initiator];
 
 
             // Determine collision phase
@@ -103,25 +100,28 @@ void CollisionManager::updateCollisions(){
 
             std::vector<Collision> endPhaseCollisions;
             std::set_difference(pastCollisions.begin(),pastCollisions.end(), presentCollisions.begin(),presentCollisions.end(), std::back_inserter(endPhaseCollisions));
+            //
 
 
             // Run collision responses based on collision phase
             if(startPhaseCollisions.size())
-                if(pair.startPhaseCollisionResponse)
-                    pair.startPhaseCollisionResponse(startPhaseCollisions);
+                if(collisionPair.startPhaseCollisionResponse)
+                    collisionPair.startPhaseCollisionResponse(startPhaseCollisions);
 
             if(continuousPhaseCollisions.size())
-                if(pair.continuousPhaseCollisionResponse)
-                    pair.continuousPhaseCollisionResponse(continuousPhaseCollisions);
+                if(collisionPair.continuousPhaseCollisionResponse)
+                    collisionPair.continuousPhaseCollisionResponse(continuousPhaseCollisions);
             
             if(endPhaseCollisions.size())
-                if(pair.endPhaseCollisionResponse)
-                    pair.endPhaseCollisionResponse(endPhaseCollisions);
+                if(collisionPair.endPhaseCollisionResponse)
+                    collisionPair.endPhaseCollisionResponse(endPhaseCollisions);
+            //
 
 
             // Reset
-            pair.pastCollisions[initiator] = presentCollisions;
+            collisionPair.pastCollisions[initiator] = presentCollisions;
             presentCollisions.clear();
+            //
         }
     }
 }

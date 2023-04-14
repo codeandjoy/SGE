@@ -36,6 +36,7 @@ void resolveAABB(std::vector<Collision> collisions){
                 recipientOwner->getPosition().y - collision.initiator->getGlobalBounds().height - collision.initiator->offset.y
             );
         }
+        //
     }
 }
 
