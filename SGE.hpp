@@ -500,11 +500,15 @@ float determineCollisionDepth(CollisionSide initiatorImpactSide, CollisionShape 
 CollisionSide determineInitiatorImpactSide(CollisionShape *initiator, CollisionShape *recipient){
     std::vector<CollisionSide> allImpactSides;
 
-    // ! Order matters 
-    if(initiator->getOwner()->velocity.x < 0) allImpactSides.push_back(CollisionSide::left);
-    if(initiator->getOwner()->velocity.x > 0) allImpactSides.push_back(CollisionSide::right);
-    if(initiator->getOwner()->velocity.y < 0) allImpactSides.push_back(CollisionSide::top);
-    if(initiator->getOwner()->velocity.y > 0) allImpactSides.push_back(CollisionSide::bottom);
+    if(initiator->getPosition().x > recipient->getPosition().x) allImpactSides.push_back(CollisionSide::left);
+    if(initiator->getPosition().x < recipient->getPosition().x) allImpactSides.push_back(CollisionSide::right);
+    if(initiator->getPosition().y > recipient->getPosition().y) allImpactSides.push_back(CollisionSide::top);
+    if(initiator->getPosition().y < recipient->getPosition().y) allImpactSides.push_back(CollisionSide::bottom);
+    // // ! Order matters 
+    // if(initiator->getOwner()->velocity.x < 0) allImpactSides.push_back(CollisionSide::left);
+    // if(initiator->getOwner()->velocity.x > 0) allImpactSides.push_back(CollisionSide::right);
+    // if(initiator->getOwner()->velocity.y < 0) allImpactSides.push_back(CollisionSide::top);
+    // if(initiator->getOwner()->velocity.y > 0) allImpactSides.push_back(CollisionSide::bottom);
 
     CollisionSide lowestDepthSide;
     float lowestDepth = std::numeric_limits<float>::infinity();
