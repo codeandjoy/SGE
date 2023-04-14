@@ -8,22 +8,19 @@
 
 class DebugEntity{
     public:
-        DebugEntity(Entity* _relatedEntity);
+        DebugEntity(Entity* relatedEntity);
 
         bool drawCollisionShapeBorders = true;
         std::map<std::string, CollisionShapeBorderSettings> customCollisionShapeBorderSettings;
-
         std::vector<CollisionShapeBorder*> generateCollisionShapeBorders();
 
-        void addExtraDebugFunction(std::function<void(sf::RenderWindow* windowPtr)> edf);
+        void addExtraDebugFunction(std::function<void(sf::RenderWindow* windowPtr)> extraDebugFunction);
         std::vector<std::function<void(sf::RenderWindow* windowPtr)>> getExtraDebugFunctions();
 
     private:
-        Entity* relatedEntity;
-
-        CollisionShapeBorderSettings defaultCollisionShapeBorderSettings = CollisionShapeBorderSettings();
-
-        std::vector<std::function<void(sf::RenderWindow* windowPtr)>> extraDebugFunctions;
+        Entity* m_relatedEntity;
+        CollisionShapeBorderSettings m_defaultCollisionShapeBorderSettings = CollisionShapeBorderSettings();
+        std::vector<std::function<void(sf::RenderWindow* windowPtr)>> m_extraDebugFunctions;
 };
 
 

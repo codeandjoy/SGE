@@ -6,12 +6,12 @@
 
 class DebugManager{
     public:
-        void registerDebugEntity(DebugEntity* de);
+        void registerDebugEntity(DebugEntity* debugEntity);
 
         void showDebugInfo(sf::RenderWindow* windowPtr);
 
     private:
-        std::vector<DebugEntity*> debugEntities;
+        std::vector<DebugEntity*> m_debugEntities; // ? map<Entity -> DebugEntity> ?
 };
 
 
