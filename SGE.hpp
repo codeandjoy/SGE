@@ -364,8 +364,6 @@ class DebugEntity{
     public:
         DebugEntity(Entity* _relatedEntity);
 
-        Entity* getRelatedEntity();
-
         bool drawCollisionShapeBorders = true;
         std::map<std::string, CollisionShapeBorderSettings> customCollisionShapeBorderSettings;
 
@@ -907,8 +905,6 @@ CollisionShapeBorder::CollisionShapeBorder(CollisionShape* owner, CollisionShape
 
 
 DebugEntity::DebugEntity(Entity* _relatedEntity){ relatedEntity = _relatedEntity; }
-
-Entity* DebugEntity::getRelatedEntity(){ return relatedEntity; }
 
 std::vector<CollisionShapeBorder*> DebugEntity::generateCollisionShapeBorders(){
     std::vector<CollisionShapeBorder*> collisionShapeBorders;
