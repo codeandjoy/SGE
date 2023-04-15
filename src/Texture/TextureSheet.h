@@ -6,19 +6,19 @@
 
 
 // TODO texturesheet with gaps between textures
+// ? parse from .tsx ?
 class TextureSheet{
     public:
-        TextureSheet(TextureSheetSizes tss, std::string location);
+        TextureSheet(TextureSheetSizes textureSheetSizes, std::string location);
 
-        // TODO make names shorter
         std::string getLocation();
         sf::Texture* getTextureSheet();
         sf::IntRect getTextureRect(int textureN);
 
     private:
-        std::string location;
-        sf::Texture textureSheet;
-        std::vector<sf::IntRect> textureRects;
+        std::string m_location;
+        sf::Texture m_textureSheet;
+        std::vector<sf::IntRect> m_textureRects;
 };
 
 

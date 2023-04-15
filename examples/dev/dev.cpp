@@ -22,8 +22,8 @@ int main(){
     //
 
     // Load all textures
-    universe->textureManager->loadTexture(std::filesystem::current_path().string() + "/examples/dev/assets/pico_8_knight_sprite.png", "knight", TextureSheetSizes(8, 8, 12, 12));
-    universe->textureManager->loadTexture(std::filesystem::current_path().string() + "/examples/dev/assets/pico_8_tiles.png", "picoTiles", TextureSheetSizes(8, 8, 12, 12));
+    universe->textureManager->loadTexture(std::filesystem::current_path().string() + "/examples/dev/assets/pico_8_knight_sprite.png", "knight", TextureSheetSizes{8, 8, 12, 12});
+    universe->textureManager->loadTexture(std::filesystem::current_path().string() + "/examples/dev/assets/pico_8_tiles.png", "picoTiles", TextureSheetSizes{8, 8, 12, 12});
     //
 
 
@@ -154,10 +154,10 @@ int main(){
 
     // Animation
     Animation* playerAnimation = new Animation(universe->textureManager->getTexture("knight"), playerPO, 9);
-    playerAnimation->addAnimationSequence("idle", std::vector<int>{9});
-    playerAnimation->addAnimationSequence("runRight", std::vector<int>{33, 34, 35});
-    playerAnimation->addAnimationSequence("runLeft", std::vector<int>{45, 46, 47});
-    playerAnimation->setCurrentAnimationSequence("idle");
+    playerAnimation->addTextureSequence("idle", std::vector<int>{9});
+    playerAnimation->addTextureSequence("runRight", std::vector<int>{33, 34, 35});
+    playerAnimation->addTextureSequence("runLeft", std::vector<int>{45, 46, 47});
+    playerAnimation->setCurrentTextureSequence("idle");
     //
 
     // Build entity
@@ -302,15 +302,15 @@ int main(){
     universe->addController([playerPO, playerAnimation](){
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::A)){
             playerPO->velocity.x = -100;
-            playerAnimation->setCurrentAnimationSequence("runLeft");
+            playerAnimation->setCurrentTextureSequence("runLeft");
         }
         else if(sf::Keyboard::isKeyPressed(sf::Keyboard::D)){
             playerPO->velocity.x = 100;
-            playerAnimation->setCurrentAnimationSequence("runRight");
+            playerAnimation->setCurrentTextureSequence("runRight");
         }
         else{
             playerPO->velocity.x = 0;
-            playerAnimation->setCurrentAnimationSequence("idle");
+            playerAnimation->setCurrentTextureSequence("idle");
         }
     });
 

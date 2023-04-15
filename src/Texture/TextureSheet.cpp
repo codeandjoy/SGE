@@ -1,26 +1,18 @@
 #include "TextureSheet.h"
 
-TextureSheet::TextureSheet(TextureSheetSizes tss, std::string location){
-    this->location = location;
-    textureSheet.loadFromFile(location);
+TextureSheet::TextureSheet(TextureSheetSizes textureSheetSizes, std::string location){
+    m_location = location;
+    m_textureSheet.loadFromFile(location);
 
-    // Create coordinates vector
-    for(int i = 0; i < tss.numTexturesY*tss.textureSizeY; i += tss.textureSizeY){
-        for(int j = 0; j < tss.numTexturesX*tss.textureSizeX; j += tss.textureSizeX){
-            textureRects.push_back(sf::IntRect(j, i, tss.textureSizeX, tss.textureSizeY));
+    for(int i = 0; i < textureSheetSizes.numTexturesY*textureSheetSizes.textureSizeY; i += textureSheetSizes.textureSizeY){
+        for(int j = 0; j < textureSheetSizes.numTexturesX*textureSheetSizes.textureSizeX; j += textureSheetSizes.textureSizeX){
+            m_textureRects.push_back(sf::IntRect(j, i, textureSheetSizes.textureSizeX, textureSheetSizes.textureSizeY));
         }
     }
 }
 
-std::string TextureSheet::getLocation(){
-    return location;
-}
 
-sf::Texture* TextureSheet::getTextureSheet(){
-    return &textureSheet;
-}
 
-sf::IntRect TextureSheet::getTextureRect(int textureN){
-    // TODO check if out of bounds
-    return textureRects[textureN];
-}
+std::string TextureSheet::getLocation(){ return m_location; }
+sf::Texture* TextureSheet::getTextureSheet(){ return &m_textureSheet; }
+sf::IntRect TextureSheet::getTextureRect(int textureN){ return m_textureRects[textureN]; }

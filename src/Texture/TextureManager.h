@@ -8,22 +8,20 @@
 
 class TextureManager{
     public:
-        // * Textures
         void loadTexture(std::string location, std::string name, TextureSheetSizes textureSheetSizes);
-        TextureSheet* getTexture(std::string name); // TODO check nonexistent data (return nullptr?)
-        // *
+        TextureSheet* getTexture(std::string name);
 
-        // * Animations
+
         void registerAnimation(Animation* animation);
         void deregisterAnimation(Animation* animation);
-        // *
+
 
         void initAnimationClocks();
         void updateAnimations();
 
     private:
-        std::map<std::string, TextureSheet*> loadedTextures;
-        std::vector<Animation*> animations;
+        std::map<std::string, TextureSheet*> m_loadedTextures;
+        std::vector<Animation*> m_animations;
 };
 
 

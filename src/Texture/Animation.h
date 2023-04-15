@@ -8,27 +8,28 @@
 // TODO Animations should switch immediately
 class Animation{
     public:
-        Animation(TextureSheet *spritesheet, sf::Sprite *owner, int initialTextureN);
+        Animation(TextureSheet* textureSheet, sf::Sprite* owner, int initialTextureN);
     
+        
+        void addTextureSequence(std::string name, std::vector<int> textureSequence);
+        void setCurrentTextureSequence(std::string name);
+    
+
         // ?
         // runForward -> 1,2,3,1,2,3
         // runCycle -> 1,2,3,2,1,2
         // ?
         void run();
-        
         void restartClock();
-        
-        void addAnimationSequence(std::string sequenceName, std::vector<int> textureSequence);
-        void setCurrentAnimationSequence(std::string sequenceName);
 
     private:
-        sf::Sprite *owner;
-        TextureSheet *textureSheet;
+        sf::Sprite* m_owner;
+        TextureSheet* m_textureSheet;
         
-        sf::Clock clock;
-        std::map<std::string, std::vector<int>> animationSequences; // e.g. "idle": [5, 6, 7, 8]
-        std::string currentAnimationSequence;
-        int currentTextureN = 0;
+        sf::Clock m_clock;
+        std::map<std::string, std::vector<int>> m_textureSequences; // e.g. "idle": [5, 6, 7, 8]
+        std::string m_currentTextureSequence;
+        int m_currentTextureN = 0;
 
 };
 
