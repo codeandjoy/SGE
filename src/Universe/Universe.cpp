@@ -1,35 +1,33 @@
 #include "Universe.h"
 
-Universe::Universe(PhysicsManager* _physicsManager, CollisionManager* _collisionManager, TextureManager* _textureManager, EntityManager* _entityManager){
-    physicsManager = _physicsManager;
-    collisionManager = _collisionManager;
-    textureManager = _textureManager;
-    entityManager = _entityManager;
+Universe::Universe(PhysicsManager* t_physicsManager, CollisionManager* t_collisionManager, TextureManager* t_textureManager, EntityManager* t_entityManager){
+    physicsManager = t_physicsManager;
+    collisionManager = t_collisionManager;
+    textureManager = t_textureManager;
+    entityManager = t_entityManager;
 }
 
-Universe::Universe(PhysicsManager* _physicsManager, CollisionManager* _collisionManager, TextureManager* _textureManager, EntityManager* _entityManager, DebugManager* _debugManager){
-    physicsManager = _physicsManager;
-    collisionManager = _collisionManager;
-    textureManager = _textureManager;
-    entityManager = _entityManager;
-    debugManager = _debugManager;
+Universe::Universe(PhysicsManager* t_physicsManager, CollisionManager* t_collisionManager, TextureManager* t_textureManager, EntityManager* t_entityManager, DebugManager* t_debugManager){
+    physicsManager = t_physicsManager;
+    collisionManager = t_collisionManager;
+    textureManager = t_textureManager;
+    entityManager = t_entityManager;
+    debugManager = t_debugManager;
 }
 
 
-void Universe::setupWindow(sf::RenderWindow *window){
-    windowPtr = window;
-}
+void Universe::setupWindow(sf::RenderWindow *window){ m_windowPtr = window; }
 
-void Universe::addController(std::function<void()> controller){
-    controllers.push_back(controller);
-}
 
-void Universe::addEventHandler(std::function<void(sf::Event event)> eventHandler){
-    eventHandlers.push_back(eventHandler);
-}
+
+
+void Universe::addController(std::function<void()> controller){ m_controllers.push_back(controller); }
+void Universe::addEventHandler(std::function<void(sf::Event event)> eventHandler){ m_eventHandlers.push_back(eventHandler); }
+
+
 
 void Universe::loop(){
-    if(!windowPtr){
+    if(!m_windowPtr){
         printf("RenderWindow is not initialized. Use setupWindow method to initialize RenderWindow before(!) looping the Universe.\n");
         exit(1);
     }
@@ -39,33 +37,34 @@ void Universe::loop(){
     textureManager->initAnimationClocks();
     // !
 
-    deltaClock.restart();
+    m_deltaClock.restart();
     //
 
-    while(windowPtr->isOpen()){
+    while(m_windowPtr->isOpen()){
+        // Events
         sf::Event event;
-        while(windowPtr->pollEvent(event)){
-            if (event.type == sf::Event::Closed) windowPtr->close();
+        while(m_windowPtr->pollEvent(event)){
+            if (event.type == sf::Event::Closed) m_windowPtr->close();
         
-            for(std::function eventHandler : eventHandlers){
+            for(std::function eventHandler : m_eventHandlers){
                 eventHandler(event);
             }
         }
+        //
 
         // Controllers
-        for(std::function controller : controllers){
+        for(std::function controller : m_controllers){
             controller();
         }
+        //
 
-        windowPtr->clear();
-
+        // Game updates
         // Calculate dt
-        sf::Time deltaTime = deltaClock.restart();
+        sf::Time deltaTime = m_deltaClock.restart();
         float dt = deltaTime.asSeconds();
         if(dt > 0.15f) dt = 0.15f;
         //
 
-        // Game updates
         physicsManager->updatePhysics(dt);
         collisionManager->alignCollisionShapes();
         collisionManager->updateCollisions();
@@ -73,18 +72,17 @@ void Universe::loop(){
         // 
 
         // Game draws
+        m_windowPtr->clear();
+        
         for(PhysicalObject* physicalObject : physicsManager->getAllPhysicalObjects()){
-            windowPtr->draw(*physicalObject);
+            m_windowPtr->draw(*physicalObject);
         }
-
-        // for(CollisionShape* collisionShape : collisionManager->getAllCollisionShapes()){
-        //     if(collisionShape->getIsVisible()) windowPtr->draw(*collisionShape->getBorder());
-        // }
 
         if(debugManager){
-            debugManager->showDebugInfo(windowPtr);
+            debugManager->showDebugInfo(m_windowPtr);
         }
+        //
 
-        windowPtr->display();
+        m_windowPtr->display();
     }
 }
