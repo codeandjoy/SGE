@@ -3,6 +3,8 @@
 
 #include <SFML/Graphics.hpp>
 
+//namespace sge{
+
 #ifndef UNIVERSE_H
 #define UNIVERSE_H
 
@@ -955,3 +957,5 @@ void Universe::loop(){
 
 
 #endif
+
+//}

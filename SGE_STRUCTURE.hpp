@@ -3,6 +3,8 @@
 
 #include <SFML/Graphics.hpp>
 
+//namespace sge{
+
 #include "./src/Universe/Universe.h"
 
 #include "./src/Texture/TextureSheet.h"
@@ -34,3 +36,5 @@
 // -> stitch <-
 
 #endif
+
+//}
