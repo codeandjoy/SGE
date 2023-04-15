@@ -39,7 +39,6 @@ class PhysicalObject : public sf::Sprite{
         void createContinuousComputation(std::string name, std::function<void(float dt)> computation);
         void runContinuousComputation(std::string name);
         void stopContinuousComputation(std::string name);
-        // removeContinuousAction()
         
 
         void createFlag(std::string name);
@@ -127,10 +126,10 @@ struct Collision{
     CollisionSide initiatorImpactSide;
     CollisionSide recipientImpactSide;
 
-    friend bool operator< (const Collision a, const Collision b){ return a.initiator < b.initiator; }
-    friend bool operator> (const Collision a, const Collision b){ return a.initiator > b.initiator; }
-    friend bool operator== (const Collision a, const Collision b){ return a.initiator == b.initiator; }
-    friend bool operator!= (const Collision a, const Collision b){ return a.initiator != b.initiator; }
+    friend bool operator< (const Collision a, const Collision b){ return a.recipient < b.recipient; }
+    friend bool operator> (const Collision a, const Collision b){ return a.recipient > b.recipient; }
+    friend bool operator== (const Collision a, const Collision b){ return a.recipient == b.recipient; }
+    friend bool operator!= (const Collision a, const Collision b){ return a.recipient != b.recipient; }
 };
 
 #endif
@@ -672,6 +671,8 @@ void CollisionManager::updateCollisions(){
 
             // std::vector<Collision> endPhaseCollisions;
             // std::set_difference(pastCollisions.begin(),pastCollisions.end(), presentCollisions.begin(),presentCollisions.end(), std::back_inserter(endPhaseCollisions));
+
+            // Either works
 
             std::vector<Collision> continuousPhaseCollisions;
             std::set_intersection(pastCollisions.begin(),pastCollisions.end(), presentCollisions.begin(),presentCollisions.end(), std::back_inserter(continuousPhaseCollisions));

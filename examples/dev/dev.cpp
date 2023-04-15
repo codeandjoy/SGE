@@ -252,7 +252,7 @@ int main(){
         printf("start_phase\n");
     });
     universe->collisionManager->setPairCollisionResponse("playerAABB", "continuous_phase", [mapTilesEntityGroup, mapTilesDebugEntities](std::vector<Collision> collisions){
-        printf("continuous_phase\n");
+        // printf("continuous_phase\n");
         resolveAABB(collisions);
         initiatorStandOnTopOfRecipient(collisions);
     });

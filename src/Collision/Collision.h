@@ -11,10 +11,10 @@ struct Collision{
     CollisionSide initiatorImpactSide;
     CollisionSide recipientImpactSide;
 
-    friend bool operator< (const Collision a, const Collision b){ return a.initiator < b.initiator; }
-    friend bool operator> (const Collision a, const Collision b){ return a.initiator > b.initiator; }
-    friend bool operator== (const Collision a, const Collision b){ return a.initiator == b.initiator; }
-    friend bool operator!= (const Collision a, const Collision b){ return a.initiator != b.initiator; }
+    friend bool operator< (const Collision a, const Collision b){ return a.recipient < b.recipient; }
+    friend bool operator> (const Collision a, const Collision b){ return a.recipient > b.recipient; }
+    friend bool operator== (const Collision a, const Collision b){ return a.recipient == b.recipient; }
+    friend bool operator!= (const Collision a, const Collision b){ return a.recipient != b.recipient; }
 };
 
 
