@@ -2,8 +2,7 @@
 #define PHYSICAL_OBJECT_H
 
 #include <SFML/Graphics.hpp>
-#include "ContinuousAction.h"
-#include "ConditionalAction.h"
+#include "ContinuousComputation.h"
 
 
 class PhysicalObject : public sf::Sprite{
@@ -18,15 +17,10 @@ class PhysicalObject : public sf::Sprite{
         // removeAction()
 
 
-        void createContinuousAction(std::string name, std::function<void(float dt)> action);
-        void runContinuousAction(std::string name);
-        void stopContinuousAction(std::string name);
-        // removeContinuousAction()
+        void createContinuousComputation(std::string name, std::function<void(float dt)> computation);
+        void runContinuousComputation(std::string name);
+        void stopContinuousComputation(std::string name);
         
-
-        void createConditionalAction(std::string name, std::function<bool()> condition, std::function<void()> action);
-        // removeConditionalAction()
-
 
         void createFlag(std::string name);
         bool getFlag(std::string flagName);
@@ -38,8 +32,8 @@ class PhysicalObject : public sf::Sprite{
 
     private:
         std::map<std::string, std::function<void()>> m_actions;
-        std::map<std::string, ContinuousAction> m_continuousActions;
-        std::map<std::string, ConditionalAction> m_conditionalActions;
+        std::unordered_map<std::string, ContinuousComputation> m_continuousComputations;
+        std::vector<std::string> m_continuousComputationOrder;
         std::map<std::string, bool> m_flags;
 };
 

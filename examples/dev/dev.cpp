@@ -111,6 +111,9 @@ int main(){
 
     boxPO->acceleration = sf::Vector2f(0, .1);
 
+    boxPO->createContinuousComputation("updateVelocity", updateVelocityBasedOnAcceleration(boxPO));
+    boxPO->createContinuousComputation("updatePosition", updatePositionBasedOnVelocity(boxPO));
+
     std::map<std::string, CollisionShape*> boxCSs = {{"globalBounds", new CollisionShape(boxPO)}};
 
     std::vector<Entity*> boxEntityGroup = {new Entity{boxPO, boxCSs}};
@@ -141,6 +144,9 @@ int main(){
     playerPO->setTextureRect(universe->textureManager->getTexture("knight")->getTextureRect(9));
     
     playerPO->acceleration.y = .2; // gravity
+
+    playerPO->createContinuousComputation("updateVelocity", updateVelocityBasedOnAcceleration(playerPO));
+    playerPO->createContinuousComputation("updatePosition", updatePositionBasedOnVelocity(playerPO));
     //
 
     // Collision shape

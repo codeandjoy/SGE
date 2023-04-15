@@ -14,8 +14,8 @@
 
 #include "./src/Physics/PhysicsManager.h"
 #include "./src/Physics/PhysicalObject.h"
-#include "./src/Physics/ContinuousAction.h"
-#include "./src/Physics/ConditionalAction.h"
+#include "./src/Physics/ContinuousComputation.h"
+#include "./src/Physics/computations.h"
 
 #include "./src/Collision/CollisionManager.h"
 #include "./src/Collision/CollisionPair.h"

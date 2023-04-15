@@ -6,13 +6,12 @@ void PhysicalObject::doAction(std::string name){ m_actions[name](); }
 
 
 
-void PhysicalObject::createContinuousAction(std::string name, std::function<void(float dt)> action){ m_continuousActions[name] = { false, action }; }
-void PhysicalObject::runContinuousAction(std::string name){ m_continuousActions[name].shouldRun = true; }
-void PhysicalObject::stopContinuousAction(std::string name){ m_continuousActions[name].shouldRun = false; }
-
-
-
-void PhysicalObject::createConditionalAction(std::string name, std::function<bool()> condition, std::function<void()> action){ m_conditionalActions[name] = { condition, action }; }
+void PhysicalObject::createContinuousComputation(std::string name, std::function<void(float dt)> computation){
+    m_continuousComputations[name] = { true, computation };
+    m_continuousComputationOrder.push_back(name);
+}
+void PhysicalObject::runContinuousComputation(std::string name){ m_continuousComputations[name].shouldRun = true; }
+void PhysicalObject::stopContinuousComputation(std::string name){ m_continuousComputations[name].shouldRun = false; }
 
 
 
@@ -23,15 +22,9 @@ void PhysicalObject::setFlag(std::string flagName, bool value){ m_flags[flagName
 
 
 void PhysicalObject::update(float dt){
-    for(auto const& [name, continuousAction] : m_continuousActions){
-        if(continuousAction.shouldRun) continuousAction.runAction(dt);
-    }
-
-    for(auto const& [name, conditionalAction] : m_conditionalActions){
-        if(conditionalAction.condition()){
-            conditionalAction.runAction();
+    for(std::string computation : m_continuousComputationOrder){
+        if(m_continuousComputations[computation].shouldRun){
+            m_continuousComputations[computation].compute(dt);
         }
     }
-
-    setPosition(getPosition() + velocity * dt); // ? make part of default continuousActions, remove from here ?
 };

@@ -92,14 +92,25 @@ void CollisionManager::updateCollisions(){
             std::sort(presentCollisions.begin(), presentCollisions.end());
             std::sort(pastCollisions.begin(), pastCollisions.end());
 
-            std::vector<Collision> startPhaseCollisions;
-            std::set_difference(presentCollisions.begin(),presentCollisions.end(), pastCollisions.begin(),pastCollisions.end(), std::back_inserter(startPhaseCollisions));
+            // std::vector<Collision> startPhaseCollisions;
+            // std::set_difference(presentCollisions.begin(),presentCollisions.end(), pastCollisions.begin(),pastCollisions.end(), std::back_inserter(startPhaseCollisions));
+
+            // std::vector<Collision> continuousPhaseCollisions;
+            // std::set_intersection(pastCollisions.begin(),pastCollisions.end(), presentCollisions.begin(),presentCollisions.end(), std::back_inserter(continuousPhaseCollisions));
+
+            // std::vector<Collision> endPhaseCollisions;
+            // std::set_difference(pastCollisions.begin(),pastCollisions.end(), presentCollisions.begin(),presentCollisions.end(), std::back_inserter(endPhaseCollisions));
+
+            // Either works
 
             std::vector<Collision> continuousPhaseCollisions;
             std::set_intersection(pastCollisions.begin(),pastCollisions.end(), presentCollisions.begin(),presentCollisions.end(), std::back_inserter(continuousPhaseCollisions));
 
+            std::vector<Collision> startPhaseCollisions;
+            std::set_difference(presentCollisions.begin(),presentCollisions.end(), continuousPhaseCollisions.begin(),continuousPhaseCollisions.end(), std::back_inserter(startPhaseCollisions));
+
             std::vector<Collision> endPhaseCollisions;
-            std::set_difference(pastCollisions.begin(),pastCollisions.end(), presentCollisions.begin(),presentCollisions.end(), std::back_inserter(endPhaseCollisions));
+            std::set_difference(pastCollisions.begin(),pastCollisions.end(), continuousPhaseCollisions.begin(),continuousPhaseCollisions.end(), std::back_inserter(endPhaseCollisions));
             //
 
 

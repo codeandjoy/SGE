@@ -16,21 +16,12 @@
 #define PHYSICAL_OBJECT_H
 
 #include <SFML/Graphics.hpp>
-#ifndef CONTINUOUS_ACTION_H
-#define CONTINUOUS_ACTION_H
+#ifndef CONTINUOUS_CALCULATION_H
+#define CONTINUOUS_CALCULATION_H
 
-struct ContinuousAction{
+struct ContinuousComputation{
     bool shouldRun;
-    std::function<void(float dt)> runAction;
-};
-
-#endif
-#ifndef CONDITIONAL_ACTION_H
-#define CONDITIONAL_ACTION_H
-
-struct ConditionalAction{
-    std::function<bool()> condition;
-    std::function<void()> runAction; // ? Make function variadic ?
+    std::function<void(float dt)> compute;
 };
 
 #endif
@@ -45,14 +36,11 @@ class PhysicalObject : public sf::Sprite{
         void doAction(std::string name);
         // removeAction()
 
-        void createContinuousAction(std::string name, std::function<void(float dt)> action);
-        void runContinuousAction(std::string name);
-        void stopContinuousAction(std::string name);
+        void createContinuousComputation(std::string name, std::function<void(float dt)> computation);
+        void runContinuousComputation(std::string name);
+        void stopContinuousComputation(std::string name);
         // removeContinuousAction()
         
-
-        void createConditionalAction(std::string name, std::function<bool()> condition, std::function<void()> action);
-        // removeConditionalAction()
 
         void createFlag(std::string name);
         bool getFlag(std::string flagName);
@@ -63,8 +51,8 @@ class PhysicalObject : public sf::Sprite{
 
     private:
         std::map<std::string, std::function<void()>> m_actions;
-        std::map<std::string, ContinuousAction> m_continuousActions;
-        std::map<std::string, ConditionalAction> m_conditionalActions;
+        std::unordered_map<std::string, ContinuousComputation> m_continuousComputations;
+        std::vector<std::string> m_continuousComputationOrder;
         std::map<std::string, bool> m_flags;
 };
 
@@ -399,6 +387,30 @@ class Universe{
 
 #endif
 
+std::function<void(float)> updatePositionBasedOnVelocity(PhysicalObject* physicalObject){
+    return [physicalObject](float dt){
+        physicalObject->setPosition(physicalObject->getPosition() + physicalObject->velocity * dt);
+    };
+}
+
+std::function<void(float)> updateVelocityBasedOnAcceleration(PhysicalObject* physicalObject){
+    return [physicalObject](float dt){
+        if(abs(physicalObject->velocity.x) >= physicalObject->speedLimit.x){
+            physicalObject->velocity.x = physicalObject->speedLimit.x;
+        }
+        else{
+            physicalObject->velocity.x += physicalObject->acceleration.x;
+        }
+
+        if(abs(physicalObject->velocity.y) >= physicalObject->speedLimit.y){
+            physicalObject->velocity.y = physicalObject->speedLimit.y;
+        }
+        else{
+            physicalObject->velocity.y += physicalObject->acceleration.y;
+        }
+    };
+}
+
 #ifndef COLLISION_RESPONSES_H
 #define COLLISION_RESPONSES_H
 
@@ -527,28 +539,23 @@ float approach(float goal, float current, float dt){
 void PhysicalObject::createAction(std::string name, std::function<void()> action){ m_actions[name] = action; }
 void PhysicalObject::doAction(std::string name){ m_actions[name](); }
 
-void PhysicalObject::createContinuousAction(std::string name, std::function<void(float dt)> action){ m_continuousActions[name] = { false, action }; }
-void PhysicalObject::runContinuousAction(std::string name){ m_continuousActions[name].shouldRun = true; }
-void PhysicalObject::stopContinuousAction(std::string name){ m_continuousActions[name].shouldRun = false; }
-
-void PhysicalObject::createConditionalAction(std::string name, std::function<bool()> condition, std::function<void()> action){ m_conditionalActions[name] = { condition, action }; }
+void PhysicalObject::createContinuousComputation(std::string name, std::function<void(float dt)> computation){
+    m_continuousComputations[name] = { true, computation };
+    m_continuousComputationOrder.push_back(name);
+}
+void PhysicalObject::runContinuousComputation(std::string name){ m_continuousComputations[name].shouldRun = true; }
+void PhysicalObject::stopContinuousComputation(std::string name){ m_continuousComputations[name].shouldRun = false; }
 
 void PhysicalObject::createFlag(std::string name){ m_flags[name] = false; }
 bool PhysicalObject::getFlag(std::string flagName){ return m_flags[flagName]; }
 void PhysicalObject::setFlag(std::string flagName, bool value){ m_flags[flagName] = value; }
 
 void PhysicalObject::update(float dt){
-    for(auto const& [name, continuousAction] : m_continuousActions){
-        if(continuousAction.shouldRun) continuousAction.runAction(dt);
-    }
-
-    for(auto const& [name, conditionalAction] : m_conditionalActions){
-        if(conditionalAction.condition()){
-            conditionalAction.runAction();
+    for(std::string computation : m_continuousComputationOrder){
+        if(m_continuousComputations[computation].shouldRun){
+            m_continuousComputations[computation].compute(dt);
         }
     }
-
-    setPosition(getPosition() + velocity * dt); // ? make part of default continuousActions, remove from here ?
 };
 
 
@@ -558,30 +565,6 @@ std::vector<PhysicalObject*> PhysicsManager::getAllPhysicalObjects(){ return m_p
 
 void PhysicsManager::updatePhysics(float dt){
     for(PhysicalObject* physicalObject : m_physicalObjects){
-        // !
-        // !
-        // !
-        // ? Should be in physicalObject.update ?
-        // ? Is it just the continuous action ?
-        // !
-        // !
-        // !
-        // Accelerate (approach speed limit with acceleration step)
-        if(abs(physicalObject->velocity.x) >= physicalObject->speedLimit.x){
-            physicalObject->velocity.x = physicalObject->speedLimit.x;
-        }
-        else{
-            physicalObject->velocity.x += physicalObject->acceleration.x;
-        }
-
-        if(abs(physicalObject->velocity.y) >= physicalObject->speedLimit.y){
-            physicalObject->velocity.y = physicalObject->speedLimit.y;
-        }
-        else{
-            physicalObject->velocity.y += physicalObject->acceleration.y;
-        }
-        //
-
         physicalObject->update(dt);
     }
 }
@@ -681,14 +664,23 @@ void CollisionManager::updateCollisions(){
             std::sort(presentCollisions.begin(), presentCollisions.end());
             std::sort(pastCollisions.begin(), pastCollisions.end());
 
-            std::vector<Collision> startPhaseCollisions;
-            std::set_difference(presentCollisions.begin(),presentCollisions.end(), pastCollisions.begin(),pastCollisions.end(), std::back_inserter(startPhaseCollisions));
+            // std::vector<Collision> startPhaseCollisions;
+            // std::set_difference(presentCollisions.begin(),presentCollisions.end(), pastCollisions.begin(),pastCollisions.end(), std::back_inserter(startPhaseCollisions));
+
+            // std::vector<Collision> continuousPhaseCollisions;
+            // std::set_intersection(pastCollisions.begin(),pastCollisions.end(), presentCollisions.begin(),presentCollisions.end(), std::back_inserter(continuousPhaseCollisions));
+
+            // std::vector<Collision> endPhaseCollisions;
+            // std::set_difference(pastCollisions.begin(),pastCollisions.end(), presentCollisions.begin(),presentCollisions.end(), std::back_inserter(endPhaseCollisions));
 
             std::vector<Collision> continuousPhaseCollisions;
             std::set_intersection(pastCollisions.begin(),pastCollisions.end(), presentCollisions.begin(),presentCollisions.end(), std::back_inserter(continuousPhaseCollisions));
 
+            std::vector<Collision> startPhaseCollisions;
+            std::set_difference(presentCollisions.begin(),presentCollisions.end(), continuousPhaseCollisions.begin(),continuousPhaseCollisions.end(), std::back_inserter(startPhaseCollisions));
+
             std::vector<Collision> endPhaseCollisions;
-            std::set_difference(pastCollisions.begin(),pastCollisions.end(), presentCollisions.begin(),presentCollisions.end(), std::back_inserter(endPhaseCollisions));
+            std::set_difference(pastCollisions.begin(),pastCollisions.end(), continuousPhaseCollisions.begin(),continuousPhaseCollisions.end(), std::back_inserter(endPhaseCollisions));
             //
 
             // Run collision responses based on collision phase
