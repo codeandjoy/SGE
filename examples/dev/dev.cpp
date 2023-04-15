@@ -241,24 +241,24 @@ int main(){
 
     // To work properly, all AABB shapes should be checked together
     universe->collisionManager->createCollisionPair("playerAABB", "player", "tiles+box");
-    universe->collisionManager->setCollisionDetectionAlgorithm("playerAABB", boundingBox);
-    universe->collisionManager->setCollisionResponse("playerAABB", "start_phase", [](std::vector<Collision> collisions){
+    universe->collisionManager->setPairCollisionDetectionAlgorithm("playerAABB", boundingBox);
+    universe->collisionManager->setPairCollisionResponse("playerAABB", "start_phase", [](std::vector<Collision> collisions){
         printf("start_phase\n");
     });
-    universe->collisionManager->setCollisionResponse("playerAABB", "continuous_phase", [mapTilesEntityGroup, mapTilesDebugEntities](std::vector<Collision> collisions){
+    universe->collisionManager->setPairCollisionResponse("playerAABB", "continuous_phase", [mapTilesEntityGroup, mapTilesDebugEntities](std::vector<Collision> collisions){
         printf("continuous_phase\n");
         resolveAABB(collisions);
         initiatorStandOnTopOfRecipient(collisions);
     });
-    universe->collisionManager->setCollisionResponse("playerAABB", "end_phase", [mapTilesEntityGroup, mapTilesDebugEntities](std::vector<Collision> collisions){
+    universe->collisionManager->setPairCollisionResponse("playerAABB", "end_phase", [mapTilesEntityGroup, mapTilesDebugEntities](std::vector<Collision> collisions){
         printf("end_phase\n");
     });
 
 
     // To work properly, all AABB shapes should be checked together
     universe->collisionManager->createCollisionPair("boxAABB", "box", "tiles");
-    universe->collisionManager->setCollisionDetectionAlgorithm("boxAABB", boundingBox);
-    universe->collisionManager->setCollisionResponse("boxAABB", "continuous_phase", [](std::vector<Collision> collisions){
+    universe->collisionManager->setPairCollisionDetectionAlgorithm("boxAABB", boundingBox);
+    universe->collisionManager->setPairCollisionResponse("boxAABB", "continuous_phase", [](std::vector<Collision> collisions){
         resolveAABB(collisions);
         initiatorStandOnTopOfRecipient(collisions);
     });
@@ -266,8 +266,8 @@ int main(){
 
 
     universe->collisionManager->createCollisionPair("PB", "player", "box");
-    universe->collisionManager->setCollisionDetectionAlgorithm("PB", boundingBox);
-    universe->collisionManager->setCollisionResponse("PB", "start_phase", [boxDE](std::vector<Collision> collisions){
+    universe->collisionManager->setPairCollisionDetectionAlgorithm("PB", boundingBox);
+    universe->collisionManager->setPairCollisionResponse("PB", "start_phase", [boxDE](std::vector<Collision> collisions){
         boxDE->customCollisionShapeBorderSettings["globalBounds"] = CollisionShapeBorderSettings{sf::Color::Red};
 
         // Refactor as pushRecipient(float velocity);
@@ -280,7 +280,7 @@ int main(){
             }
         }
     });
-    universe->collisionManager->setCollisionResponse("PB", "end_phase", [boxDE](std::vector<Collision> collisions){
+    universe->collisionManager->setPairCollisionResponse("PB", "end_phase", [boxDE](std::vector<Collision> collisions){
         boxDE->customCollisionShapeBorderSettings["globalBounds"] = CollisionShapeBorderSettings{sf::Color::Green};
         
         for(Collision collision : collisions){
