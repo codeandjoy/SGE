@@ -48,52 +48,25 @@ int main(){
     // Tile layer
     //
 
-    // Init physical objects
-    std::vector<PhysicalObject*> mapTilesPOs;
+    std::vector<Entity*> mapTilesEntityGroup;
 
     for(int i = 0; i < map.getTileCount().y; i++){
         for(int j = 0; j < map.getTileCount().x; j++){
             if(tiles[map.getTileCount().x*i+j].ID != 0){
-                PhysicalObject *tile = new PhysicalObject();
+                PhysicalObject* tilePO = new PhysicalObject();
+                tilePO->setTexture(*universe->textureManager->getTexture("picoTiles")->getTextureSheet());
+                tilePO->setTextureRect(universe->textureManager->getTexture("picoTiles")->getTextureRect(tiles[map.getTileCount().x*i+j].ID-1));
+                tilePO->setPosition(sf::Vector2f(j*map.getTileSize().x, i*map.getTileSize().y));
 
-                tile->setTexture(*universe->textureManager->getTexture("picoTiles")->getTextureSheet());
-                tile->setTextureRect(universe->textureManager->getTexture("picoTiles")->getTextureRect(tiles[map.getTileCount().x*i+j].ID-1));
-                tile->setPosition(sf::Vector2f(j*map.getTileSize().x, i*map.getTileSize().y));
-                mapTilesPOs.push_back(tile);
+                CollisionShape* tileCS = new CollisionShape(tilePO);
+
+                mapTilesEntityGroup.push_back(new Entity{tilePO, std::map<std::string, CollisionShape*>{{ "globalBounds", tileCS }}});
             }
         }
     }
-    // 
 
-    // Init collision shapes
-    std::vector<std::map<std::string, CollisionShape*>> mapTileCSs;
-    for(PhysicalObject* tilePO : mapTilesPOs){
-        mapTileCSs.push_back({{"globalBounds", new CollisionShape(tilePO)}});
-    }
-    //
-
-    // Build entities
-    std::vector<Entity*> mapTilesEntityGroup;
-    for(int i = 0; i < mapTilesPOs.size(); i++){
-        mapTilesEntityGroup.push_back(new Entity{mapTilesPOs[i], mapTileCSs[i]});
-    }
-    //
-
-    // Register map tile entities
-    // 1 PhysicalObject, 1 CollisionShape, no Animation
     universe->entityManager->registerEntityGroup("mapTiles", mapTilesEntityGroup);
-    //
 
-    // Register map tile debug entitites
-    std::vector<DebugEntity*> mapTilesDebugEntities;
-    for(Entity* tileEntity : mapTilesEntityGroup){
-        DebugEntity* de = new DebugEntity(tileEntity);
-
-        mapTilesDebugEntities.push_back(de);
-        universe->debugManager->registerDebugEntity(de);
-    }
-    //
-    
     //
     //
     //
@@ -137,7 +110,6 @@ int main(){
     // Player
     //
     
-    // Physical object
     PhysicalObject *playerPO = new PhysicalObject();
     playerPO->setPosition(sf::Vector2f(100, 50));
     playerPO->setTexture(*universe->textureManager->getTexture("knight")->getTextureSheet());
@@ -147,35 +119,30 @@ int main(){
 
     playerPO->createContinuousComputation("updateVelocity", updateVelocityBasedOnAcceleration(playerPO));
     playerPO->createContinuousComputation("updatePosition", updatePositionBasedOnVelocity(playerPO));
-    //
 
-    // Collision shape
+
     std::map<std::string, CollisionShape*> playerCSs;
     CollisionShape* playerCS = new CollisionShape(playerPO);
     playerCS->setSize(sf::Vector2f(playerPO->getGlobalBounds().width, 4));
     playerCS->offset = sf::Vector2f(0, 4);
 
     playerCSs["globalBounds"] = playerCS;
-    //
 
-    // Animation
+
     Animation* playerAnimation = new Animation(universe->textureManager->getTexture("knight"), playerPO, 9);
     playerAnimation->addTextureSequence("idle", std::vector<int>{9});
     playerAnimation->addTextureSequence("runRight", std::vector<int>{33, 34, 35});
     playerAnimation->addTextureSequence("runLeft", std::vector<int>{45, 46, 47});
     playerAnimation->setCurrentTextureSequence("idle");
-    //
 
-    // Build entity
+    
     std::vector<Entity*> playerEntityGroup;
     playerEntityGroup.push_back(new Entity{playerPO, playerCSs, playerAnimation});
-    //
 
-    // Register player entity
-    // 1 PhysicalObject, 1 CollisionShape, Animation present
+
     universe->entityManager->registerEntityGroup("player", playerEntityGroup);
 
-    // Register debug entity
+
     DebugEntity* playerDE = new DebugEntity(playerEntityGroup[0]);
     playerDE->customCollisionShapeBorderSettings["globalBounds"] = CollisionShapeBorderSettings{sf::Color::Red};
     // Extra debug function example
@@ -184,7 +151,6 @@ int main(){
     // });
 
     universe->debugManager->registerDebugEntity(playerDE);
-    //
 
     //
     //
@@ -251,12 +217,12 @@ int main(){
     universe->collisionManager->setPairCollisionResponse("playerAABB", "start_phase", [](std::vector<Collision> collisions){
         printf("start_phase\n");
     });
-    universe->collisionManager->setPairCollisionResponse("playerAABB", "continuous_phase", [mapTilesEntityGroup, mapTilesDebugEntities](std::vector<Collision> collisions){
+    universe->collisionManager->setPairCollisionResponse("playerAABB", "continuous_phase", [mapTilesEntityGroup](std::vector<Collision> collisions){
         // printf("continuous_phase\n");
         resolveAABB(collisions);
         initiatorStandOnTopOfRecipient(collisions);
     });
-    universe->collisionManager->setPairCollisionResponse("playerAABB", "end_phase", [mapTilesEntityGroup, mapTilesDebugEntities](std::vector<Collision> collisions){
+    universe->collisionManager->setPairCollisionResponse("playerAABB", "end_phase", [mapTilesEntityGroup](std::vector<Collision> collisions){
         printf("end_phase\n");
     });
 

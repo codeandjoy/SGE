@@ -1,9 +1,9 @@
+//namespace sge{
+
 #ifndef SGE_HPP
 #define SGE_HPP
 
 #include <SFML/Graphics.hpp>
-
-//namespace sge{
 
 #ifndef UNIVERSE_H
 #define UNIVERSE_H
@@ -795,13 +795,15 @@ void EntityManager::registerEntityGroup(std::string name, std::vector<Entity*> e
     for(Entity* entity : entityGroup){
         m_physicsManagerPtr->registerPhysicalObject(entity->physicalObject);
         
-        // Map to vector
-        std::vector<CollisionShape*> entityCollisionShapes;
-        for(auto& [_, collisionShape] : entity->collisionShapes){
-            entityCollisionShapes.push_back(collisionShape);
+        if(entity->collisionShapes.size()){
+            // Map to vector
+            std::vector<CollisionShape*> entityCollisionShapes;
+            for(auto& [_, collisionShape] : entity->collisionShapes){
+                entityCollisionShapes.push_back(collisionShape);
+            }
+            //
+            m_collisionManagerPtr->registerCollisionShapes(entityCollisionShapes);
         }
-        //
-        m_collisionManagerPtr->registerCollisionShapes(entityCollisionShapes);
         
         if(entity->animation){
             m_textureManagerPtr->registerAnimation(entity->animation);
