@@ -1,9 +1,9 @@
+//namespace sge{
+
 #ifndef SGE_HPP
 #define SGE_HPP
 
 #include <SFML/Graphics.hpp>
-
-//namespace sge{
 
 #include "./src/Universe/Universe.h"
 
