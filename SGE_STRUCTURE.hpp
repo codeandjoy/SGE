@@ -26,6 +26,14 @@
 #include "./src/Collision/CollisionUtils.h"
 #include "./src/Collision/CollisionShape.h"
 
+#include "./src/Entity/Entity.h"
+#include "./src/Entity/EntityManager.h"
+
+#include "./src/Debug/DebugEntity.h"
+#include "./src/Debug/DebugManager.h"
+#include "./src/Debug/CollisionShapeBorder.h"
+#include "./src/Debug/CollisionShapeBorderSettings.h"
+
 #include "./src/utils/approach.h"
 #include "./src/utils/Measurements.h"
 
