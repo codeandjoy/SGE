@@ -60,7 +60,7 @@ int main(){
 
                 CollisionShape* tileCS = new CollisionShape(tilePO);
 
-                mapTilesEntityGroup.push_back(new Entity{tilePO, std::map<std::string, CollisionShape*>{{ "globalBounds", tileCS }}});
+                mapTilesEntityGroup.push_back(new Entity{tilePO, std::unordered_map<std::string, CollisionShape*>{{ "globalBounds", tileCS }}});
             }
         }
     }
@@ -87,11 +87,11 @@ int main(){
     boxPO->createContinuousComputation("updateVelocity", updateVelocityBasedOnAcceleration(boxPO));
     boxPO->createContinuousComputation("updatePosition", updatePositionBasedOnVelocity(boxPO));
 
-    std::map<std::string, CollisionShape*> boxCSs = {{"globalBounds", new CollisionShape(boxPO)}};
 
-    std::vector<Entity*> boxEntityGroup = {new Entity{boxPO, boxCSs}};
+    std::vector<Entity*> boxEntityGroup = {new Entity{boxPO, std::unordered_map<std::string, CollisionShape*>{{"globalBounds", new CollisionShape(boxPO)}}}};
 
     universe->entityManager->registerEntityGroup("boxes", boxEntityGroup);
+
 
     DebugEntity* boxDE = new DebugEntity(boxEntityGroup[0]);
     boxDE->customCollisionShapeBorderSettings["globalBounds"] = CollisionShapeBorderSettings{sf::Color::Green};
@@ -121,7 +121,7 @@ int main(){
     playerPO->createContinuousComputation("updatePosition", updatePositionBasedOnVelocity(playerPO));
 
 
-    std::map<std::string, CollisionShape*> playerCSs;
+    std::unordered_map<std::string, CollisionShape*> playerCSs;
     CollisionShape* playerCS = new CollisionShape(playerPO);
     playerCS->setSize(sf::Vector2f(playerPO->getGlobalBounds().width, 4));
     playerCS->offset = sf::Vector2f(0, 4);

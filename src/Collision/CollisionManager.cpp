@@ -23,13 +23,13 @@ void CollisionManager::alignCollisionShapes(){
 
 void CollisionManager::registerCollisionGroup(std::string name, std::vector<CollisionShape*> collisionGroup){ m_collisionGroups[name] = collisionGroup; } 
 void CollisionManager::deregisterCollisionGroup(std::string name){ m_collisionGroups.erase(name); }
-void CollisionManager::registerCollisionGroups(std::map<std::string, std::vector<CollisionShape*>> collisionGroups){ m_collisionGroups.insert(collisionGroups.begin(), collisionGroups.end()); }
-void CollisionManager::deregisterCollisionGroups(std::map<std::string, std::vector<CollisionShape*>> collisionGroups){
+void CollisionManager::registerCollisionGroups(std::unordered_map<std::string, std::vector<CollisionShape*>> collisionGroups){ m_collisionGroups.insert(collisionGroups.begin(), collisionGroups.end()); }
+void CollisionManager::deregisterCollisionGroups(std::unordered_map<std::string, std::vector<CollisionShape*>> collisionGroups){
     for(auto& [name, _] : collisionGroups){
         deregisterCollisionGroup(name);
     }
 }
-std::map<std::string, std::vector<CollisionShape*>> CollisionManager::getCollisionGroups(){ return m_collisionGroups; }
+std::unordered_map<std::string, std::vector<CollisionShape*>> CollisionManager::getCollisionGroups(){ return m_collisionGroups; }
 
 
 

@@ -49,10 +49,10 @@ class PhysicalObject : public sf::Sprite{
         void update(float dt);
 
     private:
-        std::map<std::string, std::function<void()>> m_actions;
+        std::unordered_map<std::string, std::function<void()>> m_actions;
         std::unordered_map<std::string, ContinuousComputation> m_continuousComputations;
         std::vector<std::string> m_continuousComputationOrder;
-        std::map<std::string, bool> m_flags;
+        std::unordered_map<std::string, bool> m_flags;
 };
 
 #endif
@@ -141,7 +141,7 @@ struct CollisionPair{
     std::function<void(std::vector<Collision>)> continuousPhaseCollisionResponse;
     std::function<void(std::vector<Collision>)> endPhaseCollisionResponse;
 
-    std::map<CollisionShape*, std::vector<Collision>> pastCollisions;
+    std::unordered_map<CollisionShape*, std::vector<Collision>> pastCollisions;
     
     std::function<bool(CollisionShape *initiator, CollisionShape *recipient)> checkCollision;
 };
@@ -160,9 +160,9 @@ class CollisionManager{
 
         void registerCollisionGroup(std::string name, std::vector<CollisionShape*> collisionGroup);
         void deregisterCollisionGroup(std::string name);
-        void registerCollisionGroups(std::map<std::string, std::vector<CollisionShape*>> collisionGroups);
-        void deregisterCollisionGroups(std::map<std::string, std::vector<CollisionShape*>> collisionGroups);
-        std::map<std::string, std::vector<CollisionShape*>> getCollisionGroups();
+        void registerCollisionGroups(std::unordered_map<std::string, std::vector<CollisionShape*>> collisionGroups);
+        void deregisterCollisionGroups(std::unordered_map<std::string, std::vector<CollisionShape*>> collisionGroups);
+        std::unordered_map<std::string, std::vector<CollisionShape*>> getCollisionGroups();
 
         void createCollisionPair(std::string name, std::string initiatorGroup, std::string recipientGroup);
         void setPairCollisionDetectionAlgorithm(std::string collisionPairName, std::function<bool(CollisionShape* initiator, CollisionShape* recipient)> collisionDetectionAlgorithm);
@@ -172,8 +172,8 @@ class CollisionManager{
 
     private:
         std::vector<CollisionShape*> m_allCollisionShapes;
-        std::map<std::string, std::vector<CollisionShape*>> m_collisionGroups;
-        std::map<std::string, CollisionPair> m_collisionPairs;
+        std::unordered_map<std::string, std::vector<CollisionShape*>> m_collisionGroups;
+        std::unordered_map<std::string, CollisionPair> m_collisionPairs;
 };
 
 #endif
@@ -240,7 +240,7 @@ class Animation{
         TextureSheet* m_textureSheet;
         
         sf::Clock m_clock;
-        std::map<std::string, std::vector<int>> m_textureSequences; // e.g. "idle": [5, 6, 7, 8]
+        std::unordered_map<std::string, std::vector<int>> m_textureSequences; // e.g. "idle": [5, 6, 7, 8]
         std::string m_currentTextureSequence;
         int m_currentTextureN = 0;
 
@@ -260,7 +260,7 @@ class TextureManager{
         void updateAnimations();
 
     private:
-        std::map<std::string, TextureSheet*> m_loadedTextures;
+        std::unordered_map<std::string, TextureSheet*> m_loadedTextures;
         std::vector<Animation*> m_animations;
 };
 
@@ -273,7 +273,7 @@ class TextureManager{
 
 struct Entity{
     PhysicalObject* physicalObject;
-    std::map<std::string, CollisionShape*> collisionShapes; 
+    std::unordered_map<std::string, CollisionShape*> collisionShapes; 
     Animation* animation = nullptr;
 };
 
@@ -284,12 +284,12 @@ class EntityManager{
         EntityManager(PhysicsManager* physicsManager, CollisionManager* collisionManager, TextureManager* textureManager);
 
         void registerEntityGroup(std::string name, std::vector<Entity*> entityGroup);
-        std::map<std::string, std::vector<Entity*>> getAllEntityGroups();
+        std::unordered_map<std::string, std::vector<Entity*>> getAllEntityGroups();
         void destroyEntityGroup(std::string name);
         void destroyEntity(std::string memberEntityGroup, Entity* entity);
 
     private:
-        std::map<std::string, std::vector<Entity*>> m_entityGroups;
+        std::unordered_map<std::string, std::vector<Entity*>> m_entityGroups;
 
         PhysicsManager* m_physicsManagerPtr;
         CollisionManager* m_collisionManagerPtr;
@@ -331,7 +331,7 @@ class DebugEntity{
         DebugEntity(Entity* relatedEntity);
 
         bool drawCollisionShapeBorders = true;
-        std::map<std::string, CollisionShapeBorderSettings> customCollisionShapeBorderSettings;
+        std::unordered_map<std::string, CollisionShapeBorderSettings> customCollisionShapeBorderSettings;
         std::vector<CollisionShapeBorder*> generateCollisionShapeBorders();
 
         void addExtraDebugFunction(std::function<void(sf::RenderWindow* windowPtr)> extraDebugFunction);
@@ -550,6 +550,7 @@ bool PhysicalObject::getFlag(std::string flagName){ return m_flags[flagName]; }
 void PhysicalObject::setFlag(std::string flagName, bool value){ m_flags[flagName] = value; }
 
 void PhysicalObject::update(float dt){
+    // Run continuous computations in order of insertion
     for(std::string computation : m_continuousComputationOrder){
         if(m_continuousComputations[computation].shouldRun){
             m_continuousComputations[computation].compute(dt);
@@ -602,13 +603,13 @@ void CollisionManager::alignCollisionShapes(){
 
 void CollisionManager::registerCollisionGroup(std::string name, std::vector<CollisionShape*> collisionGroup){ m_collisionGroups[name] = collisionGroup; } 
 void CollisionManager::deregisterCollisionGroup(std::string name){ m_collisionGroups.erase(name); }
-void CollisionManager::registerCollisionGroups(std::map<std::string, std::vector<CollisionShape*>> collisionGroups){ m_collisionGroups.insert(collisionGroups.begin(), collisionGroups.end()); }
-void CollisionManager::deregisterCollisionGroups(std::map<std::string, std::vector<CollisionShape*>> collisionGroups){
+void CollisionManager::registerCollisionGroups(std::unordered_map<std::string, std::vector<CollisionShape*>> collisionGroups){ m_collisionGroups.insert(collisionGroups.begin(), collisionGroups.end()); }
+void CollisionManager::deregisterCollisionGroups(std::unordered_map<std::string, std::vector<CollisionShape*>> collisionGroups){
     for(auto& [name, _] : collisionGroups){
         deregisterCollisionGroup(name);
     }
 }
-std::map<std::string, std::vector<CollisionShape*>> CollisionManager::getCollisionGroups(){ return m_collisionGroups; }
+std::unordered_map<std::string, std::vector<CollisionShape*>> CollisionManager::getCollisionGroups(){ return m_collisionGroups; }
 
 void CollisionManager::createCollisionPair(std::string name, std::string initiatorGroup, std::string recipientGroup){
     if(!m_collisionGroups.count(initiatorGroup) && !m_collisionGroups.count(recipientGroup)){
@@ -813,7 +814,7 @@ void EntityManager::registerEntityGroup(std::string name, std::vector<Entity*> e
     m_entityGroups[name] = entityGroup;    
 }
 
-std::map<std::string, std::vector<Entity*>> EntityManager::getAllEntityGroups(){ return m_entityGroups; }
+std::unordered_map<std::string, std::vector<Entity*>> EntityManager::getAllEntityGroups(){ return m_entityGroups; }
 
 // TODO destroy
 

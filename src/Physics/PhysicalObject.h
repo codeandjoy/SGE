@@ -31,10 +31,10 @@ class PhysicalObject : public sf::Sprite{
         void update(float dt);
 
     private:
-        std::map<std::string, std::function<void()>> m_actions;
+        std::unordered_map<std::string, std::function<void()>> m_actions;
         std::unordered_map<std::string, ContinuousComputation> m_continuousComputations;
         std::vector<std::string> m_continuousComputationOrder;
-        std::map<std::string, bool> m_flags;
+        std::unordered_map<std::string, bool> m_flags;
 };
 
 

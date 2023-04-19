@@ -30,6 +30,6 @@ void EntityManager::registerEntityGroup(std::string name, std::vector<Entity*> e
     m_entityGroups[name] = entityGroup;    
 }
 
-std::map<std::string, std::vector<Entity*>> EntityManager::getAllEntityGroups(){ return m_entityGroups; }
+std::unordered_map<std::string, std::vector<Entity*>> EntityManager::getAllEntityGroups(){ return m_entityGroups; }
 
 // TODO destroy

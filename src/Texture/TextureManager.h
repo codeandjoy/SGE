@@ -20,7 +20,7 @@ class TextureManager{
         void updateAnimations();
 
     private:
-        std::map<std::string, TextureSheet*> m_loadedTextures;
+        std::unordered_map<std::string, TextureSheet*> m_loadedTextures;
         std::vector<Animation*> m_animations;
 };
 

@@ -27,7 +27,7 @@ class Animation{
         TextureSheet* m_textureSheet;
         
         sf::Clock m_clock;
-        std::map<std::string, std::vector<int>> m_textureSequences; // e.g. "idle": [5, 6, 7, 8]
+        std::unordered_map<std::string, std::vector<int>> m_textureSequences; // e.g. "idle": [5, 6, 7, 8]
         std::string m_currentTextureSequence;
         int m_currentTextureN = 0;
 

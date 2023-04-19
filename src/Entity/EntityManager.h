@@ -12,12 +12,12 @@ class EntityManager{
         EntityManager(PhysicsManager* physicsManager, CollisionManager* collisionManager, TextureManager* textureManager);
 
         void registerEntityGroup(std::string name, std::vector<Entity*> entityGroup);
-        std::map<std::string, std::vector<Entity*>> getAllEntityGroups();
+        std::unordered_map<std::string, std::vector<Entity*>> getAllEntityGroups();
         void destroyEntityGroup(std::string name);
         void destroyEntity(std::string memberEntityGroup, Entity* entity);
 
     private:
-        std::map<std::string, std::vector<Entity*>> m_entityGroups;
+        std::unordered_map<std::string, std::vector<Entity*>> m_entityGroups;
 
         PhysicsManager* m_physicsManagerPtr;
         CollisionManager* m_collisionManagerPtr;

@@ -22,6 +22,7 @@ void PhysicalObject::setFlag(std::string flagName, bool value){ m_flags[flagName
 
 
 void PhysicalObject::update(float dt){
+    // Run continuous computations in order of insertion
     for(std::string computation : m_continuousComputationOrder){
         if(m_continuousComputations[computation].shouldRun){
             m_continuousComputations[computation].compute(dt);

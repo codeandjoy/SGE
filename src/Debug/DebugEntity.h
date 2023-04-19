@@ -11,7 +11,7 @@ class DebugEntity{
         DebugEntity(Entity* relatedEntity);
 
         bool drawCollisionShapeBorders = true;
-        std::map<std::string, CollisionShapeBorderSettings> customCollisionShapeBorderSettings;
+        std::unordered_map<std::string, CollisionShapeBorderSettings> customCollisionShapeBorderSettings;
         std::vector<CollisionShapeBorder*> generateCollisionShapeBorders();
 
         void addExtraDebugFunction(std::function<void(sf::RenderWindow* windowPtr)> extraDebugFunction);

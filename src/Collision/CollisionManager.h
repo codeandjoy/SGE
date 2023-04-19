@@ -19,9 +19,9 @@ class CollisionManager{
 
         void registerCollisionGroup(std::string name, std::vector<CollisionShape*> collisionGroup);
         void deregisterCollisionGroup(std::string name);
-        void registerCollisionGroups(std::map<std::string, std::vector<CollisionShape*>> collisionGroups);
-        void deregisterCollisionGroups(std::map<std::string, std::vector<CollisionShape*>> collisionGroups);
-        std::map<std::string, std::vector<CollisionShape*>> getCollisionGroups();
+        void registerCollisionGroups(std::unordered_map<std::string, std::vector<CollisionShape*>> collisionGroups);
+        void deregisterCollisionGroups(std::unordered_map<std::string, std::vector<CollisionShape*>> collisionGroups);
+        std::unordered_map<std::string, std::vector<CollisionShape*>> getCollisionGroups();
 
 
         void createCollisionPair(std::string name, std::string initiatorGroup, std::string recipientGroup);
@@ -33,8 +33,8 @@ class CollisionManager{
 
     private:
         std::vector<CollisionShape*> m_allCollisionShapes;
-        std::map<std::string, std::vector<CollisionShape*>> m_collisionGroups;
-        std::map<std::string, CollisionPair> m_collisionPairs;
+        std::unordered_map<std::string, std::vector<CollisionShape*>> m_collisionGroups;
+        std::unordered_map<std::string, CollisionPair> m_collisionPairs;
 };
 
 

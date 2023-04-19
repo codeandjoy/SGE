@@ -8,7 +8,7 @@
 
 struct Entity{
     PhysicalObject* physicalObject;
-    std::map<std::string, CollisionShape*> collisionShapes; 
+    std::unordered_map<std::string, CollisionShape*> collisionShapes; 
     Animation* animation = nullptr;
 };
 
