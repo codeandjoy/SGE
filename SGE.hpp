@@ -284,13 +284,14 @@ class EntityManager{
     public:
         EntityManager(PhysicsManager* physicsManager, CollisionManager* collisionManager, TextureManager* textureManager);
 
-        void registerEntityGroup(std::string name, std::vector<Entity*> entityGroup);
-        std::unordered_map<std::string, std::vector<Entity*>> getAllEntityGroups();
-        void destroyEntityGroup(std::string name);
-        void destroyEntity(std::string memberEntityGroup, Entity* entity);
+        void registerEntity(Entity* entity);
+        void registerEntities(std::vector<Entity*> entities);
+        void destroyEntity(Entity* entity);
+        // void destroyEntityGroup(std::string name);
+        std::vector<Entity*> getAllEntities();
 
     private:
-        std::unordered_map<std::string, std::vector<Entity*>> m_entityGroups;
+        std::vector<Entity*> m_entities;
 
         PhysicsManager* m_physicsManagerPtr;
         CollisionManager* m_collisionManagerPtr;
@@ -822,9 +823,26 @@ EntityManager::EntityManager(PhysicsManager* physicsManager, CollisionManager* c
     m_textureManagerPtr = textureManager;
 }
 
-void EntityManager::registerEntityGroup(std::string name, std::vector<Entity*> entityGroup){
+void EntityManager::registerEntity(Entity* entity){
+    m_physicsManagerPtr->registerPhysicalObject(entity->physicalObject);
+        
+    if(entity->collisionShapes.size()){
+        // Map to vector
+        std::vector<CollisionShape*> entityCollisionShapes;
+        for(auto& [_, collisionShape] : entity->collisionShapes){
+            entityCollisionShapes.push_back(collisionShape);
+        }
+        //
+        m_collisionManagerPtr->registerCollisionShapes(entityCollisionShapes);
+    }
     
-    for(Entity* entity : entityGroup){
+    if(entity->animation){
+        m_textureManagerPtr->registerAnimation(entity->animation);
+    }
+}
+
+void EntityManager::registerEntities(std::vector<Entity*> entities){
+    for(Entity* entity : entities){
         m_physicsManagerPtr->registerPhysicalObject(entity->physicalObject);
         
         if(entity->collisionShapes.size()){
@@ -840,14 +858,13 @@ void EntityManager::registerEntityGroup(std::string name, std::vector<Entity*> e
         if(entity->animation){
             m_textureManagerPtr->registerAnimation(entity->animation);
         }
-    }
 
-    m_entityGroups[name] = entityGroup;    
+        m_entities.push_back(entity);
+    }
 }
 
-std::unordered_map<std::string, std::vector<Entity*>> EntityManager::getAllEntityGroups(){ return m_entityGroups; }
+std::vector<Entity*> EntityManager::getAllEntities(){ return m_entities; }
 
-// TODO destroy
 
 CollisionShapeBorder::CollisionShapeBorder(CollisionShape* owner, CollisionShapeBorderSettings settings){
     this->setFillColor(sf::Color(0,0,0,0));

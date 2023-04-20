@@ -37,12 +37,12 @@ int main(){
 
 
     // Tile layer
-    std::vector<Entity*> mapTilesEntityGroup;
+    std::vector<Entity*> mapTileEntities;
 
     for(int i = 0; i < map.getTileCount().y; i++){
         for(int j = 0; j < map.getTileCount().x; j++){
             if(tiles[map.getTileCount().x*i+j].ID != 0){
-                mapTilesEntityGroup.push_back(buildStaticEntity(
+                mapTileEntities.push_back(buildStaticEntity(
                     universe->textureManager->getTexture("picoTiles")->getTextureSheet(),
                     universe->textureManager->getTexture("picoTiles")->getTextureRect(tiles[map.getTileCount().x*i+j].ID-1),
                     sf::Vector2f(j*map.getTileSize().x, i*map.getTileSize().y)
@@ -51,7 +51,7 @@ int main(){
         }
     }
 
-    universe->entityManager->registerEntityGroup("mapTiles", mapTilesEntityGroup);
+    universe->entityManager->registerEntities(mapTileEntities);
     //
 
 
@@ -67,12 +67,10 @@ int main(){
 
     boxEntity->physicalObject->acceleration.y = .1; // gravity
     
-    std::vector<Entity*> boxEntityGroup = { boxEntity };
-
-    universe->entityManager->registerEntityGroup("boxes", boxEntityGroup);
+    universe->entityManager->registerEntity(boxEntity);
 
 
-    DebugEntity* boxDE = new DebugEntity(boxEntityGroup[0]);
+    DebugEntity* boxDE = new DebugEntity(boxEntity);
     boxDE->customCollisionShapeBorderSettings["globalBounds"] = CollisionShapeBorderSettings{sf::Color::Green};
     universe->debugManager->registerDebugEntity(boxDE); // ? make it registerDebugEntityGroup for consistency
     //
@@ -100,12 +98,10 @@ int main(){
     playerEntity->animation = playerAnimation;
     
 
-    std::vector<Entity*> playerEntityGroup = { playerEntity };
-
-    universe->entityManager->registerEntityGroup("player", playerEntityGroup);
+    universe->entityManager->registerEntity(playerEntity);
 
 
-    DebugEntity* playerDE = new DebugEntity(playerEntityGroup[0]);
+    DebugEntity* playerDE = new DebugEntity(playerEntity);
     playerDE->customCollisionShapeBorderSettings["globalBounds"] = CollisionShapeBorderSettings{sf::Color::Red};
     // Extra debug function example
     // playerDE->addExtraDebugFunction([playerEntity](auto _){
@@ -119,16 +115,16 @@ int main(){
 
     // Collision groups
     // Player
-    std::vector<CollisionShape*> playerCollisionGroup =  {playerEntityGroup[0]->collisionShapes["globalBounds"]};
+    std::vector<CollisionShape*> playerCollisionGroup =  {playerEntity->collisionShapes["globalBounds"]};
     
     // Map
     std::vector<CollisionShape*> mapCollisionGroup;
-    for(Entity* mapTileEntity : mapTilesEntityGroup){
+    for(Entity* mapTileEntity : mapTileEntities){
         mapCollisionGroup.push_back(mapTileEntity->collisionShapes["globalBounds"]);
     }
 
     // Box
-    std::vector<CollisionShape*> boxCollisionGroup = {boxEntityGroup[0]->collisionShapes["globalBounds"]};
+    std::vector<CollisionShape*> boxCollisionGroup = {boxEntity->collisionShapes["globalBounds"]};
 
     // Map tiles + Box for player AABB
     std::vector<CollisionShape*> tilesAndBoxCollisionGroup = mapCollisionGroup;
@@ -165,12 +161,12 @@ int main(){
     universe->collisionManager->setPairCollisionResponse("playerAABB", "start_phase", [](std::vector<Collision> collisions){
         printf("start_phase\n");
     });
-    universe->collisionManager->setPairCollisionResponse("playerAABB", "continuous_phase", [mapTilesEntityGroup](std::vector<Collision> collisions){
+    universe->collisionManager->setPairCollisionResponse("playerAABB", "continuous_phase", [](std::vector<Collision> collisions){
         // printf("continuous_phase\n");
         resolveAABB(collisions);
         initiatorStandOnTopOfRecipient(collisions);
     });
-    universe->collisionManager->setPairCollisionResponse("playerAABB", "end_phase", [mapTilesEntityGroup](std::vector<Collision> collisions){
+    universe->collisionManager->setPairCollisionResponse("playerAABB", "end_phase", [](std::vector<Collision> collisions){
         printf("end_phase\n");
     });
 

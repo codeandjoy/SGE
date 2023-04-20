@@ -11,13 +11,14 @@ class EntityManager{
     public:
         EntityManager(PhysicsManager* physicsManager, CollisionManager* collisionManager, TextureManager* textureManager);
 
-        void registerEntityGroup(std::string name, std::vector<Entity*> entityGroup);
-        std::unordered_map<std::string, std::vector<Entity*>> getAllEntityGroups();
-        void destroyEntityGroup(std::string name);
-        void destroyEntity(std::string memberEntityGroup, Entity* entity);
+        void registerEntity(Entity* entity);
+        void registerEntities(std::vector<Entity*> entities);
+        void destroyEntity(Entity* entity);
+        // void destroyEntityGroup(std::string name);
+        std::vector<Entity*> getAllEntities();
 
     private:
-        std::unordered_map<std::string, std::vector<Entity*>> m_entityGroups;
+        std::vector<Entity*> m_entities;
 
         PhysicsManager* m_physicsManagerPtr;
         CollisionManager* m_collisionManagerPtr;
