@@ -35,17 +35,12 @@ std::unordered_map<std::string, std::vector<CollisionShape*>> CollisionManager::
 
 void CollisionManager::createCollisionPair(std::string name, std::string initiatorGroup, std::string recipientGroup){
     if(!m_collisionGroups.count(initiatorGroup) && !m_collisionGroups.count(recipientGroup)){
-        printf("Can not create %s - %s collision collisionPair.", initiatorGroup.c_str(), recipientGroup.c_str());
+        printf("Can not create %s - %s collision m_collisionPairs[pair].", initiatorGroup.c_str(), recipientGroup.c_str());
         exit(1);
     }
-    
-    CollisionPair collisionPair = CollisionPair{std::make_pair(initiatorGroup, recipientGroup)}; 
 
-    for(CollisionShape* initiator : m_collisionGroups[initiatorGroup]){
-        collisionPair.pastCollisions[initiator] = std::vector<Collision>();
-    }
-
-    m_collisionPairs[name] = collisionPair;
+    m_collisionPairs[name] = CollisionPair{std::make_pair(initiatorGroup, recipientGroup)};
+    m_collisionPairsOrder.push_back(name);
 }
 void CollisionManager::setPairCollisionDetectionAlgorithm(std::string collisionPairName, std::function<bool(CollisionShape *CS1, CollisionShape *CS2)> collisionDetectionAlgorithm){ m_collisionPairs[collisionPairName].checkCollision = collisionDetectionAlgorithm; }
 void CollisionManager::setPairCollisionResponse(std::string collisionPairName, std::string collisionPhase, std::function<void(std::vector<Collision>)> response){
@@ -68,11 +63,12 @@ void CollisionManager::updateCollisions(){
     std::vector<Collision> presentCollisions;
 
     // TODO check in order of insertion ?
-    for(auto& [_, collisionPair] : m_collisionPairs){
-        for(CollisionShape* initiator : m_collisionGroups[collisionPair.collisionGroups.first]){
+    for(std::string pair : m_collisionPairsOrder){
+
+        for(CollisionShape* initiator : m_collisionGroups[m_collisionPairs[pair].collisionGroups.first]){
             // Register all present collisions
-            for(CollisionShape* recipient : m_collisionGroups[collisionPair.collisionGroups.second]){
-                if(collisionPair.checkCollision(initiator, recipient)){
+            for(CollisionShape* recipient : m_collisionGroups[m_collisionPairs[pair].collisionGroups.second]){
+                if(m_collisionPairs[pair].checkCollision(initiator, recipient)){
                     CollisionSide initiatorImpactSide = determineInitiatorImpactSide(initiator, recipient);
 
                     presentCollisions.push_back(Collision{
@@ -86,7 +82,7 @@ void CollisionManager::updateCollisions(){
             //
 
 
-            std::vector<Collision> pastCollisions = collisionPair.pastCollisions[initiator];
+            std::vector<Collision> pastCollisions = m_collisionPairs[pair].pastCollisions[initiator];
 
 
             // Determine collision phase
@@ -117,21 +113,21 @@ void CollisionManager::updateCollisions(){
 
             // Run collision responses based on collision phase
             if(startPhaseCollisions.size())
-                if(collisionPair.startPhaseCollisionResponse)
-                    collisionPair.startPhaseCollisionResponse(startPhaseCollisions);
+                if(m_collisionPairs[pair].startPhaseCollisionResponse)
+                    m_collisionPairs[pair].startPhaseCollisionResponse(startPhaseCollisions);
 
             if(continuousPhaseCollisions.size())
-                if(collisionPair.continuousPhaseCollisionResponse)
-                    collisionPair.continuousPhaseCollisionResponse(continuousPhaseCollisions);
+                if(m_collisionPairs[pair].continuousPhaseCollisionResponse)
+                    m_collisionPairs[pair].continuousPhaseCollisionResponse(continuousPhaseCollisions);
             
             if(endPhaseCollisions.size())
-                if(collisionPair.endPhaseCollisionResponse)
-                    collisionPair.endPhaseCollisionResponse(endPhaseCollisions);
+                if(m_collisionPairs[pair].endPhaseCollisionResponse)
+                    m_collisionPairs[pair].endPhaseCollisionResponse(endPhaseCollisions);
             //
 
 
             // Reset
-            collisionPair.pastCollisions[initiator] = presentCollisions;
+            m_collisionPairs[pair].pastCollisions[initiator] = presentCollisions;
             presentCollisions.clear();
             //
         }

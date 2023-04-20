@@ -35,6 +35,7 @@ class CollisionManager{
         std::vector<CollisionShape*> m_allCollisionShapes;
         std::unordered_map<std::string, std::vector<CollisionShape*>> m_collisionGroups;
         std::unordered_map<std::string, CollisionPair> m_collisionPairs;
+        std::vector<std::string> m_collisionPairsOrder;
 };
 
 
