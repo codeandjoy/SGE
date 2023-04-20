@@ -359,8 +359,10 @@ class DebugManager{
 
 class Universe{
     public:
-        Universe(PhysicsManager* t_physicsManager, CollisionManager* t_collisionManager, TextureManager* t_textureManager, EntityManager* t_entityManager);
-        Universe(PhysicsManager* t_physicsManager, CollisionManager* t_collisionManager, TextureManager* t_textureManager, EntityManager* t_entityManager, DebugManager* t_debugManager);
+        Universe(bool DEBUG = false);
+
+        // Universe(PhysicsManager* t_physicsManager, CollisionManager* t_collisionManager, TextureManager* t_textureManager, EntityManager* t_entityManager);
+        // Universe(PhysicsManager* t_physicsManager, CollisionManager* t_collisionManager, TextureManager* t_textureManager, EntityManager* t_entityManager, DebugManager* t_debugManager);
 
         void setupWindow(sf::RenderWindow* window);
 
@@ -369,11 +371,11 @@ class Universe{
 
         void loop();
 
-        PhysicsManager* physicsManager;
-        CollisionManager* collisionManager;
-        TextureManager* textureManager;
-        EntityManager* entityManager;
-        DebugManager* debugManager;
+        PhysicsManager* physicsManager = nullptr;
+        CollisionManager* collisionManager = nullptr;
+        TextureManager* textureManager = nullptr;
+        EntityManager* entityManager = nullptr;
+        DebugManager* debugManager = nullptr;
 
     private:
         sf::RenderWindow* m_windowPtr;
@@ -675,6 +677,7 @@ void CollisionManager::setPairCollisionResponse(std::string collisionPairName, s
 void CollisionManager::updateCollisions(){
     std::vector<Collision> presentCollisions;
 
+    // TODO check in order of insertion ?
     for(auto& [_, collisionPair] : m_collisionPairs){
         for(CollisionShape* initiator : m_collisionGroups[collisionPair.collisionGroups.first]){
             // Register all present collisions
@@ -904,20 +907,36 @@ void DebugManager::showDebugInfo(sf::RenderWindow* windowPtr){
 }
 
 
-Universe::Universe(PhysicsManager* t_physicsManager, CollisionManager* t_collisionManager, TextureManager* t_textureManager, EntityManager* t_entityManager){
-    physicsManager = t_physicsManager;
-    collisionManager = t_collisionManager;
-    textureManager = t_textureManager;
-    entityManager = t_entityManager;
+Universe::Universe(bool DEBUG){
+    PhysicsManager* PM = new PhysicsManager();
+    CollisionManager* CM = new CollisionManager();
+    TextureManager* TM = new TextureManager();
+    EntityManager* EM = new EntityManager(PM, CM, TM);
+    
+    physicsManager = PM;
+    collisionManager = CM;
+    textureManager = TM;
+    entityManager = EM;
+
+    if(DEBUG){
+        debugManager = new DebugManager();
+    }
 }
 
-Universe::Universe(PhysicsManager* t_physicsManager, CollisionManager* t_collisionManager, TextureManager* t_textureManager, EntityManager* t_entityManager, DebugManager* t_debugManager){
-    physicsManager = t_physicsManager;
-    collisionManager = t_collisionManager;
-    textureManager = t_textureManager;
-    entityManager = t_entityManager;
-    debugManager = t_debugManager;
-}
+// Universe::Universe(PhysicsManager* t_physicsManager, CollisionManager* t_collisionManager, TextureManager* t_textureManager, EntityManager* t_entityManager){
+//     physicsManager = t_physicsManager;
+//     collisionManager = t_collisionManager;
+//     textureManager = t_textureManager;
+//     entityManager = t_entityManager;
+// }
+
+// Universe::Universe(PhysicsManager* t_physicsManager, CollisionManager* t_collisionManager, TextureManager* t_textureManager, EntityManager* t_entityManager, DebugManager* t_debugManager){
+//     physicsManager = t_physicsManager;
+//     collisionManager = t_collisionManager;
+//     textureManager = t_textureManager;
+//     entityManager = t_entityManager;
+//     debugManager = t_debugManager;
+// }
 
 void Universe::setupWindow(sf::RenderWindow *window){ m_windowPtr = window; }
 

@@ -1,23 +1,24 @@
 #include "Universe.h"
 
-Universe::Universe(PhysicsManager* t_physicsManager, CollisionManager* t_collisionManager, TextureManager* t_textureManager, EntityManager* t_entityManager){
-    physicsManager = t_physicsManager;
-    collisionManager = t_collisionManager;
-    textureManager = t_textureManager;
-    entityManager = t_entityManager;
+Universe::Universe(bool DEBUG){
+    PhysicsManager* PM = new PhysicsManager();
+    CollisionManager* CM = new CollisionManager();
+    TextureManager* TM = new TextureManager();
+    EntityManager* EM = new EntityManager(PM, CM, TM);
+    
+    physicsManager = PM;
+    collisionManager = CM;
+    textureManager = TM;
+    entityManager = EM;
+
+    if(DEBUG){
+        debugManager = new DebugManager();
+    }
 }
 
-Universe::Universe(PhysicsManager* t_physicsManager, CollisionManager* t_collisionManager, TextureManager* t_textureManager, EntityManager* t_entityManager, DebugManager* t_debugManager){
-    physicsManager = t_physicsManager;
-    collisionManager = t_collisionManager;
-    textureManager = t_textureManager;
-    entityManager = t_entityManager;
-    debugManager = t_debugManager;
-}
 
 
 void Universe::setupWindow(sf::RenderWindow *window){ m_windowPtr = window; }
-
 
 
 

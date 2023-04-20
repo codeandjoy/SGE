@@ -11,8 +11,7 @@
 
 class Universe{
     public:
-        Universe(PhysicsManager* t_physicsManager, CollisionManager* t_collisionManager, TextureManager* t_textureManager, EntityManager* t_entityManager);
-        Universe(PhysicsManager* t_physicsManager, CollisionManager* t_collisionManager, TextureManager* t_textureManager, EntityManager* t_entityManager, DebugManager* t_debugManager);
+        Universe(bool DEBUG = false);
 
 
         void setupWindow(sf::RenderWindow* window);
@@ -25,11 +24,11 @@ class Universe{
         void loop();
 
 
-        PhysicsManager* physicsManager;
-        CollisionManager* collisionManager;
-        TextureManager* textureManager;
-        EntityManager* entityManager;
-        DebugManager* debugManager;
+        PhysicsManager* physicsManager = nullptr;
+        CollisionManager* collisionManager = nullptr;
+        TextureManager* textureManager = nullptr;
+        EntityManager* entityManager = nullptr;
+        DebugManager* debugManager = nullptr;
 
     private:
         sf::RenderWindow* m_windowPtr;

@@ -11,15 +11,7 @@ int main(){
 
 
 
-    // Init
-    PhysicsManager* PM = new PhysicsManager();
-    CollisionManager* CM = new CollisionManager();
-    TextureManager* TM = new TextureManager();
-    EntityManager* EM = new EntityManager(PM, CM, TM);
-    DebugManager* DM = new DebugManager();
-
-    Universe *universe = new Universe(PM, CM, TM, EM, DM);
-    //
+    Universe* universe = new Universe(true);
 
 
 
