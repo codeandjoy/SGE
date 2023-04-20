@@ -1,4 +1,4 @@
-//namespace sge{
+namespace sge{
 
 #ifndef SGE_HPP
 #define SGE_HPP
@@ -15,16 +15,16 @@
 #include "./src/Physics/PhysicsManager.h"
 #include "./src/Physics/PhysicalObject.h"
 #include "./src/Physics/ContinuousComputation.h"
-#include "./src/Physics/computations.h"
+#include "./src/Physics/Computations.h"
 
 #include "./src/Collision/CollisionManager.h"
 #include "./src/Collision/CollisionPair.h"
-#include "./src/Collision/CollisionResponses.h"
-#include "./src/Collision/CollisionDetectionAlgorithms.h"
 #include "./src/Collision/CollisionSide.h"
 #include "./src/Collision/Collision.h"
 #include "./src/Collision/CollisionUtils.h"
 #include "./src/Collision/CollisionShape.h"
+#include "./src/Collision/CollisionResponses.h"
+#include "./src/Collision/CollisionDetectionAlgorithms.h"
 
 #include "./src/Entity/Entity.h"
 #include "./src/Entity/EntityManager.h"
@@ -35,7 +35,7 @@
 #include "./src/Debug/CollisionShapeBorder.h"
 #include "./src/Debug/CollisionShapeBorderSettings.h"
 
-#include "./src/utils/approach.h"
+#include "./src/utils/Approach.h"
 #include "./src/utils/Measurements.h"
 
 #endif
@@ -46,4 +46,4 @@
 
 #endif
 
-//}
+}

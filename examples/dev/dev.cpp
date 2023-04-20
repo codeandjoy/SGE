@@ -11,13 +11,13 @@ int main(){
 
 
 
-    Universe* universe = new Universe(true);
+    sge::Universe* universe = new sge::Universe(true);
 
 
 
     // Load all textures
-    universe->textureManager->loadTexture(std::filesystem::current_path().string() + "/examples/dev/assets/pico_8_knight_sprite.png", "knight", TextureSheetSizes{8, 8, 12, 12});
-    universe->textureManager->loadTexture(std::filesystem::current_path().string() + "/examples/dev/assets/pico_8_tiles.png", "picoTiles", TextureSheetSizes{8, 8, 12, 12});
+    universe->textureManager->loadTexture(std::filesystem::current_path().string() + "/examples/dev/assets/pico_8_knight_sprite.png", "knight", sge::TextureSheetSizes{8, 8, 12, 12});
+    universe->textureManager->loadTexture(std::filesystem::current_path().string() + "/examples/dev/assets/pico_8_tiles.png", "picoTiles", sge::TextureSheetSizes{8, 8, 12, 12});
     //
 
 
@@ -37,12 +37,12 @@ int main(){
 
 
     // Tile layer
-    std::vector<Entity*> mapTileEntities;
+    std::vector<sge::Entity*> mapTileEntities;
 
     for(int i = 0; i < map.getTileCount().y; i++){
         for(int j = 0; j < map.getTileCount().x; j++){
             if(tiles[map.getTileCount().x*i+j].ID != 0){
-                mapTileEntities.push_back(buildStaticEntity(
+                mapTileEntities.push_back(sge::buildStaticEntity(
                     universe->textureManager->getTexture("picoTiles")->getTextureSheet(),
                     universe->textureManager->getTexture("picoTiles")->getTextureRect(tiles[map.getTileCount().x*i+j].ID-1),
                     sf::Vector2f(j*map.getTileSize().x, i*map.getTileSize().y)
@@ -59,7 +59,7 @@ int main(){
     // Object layer
     auto& box = boxes[0];
 
-    Entity* boxEntity = buildMobileEntity(
+    sge::Entity* boxEntity = sge::buildMobileEntity(
         universe->textureManager->getTexture("picoTiles")->getTextureSheet(),
         universe->textureManager->getTexture("picoTiles")->getTextureRect(box.getTileID()-1),
         sf::Vector2f(box.getPosition().x, box.getPosition().y)
@@ -70,15 +70,15 @@ int main(){
     universe->entityManager->registerEntity(boxEntity);
 
 
-    DebugEntity* boxDE = new DebugEntity(boxEntity);
-    boxDE->customCollisionShapeBorderSettings["globalBounds"] = CollisionShapeBorderSettings{sf::Color::Green};
+    sge::DebugEntity* boxDE = new sge::DebugEntity(boxEntity);
+    boxDE->customCollisionShapeBorderSettings["globalBounds"] = sge::CollisionShapeBorderSettings{sf::Color::Green};
     universe->debugManager->registerDebugEntity(boxDE); // ? make it registerDebugEntityGroup for consistency
     //
 
 
 
     // Player
-    Entity* playerEntity = buildMobileEntity(
+    sge::Entity* playerEntity = sge::buildMobileEntity(
         universe->textureManager->getTexture("knight")->getTextureSheet(),
         universe->textureManager->getTexture("knight")->getTextureRect(9),
         sf::Vector2f(100, 50)
@@ -89,7 +89,7 @@ int main(){
 
     playerEntity->physicalObject->acceleration.y = .1; // gravity
 
-    Animation* playerAnimation = new Animation(universe->textureManager->getTexture("knight"), playerEntity->physicalObject, 9);
+    sge::Animation* playerAnimation = new sge::Animation(universe->textureManager->getTexture("knight"), playerEntity->physicalObject, 9);
     playerAnimation->addTextureSequence("idle", std::vector<int>{9});
     playerAnimation->addTextureSequence("runRight", std::vector<int>{33, 34, 35});
     playerAnimation->addTextureSequence("runLeft", std::vector<int>{45, 46, 47});
@@ -101,8 +101,8 @@ int main(){
     universe->entityManager->registerEntity(playerEntity);
 
 
-    DebugEntity* playerDE = new DebugEntity(playerEntity);
-    playerDE->customCollisionShapeBorderSettings["globalBounds"] = CollisionShapeBorderSettings{sf::Color::Red};
+    sge::DebugEntity* playerDE = new sge::DebugEntity(playerEntity);
+    playerDE->customCollisionShapeBorderSettings["globalBounds"] = sge::CollisionShapeBorderSettings{sf::Color::Red};
     // Extra debug function example
     // playerDE->addExtraDebugFunction([playerEntity](auto _){
     //     printf("%f, %f\n", playerEntity->getPosition().x, playerEntity->getPosition().y);
@@ -115,23 +115,23 @@ int main(){
 
     // Collision groups
     // Player
-    std::vector<CollisionShape*> playerCollisionGroup =  {playerEntity->collisionShapes["globalBounds"]};
+    std::vector<sge::CollisionShape*> playerCollisionGroup =  {playerEntity->collisionShapes["globalBounds"]};
     
     // Map
-    std::vector<CollisionShape*> mapCollisionGroup;
-    for(Entity* mapTileEntity : mapTileEntities){
+    std::vector<sge::CollisionShape*> mapCollisionGroup;
+    for(sge::Entity* mapTileEntity : mapTileEntities){
         mapCollisionGroup.push_back(mapTileEntity->collisionShapes["globalBounds"]);
     }
 
     // Box
-    std::vector<CollisionShape*> boxCollisionGroup = {boxEntity->collisionShapes["globalBounds"]};
+    std::vector<sge::CollisionShape*> boxCollisionGroup = {boxEntity->collisionShapes["globalBounds"]};
 
     // Map tiles + Box for player AABB
-    std::vector<CollisionShape*> tilesAndBoxCollisionGroup = mapCollisionGroup;
+    std::vector<sge::CollisionShape*> tilesAndBoxCollisionGroup = mapCollisionGroup;
     tilesAndBoxCollisionGroup.insert(tilesAndBoxCollisionGroup.end(), boxCollisionGroup.begin(), boxCollisionGroup.end());
 
     // Map tiles + Player for box AABB
-    std::vector<CollisionShape*> tilesAndPlayerCollisionGroup = mapCollisionGroup;
+    std::vector<sge::CollisionShape*> tilesAndPlayerCollisionGroup = mapCollisionGroup;
     tilesAndPlayerCollisionGroup.insert(tilesAndPlayerCollisionGroup.end(), playerCollisionGroup.begin(), playerCollisionGroup.end());
 
     universe->collisionManager->registerCollisionGroup("player", playerCollisionGroup);
@@ -157,46 +157,46 @@ int main(){
 
     // To work properly, all AABB shapes should be checked together
     universe->collisionManager->createCollisionPair("playerAABB", "player", "tiles+box");
-    universe->collisionManager->setPairCollisionDetectionAlgorithm("playerAABB", boundingBox);
-    universe->collisionManager->setPairCollisionResponse("playerAABB", "start_phase", [](std::vector<Collision> collisions){
+    universe->collisionManager->setPairCollisionDetectionAlgorithm("playerAABB", sge::boundingBox);
+    universe->collisionManager->setPairCollisionResponse("playerAABB", "start_phase", [](std::vector<sge::Collision> collisions){
         printf("start_phase\n");
     });
-    universe->collisionManager->setPairCollisionResponse("playerAABB", "continuous_phase", [](std::vector<Collision> collisions){
+    universe->collisionManager->setPairCollisionResponse("playerAABB", "continuous_phase", [](std::vector<sge::Collision> collisions){
         // printf("continuous_phase\n");
-        resolveAABB(collisions);
-        initiatorStandOnTopOfRecipient(collisions);
+        sge::resolveAABB(collisions);
+        sge::initiatorStandOnTopOfRecipient(collisions);
     });
-    universe->collisionManager->setPairCollisionResponse("playerAABB", "end_phase", [](std::vector<Collision> collisions){
+    universe->collisionManager->setPairCollisionResponse("playerAABB", "end_phase", [](std::vector<sge::Collision> collisions){
         printf("end_phase\n");
     });
 
     // To work properly, all AABB shapes should be checked together
     universe->collisionManager->createCollisionPair("boxAABB", "box", "tiles");
-    universe->collisionManager->setPairCollisionDetectionAlgorithm("boxAABB", boundingBox);
-    universe->collisionManager->setPairCollisionResponse("boxAABB", "continuous_phase", [](std::vector<Collision> collisions){
-        resolveAABB(collisions);
-        initiatorStandOnTopOfRecipient(collisions);
+    universe->collisionManager->setPairCollisionDetectionAlgorithm("boxAABB", sge::boundingBox);
+    universe->collisionManager->setPairCollisionResponse("boxAABB", "continuous_phase", [](std::vector<sge::Collision> collisions){
+        sge::resolveAABB(collisions);
+        sge::initiatorStandOnTopOfRecipient(collisions);
     });
 
     universe->collisionManager->createCollisionPair("PB", "player", "box");
-    universe->collisionManager->setPairCollisionDetectionAlgorithm("PB", boundingBox);
-    universe->collisionManager->setPairCollisionResponse("PB", "start_phase", [boxDE](std::vector<Collision> collisions){
-        boxDE->customCollisionShapeBorderSettings["globalBounds"] = CollisionShapeBorderSettings{sf::Color::Red};
+    universe->collisionManager->setPairCollisionDetectionAlgorithm("PB", sge::boundingBox);
+    universe->collisionManager->setPairCollisionResponse("PB", "start_phase", [boxDE](std::vector<sge::Collision> collisions){
+        boxDE->customCollisionShapeBorderSettings["globalBounds"] = sge::CollisionShapeBorderSettings{sf::Color::Red};
 
         // Refactor as pushRecipient(float velocity);
-        for(Collision collision : collisions){
-            if(collision.recipientImpactSide == CollisionSide::right){
+        for(sge::Collision collision : collisions){
+            if(collision.recipientImpactSide == sge::CollisionSide::right){
                 collision.recipient->getOwner()->velocity.x = -10;
             }
-            else if(collision.recipientImpactSide == CollisionSide::left){
+            else if(collision.recipientImpactSide == sge::CollisionSide::left){
                 collision.recipient->getOwner()->velocity.x = 10;
             }
         }
     });
-    universe->collisionManager->setPairCollisionResponse("PB", "end_phase", [boxDE](std::vector<Collision> collisions){
-        boxDE->customCollisionShapeBorderSettings["globalBounds"] = CollisionShapeBorderSettings{sf::Color::Green};
+    universe->collisionManager->setPairCollisionResponse("PB", "end_phase", [boxDE](std::vector<sge::Collision> collisions){
+        boxDE->customCollisionShapeBorderSettings["globalBounds"] = sge::CollisionShapeBorderSettings{sf::Color::Green};
         
-        for(Collision collision : collisions){
+        for(sge::Collision collision : collisions){
             // TODO remove (minus) push force in the future
             collision.recipient->getOwner()->velocity.x = 0;
         }

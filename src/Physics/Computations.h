@@ -1,4 +1,8 @@
+#ifndef COMPUTATIONS_H
+#define COMPUTATIONS_H
+
 #include "PhysicalObject.h"
+
 
 std::function<void(float)> updatePositionBasedOnVelocity(PhysicalObject* physicalObject){
     return [physicalObject](float dt){
@@ -23,3 +27,6 @@ std::function<void(float)> updateVelocityBasedOnAcceleration(PhysicalObject* phy
         }
     };
 }
+
+
+#endif

@@ -2,7 +2,7 @@
 #define ENTITY_BUILDERS_H
 
 #include "./Entity.h"
-#include "../Physics/computations.h"
+#include "../Physics/Computations.h"
 #include "../Physics/PhysicalObject.h"
 #include "../Collision/CollisionShape.h"
 
