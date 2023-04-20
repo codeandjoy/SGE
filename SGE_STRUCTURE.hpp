@@ -28,6 +28,7 @@
 
 #include "./src/Entity/Entity.h"
 #include "./src/Entity/EntityManager.h"
+#include "./src/Entity/EntityBuilders.h"
 
 #include "./src/Debug/DebugEntity.h"
 #include "./src/Debug/DebugManager.h"

@@ -21,6 +21,8 @@ int main(){
     Universe *universe = new Universe(PM, CM, TM, EM, DM);
     //
 
+
+
     // Load all textures
     universe->textureManager->loadTexture(std::filesystem::current_path().string() + "/examples/dev/assets/pico_8_knight_sprite.png", "knight", TextureSheetSizes{8, 8, 12, 12});
     universe->textureManager->loadTexture(std::filesystem::current_path().string() + "/examples/dev/assets/pico_8_tiles.png", "picoTiles", TextureSheetSizes{8, 8, 12, 12});
@@ -28,11 +30,7 @@ int main(){
 
 
 
-    //
-    // Map
-    //
-
-    // Read
+    // Read map
     tmx::Map map;
     if(!map.load(std::filesystem::current_path().string() + "/examples/dev/assets/map.tmx")){
         printf("Can't load map");
@@ -44,51 +42,40 @@ int main(){
     const auto& boxes = layers[1]->getLayerAs<tmx::ObjectGroup>().getObjects();
     //
 
-    //
-    // Tile layer
-    //
 
+
+    // Tile layer
     std::vector<Entity*> mapTilesEntityGroup;
 
     for(int i = 0; i < map.getTileCount().y; i++){
         for(int j = 0; j < map.getTileCount().x; j++){
             if(tiles[map.getTileCount().x*i+j].ID != 0){
-                PhysicalObject* tilePO = new PhysicalObject();
-                tilePO->setTexture(*universe->textureManager->getTexture("picoTiles")->getTextureSheet());
-                tilePO->setTextureRect(universe->textureManager->getTexture("picoTiles")->getTextureRect(tiles[map.getTileCount().x*i+j].ID-1));
-                tilePO->setPosition(sf::Vector2f(j*map.getTileSize().x, i*map.getTileSize().y));
-
-                CollisionShape* tileCS = new CollisionShape(tilePO);
-
-                mapTilesEntityGroup.push_back(new Entity{tilePO, std::unordered_map<std::string, CollisionShape*>{{ "globalBounds", tileCS }}});
+                mapTilesEntityGroup.push_back(buildStaticEntity(
+                    universe->textureManager->getTexture("picoTiles")->getTextureSheet(),
+                    universe->textureManager->getTexture("picoTiles")->getTextureRect(tiles[map.getTileCount().x*i+j].ID-1),
+                    sf::Vector2f(j*map.getTileSize().x, i*map.getTileSize().y)
+                ));
             }
         }
     }
 
     universe->entityManager->registerEntityGroup("mapTiles", mapTilesEntityGroup);
-
-    //
-    //
     //
 
-    //
+
+
     // Object layer
-    //
-
     auto& box = boxes[0];
 
-    PhysicalObject* boxPO = new PhysicalObject();
-    boxPO->setTexture(*universe->textureManager->getTexture("picoTiles")->getTextureSheet());
-    boxPO->setTextureRect(universe->textureManager->getTexture("picoTiles")->getTextureRect(box.getTileID()-1));
-    boxPO->setPosition(sf::Vector2f(box.getPosition().x, box.getPosition().y));
+    Entity* boxEntity = buildMobileEntity(
+        universe->textureManager->getTexture("picoTiles")->getTextureSheet(),
+        universe->textureManager->getTexture("picoTiles")->getTextureRect(box.getTileID()-1),
+        sf::Vector2f(box.getPosition().x, box.getPosition().y)
+    );
 
-    boxPO->acceleration = sf::Vector2f(0, .1);
-
-    boxPO->createContinuousComputation("updateVelocity", updateVelocityBasedOnAcceleration(boxPO));
-    boxPO->createContinuousComputation("updatePosition", updatePositionBasedOnVelocity(boxPO));
-
-
-    std::vector<Entity*> boxEntityGroup = {new Entity{boxPO, std::unordered_map<std::string, CollisionShape*>{{"globalBounds", new CollisionShape(boxPO)}}}};
+    boxEntity->physicalObject->acceleration.y = .1; // gravity
+    
+    std::vector<Entity*> boxEntityGroup = { boxEntity };
 
     universe->entityManager->registerEntityGroup("boxes", boxEntityGroup);
 
@@ -97,48 +84,31 @@ int main(){
     boxDE->customCollisionShapeBorderSettings["globalBounds"] = CollisionShapeBorderSettings{sf::Color::Green};
     universe->debugManager->registerDebugEntity(boxDE); // ? make it registerDebugEntityGroup for consistency
     //
-    //
-    //
-
-    //
-    //
-    //
 
 
 
-    //
     // Player
-    //
-    
-    PhysicalObject *playerPO = new PhysicalObject();
-    playerPO->setPosition(sf::Vector2f(100, 50));
-    playerPO->setTexture(*universe->textureManager->getTexture("knight")->getTextureSheet());
-    playerPO->setTextureRect(universe->textureManager->getTexture("knight")->getTextureRect(9));
-    
-    playerPO->acceleration.y = .2; // gravity
+    Entity* playerEntity = buildMobileEntity(
+        universe->textureManager->getTexture("knight")->getTextureSheet(),
+        universe->textureManager->getTexture("knight")->getTextureRect(9),
+        sf::Vector2f(100, 50)
+    );
 
-    playerPO->createContinuousComputation("updateVelocity", updateVelocityBasedOnAcceleration(playerPO));
-    playerPO->createContinuousComputation("updatePosition", updatePositionBasedOnVelocity(playerPO));
+    playerEntity->collisionShapes["globalBounds"]->setSize(sf::Vector2f(8, 4));
+    playerEntity->collisionShapes["globalBounds"]->offset = sf::Vector2f(0, 4);
 
+    playerEntity->physicalObject->acceleration.y = .1; // gravity
 
-    std::unordered_map<std::string, CollisionShape*> playerCSs;
-    CollisionShape* playerCS = new CollisionShape(playerPO);
-    playerCS->setSize(sf::Vector2f(playerPO->getGlobalBounds().width, 4));
-    playerCS->offset = sf::Vector2f(0, 4);
-
-    playerCSs["globalBounds"] = playerCS;
-
-
-    Animation* playerAnimation = new Animation(universe->textureManager->getTexture("knight"), playerPO, 9);
+    Animation* playerAnimation = new Animation(universe->textureManager->getTexture("knight"), playerEntity->physicalObject, 9);
     playerAnimation->addTextureSequence("idle", std::vector<int>{9});
     playerAnimation->addTextureSequence("runRight", std::vector<int>{33, 34, 35});
     playerAnimation->addTextureSequence("runLeft", std::vector<int>{45, 46, 47});
     playerAnimation->setCurrentTextureSequence("idle");
 
+    playerEntity->animation = playerAnimation;
     
-    std::vector<Entity*> playerEntityGroup;
-    playerEntityGroup.push_back(new Entity{playerPO, playerCSs, playerAnimation});
 
+    std::vector<Entity*> playerEntityGroup = { playerEntity };
 
     universe->entityManager->registerEntityGroup("player", playerEntityGroup);
 
@@ -146,22 +116,16 @@ int main(){
     DebugEntity* playerDE = new DebugEntity(playerEntityGroup[0]);
     playerDE->customCollisionShapeBorderSettings["globalBounds"] = CollisionShapeBorderSettings{sf::Color::Red};
     // Extra debug function example
-    // playerDE->addExtraDebugFunction([playerPO](auto _){
-    //     printf("%f, %f\n", playerPO->getPosition().x, playerPO->getPosition().y);
+    // playerDE->addExtraDebugFunction([playerEntity](auto _){
+    //     printf("%f, %f\n", playerEntity->getPosition().x, playerEntity->getPosition().y);
     // });
 
     universe->debugManager->registerDebugEntity(playerDE);
-
-    //
-    //
     //
 
 
 
-    //
     // Collision groups
-    //
-
     // Player
     std::vector<CollisionShape*> playerCollisionGroup =  {playerEntityGroup[0]->collisionShapes["globalBounds"]};
     
@@ -182,34 +146,26 @@ int main(){
     std::vector<CollisionShape*> tilesAndPlayerCollisionGroup = mapCollisionGroup;
     tilesAndPlayerCollisionGroup.insert(tilesAndPlayerCollisionGroup.end(), playerCollisionGroup.begin(), playerCollisionGroup.end());
 
-    //
-    //
-    //
-
-
-
-    //
-    // Collision management
-    //
-
-    // * Notes:
-    // ! The collision shape CAN NOT be the initiator AND the recepient of the AABB response
-    // ! To work properly, all AABB recipients with common initiator should be located in the SAME collision group
-
-    
     universe->collisionManager->registerCollisionGroup("player", playerCollisionGroup);
     universe->collisionManager->registerCollisionGroup("tiles", mapCollisionGroup);
     universe->collisionManager->registerCollisionGroup("box", boxCollisionGroup);
     universe->collisionManager->registerCollisionGroup("tiles+box", tilesAndBoxCollisionGroup);
     universe->collisionManager->registerCollisionGroup("tiles+player", tilesAndPlayerCollisionGroup);
+    //
+
+
+
+    // Collision management
+    // * Notes:
+    // ! The collision shape CAN NOT be the initiator AND the recepient of the AABB response
+    // ! To work properly, all AABB recipients with common initiator should be located in the SAME collision group
+
     // ? change collision pair to accept multiple groups, for convenience:
     // ? e.g.
     // ? createCollisionPair("name", vecInitiatorGroups{"g1name"}, vecRecipientGroups{"g2name", "g3name", "g4name"});
     // ? then loop through all initiator and recipient groups respectively when checking collisions
     // ?
     // ? to remove the need of creating extra collision groups like "tiles+box"
-
-
 
     // To work properly, all AABB shapes should be checked together
     universe->collisionManager->createCollisionPair("playerAABB", "player", "tiles+box");
@@ -226,7 +182,6 @@ int main(){
         printf("end_phase\n");
     });
 
-
     // To work properly, all AABB shapes should be checked together
     universe->collisionManager->createCollisionPair("boxAABB", "box", "tiles");
     universe->collisionManager->setPairCollisionDetectionAlgorithm("boxAABB", boundingBox);
@@ -234,8 +189,6 @@ int main(){
         resolveAABB(collisions);
         initiatorStandOnTopOfRecipient(collisions);
     });
-
-
 
     universe->collisionManager->createCollisionPair("PB", "player", "box");
     universe->collisionManager->setPairCollisionDetectionAlgorithm("PB", boundingBox);
@@ -260,41 +213,33 @@ int main(){
             collision.recipient->getOwner()->velocity.x = 0;
         }
     });
-
-    //
-    //
     //
 
 
 
-    //
     // Controllers and events
-    //
-
-    universe->addController([playerPO, playerAnimation](){
+    universe->addController([playerEntity, playerAnimation](){
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::A)){
-            playerPO->velocity.x = -100;
+            playerEntity->physicalObject->velocity.x = -100;
             playerAnimation->setCurrentTextureSequence("runLeft");
         }
         else if(sf::Keyboard::isKeyPressed(sf::Keyboard::D)){
-            playerPO->velocity.x = 100;
+            playerEntity->physicalObject->velocity.x = 100;
             playerAnimation->setCurrentTextureSequence("runRight");
         }
         else{
-            playerPO->velocity.x = 0;
+            playerEntity->physicalObject->velocity.x = 0;
             playerAnimation->setCurrentTextureSequence("idle");
         }
     });
 
-    universe->addEventHandler([playerPO](sf::Event event){
+    universe->addEventHandler([playerEntity](sf::Event event){
         if(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space){
-            playerPO->velocity.y = -100;
+            playerEntity->physicalObject->velocity.y = -100;
         }
     }); 
+    //
 
-    //
-    //
-    //
 
 
     sf::RenderWindow *window = new sf::RenderWindow(sf::VideoMode(1000, 600), "Test");

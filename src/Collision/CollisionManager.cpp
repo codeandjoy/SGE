@@ -67,6 +67,7 @@ void CollisionManager::setPairCollisionResponse(std::string collisionPairName, s
 void CollisionManager::updateCollisions(){
     std::vector<Collision> presentCollisions;
 
+    // TODO check in order of insertion ?
     for(auto& [_, collisionPair] : m_collisionPairs){
         for(CollisionShape* initiator : m_collisionGroups[collisionPair.collisionGroups.first]){
             // Register all present collisions
