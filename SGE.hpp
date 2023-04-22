@@ -12,6 +12,22 @@ namespace sge{
 #ifndef PHYSICS_MANAGER_H
 #define PHYSICS_MANAGER_H
 
+#include <vector>
+class PhysicalObject;
+
+class PhysicsManager{
+    public:
+        void registerPhysicalObject(PhysicalObject* physicalObject);
+        void deregisterPhysicalObject(PhysicalObject* physicalObject);
+        std::vector<PhysicalObject*> getAllPhysicalObjects();
+
+        void updatePhysics(float dt);
+
+    private:
+        std::vector<PhysicalObject*> m_physicalObjects;
+};
+
+#endif
 #ifndef PHYSICAL_OBJECT_H
 #define PHYSICAL_OBJECT_H
 
@@ -56,21 +72,6 @@ class PhysicalObject : public sf::Sprite{
 };
 
 #endif
-
-class PhysicsManager{
-    public:
-        void registerPhysicalObject(PhysicalObject* physicalObject);
-        void deregisterPhysicalObject(PhysicalObject* physicalObject);
-        std::vector<PhysicalObject*> getAllPhysicalObjects();
-
-        void updatePhysics(float dt);
-
-    private:
-        std::vector<PhysicalObject*> m_physicalObjects;
-};
-
-#endif
-
 #ifndef COLLISION_MANAGER_H
 #define COLLISION_MANAGER_H
 
@@ -274,29 +275,11 @@ class Universe{
 #ifndef COMPUTATIONS_H
 #define COMPUTATIONS_H
 
-std::function<void(float)> updatePositionBasedOnVelocity(PhysicalObject* physicalObject){
-    return [physicalObject](float dt){
-        physicalObject->setPosition(physicalObject->getPosition() + physicalObject->velocity * dt);
-    };
-}
+class PhysicalObject;
 
-std::function<void(float)> updateVelocityBasedOnAcceleration(PhysicalObject* physicalObject){
-    return [physicalObject](float dt){
-        if(abs(physicalObject->velocity.x) >= physicalObject->speedLimit.x){
-            physicalObject->velocity.x = physicalObject->speedLimit.x;
-        }
-        else{
-            physicalObject->velocity.x += physicalObject->acceleration.x;
-        }
+std::function<void(float)> updatePositionBasedOnVelocity(PhysicalObject* physicalObject);
 
-        if(abs(physicalObject->velocity.y) >= physicalObject->speedLimit.y){
-            physicalObject->velocity.y = physicalObject->speedLimit.y;
-        }
-        else{
-            physicalObject->velocity.y += physicalObject->acceleration.y;
-        }
-    };
-}
+std::function<void(float)> updateVelocityBasedOnAcceleration(PhysicalObject* physicalObject);
 
 #endif
 
@@ -518,6 +501,17 @@ struct Measurements{
 
 #ifndef SGE_MAIN
 
+void PhysicsManager::registerPhysicalObject(PhysicalObject* physicalObject){ m_physicalObjects.push_back(physicalObject); }
+void PhysicsManager::deregisterPhysicalObject(PhysicalObject* physicalObject){ m_physicalObjects.erase(std::remove(m_physicalObjects.begin(), m_physicalObjects.end(), physicalObject), m_physicalObjects.end()); }
+std::vector<PhysicalObject*> PhysicsManager::getAllPhysicalObjects(){ return m_physicalObjects; }
+
+void PhysicsManager::updatePhysics(float dt){
+    for(PhysicalObject* physicalObject : m_physicalObjects){
+        physicalObject->update(dt);
+    }
+}
+
+
 void PhysicalObject::createAction(std::string name, std::function<void()> action){ m_actions[name] = action; }
 void PhysicalObject::doAction(std::string name){ m_actions[name](); }
 
@@ -540,17 +534,6 @@ void PhysicalObject::update(float dt){
         }
     }
 };
-
-
-void PhysicsManager::registerPhysicalObject(PhysicalObject* physicalObject){ m_physicalObjects.push_back(physicalObject); }
-void PhysicsManager::deregisterPhysicalObject(PhysicalObject* physicalObject){ m_physicalObjects.erase(std::remove(m_physicalObjects.begin(), m_physicalObjects.end(), physicalObject), m_physicalObjects.end()); }
-std::vector<PhysicalObject*> PhysicsManager::getAllPhysicalObjects(){ return m_physicalObjects; }
-
-void PhysicsManager::updatePhysics(float dt){
-    for(PhysicalObject* physicalObject : m_physicalObjects){
-        physicalObject->update(dt);
-    }
-}
 
 
 void CollisionManager::registerCollisionShape(CollisionShape* collisionShape){ m_allCollisionShapes.push_back(collisionShape); }
@@ -895,6 +878,31 @@ void Universe::loop(){
 
         m_windowPtr->display();
     }
+}
+
+
+std::function<void(float)> updatePositionBasedOnVelocity(PhysicalObject* physicalObject){
+    return [physicalObject](float dt){
+        physicalObject->setPosition(physicalObject->getPosition() + physicalObject->velocity * dt);
+    };
+}
+
+std::function<void(float)> updateVelocityBasedOnAcceleration(PhysicalObject* physicalObject){
+    return [physicalObject](float dt){
+        if(abs(physicalObject->velocity.x) >= physicalObject->speedLimit.x){
+            physicalObject->velocity.x = physicalObject->speedLimit.x;
+        }
+        else{
+            physicalObject->velocity.x += physicalObject->acceleration.x;
+        }
+
+        if(abs(physicalObject->velocity.y) >= physicalObject->speedLimit.y){
+            physicalObject->velocity.y = physicalObject->speedLimit.y;
+        }
+        else{
+            physicalObject->velocity.y += physicalObject->acceleration.y;
+        }
+    };
 }
 
 

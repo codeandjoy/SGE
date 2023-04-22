@@ -1,7 +1,8 @@
 #ifndef PHYSICS_MANAGER_H
 #define PHYSICS_MANAGER_H
 
-#include "PhysicalObject.h"
+#include <vector>
+class PhysicalObject;
 
 
 class PhysicsManager{
