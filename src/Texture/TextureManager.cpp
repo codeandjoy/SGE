@@ -1,4 +1,6 @@
 #include "TextureManager.h"
+#include "TextureSheet.h"
+#include "Animation.h"
 
 
 void TextureManager::loadTexture(std::string location, std::string name, TextureSheetSizes textureSheetSizes){ m_loadedTextures[name] = new TextureSheet(textureSheetSizes, location); }

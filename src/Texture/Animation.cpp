@@ -1,4 +1,6 @@
 #include "Animation.h"
+#include "TextureSheet.h"
+
 
 Animation::Animation(TextureSheet* textureSheet, sf::Sprite* owner, int initialTextureN){
     m_textureSheet = textureSheet;

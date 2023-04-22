@@ -2,11 +2,12 @@
 #define TEXTURESHEET_H
 
 #include <SFML/Graphics.hpp>
+#include <string>
+#include <vector>
 #include "TextureSheetSizes.h"
 
 
 // TODO texturesheet with gaps between textures
-// ? parse from .tsx ?
 class TextureSheet{
     public:
         TextureSheet(TextureSheetSizes textureSheetSizes, std::string location);

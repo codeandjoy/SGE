@@ -1,9 +1,13 @@
 #ifndef TEXTURE_MANAGER_H
 #define TEXTURE_MANAGER_H
 
+#include <string>
+#include <unordered_map>
+#include <vector>
 #include "TextureSheetSizes.h"
-#include "TextureSheet.h"
-#include "Animation.h"
+
+class TextureSheet;
+class Animation;
 
 
 class TextureManager{

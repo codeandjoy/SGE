@@ -1,5 +1,6 @@
 #include "TextureSheet.h"
 
+
 TextureSheet::TextureSheet(TextureSheetSizes textureSheetSizes, std::string location){
     m_location = location;
     m_textureSheet.loadFromFile(location);

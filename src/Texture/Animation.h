@@ -2,7 +2,7 @@
 #define ANIMATION_H
 
 #include <SFML/Graphics.hpp>
-#include "../Texture/TextureSheet.h"
+class TextureSheet;
 
 
 // TODO Animations should switch immediately
