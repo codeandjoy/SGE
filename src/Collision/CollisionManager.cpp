@@ -1,6 +1,8 @@
 #include "CollisionManager.h"
 #include "Collision.h"
 #include "CollisionUtils.h"
+#include "CollisionPair.h"
+#include "CollisionShape.h"
 
 
 
@@ -39,19 +41,19 @@ void CollisionManager::createCollisionPair(std::string name, std::string initiat
         exit(1);
     }
 
-    m_collisionPairs[name] = CollisionPair{std::make_pair(initiatorGroup, recipientGroup)};
+    m_collisionPairs[name] = new CollisionPair{std::make_pair(initiatorGroup, recipientGroup)};
     m_collisionPairsOrder.push_back(name);
 }
-void CollisionManager::setPairCollisionDetectionAlgorithm(std::string collisionPairName, std::function<bool(CollisionShape *CS1, CollisionShape *CS2)> collisionDetectionAlgorithm){ m_collisionPairs[collisionPairName].checkCollision = collisionDetectionAlgorithm; }
+void CollisionManager::setPairCollisionDetectionAlgorithm(std::string collisionPairName, std::function<bool(CollisionShape *CS1, CollisionShape *CS2)> collisionDetectionAlgorithm){ m_collisionPairs[collisionPairName]->checkCollision = collisionDetectionAlgorithm; }
 void CollisionManager::setPairCollisionResponse(std::string collisionPairName, std::string collisionPhase, std::function<void(std::vector<Collision>)> response){
     if(collisionPhase == "start_phase"){
-        m_collisionPairs[collisionPairName].startPhaseCollisionResponse = response;
+        m_collisionPairs[collisionPairName]->startPhaseCollisionResponse = response;
     }
     else if(collisionPhase == "continuous_phase"){
-        m_collisionPairs[collisionPairName].continuousPhaseCollisionResponse = response;
+        m_collisionPairs[collisionPairName]->continuousPhaseCollisionResponse = response;
     }
     else if(collisionPhase == "end_phase"){
-        m_collisionPairs[collisionPairName].endPhaseCollisionResponse = response;
+        m_collisionPairs[collisionPairName]->endPhaseCollisionResponse = response;
     }
 }
 
@@ -65,10 +67,10 @@ void CollisionManager::updateCollisions(){
     // TODO check in order of insertion ?
     for(std::string pair : m_collisionPairsOrder){
 
-        for(CollisionShape* initiator : m_collisionGroups[m_collisionPairs[pair].collisionGroups.first]){
+        for(CollisionShape* initiator : m_collisionGroups[m_collisionPairs[pair]->collisionGroups.first]){
             // Register all present collisions
-            for(CollisionShape* recipient : m_collisionGroups[m_collisionPairs[pair].collisionGroups.second]){
-                if(m_collisionPairs[pair].checkCollision(initiator, recipient)){
+            for(CollisionShape* recipient : m_collisionGroups[m_collisionPairs[pair]->collisionGroups.second]){
+                if(m_collisionPairs[pair]->checkCollision(initiator, recipient)){
                     CollisionSide initiatorImpactSide = determineInitiatorImpactSide(initiator, recipient);
 
                     presentCollisions.push_back(Collision{
@@ -82,7 +84,7 @@ void CollisionManager::updateCollisions(){
             //
 
 
-            std::vector<Collision> pastCollisions = m_collisionPairs[pair].pastCollisions[initiator];
+            std::vector<Collision> pastCollisions = m_collisionPairs[pair]->pastCollisions[initiator];
 
 
             // Determine collision phase
@@ -113,21 +115,21 @@ void CollisionManager::updateCollisions(){
 
             // Run collision responses based on collision phase
             if(startPhaseCollisions.size())
-                if(m_collisionPairs[pair].startPhaseCollisionResponse)
-                    m_collisionPairs[pair].startPhaseCollisionResponse(startPhaseCollisions);
+                if(m_collisionPairs[pair]->startPhaseCollisionResponse)
+                    m_collisionPairs[pair]->startPhaseCollisionResponse(startPhaseCollisions);
 
             if(continuousPhaseCollisions.size())
-                if(m_collisionPairs[pair].continuousPhaseCollisionResponse)
-                    m_collisionPairs[pair].continuousPhaseCollisionResponse(continuousPhaseCollisions);
+                if(m_collisionPairs[pair]->continuousPhaseCollisionResponse)
+                    m_collisionPairs[pair]->continuousPhaseCollisionResponse(continuousPhaseCollisions);
             
             if(endPhaseCollisions.size())
-                if(m_collisionPairs[pair].endPhaseCollisionResponse)
-                    m_collisionPairs[pair].endPhaseCollisionResponse(endPhaseCollisions);
+                if(m_collisionPairs[pair]->endPhaseCollisionResponse)
+                    m_collisionPairs[pair]->endPhaseCollisionResponse(endPhaseCollisions);
             //
 
 
             // Reset
-            m_collisionPairs[pair].pastCollisions[initiator] = presentCollisions;
+            m_collisionPairs[pair]->pastCollisions[initiator] = presentCollisions;
             presentCollisions.clear();
             //
         }

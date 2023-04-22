@@ -74,84 +74,10 @@ class PhysicsManager{
 #ifndef COLLISION_MANAGER_H
 #define COLLISION_MANAGER_H
 
-#include <SFML/Graphics.hpp>
-#ifndef COLLISION_PAIR_H
-#define COLLISION_PAIR_H
+struct Collision;
+struct CollisionPair;
+class CollisionShape;
 
-#include <SFML/Graphics.hpp> 
-#ifndef COLLISION_H
-#define COLLISION_H
-
-#ifndef COLLISION_SIDE_H
-#define COLLISION_SIDE_H
-
-enum CollisionSide{ left, right, top, bottom };
-
-#endif
-#ifndef COLLISION_SHAPE_H
-#define COLLISION_SHAPE_H
-
-#include <SFML/Graphics.hpp>
-#ifndef MEASUREMENTS_H
-#define MEASUREMENTS_H
-
-struct Measurements{
-    float x;
-    float y;
-    float height;
-    float width;
-};
-
-#endif
-// #include "../Entity/Entity.h"
-class Entity;
-// #include "../Physics/PhysicalObject.h"
-
-class CollisionShape : public sf::RectangleShape{
-    public:
-        CollisionShape(Entity* ownerEntityPtr);
-
-        sf::Vector2f offset = sf::Vector2f(0, 0);
-
-        Entity* getOwnerEntity();
-        Measurements getMeasurements();
-        void align();
-
-    private:
-        Entity* m_ownerEntityPtr;
-};
-
-#endif
-
-struct Collision{
-    CollisionShape *initiator;
-    CollisionShape *recipient;
-    CollisionSide initiatorImpactSide;
-    CollisionSide recipientImpactSide;
-
-    friend bool operator< (const Collision a, const Collision b){ return a.recipient < b.recipient; }
-    friend bool operator> (const Collision a, const Collision b){ return a.recipient > b.recipient; }
-    friend bool operator== (const Collision a, const Collision b){ return a.recipient == b.recipient; }
-    friend bool operator!= (const Collision a, const Collision b){ return a.recipient != b.recipient; }
-};
-
-#endif
-
-struct CollisionPair{
-    std::pair<std::string, std::string> collisionGroups;
-    
-    std::function<void(std::vector<Collision>)> startPhaseCollisionResponse;
-    std::function<void(std::vector<Collision>)> continuousPhaseCollisionResponse;
-    std::function<void(std::vector<Collision>)> endPhaseCollisionResponse;
-
-    std::unordered_map<CollisionShape*, std::vector<Collision>> pastCollisions;
-    
-    std::function<bool(CollisionShape *initiator, CollisionShape *recipient)> checkCollision;
-};
-
-#endif
-
-// ? addToGroup(...), removeFromGroup(...), reloadGroup(...) (checks if pointers are still valid), removePair(...), removeCOllisionResponse(...)
 class CollisionManager{
     public:
         void registerCollisionShape(CollisionShape* collisionShape);
@@ -176,7 +102,7 @@ class CollisionManager{
     private:
         std::vector<CollisionShape*> m_allCollisionShapes;
         std::unordered_map<std::string, std::vector<CollisionShape*>> m_collisionGroups;
-        std::unordered_map<std::string, CollisionPair> m_collisionPairs;
+        std::unordered_map<std::string, CollisionPair*> m_collisionPairs;
         std::vector<std::string> m_collisionPairsOrder;
 };
 
@@ -274,6 +200,29 @@ class TextureManager{
 
 #ifndef ENTITY_H
 #define ENTITY_H
+
+#ifndef COLLISION_SHAPE_H
+#define COLLISION_SHAPE_H
+
+#include <SFML/Graphics.hpp>
+class Entity;
+struct Measurements;
+
+class CollisionShape : public sf::RectangleShape{
+    public:
+        CollisionShape(Entity* ownerEntityPtr);
+
+        sf::Vector2f offset = sf::Vector2f(0, 0);
+
+        Entity* getOwnerEntity();
+        Measurements getMeasurements();
+        void align();
+
+    private:
+        Entity* m_ownerEntityPtr;
+};
+
+#endif
 
 struct Entity{
     PhysicalObject* physicalObject;
@@ -419,108 +368,81 @@ std::function<void(float)> updateVelocityBasedOnAcceleration(PhysicalObject* phy
 
 #endif
 
+#ifndef COLLISION_PAIR_H
+#define COLLISION_PAIR_H
+
+struct Collision;
+class CollisionShape;
+
+struct CollisionPair{
+    std::pair<std::string, std::string> collisionGroups;
+    
+    std::function<void(std::vector<Collision>)> startPhaseCollisionResponse;
+    std::function<void(std::vector<Collision>)> continuousPhaseCollisionResponse;
+    std::function<void(std::vector<Collision>)> endPhaseCollisionResponse;
+
+    std::unordered_map<CollisionShape*, std::vector<Collision>> pastCollisions;
+    
+    std::function<bool(CollisionShape *initiator, CollisionShape *recipient)> checkCollision;
+};
+
+#endif
+#ifndef COLLISION_SIDE_H
+#define COLLISION_SIDE_H
+
+enum CollisionSide : int{ left, right, top, bottom };
+
+#endif
+#ifndef COLLISION_H
+#define COLLISION_H
+
+enum CollisionSide : int;
+class CollisionShape;
+
+struct Collision{
+    CollisionShape *initiator;
+    CollisionShape *recipient;
+    CollisionSide initiatorImpactSide;
+    CollisionSide recipientImpactSide;
+
+    friend bool operator< (const Collision a, const Collision b);
+    friend bool operator> (const Collision a, const Collision b);
+    friend bool operator== (const Collision a, const Collision b);
+    friend bool operator!= (const Collision a, const Collision b);
+};
+
+#endif
 #ifndef COLLISION_UTILS_H
 #define COLLISION_UTILS_H
 
-#include <limits>
+class CollisionShape;
+enum CollisionSide : int;
 
-float determineCollisionDepth(CollisionSide initiatorImpactSide, CollisionShape *initiator, CollisionShape *recipient){
-    auto [x1, y1, height1, width1] = initiator->getMeasurements();
-    auto [x2, y2, height2, width2] = recipient->getMeasurements();
-    
-    if(initiatorImpactSide == CollisionSide::left) return x2 + width2 - x1;
-    if(initiatorImpactSide == CollisionSide::right) return x1 + width1 - x2;
-    if(initiatorImpactSide == CollisionSide::top) return y2 + height2 - y1;
-    if(initiatorImpactSide == CollisionSide::bottom) return y1 + height1 - y2;
+float determineCollisionDepth(CollisionSide initiatorImpactSide, CollisionShape *initiator, CollisionShape *recipient);
 
-    return 0;
-}
+CollisionSide determineInitiatorImpactSide(CollisionShape *initiator, CollisionShape *recipient);
 
-CollisionSide determineInitiatorImpactSide(CollisionShape *initiator, CollisionShape *recipient){
-    std::vector<CollisionSide> allImpactSides;
-
-    if(initiator->getPosition().x > recipient->getPosition().x) allImpactSides.push_back(CollisionSide::left);
-    if(initiator->getPosition().x < recipient->getPosition().x) allImpactSides.push_back(CollisionSide::right);
-    if(initiator->getPosition().y > recipient->getPosition().y) allImpactSides.push_back(CollisionSide::top);
-    if(initiator->getPosition().y < recipient->getPosition().y) allImpactSides.push_back(CollisionSide::bottom);
-
-    CollisionSide lowestDepthSide;
-    float lowestDepth = std::numeric_limits<float>::infinity();
-    
-    for(CollisionSide collisionSide : allImpactSides){
-        float depth = determineCollisionDepth(collisionSide, initiator, recipient);
-        if(depth <= lowestDepth){
-            lowestDepthSide = collisionSide;
-            lowestDepth = depth;
-        }
-    }
-
-    return lowestDepthSide;
-}
-
-CollisionSide flipInitiatorImpactSide(CollisionSide initiatorImpactSide){
-    if(initiatorImpactSide == CollisionSide::top) return CollisionSide::bottom;
-    if(initiatorImpactSide == CollisionSide::bottom) return CollisionSide::top;
-    if(initiatorImpactSide == CollisionSide::right) return CollisionSide::left;
-    if(initiatorImpactSide == CollisionSide::left) return CollisionSide::right;
-
-    return CollisionSide::bottom;
-}
+CollisionSide flipInitiatorImpactSide(CollisionSide initiatorImpactSide);
 
 #endif
 
 #ifndef COLLISION_RESPONSES_H
 #define COLLISION_RESPONSES_H
 
-void resolveAABB(std::vector<Collision> collisions){
-    for(Collision collision : collisions){
-        PhysicalObject *initiatorPhysicalObject = collision.initiator->getOwnerEntity()->physicalObject;
-        PhysicalObject *recipientPhysicalObject = collision.recipient->getOwnerEntity()->physicalObject;
-        
-        // Align initiator based on impact side
-        if(collision.initiatorImpactSide == CollisionSide::left){
-            initiatorPhysicalObject->setPosition(
-                recipientPhysicalObject->getPosition().x + recipientPhysicalObject->getGlobalBounds().width - collision.initiator->offset.x,
-                initiatorPhysicalObject->getPosition().y
-            );
-        }
-        else if(collision.initiatorImpactSide == CollisionSide::right){
-            initiatorPhysicalObject->setPosition(
-                recipientPhysicalObject->getPosition().x - collision.initiator->getGlobalBounds().width - collision.initiator->offset.x,
-                initiatorPhysicalObject->getPosition().y
-            );
-        }
-        else if(collision.initiatorImpactSide == CollisionSide::top){
-            initiatorPhysicalObject->setPosition(
-                initiatorPhysicalObject->getPosition().x,
-                recipientPhysicalObject->getPosition().y + recipientPhysicalObject->getGlobalBounds().height - collision.initiator->offset.y
-            );
-        }
-        else if(collision.initiatorImpactSide == CollisionSide::bottom){
-            initiatorPhysicalObject->setPosition(
-                initiatorPhysicalObject->getPosition().x,
-                recipientPhysicalObject->getPosition().y - collision.initiator->getGlobalBounds().height - collision.initiator->offset.y
-            );
-        }
-        //
-    }
-}
+#include <vector>
+struct Collision;
 
-void initiatorStandOnTopOfRecipient(std::vector<Collision> collisions){
-    for(Collision collision : collisions){
-        if(collision.initiatorImpactSide == CollisionSide::bottom){
-            collision.initiator->getOwnerEntity()->physicalObject->velocity.y = 0;
-        }
-    }
-}
+void resolveAABB(std::vector<Collision> collisions);
+
+void initiatorStandOnTopOfRecipient(std::vector<Collision> collisions);
 
 #endif
 #ifndef COLLISION_DETECTION_ALGORITHMS_H
 #define COLLISION_DETECTION_ALGORITHMS_H
 
-bool boundingBox(CollisionShape *initiator, CollisionShape *recipient){
-    return initiator->getGlobalBounds().intersects(recipient->getGlobalBounds());
-}
+class CollisionShape;
+
+bool boundingBox(CollisionShape* initiator, CollisionShape* recipient);
 
 // TODO
 // bool rayRect(){}
@@ -573,6 +495,17 @@ float approach(float goal, float current, float dt){
 }
 
 #endif
+#ifndef MEASUREMENTS_H
+#define MEASUREMENTS_H
+
+struct Measurements{
+    float x;
+    float y;
+    float height;
+    float width;
+};
+
+#endif
 
 #endif
 
@@ -613,22 +546,6 @@ void PhysicsManager::updatePhysics(float dt){
 }
 
 
-CollisionShape::CollisionShape(Entity* ownerEntityPtr){
-    m_ownerEntityPtr = ownerEntityPtr;
-
-    this->setFillColor(sf::Color(0,0,0,0));
-    this->setSize(sf::Vector2f(ownerEntityPtr->physicalObject->getGlobalBounds().width, ownerEntityPtr->physicalObject->getGlobalBounds().height));
-}
-
-Entity* CollisionShape::getOwnerEntity(){ return m_ownerEntityPtr; }
-Measurements CollisionShape::getMeasurements(){
-    return { this->getPosition().x, this->getPosition().y, this->getGlobalBounds().height, this->getGlobalBounds().width };
-}
-void CollisionShape::align(){
-    this->setPosition(m_ownerEntityPtr->physicalObject->getPosition() + offset);
-}
-
-
 void CollisionManager::registerCollisionShape(CollisionShape* collisionShape){ m_allCollisionShapes.push_back(collisionShape); }
 void CollisionManager::deregisterCollisionShape(CollisionShape* collisionShape){ m_allCollisionShapes.erase(std::remove(m_allCollisionShapes.begin(), m_allCollisionShapes.end(), collisionShape), m_allCollisionShapes.end()); }
 void CollisionManager::registerCollisionShapes(std::vector<CollisionShape*> collisionShapes){ m_allCollisionShapes.insert(m_allCollisionShapes.end(), collisionShapes.begin(), collisionShapes.end()); }
@@ -660,19 +577,19 @@ void CollisionManager::createCollisionPair(std::string name, std::string initiat
         exit(1);
     }
 
-    m_collisionPairs[name] = CollisionPair{std::make_pair(initiatorGroup, recipientGroup)};
+    m_collisionPairs[name] = new CollisionPair{std::make_pair(initiatorGroup, recipientGroup)};
     m_collisionPairsOrder.push_back(name);
 }
-void CollisionManager::setPairCollisionDetectionAlgorithm(std::string collisionPairName, std::function<bool(CollisionShape *CS1, CollisionShape *CS2)> collisionDetectionAlgorithm){ m_collisionPairs[collisionPairName].checkCollision = collisionDetectionAlgorithm; }
+void CollisionManager::setPairCollisionDetectionAlgorithm(std::string collisionPairName, std::function<bool(CollisionShape *CS1, CollisionShape *CS2)> collisionDetectionAlgorithm){ m_collisionPairs[collisionPairName]->checkCollision = collisionDetectionAlgorithm; }
 void CollisionManager::setPairCollisionResponse(std::string collisionPairName, std::string collisionPhase, std::function<void(std::vector<Collision>)> response){
     if(collisionPhase == "start_phase"){
-        m_collisionPairs[collisionPairName].startPhaseCollisionResponse = response;
+        m_collisionPairs[collisionPairName]->startPhaseCollisionResponse = response;
     }
     else if(collisionPhase == "continuous_phase"){
-        m_collisionPairs[collisionPairName].continuousPhaseCollisionResponse = response;
+        m_collisionPairs[collisionPairName]->continuousPhaseCollisionResponse = response;
     }
     else if(collisionPhase == "end_phase"){
-        m_collisionPairs[collisionPairName].endPhaseCollisionResponse = response;
+        m_collisionPairs[collisionPairName]->endPhaseCollisionResponse = response;
     }
 }
 
@@ -682,10 +599,10 @@ void CollisionManager::updateCollisions(){
     // TODO check in order of insertion ?
     for(std::string pair : m_collisionPairsOrder){
 
-        for(CollisionShape* initiator : m_collisionGroups[m_collisionPairs[pair].collisionGroups.first]){
+        for(CollisionShape* initiator : m_collisionGroups[m_collisionPairs[pair]->collisionGroups.first]){
             // Register all present collisions
-            for(CollisionShape* recipient : m_collisionGroups[m_collisionPairs[pair].collisionGroups.second]){
-                if(m_collisionPairs[pair].checkCollision(initiator, recipient)){
+            for(CollisionShape* recipient : m_collisionGroups[m_collisionPairs[pair]->collisionGroups.second]){
+                if(m_collisionPairs[pair]->checkCollision(initiator, recipient)){
                     CollisionSide initiatorImpactSide = determineInitiatorImpactSide(initiator, recipient);
 
                     presentCollisions.push_back(Collision{
@@ -698,7 +615,7 @@ void CollisionManager::updateCollisions(){
             }
             //
 
-            std::vector<Collision> pastCollisions = m_collisionPairs[pair].pastCollisions[initiator];
+            std::vector<Collision> pastCollisions = m_collisionPairs[pair]->pastCollisions[initiator];
 
             // Determine collision phase
             std::sort(presentCollisions.begin(), presentCollisions.end());
@@ -727,20 +644,20 @@ void CollisionManager::updateCollisions(){
 
             // Run collision responses based on collision phase
             if(startPhaseCollisions.size())
-                if(m_collisionPairs[pair].startPhaseCollisionResponse)
-                    m_collisionPairs[pair].startPhaseCollisionResponse(startPhaseCollisions);
+                if(m_collisionPairs[pair]->startPhaseCollisionResponse)
+                    m_collisionPairs[pair]->startPhaseCollisionResponse(startPhaseCollisions);
 
             if(continuousPhaseCollisions.size())
-                if(m_collisionPairs[pair].continuousPhaseCollisionResponse)
-                    m_collisionPairs[pair].continuousPhaseCollisionResponse(continuousPhaseCollisions);
+                if(m_collisionPairs[pair]->continuousPhaseCollisionResponse)
+                    m_collisionPairs[pair]->continuousPhaseCollisionResponse(continuousPhaseCollisions);
             
             if(endPhaseCollisions.size())
-                if(m_collisionPairs[pair].endPhaseCollisionResponse)
-                    m_collisionPairs[pair].endPhaseCollisionResponse(endPhaseCollisions);
+                if(m_collisionPairs[pair]->endPhaseCollisionResponse)
+                    m_collisionPairs[pair]->endPhaseCollisionResponse(endPhaseCollisions);
             //
 
             // Reset
-            m_collisionPairs[pair].pastCollisions[initiator] = presentCollisions;
+            m_collisionPairs[pair]->pastCollisions[initiator] = presentCollisions;
             presentCollisions.clear();
             //
         }
@@ -822,6 +739,22 @@ void TextureManager::updateAnimations(){
     for(Animation* animation : m_animations){
         animation->run();
     }
+}
+
+
+CollisionShape::CollisionShape(Entity* ownerEntityPtr){
+    m_ownerEntityPtr = ownerEntityPtr;
+
+    this->setFillColor(sf::Color(0,0,0,0));
+    this->setSize(sf::Vector2f(ownerEntityPtr->physicalObject->getGlobalBounds().width, ownerEntityPtr->physicalObject->getGlobalBounds().height));
+}
+
+Entity* CollisionShape::getOwnerEntity(){ return m_ownerEntityPtr; }
+Measurements CollisionShape::getMeasurements(){
+    return { this->getPosition().x, this->getPosition().y, this->getGlobalBounds().height, this->getGlobalBounds().width };
+}
+void CollisionShape::align(){
+    this->setPosition(m_ownerEntityPtr->physicalObject->getPosition() + offset);
 }
 
 
@@ -1002,6 +935,104 @@ void Universe::loop(){
 
         m_windowPtr->display();
     }
+}
+
+
+bool operator< (const Collision a, const Collision b){ return a.recipient < b.recipient; }
+bool operator> (const Collision a, const Collision b){ return a.recipient > b.recipient; }
+bool operator== (const Collision a, const Collision b){ return a.recipient == b.recipient; }
+bool operator!= (const Collision a, const Collision b){ return a.recipient != b.recipient; }
+#include <limits>
+
+float determineCollisionDepth(CollisionSide initiatorImpactSide, CollisionShape *initiator, CollisionShape *recipient){
+    auto [x1, y1, height1, width1] = initiator->getMeasurements();
+    auto [x2, y2, height2, width2] = recipient->getMeasurements();
+    
+    if(initiatorImpactSide == CollisionSide::left) return x2 + width2 - x1;
+    if(initiatorImpactSide == CollisionSide::right) return x1 + width1 - x2;
+    if(initiatorImpactSide == CollisionSide::top) return y2 + height2 - y1;
+    if(initiatorImpactSide == CollisionSide::bottom) return y1 + height1 - y2;
+
+    return 0;
+}
+
+CollisionSide determineInitiatorImpactSide(CollisionShape *initiator, CollisionShape *recipient){
+    std::vector<CollisionSide> allImpactSides;
+
+    if(initiator->getPosition().x > recipient->getPosition().x) allImpactSides.push_back(CollisionSide::left);
+    if(initiator->getPosition().x < recipient->getPosition().x) allImpactSides.push_back(CollisionSide::right);
+    if(initiator->getPosition().y > recipient->getPosition().y) allImpactSides.push_back(CollisionSide::top);
+    if(initiator->getPosition().y < recipient->getPosition().y) allImpactSides.push_back(CollisionSide::bottom);
+
+    CollisionSide lowestDepthSide;
+    float lowestDepth = std::numeric_limits<float>::infinity();
+    
+    for(CollisionSide collisionSide : allImpactSides){
+        float depth = determineCollisionDepth(collisionSide, initiator, recipient);
+        if(depth <= lowestDepth){
+            lowestDepthSide = collisionSide;
+            lowestDepth = depth;
+        }
+    }
+
+    return lowestDepthSide;
+}
+
+CollisionSide flipInitiatorImpactSide(CollisionSide initiatorImpactSide){
+    if(initiatorImpactSide == CollisionSide::top) return CollisionSide::bottom;
+    if(initiatorImpactSide == CollisionSide::bottom) return CollisionSide::top;
+    if(initiatorImpactSide == CollisionSide::right) return CollisionSide::left;
+    if(initiatorImpactSide == CollisionSide::left) return CollisionSide::right;
+
+    return CollisionSide::bottom;
+}
+
+
+void resolveAABB(std::vector<Collision> collisions){
+    for(Collision collision : collisions){
+        PhysicalObject *initiatorPhysicalObject = collision.initiator->getOwnerEntity()->physicalObject;
+        PhysicalObject *recipientPhysicalObject = collision.recipient->getOwnerEntity()->physicalObject;
+        
+        // Align initiator based on impact side
+        if(collision.initiatorImpactSide == CollisionSide::left){
+            initiatorPhysicalObject->setPosition(
+                recipientPhysicalObject->getPosition().x + recipientPhysicalObject->getGlobalBounds().width - collision.initiator->offset.x,
+                initiatorPhysicalObject->getPosition().y
+            );
+        }
+        else if(collision.initiatorImpactSide == CollisionSide::right){
+            initiatorPhysicalObject->setPosition(
+                recipientPhysicalObject->getPosition().x - collision.initiator->getGlobalBounds().width - collision.initiator->offset.x,
+                initiatorPhysicalObject->getPosition().y
+            );
+        }
+        else if(collision.initiatorImpactSide == CollisionSide::top){
+            initiatorPhysicalObject->setPosition(
+                initiatorPhysicalObject->getPosition().x,
+                recipientPhysicalObject->getPosition().y + recipientPhysicalObject->getGlobalBounds().height - collision.initiator->offset.y
+            );
+        }
+        else if(collision.initiatorImpactSide == CollisionSide::bottom){
+            initiatorPhysicalObject->setPosition(
+                initiatorPhysicalObject->getPosition().x,
+                recipientPhysicalObject->getPosition().y - collision.initiator->getGlobalBounds().height - collision.initiator->offset.y
+            );
+        }
+        //
+    }
+}
+
+void initiatorStandOnTopOfRecipient(std::vector<Collision> collisions){
+    for(Collision collision : collisions){
+        if(collision.initiatorImpactSide == CollisionSide::bottom){
+            collision.initiator->getOwnerEntity()->physicalObject->velocity.y = 0;
+        }
+    }
+}
+
+
+bool boundingBox(CollisionShape* initiator, CollisionShape* recipient){
+    return initiator->getGlobalBounds().intersects(recipient->getGlobalBounds());
 }
 
 

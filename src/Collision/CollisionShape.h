@@ -1,6 +1,7 @@
 #ifndef COLLISION_SHAPE_H
 #define COLLISION_SHAPE_H
 
+#include <SFML/Graphics.hpp>
 class Entity;
 struct Measurements;
 

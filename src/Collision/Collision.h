@@ -1,8 +1,8 @@
 #ifndef COLLISION_H
 #define COLLISION_H
 
-#include "CollisionSide.h"
-#include "CollisionShape.h"
+enum CollisionSide : int;
+class CollisionShape;
 
 
 struct Collision{
@@ -11,10 +11,10 @@ struct Collision{
     CollisionSide initiatorImpactSide;
     CollisionSide recipientImpactSide;
 
-    friend bool operator< (const Collision a, const Collision b){ return a.recipient < b.recipient; }
-    friend bool operator> (const Collision a, const Collision b){ return a.recipient > b.recipient; }
-    friend bool operator== (const Collision a, const Collision b){ return a.recipient == b.recipient; }
-    friend bool operator!= (const Collision a, const Collision b){ return a.recipient != b.recipient; }
+    friend bool operator< (const Collision a, const Collision b);
+    friend bool operator> (const Collision a, const Collision b);
+    friend bool operator== (const Collision a, const Collision b);
+    friend bool operator!= (const Collision a, const Collision b);
 };
 
 

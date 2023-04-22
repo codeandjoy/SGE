@@ -1,12 +1,10 @@
 #ifndef COLLISION_DETECTION_ALGORITHMS_H
 #define COLLISION_DETECTION_ALGORITHMS_H
 
-#include "CollisionShape.h"
+class CollisionShape;
 
 
-bool boundingBox(CollisionShape *initiator, CollisionShape *recipient){
-    return initiator->getGlobalBounds().intersects(recipient->getGlobalBounds());
-}
+bool boundingBox(CollisionShape* initiator, CollisionShape* recipient);
 
 // TODO
 // bool rayRect(){}

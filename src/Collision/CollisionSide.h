@@ -2,7 +2,7 @@
 #define COLLISION_SIDE_H
 
 
-enum CollisionSide{ left, right, top, bottom };
+enum CollisionSide : int{ left, right, top, bottom };
 
 
 #endif

@@ -1,12 +1,11 @@
 #ifndef COLLISION_MANAGER_H
 #define COLLISION_MANAGER_H
 
-#include <SFML/Graphics.hpp>
-#include "CollisionPair.h"
-#include "CollisionShape.h"
+struct Collision;
+struct CollisionPair;
+class CollisionShape;
 
 
-// ? addToGroup(...), removeFromGroup(...), reloadGroup(...) (checks if pointers are still valid), removePair(...), removeCOllisionResponse(...)
 class CollisionManager{
     public:
         void registerCollisionShape(CollisionShape* collisionShape);
@@ -34,7 +33,7 @@ class CollisionManager{
     private:
         std::vector<CollisionShape*> m_allCollisionShapes;
         std::unordered_map<std::string, std::vector<CollisionShape*>> m_collisionGroups;
-        std::unordered_map<std::string, CollisionPair> m_collisionPairs;
+        std::unordered_map<std::string, CollisionPair*> m_collisionPairs;
         std::vector<std::string> m_collisionPairsOrder;
 };
 
