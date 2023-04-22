@@ -255,49 +255,10 @@ class EntityManager{
 #ifndef DEBUG_MANAGER_H
 #define DEBUG_MANAGER_H
 
-#ifndef DEBUG_ENTITY_H
-#define DEBUG_ENTITY_H
-
-#ifndef COLLISION_SHAPE_BORDER_H
-#define COLLISION_SHAPE_BORDER_H
-
-#ifndef COLLISION_SHAPE_BORDER_SETTINGS_H
-#define COLLISION_SHAPE_BORDER_SETTINGS_H
-
 #include <SFML/Graphics.hpp>
+#include <vector>
 
-struct CollisionShapeBorderSettings{
-    sf::Color color = sf::Color::Blue;
-    float thickness = .5;
-};
-
-#endif
-
-class CollisionShapeBorder : public sf::RectangleShape{
-    public:
-        CollisionShapeBorder(CollisionShape* owner, CollisionShapeBorderSettings settings);
-};
-
-#endif
-
-class DebugEntity{
-    public:
-        DebugEntity(Entity* relatedEntity);
-
-        bool drawCollisionShapeBorders = true;
-        std::unordered_map<std::string, CollisionShapeBorderSettings> customCollisionShapeBorderSettings;
-        std::vector<CollisionShapeBorder*> generateCollisionShapeBorders();
-
-        void addExtraDebugFunction(std::function<void(sf::RenderWindow* windowPtr)> extraDebugFunction);
-        std::vector<std::function<void(sf::RenderWindow* windowPtr)>> getExtraDebugFunctions();
-
-    private:
-        Entity* m_relatedEntity;
-        CollisionShapeBorderSettings m_defaultCollisionShapeBorderSettings = CollisionShapeBorderSettings();
-        std::vector<std::function<void(sf::RenderWindow* windowPtr)>> m_extraDebugFunctions;
-};
-
-#endif
+class DebugEntity;
 
 class DebugManager{
     public:
@@ -480,6 +441,62 @@ Entity* buildMobileEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vec
 
     return e;
 }
+
+#endif
+
+#ifndef DEBUG_ENTITY_H
+#define DEBUG_ENTITY_H
+
+#include <SFML/Graphics.hpp> 
+#include <unordered_map>
+#include <vector>
+#include <string>
+#include <functional>
+
+#ifndef COLLISION_SHAPE_BORDER_SETTINGS_H
+#define COLLISION_SHAPE_BORDER_SETTINGS_H
+
+#include <SFML/Graphics.hpp>
+
+struct CollisionShapeBorderSettings{
+    sf::Color color = sf::Color::Blue;
+    float thickness = .5;
+};
+
+#endif
+class Entity;
+class CollisionShapeBorder;
+
+class DebugEntity{
+    public:
+        DebugEntity(Entity* relatedEntity);
+
+        bool drawCollisionShapeBorders = true;
+        std::unordered_map<std::string, CollisionShapeBorderSettings> customCollisionShapeBorderSettings;
+        std::vector<CollisionShapeBorder*> generateCollisionShapeBorders();
+
+        void addExtraDebugFunction(std::function<void(sf::RenderWindow* windowPtr)> extraDebugFunction);
+        std::vector<std::function<void(sf::RenderWindow* windowPtr)>> getExtraDebugFunctions();
+
+    private:
+        Entity* m_relatedEntity;
+        CollisionShapeBorderSettings m_defaultCollisionShapeBorderSettings = CollisionShapeBorderSettings();
+        std::vector<std::function<void(sf::RenderWindow* windowPtr)>> m_extraDebugFunctions;
+};
+
+#endif
+
+#ifndef COLLISION_SHAPE_BORDER_H
+#define COLLISION_SHAPE_BORDER_H
+
+#include <SFML/Graphics.hpp>
+class CollisionShape;
+struct CollisionShapeBorderSettings;
+
+class CollisionShapeBorder : public sf::RectangleShape{
+    public:
+        CollisionShapeBorder(CollisionShape* owner, CollisionShapeBorderSettings settings);
+};
 
 #endif
 
@@ -803,37 +820,6 @@ void EntityManager::registerEntities(std::vector<Entity*> entities){
 std::vector<Entity*> EntityManager::getAllEntities(){ return m_entities; }
 
 
-CollisionShapeBorder::CollisionShapeBorder(CollisionShape* owner, CollisionShapeBorderSettings settings){
-    this->setFillColor(sf::Color(0,0,0,0));
-
-    this->setOutlineColor(settings.color);
-    this->setOutlineThickness(settings.thickness);
-
-    this->setPosition(sf::Vector2f(owner->getPosition().x + settings.thickness, owner->getPosition().y + settings.thickness));
-    this->setSize(sf::Vector2f(owner->getSize().x - settings.thickness*2, owner->getSize().y - settings.thickness*2));
-}
-
-
-DebugEntity::DebugEntity(Entity* relatedEntity){ m_relatedEntity = relatedEntity; }
-
-std::vector<CollisionShapeBorder*> DebugEntity::generateCollisionShapeBorders(){
-    std::vector<CollisionShapeBorder*> collisionShapeBorders;
-    for(auto &[name, collisionShape] : m_relatedEntity->collisionShapes){
-        if(customCollisionShapeBorderSettings.count(name)){
-            collisionShapeBorders.push_back(new CollisionShapeBorder(collisionShape, customCollisionShapeBorderSettings[name]));
-        }
-        else{
-            collisionShapeBorders.push_back(new CollisionShapeBorder(collisionShape, m_defaultCollisionShapeBorderSettings));
-        }
-    }
-
-    return collisionShapeBorders;
-}
-
-void DebugEntity::addExtraDebugFunction(std::function<void(sf::RenderWindow* windowPtr)> extraDebugFunction){ m_extraDebugFunctions.push_back(extraDebugFunction); }
-std::vector<std::function<void(sf::RenderWindow* windowPtr)>> DebugEntity::getExtraDebugFunctions(){ return m_extraDebugFunctions; }
-
-
 void DebugManager::registerDebugEntity(DebugEntity* debugEntity){ m_debugEntities.push_back(debugEntity); }
 
 void DebugManager::showDebugInfo(sf::RenderWindow* windowPtr){
@@ -1033,6 +1019,37 @@ void initiatorStandOnTopOfRecipient(std::vector<Collision> collisions){
 
 bool boundingBox(CollisionShape* initiator, CollisionShape* recipient){
     return initiator->getGlobalBounds().intersects(recipient->getGlobalBounds());
+}
+
+
+DebugEntity::DebugEntity(Entity* relatedEntity){ m_relatedEntity = relatedEntity; }
+
+std::vector<CollisionShapeBorder*> DebugEntity::generateCollisionShapeBorders(){
+    std::vector<CollisionShapeBorder*> collisionShapeBorders;
+    for(auto &[name, collisionShape] : m_relatedEntity->collisionShapes){
+        if(customCollisionShapeBorderSettings.count(name)){
+            collisionShapeBorders.push_back(new CollisionShapeBorder(collisionShape, customCollisionShapeBorderSettings[name]));
+        }
+        else{
+            collisionShapeBorders.push_back(new CollisionShapeBorder(collisionShape, m_defaultCollisionShapeBorderSettings));
+        }
+    }
+
+    return collisionShapeBorders;
+}
+
+void DebugEntity::addExtraDebugFunction(std::function<void(sf::RenderWindow* windowPtr)> extraDebugFunction){ m_extraDebugFunctions.push_back(extraDebugFunction); }
+std::vector<std::function<void(sf::RenderWindow* windowPtr)>> DebugEntity::getExtraDebugFunctions(){ return m_extraDebugFunctions; }
+
+
+CollisionShapeBorder::CollisionShapeBorder(CollisionShape* owner, CollisionShapeBorderSettings settings){
+    this->setFillColor(sf::Color(0,0,0,0));
+
+    this->setOutlineColor(settings.color);
+    this->setOutlineThickness(settings.thickness);
+
+    this->setPosition(sf::Vector2f(owner->getPosition().x + settings.thickness, owner->getPosition().y + settings.thickness));
+    this->setSize(sf::Vector2f(owner->getSize().x - settings.thickness*2, owner->getSize().y - settings.thickness*2));
 }
 
 
