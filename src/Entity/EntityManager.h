@@ -1,10 +1,11 @@
 #ifndef ENTITY_MANAGER_H
 #define ENTITY_MANAGER_H
 
-#include "Entity.h"
-#include "../Physics/PhysicsManager.h"
-#include "../Collision/CollisionManager.h"
-#include "../Texture/TextureManager.h"
+#include <vector>
+class Entity;
+class PhysicsManager;
+class CollisionManager;
+class TextureManager;
 
 
 class EntityManager{
@@ -13,8 +14,7 @@ class EntityManager{
 
         void registerEntity(Entity* entity);
         void registerEntities(std::vector<Entity*> entities);
-        void destroyEntity(Entity* entity);
-        // void destroyEntityGroup(std::string name);
+        // void destroyEntity(Entity* entity);
         std::vector<Entity*> getAllEntities();
 
     private:

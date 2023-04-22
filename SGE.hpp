@@ -198,39 +198,11 @@ class TextureManager{
 #ifndef ENTITY_MANAGER_H
 #define ENTITY_MANAGER_H
 
-#ifndef ENTITY_H
-#define ENTITY_H
-
-#ifndef COLLISION_SHAPE_H
-#define COLLISION_SHAPE_H
-
-#include <SFML/Graphics.hpp>
+#include <vector>
 class Entity;
-struct Measurements;
-
-class CollisionShape : public sf::RectangleShape{
-    public:
-        CollisionShape(Entity* ownerEntityPtr);
-
-        sf::Vector2f offset = sf::Vector2f(0, 0);
-
-        Entity* getOwnerEntity();
-        Measurements getMeasurements();
-        void align();
-
-    private:
-        Entity* m_ownerEntityPtr;
-};
-
-#endif
-
-struct Entity{
-    PhysicalObject* physicalObject;
-    std::unordered_map<std::string, CollisionShape*> collisionShapes; 
-    Animation* animation = nullptr;
-};
-
-#endif
+class PhysicsManager;
+class CollisionManager;
+class TextureManager;
 
 class EntityManager{
     public:
@@ -238,8 +210,7 @@ class EntityManager{
 
         void registerEntity(Entity* entity);
         void registerEntities(std::vector<Entity*> entities);
-        void destroyEntity(Entity* entity);
-        // void destroyEntityGroup(std::string name);
+        // void destroyEntity(Entity* entity);
         std::vector<Entity*> getAllEntities();
 
     private:
@@ -386,7 +357,28 @@ CollisionSide determineInitiatorImpactSide(CollisionShape *initiator, CollisionS
 CollisionSide flipInitiatorImpactSide(CollisionSide initiatorImpactSide);
 
 #endif
+#ifndef COLLISION_SHAPE_H
+#define COLLISION_SHAPE_H
 
+#include <SFML/Graphics.hpp>
+class Entity;
+struct Measurements;
+
+class CollisionShape : public sf::RectangleShape{
+    public:
+        CollisionShape(Entity* ownerEntityPtr);
+
+        sf::Vector2f offset = sf::Vector2f(0, 0);
+
+        Entity* getOwnerEntity();
+        Measurements getMeasurements();
+        void align();
+
+    private:
+        Entity* m_ownerEntityPtr;
+};
+
+#endif
 #ifndef COLLISION_RESPONSES_H
 #define COLLISION_RESPONSES_H
 
@@ -410,37 +402,35 @@ bool boundingBox(CollisionShape* initiator, CollisionShape* recipient);
 
 #endif
 
+#ifndef ENTITY_H
+#define ENTITY_H
+
+class PhysicalObject;
+class CollisionShape;
+class Animation;
+
+struct Entity{
+    PhysicalObject* physicalObject;
+    std::unordered_map<std::string, CollisionShape*> collisionShapes; 
+    Animation* animation = nullptr;
+};
+
+#endif
+
 #ifndef ENTITY_BUILDERS_H
 #define ENTITY_BUILDERS_H
 
-// Plain entity - Entity that consists only of PhysicalObject
-Entity* buildPlainEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position){
-    Entity* e = new Entity{ new PhysicalObject() };
-    e->physicalObject->setTexture(*texture);
-    e->physicalObject->setTextureRect(textureRect);
-    e->physicalObject->setPosition(position);
+#include <SFML/Graphics.hpp>
+class Entity;
 
-    return e;
-}
+// Plain entity - Entity that consists only of PhysicalObject
+Entity* buildPlainEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position);
 
 // Static entity - Plain entity that has >= 1 CollisionShape(s)
-Entity* buildStaticEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position){
-    Entity* e = buildPlainEntity(texture, textureRect, position);
-
-    e->collisionShapes["globalBounds"] = new CollisionShape(e);
-
-    return e;
-}
+Entity* buildStaticEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position);
 
 // Mobile entity - Static entity that has calculations that allow mobility
-Entity* buildMobileEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position){
-    Entity* e = buildStaticEntity(texture, textureRect, position);
-
-    e->physicalObject->createContinuousComputation("updateVelocity", updateVelocityBasedOnAcceleration(e->physicalObject));
-    e->physicalObject->createContinuousComputation("updatePosition", updatePositionBasedOnVelocity(e->physicalObject));
-
-    return e;
-}
+Entity* buildMobileEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position);
 
 #endif
 
@@ -759,22 +749,6 @@ void TextureManager::updateAnimations(){
 }
 
 
-CollisionShape::CollisionShape(Entity* ownerEntityPtr){
-    m_ownerEntityPtr = ownerEntityPtr;
-
-    this->setFillColor(sf::Color(0,0,0,0));
-    this->setSize(sf::Vector2f(ownerEntityPtr->physicalObject->getGlobalBounds().width, ownerEntityPtr->physicalObject->getGlobalBounds().height));
-}
-
-Entity* CollisionShape::getOwnerEntity(){ return m_ownerEntityPtr; }
-Measurements CollisionShape::getMeasurements(){
-    return { this->getPosition().x, this->getPosition().y, this->getGlobalBounds().height, this->getGlobalBounds().width };
-}
-void CollisionShape::align(){
-    this->setPosition(m_ownerEntityPtr->physicalObject->getPosition() + offset);
-}
-
-
 EntityManager::EntityManager(PhysicsManager* physicsManager, CollisionManager* collisionManager, TextureManager* textureManager){
     m_physicsManagerPtr = physicsManager;
     m_collisionManagerPtr = collisionManager;
@@ -974,6 +948,22 @@ CollisionSide flipInitiatorImpactSide(CollisionSide initiatorImpactSide){
 }
 
 
+CollisionShape::CollisionShape(Entity* ownerEntityPtr){
+    m_ownerEntityPtr = ownerEntityPtr;
+
+    this->setFillColor(sf::Color(0,0,0,0));
+    this->setSize(sf::Vector2f(ownerEntityPtr->physicalObject->getGlobalBounds().width, ownerEntityPtr->physicalObject->getGlobalBounds().height));
+}
+
+Entity* CollisionShape::getOwnerEntity(){ return m_ownerEntityPtr; }
+Measurements CollisionShape::getMeasurements(){
+    return { this->getPosition().x, this->getPosition().y, this->getGlobalBounds().height, this->getGlobalBounds().width };
+}
+void CollisionShape::align(){
+    this->setPosition(m_ownerEntityPtr->physicalObject->getPosition() + offset);
+}
+
+
 void resolveAABB(std::vector<Collision> collisions){
     for(Collision collision : collisions){
         PhysicalObject *initiatorPhysicalObject = collision.initiator->getOwnerEntity()->physicalObject;
@@ -1019,6 +1009,33 @@ void initiatorStandOnTopOfRecipient(std::vector<Collision> collisions){
 
 bool boundingBox(CollisionShape* initiator, CollisionShape* recipient){
     return initiator->getGlobalBounds().intersects(recipient->getGlobalBounds());
+}
+
+
+Entity* buildPlainEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position){
+    Entity* e = new Entity{ new PhysicalObject() };
+    e->physicalObject->setTexture(*texture);
+    e->physicalObject->setTextureRect(textureRect);
+    e->physicalObject->setPosition(position);
+
+    return e;
+}
+
+Entity* buildStaticEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position){
+    Entity* e = buildPlainEntity(texture, textureRect, position);
+
+    e->collisionShapes["globalBounds"] = new CollisionShape(e);
+
+    return e;
+}
+
+Entity* buildMobileEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position){
+    Entity* e = buildStaticEntity(texture, textureRect, position);
+
+    e->physicalObject->createContinuousComputation("updateVelocity", updateVelocityBasedOnAcceleration(e->physicalObject));
+    e->physicalObject->createContinuousComputation("updatePosition", updatePositionBasedOnVelocity(e->physicalObject));
+
+    return e;
 }
 
 

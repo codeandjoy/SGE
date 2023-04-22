@@ -1,9 +1,9 @@
 #ifndef ENTITY_H
 #define ENTITY_H
 
-#include "../Physics/PhysicalObject.h"
-#include "../Collision/CollisionShape.h"
-#include "../Texture/Animation.h"
+class PhysicalObject;
+class CollisionShape;
+class Animation;
 
 
 struct Entity{

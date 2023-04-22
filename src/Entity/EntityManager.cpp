@@ -1,4 +1,9 @@
 #include "EntityManager.h"
+#include "Entity.h"
+#include "../Physics/PhysicsManager.h"
+#include "../Collision/CollisionManager.h"
+#include "../Texture/TextureManager.h"
+
 
 EntityManager::EntityManager(PhysicsManager* physicsManager, CollisionManager* collisionManager, TextureManager* textureManager){
     m_physicsManagerPtr = physicsManager;
