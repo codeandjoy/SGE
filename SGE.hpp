@@ -9,6 +9,139 @@ namespace sge{
 #define UNIVERSE_H
 
 #include <SFML/Graphics.hpp>
+class PhysicsManager;
+class PhysicalObject;
+class CollisionManager;
+class TextureManager;
+class EntityManager;
+class DebugManager;
+
+class Universe{
+    public:
+        Universe(bool DEBUG = false);
+
+        void setupWindow(sf::RenderWindow* window);
+
+        void addController(std::function<void()> controller);
+        void addEventHandler(std::function<void(sf::Event event)> eventHandler);
+
+        void loop();
+
+        PhysicsManager* physicsManager = nullptr;
+        CollisionManager* collisionManager = nullptr;
+        TextureManager* textureManager = nullptr;
+        EntityManager* entityManager = nullptr;
+        DebugManager* debugManager = nullptr;
+
+    private:
+        sf::RenderWindow* m_windowPtr;
+
+        sf::Clock m_deltaClock;
+        
+        std::vector<std::function<void()>> m_controllers;
+        std::vector<std::function<void(sf::Event event)>> m_eventHandlers;
+};
+
+#endif
+
+#ifndef TEXTURESHEET_H
+#define TEXTURESHEET_H
+
+#include <SFML/Graphics.hpp>
+#include <string>
+#include <vector>
+#ifndef TEXTURE_SHEET_SIZES_H
+#define TEXTURE_SHEET_SIZES_H
+
+struct TextureSheetSizes{
+    int textureSizeX;
+    int textureSizeY;
+    int numTexturesX;
+    int numTexturesY;
+};
+
+#endif
+
+// TODO texturesheet with gaps between textures
+class TextureSheet{
+    public:
+        TextureSheet(TextureSheetSizes textureSheetSizes, std::string location);
+
+        std::string getLocation();
+        sf::Texture* getTextureSheet();
+        sf::IntRect getTextureRect(int textureN);
+
+    private:
+        std::string m_location;
+        sf::Texture m_textureSheet;
+        std::vector<sf::IntRect> m_textureRects;
+};
+
+#endif
+
+#ifndef TEXTURE_MANAGER_H
+#define TEXTURE_MANAGER_H
+
+#include <string>
+#include <unordered_map>
+#include <vector>
+
+class TextureSheet;
+class Animation;
+
+class TextureManager{
+    public:
+        void loadTexture(std::string location, std::string name, TextureSheetSizes textureSheetSizes);
+        TextureSheet* getTexture(std::string name);
+
+        void registerAnimation(Animation* animation);
+        void deregisterAnimation(Animation* animation);
+
+        void initAnimationClocks();
+        void updateAnimations();
+
+    private:
+        std::unordered_map<std::string, TextureSheet*> m_loadedTextures;
+        std::vector<Animation*> m_animations;
+};
+
+#endif
+#ifndef ANIMATION_H
+#define ANIMATION_H
+
+#include <SFML/Graphics.hpp>
+class TextureSheet;
+
+// TODO Animations should switch immediately
+class Animation{
+    public:
+        Animation(TextureSheet* textureSheet, sf::Sprite* owner, int initialTextureN);
+    
+        
+        void addTextureSequence(std::string name, std::vector<int> textureSequence);
+        void setCurrentTextureSequence(std::string name);
+    
+
+        // ?
+        // runForward -> 1,2,3,1,2,3
+        // runCycle -> 1,2,3,2,1,2
+        // ?
+        void run();
+        void restartClock();
+
+    private:
+        sf::Sprite* m_owner;
+        TextureSheet* m_textureSheet;
+        
+        sf::Clock m_clock;
+        std::unordered_map<std::string, std::vector<int>> m_textureSequences; // e.g. "idle": [5, 6, 7, 8]
+        std::string m_currentTextureSequence;
+        int m_currentTextureN = 0;
+
+};
+
+#endif
+
 #ifndef PHYSICS_MANAGER_H
 #define PHYSICS_MANAGER_H
 
@@ -72,6 +205,18 @@ class PhysicalObject : public sf::Sprite{
 };
 
 #endif
+
+#ifndef COMPUTATIONS_H
+#define COMPUTATIONS_H
+
+class PhysicalObject;
+
+std::function<void(float)> updatePositionBasedOnVelocity(PhysicalObject* physicalObject);
+
+std::function<void(float)> updateVelocityBasedOnAcceleration(PhysicalObject* physicalObject);
+
+#endif
+
 #ifndef COLLISION_MANAGER_H
 #define COLLISION_MANAGER_H
 
@@ -108,191 +253,6 @@ class CollisionManager{
 };
 
 #endif
-#ifndef TEXTURE_MANAGER_H
-#define TEXTURE_MANAGER_H
-
-#include <string>
-#include <unordered_map>
-#include <vector>
-#ifndef TEXTURE_SHEET_SIZES_H
-#define TEXTURE_SHEET_SIZES_H
-
-struct TextureSheetSizes{
-    int textureSizeX;
-    int textureSizeY;
-    int numTexturesX;
-    int numTexturesY;
-};
-
-#endif
-
-class TextureSheet;
-class Animation;
-
-class TextureManager{
-    public:
-        void loadTexture(std::string location, std::string name, TextureSheetSizes textureSheetSizes);
-        TextureSheet* getTexture(std::string name);
-
-        void registerAnimation(Animation* animation);
-        void deregisterAnimation(Animation* animation);
-
-        void initAnimationClocks();
-        void updateAnimations();
-
-    private:
-        std::unordered_map<std::string, TextureSheet*> m_loadedTextures;
-        std::vector<Animation*> m_animations;
-};
-
-#endif
-#ifndef ENTITY_MANAGER_H
-#define ENTITY_MANAGER_H
-
-#include <vector>
-class Entity;
-class PhysicsManager;
-class CollisionManager;
-class TextureManager;
-
-class EntityManager{
-    public:
-        EntityManager(PhysicsManager* physicsManager, CollisionManager* collisionManager, TextureManager* textureManager);
-
-        void registerEntity(Entity* entity);
-        void registerEntities(std::vector<Entity*> entities);
-        // void destroyEntity(Entity* entity);
-        std::vector<Entity*> getAllEntities();
-
-    private:
-        std::vector<Entity*> m_entities;
-
-        PhysicsManager* m_physicsManagerPtr;
-        CollisionManager* m_collisionManagerPtr;
-        TextureManager* m_textureManagerPtr;
-
-};
-
-#endif
-#ifndef DEBUG_MANAGER_H
-#define DEBUG_MANAGER_H
-
-#include <SFML/Graphics.hpp>
-#include <vector>
-
-class DebugEntity;
-
-class DebugManager{
-    public:
-        void registerDebugEntity(DebugEntity* debugEntity);
-
-        void showDebugInfo(sf::RenderWindow* windowPtr);
-
-    private:
-        std::vector<DebugEntity*> m_debugEntities; // ? map<Entity -> DebugEntity> ?
-};
-
-#endif
-
-class Universe{
-    public:
-        Universe(bool DEBUG = false);
-
-        void setupWindow(sf::RenderWindow* window);
-
-        void addController(std::function<void()> controller);
-        void addEventHandler(std::function<void(sf::Event event)> eventHandler);
-
-        void loop();
-
-        PhysicsManager* physicsManager = nullptr;
-        CollisionManager* collisionManager = nullptr;
-        TextureManager* textureManager = nullptr;
-        EntityManager* entityManager = nullptr;
-        DebugManager* debugManager = nullptr;
-
-    private:
-        sf::RenderWindow* m_windowPtr;
-
-        sf::Clock m_deltaClock;
-        
-        std::vector<std::function<void()>> m_controllers;
-        std::vector<std::function<void(sf::Event event)>> m_eventHandlers;
-};
-
-#endif
-
-#ifndef TEXTURESHEET_H
-#define TEXTURESHEET_H
-
-#include <SFML/Graphics.hpp>
-#include <string>
-#include <vector>
-
-// TODO texturesheet with gaps between textures
-class TextureSheet{
-    public:
-        TextureSheet(TextureSheetSizes textureSheetSizes, std::string location);
-
-        std::string getLocation();
-        sf::Texture* getTextureSheet();
-        sf::IntRect getTextureRect(int textureN);
-
-    private:
-        std::string m_location;
-        sf::Texture m_textureSheet;
-        std::vector<sf::IntRect> m_textureRects;
-};
-
-#endif
-
-#ifndef ANIMATION_H
-#define ANIMATION_H
-
-#include <SFML/Graphics.hpp>
-class TextureSheet;
-
-// TODO Animations should switch immediately
-class Animation{
-    public:
-        Animation(TextureSheet* textureSheet, sf::Sprite* owner, int initialTextureN);
-    
-        
-        void addTextureSequence(std::string name, std::vector<int> textureSequence);
-        void setCurrentTextureSequence(std::string name);
-    
-
-        // ?
-        // runForward -> 1,2,3,1,2,3
-        // runCycle -> 1,2,3,2,1,2
-        // ?
-        void run();
-        void restartClock();
-
-    private:
-        sf::Sprite* m_owner;
-        TextureSheet* m_textureSheet;
-        
-        sf::Clock m_clock;
-        std::unordered_map<std::string, std::vector<int>> m_textureSequences; // e.g. "idle": [5, 6, 7, 8]
-        std::string m_currentTextureSequence;
-        int m_currentTextureN = 0;
-
-};
-
-#endif
-
-#ifndef COMPUTATIONS_H
-#define COMPUTATIONS_H
-
-class PhysicalObject;
-
-std::function<void(float)> updatePositionBasedOnVelocity(PhysicalObject* physicalObject);
-
-std::function<void(float)> updateVelocityBasedOnAcceleration(PhysicalObject* physicalObject);
-
-#endif
-
 #ifndef COLLISION_PAIR_H
 #define COLLISION_PAIR_H
 
@@ -409,7 +369,34 @@ struct Entity{
 };
 
 #endif
+#ifndef ENTITY_MANAGER_H
+#define ENTITY_MANAGER_H
 
+#include <vector>
+class Entity;
+class PhysicsManager;
+class CollisionManager;
+class TextureManager;
+
+class EntityManager{
+    public:
+        EntityManager(PhysicsManager* physicsManager, CollisionManager* collisionManager, TextureManager* textureManager);
+
+        void registerEntity(Entity* entity);
+        void registerEntities(std::vector<Entity*> entities);
+        // void destroyEntity(Entity* entity);
+        std::vector<Entity*> getAllEntities();
+
+    private:
+        std::vector<Entity*> m_entities;
+
+        PhysicsManager* m_physicsManagerPtr;
+        CollisionManager* m_collisionManagerPtr;
+        TextureManager* m_textureManagerPtr;
+
+};
+
+#endif
 #ifndef ENTITY_BUILDERS_H
 #define ENTITY_BUILDERS_H
 
@@ -468,7 +455,25 @@ class DebugEntity{
 };
 
 #endif
+#ifndef DEBUG_MANAGER_H
+#define DEBUG_MANAGER_H
 
+#include <SFML/Graphics.hpp>
+#include <vector>
+
+class DebugEntity;
+
+class DebugManager{
+    public:
+        void registerDebugEntity(DebugEntity* debugEntity);
+
+        void showDebugInfo(sf::RenderWindow* windowPtr);
+
+    private:
+        std::vector<DebugEntity*> m_debugEntities; // ? map<Entity -> DebugEntity> ?
+};
+
+#endif
 #ifndef COLLISION_SHAPE_BORDER_H
 #define COLLISION_SHAPE_BORDER_H
 
@@ -511,6 +516,166 @@ struct Measurements{
 
 #ifndef SGE_MAIN
 
+Universe::Universe(bool DEBUG){
+    PhysicsManager* PM = new PhysicsManager();
+    CollisionManager* CM = new CollisionManager();
+    TextureManager* TM = new TextureManager();
+    EntityManager* EM = new EntityManager(PM, CM, TM);
+    
+    physicsManager = PM;
+    collisionManager = CM;
+    textureManager = TM;
+    entityManager = EM;
+
+    if(DEBUG){
+        debugManager = new DebugManager();
+    }
+}
+
+void Universe::setupWindow(sf::RenderWindow *window){ m_windowPtr = window; }
+
+void Universe::addController(std::function<void()> controller){ m_controllers.push_back(controller); }
+void Universe::addEventHandler(std::function<void(sf::Event event)> eventHandler){ m_eventHandlers.push_back(eventHandler); }
+
+void Universe::loop(){
+    if(!m_windowPtr){
+        printf("RenderWindow is not initialized. Use setupWindow method to initialize RenderWindow before(!) looping the Universe.\n");
+        exit(1);
+    }
+
+    // Clocks initialization
+    // ! Remove in the future (init on animation creation?)
+    textureManager->initAnimationClocks();
+    // !
+
+    m_deltaClock.restart();
+    //
+
+    while(m_windowPtr->isOpen()){
+        // Events
+        sf::Event event;
+        while(m_windowPtr->pollEvent(event)){
+            if (event.type == sf::Event::Closed) m_windowPtr->close();
+        
+            for(std::function eventHandler : m_eventHandlers){
+                eventHandler(event);
+            }
+        }
+        //
+
+        // Controllers
+        for(std::function controller : m_controllers){
+            controller();
+        }
+        //
+
+        // Game updates
+        // Calculate dt
+        sf::Time deltaTime = m_deltaClock.restart();
+        float dt = deltaTime.asSeconds();
+        if(dt > 0.15f) dt = 0.15f;
+        //
+
+        physicsManager->updatePhysics(dt);
+        collisionManager->alignCollisionShapes();
+        collisionManager->updateCollisions();
+        textureManager->updateAnimations();
+        // 
+
+        // Game draws
+        m_windowPtr->clear();
+        
+        for(PhysicalObject* physicalObject : physicsManager->getAllPhysicalObjects()){
+            m_windowPtr->draw(*physicalObject);
+        }
+
+        if(debugManager){
+            debugManager->showDebugInfo(m_windowPtr);
+        }
+        //
+
+        m_windowPtr->display();
+    }
+}
+
+
+TextureSheet::TextureSheet(TextureSheetSizes textureSheetSizes, std::string location){
+    m_location = location;
+    m_textureSheet.loadFromFile(location);
+
+    for(int i = 0; i < textureSheetSizes.numTexturesY*textureSheetSizes.textureSizeY; i += textureSheetSizes.textureSizeY){
+        for(int j = 0; j < textureSheetSizes.numTexturesX*textureSheetSizes.textureSizeX; j += textureSheetSizes.textureSizeX){
+            m_textureRects.push_back(sf::IntRect(j, i, textureSheetSizes.textureSizeX, textureSheetSizes.textureSizeY));
+        }
+    }
+}
+
+std::string TextureSheet::getLocation(){ return m_location; }
+sf::Texture* TextureSheet::getTextureSheet(){ return &m_textureSheet; }
+sf::IntRect TextureSheet::getTextureRect(int textureN){ return m_textureRects[textureN]; }
+
+
+void TextureManager::loadTexture(std::string location, std::string name, TextureSheetSizes textureSheetSizes){ m_loadedTextures[name] = new TextureSheet(textureSheetSizes, location); }
+TextureSheet* TextureManager::getTexture(std::string name){ return m_loadedTextures[name]; }
+
+void TextureManager::registerAnimation(Animation* animation){ m_animations.push_back(animation); }
+void TextureManager::deregisterAnimation(Animation* animation){ m_animations.erase(std::remove(m_animations.begin(), m_animations.end(), animation), m_animations.end()); }
+
+void TextureManager::initAnimationClocks(){
+    for(Animation* animation : m_animations){
+        animation->restartClock();
+    }
+}
+
+void TextureManager::updateAnimations(){
+    for(Animation* animation : m_animations){
+        animation->run();
+    }
+}
+
+
+Animation::Animation(TextureSheet* textureSheet, sf::Sprite* owner, int initialTextureN){
+    m_textureSheet = textureSheet;
+    m_owner = owner;
+    
+    m_owner->setTexture(*textureSheet->getTextureSheet());
+    m_owner->setTextureRect(textureSheet->getTextureRect(initialTextureN));
+}
+
+void Animation::addTextureSequence(std::string name, std::vector<int> textureSequence){ m_textureSequences[name] = textureSequence; }
+void Animation::setCurrentTextureSequence(std::string name){
+    if(m_currentTextureSequence != name){
+        m_currentTextureSequence = name;
+        m_currentTextureN = 0;
+        m_clock.restart();
+    }
+}
+
+void Animation::run(){
+    if(!m_textureSequences.size()){
+        printf("No texture sequences initialized.\n");
+        exit(1);
+    }
+    if(!m_currentTextureSequence.length()){
+        printf("Can not run animation if no current texture sequence is set.\n"); // ? Default to first added ?
+        exit(1);
+    }
+
+    // TODO dynamic animation delay (for each animation ?)
+    if(m_clock.getElapsedTime().asMilliseconds() > 100){
+        m_owner->setTextureRect(m_textureSheet->getTextureRect(m_textureSequences[m_currentTextureSequence].at(m_currentTextureN)));
+        
+        if(m_currentTextureN+1 == m_textureSequences[m_currentTextureSequence].size()){
+            m_currentTextureN = 0;
+        }
+        else m_currentTextureN++;
+
+        
+        m_clock.restart();
+    }
+}
+void Animation::restartClock(){ m_clock.restart(); }
+
 void PhysicsManager::registerPhysicalObject(PhysicalObject* physicalObject){ m_physicalObjects.push_back(physicalObject); }
 void PhysicsManager::deregisterPhysicalObject(PhysicalObject* physicalObject){ m_physicalObjects.erase(std::remove(m_physicalObjects.begin(), m_physicalObjects.end(), physicalObject), m_physicalObjects.end()); }
 std::vector<PhysicalObject*> PhysicsManager::getAllPhysicalObjects(){ return m_physicalObjects; }
@@ -544,6 +709,31 @@ void PhysicalObject::update(float dt){
         }
     }
 };
+
+
+std::function<void(float)> updatePositionBasedOnVelocity(PhysicalObject* physicalObject){
+    return [physicalObject](float dt){
+        physicalObject->setPosition(physicalObject->getPosition() + physicalObject->velocity * dt);
+    };
+}
+
+std::function<void(float)> updateVelocityBasedOnAcceleration(PhysicalObject* physicalObject){
+    return [physicalObject](float dt){
+        if(abs(physicalObject->velocity.x) >= physicalObject->speedLimit.x){
+            physicalObject->velocity.x = physicalObject->speedLimit.x;
+        }
+        else{
+            physicalObject->velocity.x += physicalObject->acceleration.x;
+        }
+
+        if(abs(physicalObject->velocity.y) >= physicalObject->speedLimit.y){
+            physicalObject->velocity.y = physicalObject->speedLimit.y;
+        }
+        else{
+            physicalObject->velocity.y += physicalObject->acceleration.y;
+        }
+    };
+}
 
 
 void CollisionManager::registerCollisionShape(CollisionShape* collisionShape){ m_allCollisionShapes.push_back(collisionShape); }
@@ -665,257 +855,6 @@ void CollisionManager::updateCollisions(){
 }
 
 
-void TextureManager::loadTexture(std::string location, std::string name, TextureSheetSizes textureSheetSizes){ m_loadedTextures[name] = new TextureSheet(textureSheetSizes, location); }
-TextureSheet* TextureManager::getTexture(std::string name){ return m_loadedTextures[name]; }
-
-void TextureManager::registerAnimation(Animation* animation){ m_animations.push_back(animation); }
-void TextureManager::deregisterAnimation(Animation* animation){ m_animations.erase(std::remove(m_animations.begin(), m_animations.end(), animation), m_animations.end()); }
-
-void TextureManager::initAnimationClocks(){
-    for(Animation* animation : m_animations){
-        animation->restartClock();
-    }
-}
-
-void TextureManager::updateAnimations(){
-    for(Animation* animation : m_animations){
-        animation->run();
-    }
-}
-
-
-EntityManager::EntityManager(PhysicsManager* physicsManager, CollisionManager* collisionManager, TextureManager* textureManager){
-    m_physicsManagerPtr = physicsManager;
-    m_collisionManagerPtr = collisionManager;
-    m_textureManagerPtr = textureManager;
-}
-
-void EntityManager::registerEntity(Entity* entity){
-    m_physicsManagerPtr->registerPhysicalObject(entity->physicalObject);
-        
-    if(entity->collisionShapes.size()){
-        for(auto& [_, collisionShape] : entity->collisionShapes){
-            m_collisionManagerPtr->registerCollisionShape(collisionShape);
-        }
-    }
-    
-    if(entity->animation){
-        m_textureManagerPtr->registerAnimation(entity->animation);
-    }
-}
-
-void EntityManager::registerEntities(std::vector<Entity*> entities){
-    for(Entity* entity : entities){
-        m_physicsManagerPtr->registerPhysicalObject(entity->physicalObject);
-        
-        if(entity->collisionShapes.size()){
-            // Map to vector
-            std::vector<CollisionShape*> entityCollisionShapes;
-            for(auto& [_, collisionShape] : entity->collisionShapes){
-                entityCollisionShapes.push_back(collisionShape);
-            }
-            //
-            m_collisionManagerPtr->registerCollisionShapes(entityCollisionShapes);
-        }
-        
-        if(entity->animation){
-            m_textureManagerPtr->registerAnimation(entity->animation);
-        }
-
-        m_entities.push_back(entity);
-    }
-}
-
-std::vector<Entity*> EntityManager::getAllEntities(){ return m_entities; }
-
-
-void DebugManager::registerDebugEntity(DebugEntity* debugEntity){ m_debugEntities.push_back(debugEntity); }
-
-void DebugManager::showDebugInfo(sf::RenderWindow* windowPtr){
-    for(DebugEntity* debugEntity : m_debugEntities){
-        // Run extraDebugFunctions
-        for(std::function<void(sf::RenderWindow* renderWindow)> extraDebugFunction : debugEntity->getExtraDebugFunctions()){
-            extraDebugFunction(windowPtr);
-        }
-        //
-
-        // Draw collision shape borders
-        if(debugEntity->drawCollisionShapeBorders){
-            for(CollisionShapeBorder* collisionShapeBorder : debugEntity->generateCollisionShapeBorders()){
-                windowPtr->draw(*collisionShapeBorder);
-            }
-        }
-        //
-    }
-}
-
-
-Universe::Universe(bool DEBUG){
-    PhysicsManager* PM = new PhysicsManager();
-    CollisionManager* CM = new CollisionManager();
-    TextureManager* TM = new TextureManager();
-    EntityManager* EM = new EntityManager(PM, CM, TM);
-    
-    physicsManager = PM;
-    collisionManager = CM;
-    textureManager = TM;
-    entityManager = EM;
-
-    if(DEBUG){
-        debugManager = new DebugManager();
-    }
-}
-
-void Universe::setupWindow(sf::RenderWindow *window){ m_windowPtr = window; }
-
-void Universe::addController(std::function<void()> controller){ m_controllers.push_back(controller); }
-void Universe::addEventHandler(std::function<void(sf::Event event)> eventHandler){ m_eventHandlers.push_back(eventHandler); }
-
-void Universe::loop(){
-    if(!m_windowPtr){
-        printf("RenderWindow is not initialized. Use setupWindow method to initialize RenderWindow before(!) looping the Universe.\n");
-        exit(1);
-    }
-
-    // Clocks initialization
-    // ! Remove in the future (init on animation creation?)
-    textureManager->initAnimationClocks();
-    // !
-
-    m_deltaClock.restart();
-    //
-
-    while(m_windowPtr->isOpen()){
-        // Events
-        sf::Event event;
-        while(m_windowPtr->pollEvent(event)){
-            if (event.type == sf::Event::Closed) m_windowPtr->close();
-        
-            for(std::function eventHandler : m_eventHandlers){
-                eventHandler(event);
-            }
-        }
-        //
-
-        // Controllers
-        for(std::function controller : m_controllers){
-            controller();
-        }
-        //
-
-        // Game updates
-        // Calculate dt
-        sf::Time deltaTime = m_deltaClock.restart();
-        float dt = deltaTime.asSeconds();
-        if(dt > 0.15f) dt = 0.15f;
-        //
-
-        physicsManager->updatePhysics(dt);
-        collisionManager->alignCollisionShapes();
-        collisionManager->updateCollisions();
-        textureManager->updateAnimations();
-        // 
-
-        // Game draws
-        m_windowPtr->clear();
-        
-        for(PhysicalObject* physicalObject : physicsManager->getAllPhysicalObjects()){
-            m_windowPtr->draw(*physicalObject);
-        }
-
-        if(debugManager){
-            debugManager->showDebugInfo(m_windowPtr);
-        }
-        //
-
-        m_windowPtr->display();
-    }
-}
-
-
-TextureSheet::TextureSheet(TextureSheetSizes textureSheetSizes, std::string location){
-    m_location = location;
-    m_textureSheet.loadFromFile(location);
-
-    for(int i = 0; i < textureSheetSizes.numTexturesY*textureSheetSizes.textureSizeY; i += textureSheetSizes.textureSizeY){
-        for(int j = 0; j < textureSheetSizes.numTexturesX*textureSheetSizes.textureSizeX; j += textureSheetSizes.textureSizeX){
-            m_textureRects.push_back(sf::IntRect(j, i, textureSheetSizes.textureSizeX, textureSheetSizes.textureSizeY));
-        }
-    }
-}
-
-std::string TextureSheet::getLocation(){ return m_location; }
-sf::Texture* TextureSheet::getTextureSheet(){ return &m_textureSheet; }
-sf::IntRect TextureSheet::getTextureRect(int textureN){ return m_textureRects[textureN]; }
-
-
-Animation::Animation(TextureSheet* textureSheet, sf::Sprite* owner, int initialTextureN){
-    m_textureSheet = textureSheet;
-    m_owner = owner;
-    
-    m_owner->setTexture(*textureSheet->getTextureSheet());
-    m_owner->setTextureRect(textureSheet->getTextureRect(initialTextureN));
-}
-
-void Animation::addTextureSequence(std::string name, std::vector<int> textureSequence){ m_textureSequences[name] = textureSequence; }
-void Animation::setCurrentTextureSequence(std::string name){
-    if(m_currentTextureSequence != name){
-        m_currentTextureSequence = name;
-        m_currentTextureN = 0;
-        m_clock.restart();
-    }
-}
-
-void Animation::run(){
-    if(!m_textureSequences.size()){
-        printf("No texture sequences initialized.\n");
-        exit(1);
-    }
-    if(!m_currentTextureSequence.length()){
-        printf("Can not run animation if no current texture sequence is set.\n"); // ? Default to first added ?
-        exit(1);
-    }
-
-    // TODO dynamic animation delay (for each animation ?)
-    if(m_clock.getElapsedTime().asMilliseconds() > 100){
-        m_owner->setTextureRect(m_textureSheet->getTextureRect(m_textureSequences[m_currentTextureSequence].at(m_currentTextureN)));
-        
-        if(m_currentTextureN+1 == m_textureSequences[m_currentTextureSequence].size()){
-            m_currentTextureN = 0;
-        }
-        else m_currentTextureN++;
-
-        
-        m_clock.restart();
-    }
-}
-void Animation::restartClock(){ m_clock.restart(); }
-
-std::function<void(float)> updatePositionBasedOnVelocity(PhysicalObject* physicalObject){
-    return [physicalObject](float dt){
-        physicalObject->setPosition(physicalObject->getPosition() + physicalObject->velocity * dt);
-    };
-}
-
-std::function<void(float)> updateVelocityBasedOnAcceleration(PhysicalObject* physicalObject){
-    return [physicalObject](float dt){
-        if(abs(physicalObject->velocity.x) >= physicalObject->speedLimit.x){
-            physicalObject->velocity.x = physicalObject->speedLimit.x;
-        }
-        else{
-            physicalObject->velocity.x += physicalObject->acceleration.x;
-        }
-
-        if(abs(physicalObject->velocity.y) >= physicalObject->speedLimit.y){
-            physicalObject->velocity.y = physicalObject->speedLimit.y;
-        }
-        else{
-            physicalObject->velocity.y += physicalObject->acceleration.y;
-        }
-    };
-}
-
-
 bool operator< (const Collision a, const Collision b){ return a.recipient < b.recipient; }
 bool operator> (const Collision a, const Collision b){ return a.recipient > b.recipient; }
 bool operator== (const Collision a, const Collision b){ return a.recipient == b.recipient; }
@@ -1030,6 +969,51 @@ bool boundingBox(CollisionShape* initiator, CollisionShape* recipient){
 }
 
 
+EntityManager::EntityManager(PhysicsManager* physicsManager, CollisionManager* collisionManager, TextureManager* textureManager){
+    m_physicsManagerPtr = physicsManager;
+    m_collisionManagerPtr = collisionManager;
+    m_textureManagerPtr = textureManager;
+}
+
+void EntityManager::registerEntity(Entity* entity){
+    m_physicsManagerPtr->registerPhysicalObject(entity->physicalObject);
+        
+    if(entity->collisionShapes.size()){
+        for(auto& [_, collisionShape] : entity->collisionShapes){
+            m_collisionManagerPtr->registerCollisionShape(collisionShape);
+        }
+    }
+    
+    if(entity->animation){
+        m_textureManagerPtr->registerAnimation(entity->animation);
+    }
+}
+
+void EntityManager::registerEntities(std::vector<Entity*> entities){
+    for(Entity* entity : entities){
+        m_physicsManagerPtr->registerPhysicalObject(entity->physicalObject);
+        
+        if(entity->collisionShapes.size()){
+            // Map to vector
+            std::vector<CollisionShape*> entityCollisionShapes;
+            for(auto& [_, collisionShape] : entity->collisionShapes){
+                entityCollisionShapes.push_back(collisionShape);
+            }
+            //
+            m_collisionManagerPtr->registerCollisionShapes(entityCollisionShapes);
+        }
+        
+        if(entity->animation){
+            m_textureManagerPtr->registerAnimation(entity->animation);
+        }
+
+        m_entities.push_back(entity);
+    }
+}
+
+std::vector<Entity*> EntityManager::getAllEntities(){ return m_entities; }
+
+
 Entity* buildPlainEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position){
     Entity* e = new Entity{ new PhysicalObject() };
     e->physicalObject->setTexture(*texture);
@@ -1075,6 +1059,27 @@ std::vector<CollisionShapeBorder*> DebugEntity::generateCollisionShapeBorders(){
 
 void DebugEntity::addExtraDebugFunction(std::function<void(sf::RenderWindow* windowPtr)> extraDebugFunction){ m_extraDebugFunctions.push_back(extraDebugFunction); }
 std::vector<std::function<void(sf::RenderWindow* windowPtr)>> DebugEntity::getExtraDebugFunctions(){ return m_extraDebugFunctions; }
+
+
+void DebugManager::registerDebugEntity(DebugEntity* debugEntity){ m_debugEntities.push_back(debugEntity); }
+
+void DebugManager::showDebugInfo(sf::RenderWindow* windowPtr){
+    for(DebugEntity* debugEntity : m_debugEntities){
+        // Run extraDebugFunctions
+        for(std::function<void(sf::RenderWindow* renderWindow)> extraDebugFunction : debugEntity->getExtraDebugFunctions()){
+            extraDebugFunction(windowPtr);
+        }
+        //
+
+        // Draw collision shape borders
+        if(debugEntity->drawCollisionShapeBorders){
+            for(CollisionShapeBorder* collisionShapeBorder : debugEntity->generateCollisionShapeBorders()){
+                windowPtr->draw(*collisionShapeBorder);
+            }
+        }
+        //
+    }
+}
 
 
 CollisionShapeBorder::CollisionShapeBorder(CollisionShape* owner, CollisionShapeBorderSettings settings){
