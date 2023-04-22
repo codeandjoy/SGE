@@ -111,6 +111,9 @@ class CollisionManager{
 #ifndef TEXTURE_MANAGER_H
 #define TEXTURE_MANAGER_H
 
+#include <string>
+#include <unordered_map>
+#include <vector>
 #ifndef TEXTURE_SHEET_SIZES_H
 #define TEXTURE_SHEET_SIZES_H
 
@@ -122,62 +125,9 @@ struct TextureSheetSizes{
 };
 
 #endif
-#ifndef TEXTURESHEET_H
-#define TEXTURESHEET_H
 
-#include <SFML/Graphics.hpp>
-
-// TODO texturesheet with gaps between textures
-// ? parse from .tsx ?
-class TextureSheet{
-    public:
-        TextureSheet(TextureSheetSizes textureSheetSizes, std::string location);
-
-        std::string getLocation();
-        sf::Texture* getTextureSheet();
-        sf::IntRect getTextureRect(int textureN);
-
-    private:
-        std::string m_location;
-        sf::Texture m_textureSheet;
-        std::vector<sf::IntRect> m_textureRects;
-};
-
-#endif
-#ifndef ANIMATION_H
-#define ANIMATION_H
-
-#include <SFML/Graphics.hpp>
-
-// TODO Animations should switch immediately
-class Animation{
-    public:
-        Animation(TextureSheet* textureSheet, sf::Sprite* owner, int initialTextureN);
-    
-        
-        void addTextureSequence(std::string name, std::vector<int> textureSequence);
-        void setCurrentTextureSequence(std::string name);
-    
-
-        // ?
-        // runForward -> 1,2,3,1,2,3
-        // runCycle -> 1,2,3,2,1,2
-        // ?
-        void run();
-        void restartClock();
-
-    private:
-        sf::Sprite* m_owner;
-        TextureSheet* m_textureSheet;
-        
-        sf::Clock m_clock;
-        std::unordered_map<std::string, std::vector<int>> m_textureSequences; // e.g. "idle": [5, 6, 7, 8]
-        std::string m_currentTextureSequence;
-        int m_currentTextureN = 0;
-
-};
-
-#endif
+class TextureSheet;
+class Animation;
 
 class TextureManager{
     public:
@@ -268,6 +218,66 @@ class Universe{
         
         std::vector<std::function<void()>> m_controllers;
         std::vector<std::function<void(sf::Event event)>> m_eventHandlers;
+};
+
+#endif
+
+#ifndef TEXTURESHEET_H
+#define TEXTURESHEET_H
+
+#include <SFML/Graphics.hpp>
+#include <string>
+#include <vector>
+
+// TODO texturesheet with gaps between textures
+class TextureSheet{
+    public:
+        TextureSheet(TextureSheetSizes textureSheetSizes, std::string location);
+
+        std::string getLocation();
+        sf::Texture* getTextureSheet();
+        sf::IntRect getTextureRect(int textureN);
+
+    private:
+        std::string m_location;
+        sf::Texture m_textureSheet;
+        std::vector<sf::IntRect> m_textureRects;
+};
+
+#endif
+
+#ifndef ANIMATION_H
+#define ANIMATION_H
+
+#include <SFML/Graphics.hpp>
+class TextureSheet;
+
+// TODO Animations should switch immediately
+class Animation{
+    public:
+        Animation(TextureSheet* textureSheet, sf::Sprite* owner, int initialTextureN);
+    
+        
+        void addTextureSequence(std::string name, std::vector<int> textureSequence);
+        void setCurrentTextureSequence(std::string name);
+    
+
+        // ?
+        // runForward -> 1,2,3,1,2,3
+        // runCycle -> 1,2,3,2,1,2
+        // ?
+        void run();
+        void restartClock();
+
+    private:
+        sf::Sprite* m_owner;
+        TextureSheet* m_textureSheet;
+        
+        sf::Clock m_clock;
+        std::unordered_map<std::string, std::vector<int>> m_textureSequences; // e.g. "idle": [5, 6, 7, 8]
+        std::string m_currentTextureSequence;
+        int m_currentTextureN = 0;
+
 };
 
 #endif
@@ -655,64 +665,6 @@ void CollisionManager::updateCollisions(){
 }
 
 
-TextureSheet::TextureSheet(TextureSheetSizes textureSheetSizes, std::string location){
-    m_location = location;
-    m_textureSheet.loadFromFile(location);
-
-    for(int i = 0; i < textureSheetSizes.numTexturesY*textureSheetSizes.textureSizeY; i += textureSheetSizes.textureSizeY){
-        for(int j = 0; j < textureSheetSizes.numTexturesX*textureSheetSizes.textureSizeX; j += textureSheetSizes.textureSizeX){
-            m_textureRects.push_back(sf::IntRect(j, i, textureSheetSizes.textureSizeX, textureSheetSizes.textureSizeY));
-        }
-    }
-}
-
-std::string TextureSheet::getLocation(){ return m_location; }
-sf::Texture* TextureSheet::getTextureSheet(){ return &m_textureSheet; }
-sf::IntRect TextureSheet::getTextureRect(int textureN){ return m_textureRects[textureN]; }
-
-
-Animation::Animation(TextureSheet* textureSheet, sf::Sprite* owner, int initialTextureN){
-    m_textureSheet = textureSheet;
-    m_owner = owner;
-    
-    m_owner->setTexture(*textureSheet->getTextureSheet());
-    m_owner->setTextureRect(textureSheet->getTextureRect(initialTextureN));
-}
-
-void Animation::addTextureSequence(std::string name, std::vector<int> textureSequence){ m_textureSequences[name] = textureSequence; }
-void Animation::setCurrentTextureSequence(std::string name){
-    if(m_currentTextureSequence != name){
-        m_currentTextureSequence = name;
-        m_currentTextureN = 0;
-        m_clock.restart();
-    }
-}
-
-void Animation::run(){
-    if(!m_textureSequences.size()){
-        printf("No texture sequences initialized.\n");
-        exit(1);
-    }
-    if(!m_currentTextureSequence.length()){
-        printf("Can not run animation if no current texture sequence is set.\n"); // ? Default to first added ?
-        exit(1);
-    }
-
-    // TODO dynamic animation delay (for each animation ?)
-    if(m_clock.getElapsedTime().asMilliseconds() > 100){
-        m_owner->setTextureRect(m_textureSheet->getTextureRect(m_textureSequences[m_currentTextureSequence].at(m_currentTextureN)));
-        
-        if(m_currentTextureN+1 == m_textureSequences[m_currentTextureSequence].size()){
-            m_currentTextureN = 0;
-        }
-        else m_currentTextureN++;
-
-        
-        m_clock.restart();
-    }
-}
-void Animation::restartClock(){ m_clock.restart(); }
-
 void TextureManager::loadTexture(std::string location, std::string name, TextureSheetSizes textureSheetSizes){ m_loadedTextures[name] = new TextureSheet(textureSheetSizes, location); }
 TextureSheet* TextureManager::getTexture(std::string name){ return m_loadedTextures[name]; }
 
@@ -880,6 +832,64 @@ void Universe::loop(){
     }
 }
 
+
+TextureSheet::TextureSheet(TextureSheetSizes textureSheetSizes, std::string location){
+    m_location = location;
+    m_textureSheet.loadFromFile(location);
+
+    for(int i = 0; i < textureSheetSizes.numTexturesY*textureSheetSizes.textureSizeY; i += textureSheetSizes.textureSizeY){
+        for(int j = 0; j < textureSheetSizes.numTexturesX*textureSheetSizes.textureSizeX; j += textureSheetSizes.textureSizeX){
+            m_textureRects.push_back(sf::IntRect(j, i, textureSheetSizes.textureSizeX, textureSheetSizes.textureSizeY));
+        }
+    }
+}
+
+std::string TextureSheet::getLocation(){ return m_location; }
+sf::Texture* TextureSheet::getTextureSheet(){ return &m_textureSheet; }
+sf::IntRect TextureSheet::getTextureRect(int textureN){ return m_textureRects[textureN]; }
+
+
+Animation::Animation(TextureSheet* textureSheet, sf::Sprite* owner, int initialTextureN){
+    m_textureSheet = textureSheet;
+    m_owner = owner;
+    
+    m_owner->setTexture(*textureSheet->getTextureSheet());
+    m_owner->setTextureRect(textureSheet->getTextureRect(initialTextureN));
+}
+
+void Animation::addTextureSequence(std::string name, std::vector<int> textureSequence){ m_textureSequences[name] = textureSequence; }
+void Animation::setCurrentTextureSequence(std::string name){
+    if(m_currentTextureSequence != name){
+        m_currentTextureSequence = name;
+        m_currentTextureN = 0;
+        m_clock.restart();
+    }
+}
+
+void Animation::run(){
+    if(!m_textureSequences.size()){
+        printf("No texture sequences initialized.\n");
+        exit(1);
+    }
+    if(!m_currentTextureSequence.length()){
+        printf("Can not run animation if no current texture sequence is set.\n"); // ? Default to first added ?
+        exit(1);
+    }
+
+    // TODO dynamic animation delay (for each animation ?)
+    if(m_clock.getElapsedTime().asMilliseconds() > 100){
+        m_owner->setTextureRect(m_textureSheet->getTextureRect(m_textureSequences[m_currentTextureSequence].at(m_currentTextureN)));
+        
+        if(m_currentTextureN+1 == m_textureSequences[m_currentTextureSequence].size()){
+            m_currentTextureN = 0;
+        }
+        else m_currentTextureN++;
+
+        
+        m_clock.restart();
+    }
+}
+void Animation::restartClock(){ m_clock.restart(); }
 
 std::function<void(float)> updatePositionBasedOnVelocity(PhysicalObject* physicalObject){
     return [physicalObject](float dt){
