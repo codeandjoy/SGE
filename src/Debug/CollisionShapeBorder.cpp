@@ -1,4 +1,7 @@
+#include "../Collision/CollisionShape.h"
 #include "CollisionShapeBorder.h"
+#include "CollisionShapeBorderSettings.h"
+
 
 CollisionShapeBorder::CollisionShapeBorder(CollisionShape* owner, CollisionShapeBorderSettings settings){
     this->setFillColor(sf::Color(0,0,0,0));

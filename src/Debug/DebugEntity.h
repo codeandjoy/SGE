@@ -1,9 +1,15 @@
 #ifndef DEBUG_ENTITY_H
 #define DEBUG_ENTITY_H
 
-#include "../Entity/Entity.h"
-#include "./CollisionShapeBorder.h"
-#include "./CollisionShapeBorderSettings.h"
+#include <SFML/Graphics.hpp> 
+#include <unordered_map>
+#include <vector>
+#include <string>
+#include <functional>
+
+#include "CollisionShapeBorderSettings.h"
+class Entity;
+class CollisionShapeBorder;
 
 
 class DebugEntity{

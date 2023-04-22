@@ -1,6 +1,11 @@
 #include "DebugManager.h"
+#include "DebugEntity.h"
+#include "CollisionShapeBorder.h"
+
 
 void DebugManager::registerDebugEntity(DebugEntity* debugEntity){ m_debugEntities.push_back(debugEntity); }
+
+
 
 void DebugManager::showDebugInfo(sf::RenderWindow* windowPtr){
     for(DebugEntity* debugEntity : m_debugEntities){

@@ -1,4 +1,7 @@
 #include "DebugEntity.h"
+#include "../Entity/Entity.h"
+#include "CollisionShapeBorder.h"
+
 
 DebugEntity::DebugEntity(Entity* relatedEntity){ m_relatedEntity = relatedEntity; }
 

@@ -1,7 +1,10 @@
 #ifndef DEBUG_MANAGER_H
 #define DEBUG_MANAGER_H
 
-#include "./DebugEntity.h"
+#include <SFML/Graphics.hpp>
+#include <vector>
+
+class DebugEntity;
 
 
 class DebugManager{
