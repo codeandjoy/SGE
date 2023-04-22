@@ -103,19 +103,22 @@ struct Measurements{
 };
 
 #endif
+// #include "../Entity/Entity.h"
+class Entity;
+// #include "../Physics/PhysicalObject.h"
 
 class CollisionShape : public sf::RectangleShape{
     public:
-        CollisionShape(PhysicalObject *owner);
+        CollisionShape(Entity* ownerEntityPtr);
 
         sf::Vector2f offset = sf::Vector2f(0, 0);
 
-        PhysicalObject* getOwner();
+        Entity* getOwnerEntity();
         Measurements getMeasurements();
         void align();
 
     private:
-        PhysicalObject *m_owner;
+        Entity* m_ownerEntityPtr;
 };
 
 #endif
@@ -471,32 +474,32 @@ CollisionSide flipInitiatorImpactSide(CollisionSide initiatorImpactSide){
 
 void resolveAABB(std::vector<Collision> collisions){
     for(Collision collision : collisions){
-        PhysicalObject *initiatorOwner = collision.initiator->getOwner();
-        PhysicalObject *recipientOwner = collision.recipient->getOwner();
+        PhysicalObject *initiatorPhysicalObject = collision.initiator->getOwnerEntity()->physicalObject;
+        PhysicalObject *recipientPhysicalObject = collision.recipient->getOwnerEntity()->physicalObject;
         
         // Align initiator based on impact side
         if(collision.initiatorImpactSide == CollisionSide::left){
-            initiatorOwner->setPosition(
-                recipientOwner->getPosition().x + recipientOwner->getGlobalBounds().width - collision.initiator->offset.x,
-                initiatorOwner->getPosition().y
+            initiatorPhysicalObject->setPosition(
+                recipientPhysicalObject->getPosition().x + recipientPhysicalObject->getGlobalBounds().width - collision.initiator->offset.x,
+                initiatorPhysicalObject->getPosition().y
             );
         }
         else if(collision.initiatorImpactSide == CollisionSide::right){
-            initiatorOwner->setPosition(
-                recipientOwner->getPosition().x - collision.initiator->getGlobalBounds().width - collision.initiator->offset.x,
-                initiatorOwner->getPosition().y
+            initiatorPhysicalObject->setPosition(
+                recipientPhysicalObject->getPosition().x - collision.initiator->getGlobalBounds().width - collision.initiator->offset.x,
+                initiatorPhysicalObject->getPosition().y
             );
         }
         else if(collision.initiatorImpactSide == CollisionSide::top){
-            initiatorOwner->setPosition(
-                initiatorOwner->getPosition().x,
-                recipientOwner->getPosition().y + recipientOwner->getGlobalBounds().height - collision.initiator->offset.y
+            initiatorPhysicalObject->setPosition(
+                initiatorPhysicalObject->getPosition().x,
+                recipientPhysicalObject->getPosition().y + recipientPhysicalObject->getGlobalBounds().height - collision.initiator->offset.y
             );
         }
         else if(collision.initiatorImpactSide == CollisionSide::bottom){
-            initiatorOwner->setPosition(
-                initiatorOwner->getPosition().x,
-                recipientOwner->getPosition().y - collision.initiator->getGlobalBounds().height - collision.initiator->offset.y
+            initiatorPhysicalObject->setPosition(
+                initiatorPhysicalObject->getPosition().x,
+                recipientPhysicalObject->getPosition().y - collision.initiator->getGlobalBounds().height - collision.initiator->offset.y
             );
         }
         //
@@ -506,7 +509,7 @@ void resolveAABB(std::vector<Collision> collisions){
 void initiatorStandOnTopOfRecipient(std::vector<Collision> collisions){
     for(Collision collision : collisions){
         if(collision.initiatorImpactSide == CollisionSide::bottom){
-            collision.initiator->getOwner()->velocity.y = 0;
+            collision.initiator->getOwnerEntity()->physicalObject->velocity.y = 0;
         }
     }
 }
@@ -541,7 +544,7 @@ Entity* buildPlainEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vect
 Entity* buildStaticEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position){
     Entity* e = buildPlainEntity(texture, textureRect, position);
 
-    e->collisionShapes["globalBounds"] = new CollisionShape(e->physicalObject);
+    e->collisionShapes["globalBounds"] = new CollisionShape(e);
 
     return e;
 }
@@ -610,19 +613,19 @@ void PhysicsManager::updatePhysics(float dt){
 }
 
 
-CollisionShape::CollisionShape(PhysicalObject *owner){
-    m_owner = owner;
+CollisionShape::CollisionShape(Entity* ownerEntityPtr){
+    m_ownerEntityPtr = ownerEntityPtr;
 
     this->setFillColor(sf::Color(0,0,0,0));
-    this->setSize(sf::Vector2f(owner->getGlobalBounds().width, owner->getGlobalBounds().height));
+    this->setSize(sf::Vector2f(ownerEntityPtr->physicalObject->getGlobalBounds().width, ownerEntityPtr->physicalObject->getGlobalBounds().height));
 }
 
-PhysicalObject* CollisionShape::getOwner(){ return m_owner; }
+Entity* CollisionShape::getOwnerEntity(){ return m_ownerEntityPtr; }
 Measurements CollisionShape::getMeasurements(){
     return { this->getPosition().x, this->getPosition().y, this->getGlobalBounds().height, this->getGlobalBounds().width };
 }
 void CollisionShape::align(){
-    this->setPosition(m_owner->getPosition() + offset);
+    this->setPosition(m_ownerEntityPtr->physicalObject->getPosition() + offset);
 }
 
 
@@ -832,13 +835,9 @@ void EntityManager::registerEntity(Entity* entity){
     m_physicsManagerPtr->registerPhysicalObject(entity->physicalObject);
         
     if(entity->collisionShapes.size()){
-        // Map to vector
-        std::vector<CollisionShape*> entityCollisionShapes;
         for(auto& [_, collisionShape] : entity->collisionShapes){
-            entityCollisionShapes.push_back(collisionShape);
+            m_collisionManagerPtr->registerCollisionShape(collisionShape);
         }
-        //
-        m_collisionManagerPtr->registerCollisionShapes(entityCollisionShapes);
     }
     
     if(entity->animation){

@@ -8,32 +8,32 @@
 
 void resolveAABB(std::vector<Collision> collisions){
     for(Collision collision : collisions){
-        PhysicalObject *initiatorOwner = collision.initiator->getOwner();
-        PhysicalObject *recipientOwner = collision.recipient->getOwner();
+        PhysicalObject *initiatorPhysicalObject = collision.initiator->getOwnerEntity()->physicalObject;
+        PhysicalObject *recipientPhysicalObject = collision.recipient->getOwnerEntity()->physicalObject;
         
         // Align initiator based on impact side
         if(collision.initiatorImpactSide == CollisionSide::left){
-            initiatorOwner->setPosition(
-                recipientOwner->getPosition().x + recipientOwner->getGlobalBounds().width - collision.initiator->offset.x,
-                initiatorOwner->getPosition().y
+            initiatorPhysicalObject->setPosition(
+                recipientPhysicalObject->getPosition().x + recipientPhysicalObject->getGlobalBounds().width - collision.initiator->offset.x,
+                initiatorPhysicalObject->getPosition().y
             );
         }
         else if(collision.initiatorImpactSide == CollisionSide::right){
-            initiatorOwner->setPosition(
-                recipientOwner->getPosition().x - collision.initiator->getGlobalBounds().width - collision.initiator->offset.x,
-                initiatorOwner->getPosition().y
+            initiatorPhysicalObject->setPosition(
+                recipientPhysicalObject->getPosition().x - collision.initiator->getGlobalBounds().width - collision.initiator->offset.x,
+                initiatorPhysicalObject->getPosition().y
             );
         }
         else if(collision.initiatorImpactSide == CollisionSide::top){
-            initiatorOwner->setPosition(
-                initiatorOwner->getPosition().x,
-                recipientOwner->getPosition().y + recipientOwner->getGlobalBounds().height - collision.initiator->offset.y
+            initiatorPhysicalObject->setPosition(
+                initiatorPhysicalObject->getPosition().x,
+                recipientPhysicalObject->getPosition().y + recipientPhysicalObject->getGlobalBounds().height - collision.initiator->offset.y
             );
         }
         else if(collision.initiatorImpactSide == CollisionSide::bottom){
-            initiatorOwner->setPosition(
-                initiatorOwner->getPosition().x,
-                recipientOwner->getPosition().y - collision.initiator->getGlobalBounds().height - collision.initiator->offset.y
+            initiatorPhysicalObject->setPosition(
+                initiatorPhysicalObject->getPosition().x,
+                recipientPhysicalObject->getPosition().y - collision.initiator->getGlobalBounds().height - collision.initiator->offset.y
             );
         }
         //
@@ -43,7 +43,7 @@ void resolveAABB(std::vector<Collision> collisions){
 void initiatorStandOnTopOfRecipient(std::vector<Collision> collisions){
     for(Collision collision : collisions){
         if(collision.initiatorImpactSide == CollisionSide::bottom){
-            collision.initiator->getOwner()->velocity.y = 0;
+            collision.initiator->getOwnerEntity()->physicalObject->velocity.y = 0;
         }
     }
 }

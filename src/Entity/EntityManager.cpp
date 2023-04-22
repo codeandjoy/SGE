@@ -11,13 +11,9 @@ void EntityManager::registerEntity(Entity* entity){
     m_physicsManagerPtr->registerPhysicalObject(entity->physicalObject);
         
     if(entity->collisionShapes.size()){
-        // Map to vector
-        std::vector<CollisionShape*> entityCollisionShapes;
         for(auto& [_, collisionShape] : entity->collisionShapes){
-            entityCollisionShapes.push_back(collisionShape);
+            m_collisionManagerPtr->registerCollisionShape(collisionShape);
         }
-        //
-        m_collisionManagerPtr->registerCollisionShapes(entityCollisionShapes);
     }
     
     if(entity->animation){

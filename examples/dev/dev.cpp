@@ -186,10 +186,10 @@ int main(){
         // Refactor as pushRecipient(float velocity);
         for(sge::Collision collision : collisions){
             if(collision.recipientImpactSide == sge::CollisionSide::right){
-                collision.recipient->getOwner()->velocity.x = -10;
+                collision.recipient->getOwnerEntity()->physicalObject->velocity.x = -10;
             }
             else if(collision.recipientImpactSide == sge::CollisionSide::left){
-                collision.recipient->getOwner()->velocity.x = 10;
+                collision.recipient->getOwnerEntity()->physicalObject->velocity.x = 10;
             }
         }
     });
@@ -198,7 +198,7 @@ int main(){
         
         for(sge::Collision collision : collisions){
             // TODO remove (minus) push force in the future
-            collision.recipient->getOwner()->velocity.x = 0;
+            collision.recipient->getOwnerEntity()->physicalObject->velocity.x = 0;
         }
     });
     //

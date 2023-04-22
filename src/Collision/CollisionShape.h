@@ -1,23 +1,22 @@
 #ifndef COLLISION_SHAPE_H
 #define COLLISION_SHAPE_H
 
-#include <SFML/Graphics.hpp>
-#include "../utils/Measurements.h"
-#include "../Physics/PhysicalObject.h"
+class Entity;
+struct Measurements;
 
 
 class CollisionShape : public sf::RectangleShape{
     public:
-        CollisionShape(PhysicalObject *owner);
+        CollisionShape(Entity* ownerEntityPtr);
 
         sf::Vector2f offset = sf::Vector2f(0, 0);
 
-        PhysicalObject* getOwner();
+        Entity* getOwnerEntity();
         Measurements getMeasurements();
         void align();
 
     private:
-        PhysicalObject *m_owner;
+        Entity* m_ownerEntityPtr;
 };
 
 

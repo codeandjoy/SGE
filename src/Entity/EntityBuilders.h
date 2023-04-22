@@ -21,7 +21,7 @@ Entity* buildPlainEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vect
 Entity* buildStaticEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position){
     Entity* e = buildPlainEntity(texture, textureRect, position);
 
-    e->collisionShapes["globalBounds"] = new CollisionShape(e->physicalObject);
+    e->collisionShapes["globalBounds"] = new CollisionShape(e);
 
     return e;
 }
