@@ -2,12 +2,13 @@
 #define UNIVERSE_H
 
 #include <SFML/Graphics.hpp>
-#include "../Physics/PhysicsManager.h"
-#include "../Physics/PhysicalObject.h"
-#include "../Collision/CollisionManager.h"
-#include "../Texture/TextureManager.h"
-#include "../Entity/EntityManager.h"
-#include "../Debug/DebugManager.h"
+class PhysicsManager;
+class PhysicalObject;
+class CollisionManager;
+class TextureManager;
+class EntityManager;
+class DebugManager;
+
 
 class Universe{
     public:

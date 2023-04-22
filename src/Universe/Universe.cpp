@@ -1,4 +1,11 @@
 #include "Universe.h"
+#include "../Physics/PhysicsManager.h"
+#include "../Physics/PhysicalObject.h"
+#include "../Collision/CollisionManager.h"
+#include "../Texture/TextureManager.h"
+#include "../Entity/EntityManager.h"
+#include "../Debug/DebugManager.h"
+
 
 Universe::Universe(bool DEBUG){
     PhysicsManager* PM = new PhysicsManager();
