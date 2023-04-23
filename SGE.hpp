@@ -165,55 +165,46 @@ class PhysicsManager{
 #define PHYSICAL_OBJECT_H
 
 #include <SFML/Graphics.hpp>
-#ifndef CONTINUOUS_COMPUTATION_H
-#define CONTINUOUS_COMPUTATION_H
-
-struct ContinuousComputation{
-    bool shouldRun;
-    std::function<void(float dt)> compute;
-};
-
-#endif
+#include <string>
+#include <vector>
+#include <unordered_map>
+#include <functional>
 
 class PhysicalObject : public sf::Sprite{
     public:
         sf::Vector2f velocity = sf::Vector2f(0, 0);
         sf::Vector2f acceleration = sf::Vector2f(0, 0);
-        sf::Vector2f speedLimit = sf::Vector2f(9999,9999);
 
         void createAction(std::string name, std::function<void()> action);
         void doAction(std::string name);
-        // removeAction()
 
-        void createContinuousComputation(std::string name, std::function<void(float dt)> computation);
-        void runContinuousComputation(std::string name);
-        void stopContinuousComputation(std::string name);
-        
+        void createContinuousComputation(std::string name, std::function<void(PhysicalObject*, float)> computation);
 
         void createFlag(std::string name);
         bool getFlag(std::string flagName);
         void setFlag(std::string flagName, bool value);        
-        // removeflag()
 
         void update(float dt);
 
     private:
         std::unordered_map<std::string, std::function<void()>> m_actions;
-        std::unordered_map<std::string, ContinuousComputation> m_continuousComputations;
+        std::unordered_map<std::string, std::function<void(PhysicalObject*, float)>> m_continuousComputations;
         std::vector<std::string> m_continuousComputationOrder;
         std::unordered_map<std::string, bool> m_flags;
 };
 
 #endif
-
 #ifndef COMPUTATIONS_H
 #define COMPUTATIONS_H
 
+#include <SFML/Graphics.hpp>
+#include <functional>
+struct ContinuousComputation;
 class PhysicalObject;
 
-std::function<void(float)> updatePositionBasedOnVelocity(PhysicalObject* physicalObject);
+std::function<void(PhysicalObject*, float)> updatePositionBasedOnVelocity();
 
-std::function<void(float)> updateVelocityBasedOnAcceleration(PhysicalObject* physicalObject);
+std::function<void(PhysicalObject*, float)> updateVelocityBasedOnAcceleration(sf::Vector2f speedLimit=sf::Vector2f(9999, 9999));
 
 #endif
 
@@ -403,13 +394,17 @@ class EntityManager{
 #include <SFML/Graphics.hpp>
 class Entity;
 
-// Plain entity - Entity that consists only of PhysicalObject
+// Builds Entity that consists only of PhysicalObject
 Entity* buildPlainEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position);
 
-// Static entity - Plain entity that has >= 1 CollisionShape(s)
+// Builds Entity that consists of PhysicalObject* and "globalBounds" -> CollisionShape*
 Entity* buildStaticEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position);
 
-// Mobile entity - Static entity that has calculations that allow mobility
+// Builds Entity that consists of PhysicalObject* and "globalBounds" -> CollisionShape*
+//
+// PhysicalObject added continuous computations:
+// "updateVelocity" -> updateVelocityBasedOnAcceleration()
+// "updatePosition" -> updatePositionBasedOnVelocity()
 Entity* buildMobileEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position);
 
 #endif
@@ -690,12 +685,10 @@ void PhysicsManager::updatePhysics(float dt){
 void PhysicalObject::createAction(std::string name, std::function<void()> action){ m_actions[name] = action; }
 void PhysicalObject::doAction(std::string name){ m_actions[name](); }
 
-void PhysicalObject::createContinuousComputation(std::string name, std::function<void(float dt)> computation){
-    m_continuousComputations[name] = { true, computation };
+void PhysicalObject::createContinuousComputation(std::string name, std::function<void(PhysicalObject*, float)> computation){
+    m_continuousComputations[name] = computation;
     m_continuousComputationOrder.push_back(name);
 }
-void PhysicalObject::runContinuousComputation(std::string name){ m_continuousComputations[name].shouldRun = true; }
-void PhysicalObject::stopContinuousComputation(std::string name){ m_continuousComputations[name].shouldRun = false; }
 
 void PhysicalObject::createFlag(std::string name){ m_flags[name] = false; }
 bool PhysicalObject::getFlag(std::string flagName){ return m_flags[flagName]; }
@@ -704,33 +697,31 @@ void PhysicalObject::setFlag(std::string flagName, bool value){ m_flags[flagName
 void PhysicalObject::update(float dt){
     // Run continuous computations in order of insertion
     for(std::string computation : m_continuousComputationOrder){
-        if(m_continuousComputations[computation].shouldRun){
-            m_continuousComputations[computation].compute(dt);
-        }
+        m_continuousComputations[computation](this, dt);
     }
 };
 
 
-std::function<void(float)> updatePositionBasedOnVelocity(PhysicalObject* physicalObject){
-    return [physicalObject](float dt){
-        physicalObject->setPosition(physicalObject->getPosition() + physicalObject->velocity * dt);
+std::function<void(PhysicalObject*, float)> updatePositionBasedOnVelocity(){
+    return [](PhysicalObject* thisPhysicalObject, float dt){
+        thisPhysicalObject->setPosition(thisPhysicalObject->getPosition() + thisPhysicalObject->velocity * dt);
     };
 }
 
-std::function<void(float)> updateVelocityBasedOnAcceleration(PhysicalObject* physicalObject){
-    return [physicalObject](float dt){
-        if(abs(physicalObject->velocity.x) >= physicalObject->speedLimit.x){
-            physicalObject->velocity.x = physicalObject->speedLimit.x;
+std::function<void(PhysicalObject*, float)> updateVelocityBasedOnAcceleration(sf::Vector2f speedLimit){
+    return [speedLimit](PhysicalObject* thisPhysicalObject, float dt){
+        if(abs(thisPhysicalObject->velocity.x) >= speedLimit.x){
+            thisPhysicalObject->velocity.x = speedLimit.x;
         }
         else{
-            physicalObject->velocity.x += physicalObject->acceleration.x;
+            thisPhysicalObject->velocity.x += thisPhysicalObject->acceleration.x;
         }
 
-        if(abs(physicalObject->velocity.y) >= physicalObject->speedLimit.y){
-            physicalObject->velocity.y = physicalObject->speedLimit.y;
+        if(abs(thisPhysicalObject->velocity.y) >= speedLimit.y){
+            thisPhysicalObject->velocity.y = speedLimit.y;
         }
         else{
-            physicalObject->velocity.y += physicalObject->acceleration.y;
+            thisPhysicalObject->velocity.y += thisPhysicalObject->acceleration.y;
         }
     };
 }
@@ -1034,8 +1025,8 @@ Entity* buildStaticEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vec
 Entity* buildMobileEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position){
     Entity* e = buildStaticEntity(texture, textureRect, position);
 
-    e->physicalObject->createContinuousComputation("updateVelocity", updateVelocityBasedOnAcceleration(e->physicalObject));
-    e->physicalObject->createContinuousComputation("updatePosition", updatePositionBasedOnVelocity(e->physicalObject));
+    e->physicalObject->createContinuousComputation("updateVelocity", updateVelocityBasedOnAcceleration());
+    e->physicalObject->createContinuousComputation("updatePosition", updatePositionBasedOnVelocity());
 
     return e;
 }

@@ -14,7 +14,6 @@ namespace sge{
 
 #include "./src/Physics/PhysicsManager.h"
 #include "./src/Physics/PhysicalObject.h"
-#include "./src/Physics/ContinuousComputation.h"
 #include "./src/Physics/Computations.h"
 
 #include "./src/Collision/CollisionManager.h"

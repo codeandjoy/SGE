@@ -5,13 +5,17 @@
 class Entity;
 
 
-// Plain entity - Entity that consists only of PhysicalObject
+// Builds Entity that consists only of PhysicalObject
 Entity* buildPlainEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position);
 
-// Static entity - Plain entity that has >= 1 CollisionShape(s)
+// Builds Entity that consists of PhysicalObject* and "globalBounds" -> CollisionShape*
 Entity* buildStaticEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position);
 
-// Mobile entity - Static entity that has calculations that allow mobility
+// Builds Entity that consists of PhysicalObject* and "globalBounds" -> CollisionShape*
+//
+// PhysicalObject added continuous computations:
+// "updateVelocity" -> updateVelocityBasedOnAcceleration()
+// "updatePosition" -> updatePositionBasedOnVelocity()
 Entity* buildMobileEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position);
 
 

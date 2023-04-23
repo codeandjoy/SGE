@@ -2,26 +2,27 @@
 #include "PhysicalObject.h"
 
 
-std::function<void(float)> updatePositionBasedOnVelocity(PhysicalObject* physicalObject){
-    return [physicalObject](float dt){
-        physicalObject->setPosition(physicalObject->getPosition() + physicalObject->velocity * dt);
+
+std::function<void(PhysicalObject*, float)> updatePositionBasedOnVelocity(){
+    return [](PhysicalObject* thisPhysicalObject, float dt){
+        thisPhysicalObject->setPosition(thisPhysicalObject->getPosition() + thisPhysicalObject->velocity * dt);
     };
 }
 
-std::function<void(float)> updateVelocityBasedOnAcceleration(PhysicalObject* physicalObject){
-    return [physicalObject](float dt){
-        if(abs(physicalObject->velocity.x) >= physicalObject->speedLimit.x){
-            physicalObject->velocity.x = physicalObject->speedLimit.x;
+std::function<void(PhysicalObject*, float)> updateVelocityBasedOnAcceleration(sf::Vector2f speedLimit){
+    return [speedLimit](PhysicalObject* thisPhysicalObject, float dt){
+        if(abs(thisPhysicalObject->velocity.x) >= speedLimit.x){
+            thisPhysicalObject->velocity.x = speedLimit.x;
         }
         else{
-            physicalObject->velocity.x += physicalObject->acceleration.x;
+            thisPhysicalObject->velocity.x += thisPhysicalObject->acceleration.x;
         }
 
-        if(abs(physicalObject->velocity.y) >= physicalObject->speedLimit.y){
-            physicalObject->velocity.y = physicalObject->speedLimit.y;
+        if(abs(thisPhysicalObject->velocity.y) >= speedLimit.y){
+            thisPhysicalObject->velocity.y = speedLimit.y;
         }
         else{
-            physicalObject->velocity.y += physicalObject->acceleration.y;
+            thisPhysicalObject->velocity.y += thisPhysicalObject->acceleration.y;
         }
     };
 }

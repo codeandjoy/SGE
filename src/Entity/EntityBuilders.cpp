@@ -26,8 +26,8 @@ Entity* buildStaticEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vec
 Entity* buildMobileEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position){
     Entity* e = buildStaticEntity(texture, textureRect, position);
 
-    e->physicalObject->createContinuousComputation("updateVelocity", updateVelocityBasedOnAcceleration(e->physicalObject));
-    e->physicalObject->createContinuousComputation("updatePosition", updatePositionBasedOnVelocity(e->physicalObject));
+    e->physicalObject->createContinuousComputation("updateVelocity", updateVelocityBasedOnAcceleration());
+    e->physicalObject->createContinuousComputation("updatePosition", updatePositionBasedOnVelocity());
 
     return e;
 }
