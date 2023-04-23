@@ -2,6 +2,10 @@
 #define PHYSICAL_OBJECT_H
 
 #include <SFML/Graphics.hpp>
+#include <string>
+#include <vector>
+#include <unordered_map>
+#include <functional>
 #include "ContinuousComputation.h"
 
 
@@ -14,7 +18,6 @@ class PhysicalObject : public sf::Sprite{
 
         void createAction(std::string name, std::function<void()> action);
         void doAction(std::string name);
-        // removeAction()
 
 
         void createContinuousComputation(std::string name, std::function<void(float dt)> computation);
@@ -25,7 +28,6 @@ class PhysicalObject : public sf::Sprite{
         void createFlag(std::string name);
         bool getFlag(std::string flagName);
         void setFlag(std::string flagName, bool value);        
-        // removeflag()
 
 
         void update(float dt);
