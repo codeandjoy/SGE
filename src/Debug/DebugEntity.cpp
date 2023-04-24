@@ -7,6 +7,10 @@ sge::DebugEntity::DebugEntity(sge::Entity* relatedEntity){ m_relatedEntity = rel
 
 
 
+sge::Entity* sge::DebugEntity::getRelatedEntity(){ return m_relatedEntity; }
+
+
+
 std::vector<sge::CollisionShapeBorder*> sge::DebugEntity::generateCollisionShapeBorders(){
     std::vector<sge::CollisionShapeBorder*> collisionShapeBorders;
     for(auto &[name, collisionShape] : m_relatedEntity->collisionShapes){

@@ -18,6 +18,8 @@ namespace sge{
         public:
             DebugEntity(sge::Entity* relatedEntity);
 
+            sge::Entity* getRelatedEntity();
+
             bool drawCollisionShapeBorders = true;
             std::unordered_map<std::string, sge::CollisionShapeBorderSettings> customCollisionShapeBorderSettings;
             std::vector<sge::CollisionShapeBorder*> generateCollisionShapeBorders();
