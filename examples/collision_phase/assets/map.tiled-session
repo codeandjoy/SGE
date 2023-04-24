@@ -1,0 +1,42 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "world.tmx",
+    "expandedProjectPaths": [
+        "."
+    ],
+    "fileStates": {
+        "tiles.tsx": {
+            "scaleInDock": 3,
+            "scaleInEditor": 1
+        },
+        "world.tmx": {
+            "scale": 4.314583333333333,
+            "selectedLayer": -1,
+            "viewCenter": {
+                "x": 119.59439884113955,
+                "y": 79.84548527281507
+            }
+        }
+    },
+    "last.imagePath": "/home/owner/Projects/SGE/examples/collision_phase/assets",
+    "map.lastUsedFormat": "tmx",
+    "map.tileHeight": 8,
+    "map.tileWidth": 8,
+    "openFiles": [
+        "world.tmx",
+        "tiles.tsx"
+    ],
+    "project": "map.tiled-project",
+    "recentFiles": [
+        "tiles.tsx",
+        "world.tmx"
+    ],
+    "tileset.lastUsedFormat": "tsx",
+    "tileset.tileSize": {
+        "height": 8,
+        "width": 8
+    }
+}

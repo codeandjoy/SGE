@@ -499,6 +499,8 @@ namespace sge{
         public:
             DebugEntity(sge::Entity* relatedEntity);
 
+            sge::Entity* getRelatedEntity();
+
             bool drawCollisionShapeBorders = true;
             std::unordered_map<std::string, sge::CollisionShapeBorderSettings> customCollisionShapeBorderSettings;
             std::vector<sge::CollisionShapeBorder*> generateCollisionShapeBorders();
@@ -1086,6 +1088,8 @@ sge::Entity* sge::buildMobileEntity(sf::Texture* texture, sf::IntRect textureRec
 
 
 sge::DebugEntity::DebugEntity(sge::Entity* relatedEntity){ m_relatedEntity = relatedEntity; }
+
+sge::Entity* sge::DebugEntity::getRelatedEntity(){ return m_relatedEntity; }
 
 std::vector<sge::CollisionShapeBorder*> sge::DebugEntity::generateCollisionShapeBorders(){
     std::vector<sge::CollisionShapeBorder*> collisionShapeBorders;
