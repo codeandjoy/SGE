@@ -7,6 +7,8 @@
 #include "../../SGE.hpp"
 
 int main(){
+    const float GRAVITY = .3;
+
     printf(".▄▄ ·  ▄▄ • ▄▄▄ .\n▐█ ▀. ▐█ ▀ ▪▀▄.▀·\n▄▀▀▀█▄▄█ ▀█▄▐▀▀▪▄\n▐█▄▪▐█▐█▄▪▐█▐█▄▄▌\n ▀▀▀▀ ·▀▀▀▀  ▀▀▀ \n");
 
 
@@ -65,7 +67,7 @@ int main(){
         sf::Vector2f(box.getPosition().x, box.getPosition().y)
     );
 
-    boxEntity->physicalObject->acceleration.y = .1; // gravity
+    boxEntity->physicalObject->acceleration.y = GRAVITY;
     
     universe->entityManager->registerEntity(boxEntity);
 
@@ -87,7 +89,7 @@ int main(){
     playerEntity->collisionShapes["globalBounds"]->setSize(sf::Vector2f(8, 4));
     playerEntity->collisionShapes["globalBounds"]->offset = sf::Vector2f(0, 4);
 
-    playerEntity->physicalObject->acceleration.y = .1; // gravity
+    playerEntity->physicalObject->acceleration.y = GRAVITY;
 
     sge::Animation* playerAnimation = new sge::Animation(universe->textureManager->getTexture("knight"), playerEntity->physicalObject, 9);
     playerAnimation->addTextureSequence("idle", std::vector<int>{9});
@@ -208,11 +210,11 @@ int main(){
     // Controllers and events
     universe->addController([playerEntity, playerAnimation](){
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::A)){
-            playerEntity->physicalObject->velocity.x = -100;
+            playerEntity->physicalObject->velocity.x = -70;
             playerAnimation->setCurrentTextureSequence("runLeft");
         }
         else if(sf::Keyboard::isKeyPressed(sf::Keyboard::D)){
-            playerEntity->physicalObject->velocity.x = 100;
+            playerEntity->physicalObject->velocity.x = 70;
             playerAnimation->setCurrentTextureSequence("runRight");
         }
         else{
@@ -223,7 +225,7 @@ int main(){
 
     universe->addEventHandler([playerEntity](sf::Event event){
         if(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space){
-            playerEntity->physicalObject->velocity.y = -100;
+            playerEntity->physicalObject->velocity.y = -120;
         }
     }); 
     //
