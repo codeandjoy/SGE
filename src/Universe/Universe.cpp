@@ -7,11 +7,11 @@
 #include "../Debug/DebugManager.h"
 
 
-Universe::Universe(bool DEBUG){
-    PhysicsManager* PM = new PhysicsManager();
-    CollisionManager* CM = new CollisionManager();
-    TextureManager* TM = new TextureManager();
-    EntityManager* EM = new EntityManager(PM, CM, TM);
+sge::Universe::Universe(bool DEBUG){
+    sge::PhysicsManager* PM = new sge::PhysicsManager();
+    sge::CollisionManager* CM = new sge::CollisionManager();
+    sge::TextureManager* TM = new sge::TextureManager();
+    sge::EntityManager* EM = new sge::EntityManager(PM, CM, TM);
     
     physicsManager = PM;
     collisionManager = CM;
@@ -19,22 +19,22 @@ Universe::Universe(bool DEBUG){
     entityManager = EM;
 
     if(DEBUG){
-        debugManager = new DebugManager();
+        debugManager = new sge::DebugManager();
     }
 }
 
 
 
-void Universe::setupWindow(sf::RenderWindow *window){ m_windowPtr = window; }
+void sge::Universe::setupWindow(sf::RenderWindow *window){ m_windowPtr = window; }
 
 
 
-void Universe::addController(std::function<void()> controller){ m_controllers.push_back(controller); }
-void Universe::addEventHandler(std::function<void(sf::Event event)> eventHandler){ m_eventHandlers.push_back(eventHandler); }
+void sge::Universe::addController(std::function<void()> controller){ m_controllers.push_back(controller); }
+void sge::Universe::addEventHandler(std::function<void(sf::Event event)> eventHandler){ m_eventHandlers.push_back(eventHandler); }
 
 
 
-void Universe::loop(){
+void sge::Universe::loop(){
     if(!m_windowPtr){
         printf("RenderWindow is not initialized. Use setupWindow method to initialize RenderWindow before(!) looping the Universe.\n");
         exit(1);
@@ -82,7 +82,7 @@ void Universe::loop(){
         // Game draws
         m_windowPtr->clear();
         
-        for(PhysicalObject* physicalObject : physicsManager->getAllPhysicalObjects()){
+        for(sge::PhysicalObject* physicalObject : physicsManager->getAllPhysicalObjects()){
             m_windowPtr->draw(*physicalObject);
         }
 

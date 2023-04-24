@@ -1,21 +1,25 @@
 #ifndef COLLISION_H
 #define COLLISION_H
 
-enum CollisionSide : int;
-class CollisionShape;
 
 
-struct Collision{
-    CollisionShape *initiator;
-    CollisionShape *recipient;
-    CollisionSide initiatorImpactSide;
-    CollisionSide recipientImpactSide;
+namespace sge{
+    enum CollisionSide : int;
+    class CollisionShape;
 
-    friend bool operator< (const Collision a, const Collision b);
-    friend bool operator> (const Collision a, const Collision b);
-    friend bool operator== (const Collision a, const Collision b);
-    friend bool operator!= (const Collision a, const Collision b);
-};
+    struct Collision{
+        sge::CollisionShape *initiator;
+        sge::CollisionShape *recipient;
+        sge::CollisionSide initiatorImpactSide;
+        sge::CollisionSide recipientImpactSide;
+
+        friend bool operator< (const sge::Collision a, const sge::Collision b){ return a.recipient < b.recipient; }
+        friend bool operator> (const sge::Collision a, const sge::Collision b){ return a.recipient > b.recipient; }
+        friend bool operator== (const sge::Collision a, const sge::Collision b){ return a.recipient == b.recipient; }
+        friend bool operator!= (const sge::Collision a, const sge::Collision b){ return a.recipient != b.recipient; }
+    };
+}
+
 
 
 #endif

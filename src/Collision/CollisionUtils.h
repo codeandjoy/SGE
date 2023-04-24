@@ -1,15 +1,17 @@
 #ifndef COLLISION_UTILS_H
 #define COLLISION_UTILS_H
 
-class CollisionShape;
-enum CollisionSide : int;
 
+namespace sge{
+    class CollisionShape;
+    enum CollisionSide : int;
 
-float determineCollisionDepth(CollisionSide initiatorImpactSide, CollisionShape *initiator, CollisionShape *recipient);
+    float determineCollisionDepth(sge::CollisionSide initiatorImpactSide, sge::CollisionShape *initiator, sge::CollisionShape *recipient);
 
-CollisionSide determineInitiatorImpactSide(CollisionShape *initiator, CollisionShape *recipient);
+    sge::CollisionSide determineInitiatorImpactSide(sge::CollisionShape *initiator, sge::CollisionShape *recipient);
 
-CollisionSide flipInitiatorImpactSide(CollisionSide initiatorImpactSide);
+    sge::CollisionSide flipInitiatorImpactSide(sge::CollisionSide initiatorImpactSide);
+}
 
 
 #endif

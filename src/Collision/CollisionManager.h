@@ -1,41 +1,48 @@
 #ifndef COLLISION_MANAGER_H
 #define COLLISION_MANAGER_H
 
-struct Collision;
-struct CollisionPair;
-class CollisionShape;
+#include <string>
+#include <vector>
+#include <unordered_map>
+#include <functional>
 
 
-class CollisionManager{
-    public:
-        void registerCollisionShape(CollisionShape* collisionShape);
-        void deregisterCollisionShape(CollisionShape* collisionShape);
-        void registerCollisionShapes(std::vector<CollisionShape*> collisionShapes);
-        void degisterCollisionShapes(std::vector<CollisionShape*> collisionShapes);
-        std::vector<CollisionShape*> getAllCollisionShapes();
-        void alignCollisionShapes();
+namespace sge{
+    struct Collision;
+    struct CollisionPair;
+    class CollisionShape;
+
+    class CollisionManager{
+        public:
+            void registerCollisionShape(sge::CollisionShape* collisionShape);
+            void deregisterCollisionShape(sge::CollisionShape* collisionShape);
+            void registerCollisionShapes(std::vector<sge::CollisionShape*> collisionShapes);
+            void degisterCollisionShapes(std::vector<sge::CollisionShape*> collisionShapes);
+            std::vector<sge::CollisionShape*> getAllCollisionShapes();
+            void alignCollisionShapes();
 
 
-        void registerCollisionGroup(std::string name, std::vector<CollisionShape*> collisionGroup);
-        void deregisterCollisionGroup(std::string name);
-        void registerCollisionGroups(std::unordered_map<std::string, std::vector<CollisionShape*>> collisionGroups);
-        void deregisterCollisionGroups(std::unordered_map<std::string, std::vector<CollisionShape*>> collisionGroups);
-        std::unordered_map<std::string, std::vector<CollisionShape*>> getCollisionGroups();
+            void registerCollisionGroup(std::string name, std::vector<sge::CollisionShape*> collisionGroup);
+            void deregisterCollisionGroup(std::string name);
+            void registerCollisionGroups(std::unordered_map<std::string, std::vector<sge::CollisionShape*>> collisionGroups);
+            void deregisterCollisionGroups(std::unordered_map<std::string, std::vector<sge::CollisionShape*>> collisionGroups);
+            std::unordered_map<std::string, std::vector<sge::CollisionShape*>> getCollisionGroups();
 
 
-        void createCollisionPair(std::string name, std::string initiatorGroup, std::string recipientGroup);
-        void setPairCollisionDetectionAlgorithm(std::string collisionPairName, std::function<bool(CollisionShape* initiator, CollisionShape* recipient)> collisionDetectionAlgorithm);
-        void setPairCollisionResponse(std::string collisionPairName, std::string collisionPhase, std::function<void(std::vector<Collision>)> response);
+            void createCollisionPair(std::string name, std::string initiatorGroup, std::string recipientGroup);
+            void setPairCollisionDetectionAlgorithm(std::string collisionPairName, std::function<bool(sge::CollisionShape*, sge::CollisionShape*)> collisionDetectionAlgorithm);
+            void setPairCollisionResponse(std::string collisionPairName, std::string collisionPhase, std::function<void(std::vector<sge::Collision>)> response);
 
 
-        void updateCollisions();
+            void updateCollisions();
 
-    private:
-        std::vector<CollisionShape*> m_allCollisionShapes;
-        std::unordered_map<std::string, std::vector<CollisionShape*>> m_collisionGroups;
-        std::unordered_map<std::string, CollisionPair*> m_collisionPairs;
-        std::vector<std::string> m_collisionPairsOrder;
-};
+        private:
+            std::vector<sge::CollisionShape*> m_allCollisionShapes;
+            std::unordered_map<std::string, std::vector<sge::CollisionShape*>> m_collisionGroups;
+            std::unordered_map<std::string, sge::CollisionPair*> m_collisionPairs;
+            std::vector<std::string> m_collisionPairsOrder;
+    };
+}
 
 
 #endif

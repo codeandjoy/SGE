@@ -3,7 +3,7 @@
 #include "CollisionShapeBorderSettings.h"
 
 
-CollisionShapeBorder::CollisionShapeBorder(CollisionShape* owner, CollisionShapeBorderSettings settings){
+sge::CollisionShapeBorder::CollisionShapeBorder(sge::CollisionShape* owner, sge::CollisionShapeBorderSettings settings){
     this->setFillColor(sf::Color(0,0,0,0));
 
     this->setOutlineColor(settings.color);

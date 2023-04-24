@@ -2,29 +2,32 @@
 #define ENTITY_MANAGER_H
 
 #include <vector>
-class Entity;
-class PhysicsManager;
-class CollisionManager;
-class TextureManager;
 
 
-class EntityManager{
-    public:
-        EntityManager(PhysicsManager* physicsManager, CollisionManager* collisionManager, TextureManager* textureManager);
+namespace sge{
+    class Entity;
+    class PhysicsManager;
+    class CollisionManager;
+    class TextureManager;
 
-        void registerEntity(Entity* entity);
-        void registerEntities(std::vector<Entity*> entities);
-        // void destroyEntity(Entity* entity);
-        std::vector<Entity*> getAllEntities();
+    class EntityManager{
+        public:
+            EntityManager(sge::PhysicsManager* physicsManager, sge::CollisionManager* collisionManager, sge::TextureManager* textureManager);
 
-    private:
-        std::vector<Entity*> m_entities;
+            void registerEntity(sge::Entity* entity);
+            void registerEntities(std::vector<sge::Entity*> entities);
+            // void destroyEntity(sge::Entity* entity);
+            std::vector<sge::Entity*> getAllEntities();
 
-        PhysicsManager* m_physicsManagerPtr;
-        CollisionManager* m_collisionManagerPtr;
-        TextureManager* m_textureManagerPtr;
+        private:
+            std::vector<sge::Entity*> m_entities;
 
-};
+            sge::PhysicsManager* m_physicsManagerPtr;
+            sge::CollisionManager* m_collisionManagerPtr;
+            sge::TextureManager* m_textureManagerPtr;
+
+    };
+}
 
 
 #endif

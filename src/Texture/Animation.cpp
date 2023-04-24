@@ -2,7 +2,7 @@
 #include "TextureSheet.h"
 
 
-Animation::Animation(TextureSheet* textureSheet, sf::Sprite* owner, int initialTextureN){
+sge::Animation::Animation(sge::TextureSheet* textureSheet, sf::Sprite* owner, int initialTextureN){
     m_textureSheet = textureSheet;
     m_owner = owner;
     
@@ -12,8 +12,8 @@ Animation::Animation(TextureSheet* textureSheet, sf::Sprite* owner, int initialT
 
 
 
-void Animation::addTextureSequence(std::string name, std::vector<int> textureSequence){ m_textureSequences[name] = textureSequence; }
-void Animation::setCurrentTextureSequence(std::string name){
+void sge::Animation::addTextureSequence(std::string name, std::vector<int> textureSequence){ m_textureSequences[name] = textureSequence; }
+void sge::Animation::setCurrentTextureSequence(std::string name){
     if(m_currentTextureSequence != name){
         m_currentTextureSequence = name;
         m_currentTextureN = 0;
@@ -23,7 +23,7 @@ void Animation::setCurrentTextureSequence(std::string name){
 
 
 
-void Animation::run(){
+void sge::Animation::run(){
     if(!m_textureSequences.size()){
         printf("No texture sequences initialized.\n");
         exit(1);
@@ -46,4 +46,4 @@ void Animation::run(){
         m_clock.restart();
     }
 }
-void Animation::restartClock(){ m_clock.restart(); }
+void sge::Animation::restartClock(){ m_clock.restart(); }

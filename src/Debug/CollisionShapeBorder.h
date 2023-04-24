@@ -2,14 +2,17 @@
 #define COLLISION_SHAPE_BORDER_H
 
 #include <SFML/Graphics.hpp>
-class CollisionShape;
-struct CollisionShapeBorderSettings;
 
 
-class CollisionShapeBorder : public sf::RectangleShape{
-    public:
-        CollisionShapeBorder(CollisionShape* owner, CollisionShapeBorderSettings settings);
-};
+namespace sge{
+    class CollisionShape;
+    struct CollisionShapeBorderSettings;
+
+    class CollisionShapeBorder : public sf::RectangleShape{
+        public:
+            CollisionShapeBorder(sge::CollisionShape* owner, sge::CollisionShapeBorderSettings settings);
+    };
+}
 
 
 #endif

@@ -8,26 +8,29 @@
 #include <functional>
 
 #include "CollisionShapeBorderSettings.h"
-class Entity;
-class CollisionShapeBorder;
 
 
-class DebugEntity{
-    public:
-        DebugEntity(Entity* relatedEntity);
+namespace sge{
+    class Entity;
+    class CollisionShapeBorder;
 
-        bool drawCollisionShapeBorders = true;
-        std::unordered_map<std::string, CollisionShapeBorderSettings> customCollisionShapeBorderSettings;
-        std::vector<CollisionShapeBorder*> generateCollisionShapeBorders();
+    class DebugEntity{
+        public:
+            DebugEntity(sge::Entity* relatedEntity);
 
-        void addExtraDebugFunction(std::function<void(sf::RenderWindow* windowPtr)> extraDebugFunction);
-        std::vector<std::function<void(sf::RenderWindow* windowPtr)>> getExtraDebugFunctions();
+            bool drawCollisionShapeBorders = true;
+            std::unordered_map<std::string, sge::CollisionShapeBorderSettings> customCollisionShapeBorderSettings;
+            std::vector<sge::CollisionShapeBorder*> generateCollisionShapeBorders();
 
-    private:
-        Entity* m_relatedEntity;
-        CollisionShapeBorderSettings m_defaultCollisionShapeBorderSettings = CollisionShapeBorderSettings();
-        std::vector<std::function<void(sf::RenderWindow* windowPtr)>> m_extraDebugFunctions;
-};
+            void addExtraDebugFunction(std::function<void(sf::RenderWindow* windowPtr)> extraDebugFunction);
+            std::vector<std::function<void(sf::RenderWindow* windowPtr)>> getExtraDebugFunctions();
+
+        private:
+            sge::Entity* m_relatedEntity;
+            sge::CollisionShapeBorderSettings m_defaultCollisionShapeBorderSettings = sge::CollisionShapeBorderSettings();
+            std::vector<std::function<void(sf::RenderWindow* windowPtr)>> m_extraDebugFunctions;
+    };
+}
 
 
 #endif

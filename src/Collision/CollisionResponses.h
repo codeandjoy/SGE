@@ -2,12 +2,15 @@
 #define COLLISION_RESPONSES_H
 
 #include <vector>
-struct Collision;
 
 
-void resolveAABB(std::vector<Collision> collisions);
+namespace sge{
+    struct Collision;
+    
+    void resolveAABB(std::vector<sge::Collision> collisions);
 
-void initiatorStandOnTopOfRecipient(std::vector<Collision> collisions);
+    void initiatorStandOnTopOfRecipient(std::vector<sge::Collision> collisions);
+}
 
 
 #endif

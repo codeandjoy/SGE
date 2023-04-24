@@ -3,14 +3,14 @@
 
 
 
-std::function<void(PhysicalObject*, float)> updatePositionBasedOnVelocity(){
-    return [](PhysicalObject* thisPhysicalObject, float dt){
+std::function<void(sge::PhysicalObject*, float)> sge::updatePositionBasedOnVelocity(){
+    return [](sge::PhysicalObject* thisPhysicalObject, float dt){
         thisPhysicalObject->setPosition(thisPhysicalObject->getPosition() + thisPhysicalObject->velocity * dt);
     };
 }
 
-std::function<void(PhysicalObject*, float)> updateVelocityBasedOnAcceleration(sf::Vector2f speedLimit){
-    return [speedLimit](PhysicalObject* thisPhysicalObject, float dt){
+std::function<void(sge::PhysicalObject*, float)> sge::updateVelocityBasedOnAcceleration(sf::Vector2f speedLimit){
+    return [speedLimit](sge::PhysicalObject* thisPhysicalObject, float dt){
         if(abs(thisPhysicalObject->velocity.x) >= speedLimit.x){
             thisPhysicalObject->velocity.x = speedLimit.x;
         }

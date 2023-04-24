@@ -7,20 +7,22 @@
 #include "TextureSheetSizes.h"
 
 
-// TODO texturesheet with gaps between textures
-class TextureSheet{
-    public:
-        TextureSheet(TextureSheetSizes textureSheetSizes, std::string location);
+namespace sge{
+    // TODO texturesheet with gaps between textures
+    class TextureSheet{
+        public:
+            TextureSheet(sge::TextureSheetSizes textureSheetSizes, std::string location);
 
-        std::string getLocation();
-        sf::Texture* getTextureSheet();
-        sf::IntRect getTextureRect(int textureN);
+            std::string getLocation();
+            sf::Texture* getTextureSheet();
+            sf::IntRect getTextureRect(int textureN);
 
-    private:
-        std::string m_location;
-        sf::Texture m_textureSheet;
-        std::vector<sf::IntRect> m_textureRects;
-};
+        private:
+            std::string m_location;
+            sf::Texture m_textureSheet;
+            std::vector<sf::IntRect> m_textureRects;
+    };
+}
 
 
 #endif

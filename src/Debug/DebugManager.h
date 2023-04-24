@@ -4,18 +4,20 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 
-class DebugEntity;
 
+namespace sge{
+    class DebugEntity;
 
-class DebugManager{
-    public:
-        void registerDebugEntity(DebugEntity* debugEntity);
+    class DebugManager{
+        public:
+            void registerDebugEntity(sge::DebugEntity* debugEntity);
 
-        void showDebugInfo(sf::RenderWindow* windowPtr);
+            void showDebugInfo(sf::RenderWindow* windowPtr);
 
-    private:
-        std::vector<DebugEntity*> m_debugEntities; // ? map<Entity -> DebugEntity> ?
-};
+        private:
+            std::vector<sge::DebugEntity*> m_debugEntities; // ? map<Entity -> DebugEntity> ?
+    };
+}
 
 
 #endif

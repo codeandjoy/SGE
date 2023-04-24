@@ -6,8 +6,8 @@
 #include "../Collision/CollisionShape.h"
 
 
-Entity* buildPlainEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position){
-    Entity* e = new Entity{ new PhysicalObject() };
+sge::Entity* sge::buildPlainEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position){
+    sge::Entity* e = new sge::Entity{ new sge::PhysicalObject() };
     e->physicalObject->setTexture(*texture);
     e->physicalObject->setTextureRect(textureRect);
     e->physicalObject->setPosition(position);
@@ -15,19 +15,19 @@ Entity* buildPlainEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vect
     return e;
 }
 
-Entity* buildStaticEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position){
-    Entity* e = buildPlainEntity(texture, textureRect, position);
+sge::Entity* sge::buildStaticEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position){
+    sge::Entity* e = sge::buildPlainEntity(texture, textureRect, position);
 
-    e->collisionShapes["globalBounds"] = new CollisionShape(e);
+    e->collisionShapes["globalBounds"] = new sge::CollisionShape(e);
 
     return e;
 }
 
-Entity* buildMobileEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position){
-    Entity* e = buildStaticEntity(texture, textureRect, position);
+sge::Entity* sge::buildMobileEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position){
+    sge::Entity* e = sge::buildStaticEntity(texture, textureRect, position);
 
-    e->physicalObject->createContinuousComputation("updateVelocity", updateVelocityBasedOnAcceleration());
-    e->physicalObject->createContinuousComputation("updatePosition", updatePositionBasedOnVelocity());
+    e->physicalObject->createContinuousComputation("updateVelocity", sge::updateVelocityBasedOnAcceleration());
+    e->physicalObject->createContinuousComputation("updatePosition", sge::updatePositionBasedOnVelocity());
 
     return e;
 }

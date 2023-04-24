@@ -2,12 +2,14 @@
 #define MEASUREMENTS_H
 
 
-struct Measurements{
-    float x;
-    float y;
-    float height;
-    float width;
-};
+namespace sge{
+    struct Measurements{
+        float x;
+        float y;
+        float height;
+        float width;
+    };
+}
 
 
 #endif

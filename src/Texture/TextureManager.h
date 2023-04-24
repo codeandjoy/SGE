@@ -6,27 +6,29 @@
 #include <vector>
 #include "TextureSheetSizes.h"
 
-class TextureSheet;
-class Animation;
+
+namespace sge{
+    class TextureSheet;
+    class Animation;
+
+    class TextureManager{
+        public:
+            void loadTexture(std::string location, std::string name, sge::TextureSheetSizes textureSheetSizes);
+            sge::TextureSheet* getTexture(std::string name);
 
 
-class TextureManager{
-    public:
-        void loadTexture(std::string location, std::string name, TextureSheetSizes textureSheetSizes);
-        TextureSheet* getTexture(std::string name);
+            void registerAnimation(sge::Animation* animation);
+            void deregisterAnimation(sge::Animation* animation);
 
 
-        void registerAnimation(Animation* animation);
-        void deregisterAnimation(Animation* animation);
+            void initAnimationClocks();
+            void updateAnimations();
 
-
-        void initAnimationClocks();
-        void updateAnimations();
-
-    private:
-        std::unordered_map<std::string, TextureSheet*> m_loadedTextures;
-        std::vector<Animation*> m_animations;
-};
+        private:
+            std::unordered_map<std::string, sge::TextureSheet*> m_loadedTextures;
+            std::vector<sge::Animation*> m_animations;
+    };
+}
 
 
 #endif

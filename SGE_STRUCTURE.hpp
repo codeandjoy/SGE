@@ -1,5 +1,3 @@
-namespace sge{
-
 #ifndef SGE_HPP
 #define SGE_HPP
 
@@ -44,5 +42,3 @@ namespace sge{
 // -> stitch <-
 
 #endif
-
-}

@@ -1,33 +1,34 @@
 #include <limits>
+#include "CollisionUtils.h"
 #include "CollisionShape.h"
 #include "CollisionSide.h"
 
 
-float determineCollisionDepth(CollisionSide initiatorImpactSide, CollisionShape *initiator, CollisionShape *recipient){
+float sge::determineCollisionDepth(sge::CollisionSide initiatorImpactSide, sge::CollisionShape *initiator, sge::CollisionShape *recipient){
     auto [x1, y1, height1, width1] = initiator->getMeasurements();
     auto [x2, y2, height2, width2] = recipient->getMeasurements();
     
-    if(initiatorImpactSide == CollisionSide::left) return x2 + width2 - x1;
-    if(initiatorImpactSide == CollisionSide::right) return x1 + width1 - x2;
-    if(initiatorImpactSide == CollisionSide::top) return y2 + height2 - y1;
-    if(initiatorImpactSide == CollisionSide::bottom) return y1 + height1 - y2;
+    if(initiatorImpactSide == sge::CollisionSide::left) return x2 + width2 - x1;
+    if(initiatorImpactSide == sge::CollisionSide::right) return x1 + width1 - x2;
+    if(initiatorImpactSide == sge::CollisionSide::top) return y2 + height2 - y1;
+    if(initiatorImpactSide == sge::CollisionSide::bottom) return y1 + height1 - y2;
 
     return 0;
 }
 
-CollisionSide determineInitiatorImpactSide(CollisionShape *initiator, CollisionShape *recipient){
-    std::vector<CollisionSide> allImpactSides;
+sge::CollisionSide sge::determineInitiatorImpactSide(sge::CollisionShape *initiator, sge::CollisionShape *recipient){
+    std::vector<sge::CollisionSide> allImpactSides;
 
-    if(initiator->getPosition().x > recipient->getPosition().x) allImpactSides.push_back(CollisionSide::left);
-    if(initiator->getPosition().x < recipient->getPosition().x) allImpactSides.push_back(CollisionSide::right);
-    if(initiator->getPosition().y > recipient->getPosition().y) allImpactSides.push_back(CollisionSide::top);
-    if(initiator->getPosition().y < recipient->getPosition().y) allImpactSides.push_back(CollisionSide::bottom);
+    if(initiator->getPosition().x > recipient->getPosition().x) allImpactSides.push_back(sge::CollisionSide::left);
+    if(initiator->getPosition().x < recipient->getPosition().x) allImpactSides.push_back(sge::CollisionSide::right);
+    if(initiator->getPosition().y > recipient->getPosition().y) allImpactSides.push_back(sge::CollisionSide::top);
+    if(initiator->getPosition().y < recipient->getPosition().y) allImpactSides.push_back(sge::CollisionSide::bottom);
 
-    CollisionSide lowestDepthSide;
+    sge::CollisionSide lowestDepthSide;
     float lowestDepth = std::numeric_limits<float>::infinity();
     
-    for(CollisionSide collisionSide : allImpactSides){
-        float depth = determineCollisionDepth(collisionSide, initiator, recipient);
+    for(sge::CollisionSide collisionSide : allImpactSides){
+        float depth = sge::determineCollisionDepth(collisionSide, initiator, recipient);
         if(depth <= lowestDepth){
             lowestDepthSide = collisionSide;
             lowestDepth = depth;
@@ -37,11 +38,11 @@ CollisionSide determineInitiatorImpactSide(CollisionShape *initiator, CollisionS
     return lowestDepthSide;
 }
 
-CollisionSide flipInitiatorImpactSide(CollisionSide initiatorImpactSide){
-    if(initiatorImpactSide == CollisionSide::top) return CollisionSide::bottom;
-    if(initiatorImpactSide == CollisionSide::bottom) return CollisionSide::top;
-    if(initiatorImpactSide == CollisionSide::right) return CollisionSide::left;
-    if(initiatorImpactSide == CollisionSide::left) return CollisionSide::right;
+sge::CollisionSide sge::flipInitiatorImpactSide(sge::CollisionSide initiatorImpactSide){
+    if(initiatorImpactSide == sge::CollisionSide::top) return sge::CollisionSide::bottom;
+    if(initiatorImpactSide == sge::CollisionSide::bottom) return sge::CollisionSide::top;
+    if(initiatorImpactSide == sge::CollisionSide::right) return sge::CollisionSide::left;
+    if(initiatorImpactSide == sge::CollisionSide::left) return sge::CollisionSide::right;
 
-    return CollisionSide::bottom;
+    return sge::CollisionSide::bottom;
 }

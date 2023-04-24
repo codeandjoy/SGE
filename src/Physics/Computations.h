@@ -3,13 +3,15 @@
 
 #include <SFML/Graphics.hpp>
 #include <functional>
-struct ContinuousComputation;
-class PhysicalObject;
 
 
-std::function<void(PhysicalObject*, float)> updatePositionBasedOnVelocity();
+namespace sge{
+    class PhysicalObject;
 
-std::function<void(PhysicalObject*, float)> updateVelocityBasedOnAcceleration(sf::Vector2f speedLimit=sf::Vector2f(9999, 9999));
+    std::function<void(sge::PhysicalObject*, float)> updatePositionBasedOnVelocity();
+
+    std::function<void(sge::PhysicalObject*, float)> updateVelocityBasedOnAcceleration(sf::Vector2f speedLimit=sf::Vector2f(9999, 9999));
+}
 
 
 #endif

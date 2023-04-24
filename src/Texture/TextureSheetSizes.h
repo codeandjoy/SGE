@@ -2,12 +2,14 @@
 #define TEXTURE_SHEET_SIZES_H
 
 
-struct TextureSheetSizes{
-    int textureSizeX;
-    int textureSizeY;
-    int numTexturesX;
-    int numTexturesY;
-};
+namespace sge{
+    struct TextureSheetSizes{
+        int textureSizeX;
+        int textureSizeY;
+        int numTexturesX;
+        int numTexturesY;
+    };
+}
 
 
 #endif

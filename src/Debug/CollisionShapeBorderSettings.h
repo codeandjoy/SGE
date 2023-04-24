@@ -4,10 +4,12 @@
 #include <SFML/Graphics.hpp>
 
 
-struct CollisionShapeBorderSettings{
-    sf::Color color = sf::Color::Blue;
-    float thickness = .5;
-};
+namespace sge{
+    struct CollisionShapeBorderSettings{
+        sf::Color color = sf::Color::Blue;
+        float thickness = .5;
+    };
+}
 
 
 #endif

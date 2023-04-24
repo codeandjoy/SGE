@@ -2,6 +2,6 @@
 #include "CollisionShape.h"
 
 
-bool boundingBox(CollisionShape* initiator, CollisionShape* recipient){
+bool sge::boundingBox(sge::CollisionShape* initiator, sge::CollisionShape* recipient){
     return initiator->getGlobalBounds().intersects(recipient->getGlobalBounds());
 }

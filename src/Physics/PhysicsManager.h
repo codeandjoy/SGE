@@ -2,21 +2,24 @@
 #define PHYSICS_MANAGER_H
 
 #include <vector>
-class PhysicalObject;
 
 
-class PhysicsManager{
-    public:
-        void registerPhysicalObject(PhysicalObject* physicalObject);
-        void deregisterPhysicalObject(PhysicalObject* physicalObject);
-        std::vector<PhysicalObject*> getAllPhysicalObjects();
+namespace sge{
+    class PhysicalObject;
+
+    class PhysicsManager{
+        public:
+            void registerPhysicalObject(sge::PhysicalObject* physicalObject);
+            void deregisterPhysicalObject(sge::PhysicalObject* physicalObject);
+            std::vector<sge::PhysicalObject*> getAllPhysicalObjects();
 
 
-        void updatePhysics(float dt);
+            void updatePhysics(float dt);
 
-    private:
-        std::vector<PhysicalObject*> m_physicalObjects;
-};
+        private:
+            std::vector<sge::PhysicalObject*> m_physicalObjects;
+    };
+}
 
 
 #endif

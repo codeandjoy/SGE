@@ -2,23 +2,26 @@
 #define COLLISION_SHAPE_H
 
 #include <SFML/Graphics.hpp>
-class Entity;
-struct Measurements;
 
 
-class CollisionShape : public sf::RectangleShape{
-    public:
-        CollisionShape(Entity* ownerEntityPtr);
+namespace sge{
+    class Entity;
+    struct Measurements;
 
-        sf::Vector2f offset = sf::Vector2f(0, 0);
+    class CollisionShape : public sf::RectangleShape{
+        public:
+            CollisionShape(sge::Entity* ownerEntityPtr);
 
-        Entity* getOwnerEntity();
-        Measurements getMeasurements();
-        void align();
+            sf::Vector2f offset = sf::Vector2f(0, 0);
 
-    private:
-        Entity* m_ownerEntityPtr;
-};
+            sge::Entity* getOwnerEntity();
+            sge::Measurements getMeasurements();
+            void align();
+
+        private:
+            sge::Entity* m_ownerEntityPtr;
+    };
+}
 
 
 #endif

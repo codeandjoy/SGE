@@ -1,5 +1,3 @@
-namespace sge{
-
 #ifndef SGE_HPP
 #define SGE_HPP
 
@@ -9,38 +7,43 @@ namespace sge{
 #define UNIVERSE_H
 
 #include <SFML/Graphics.hpp>
-class PhysicsManager;
-class PhysicalObject;
-class CollisionManager;
-class TextureManager;
-class EntityManager;
-class DebugManager;
+#include <functional>
+#include <vector>
 
-class Universe{
-    public:
-        Universe(bool DEBUG = false);
+namespace sge{
+    class PhysicsManager;
+    class PhysicalObject;
+    class CollisionManager;
+    class TextureManager;
+    class EntityManager;
+    class DebugManager;
+    
+    class Universe{
+        public:
+            Universe(bool DEBUG = false);
 
-        void setupWindow(sf::RenderWindow* window);
+            void setupWindow(sf::RenderWindow* window);
 
-        void addController(std::function<void()> controller);
-        void addEventHandler(std::function<void(sf::Event event)> eventHandler);
+            void addController(std::function<void()> controller);
+            void addEventHandler(std::function<void(sf::Event event)> eventHandler);
 
-        void loop();
+            void loop();
 
-        PhysicsManager* physicsManager = nullptr;
-        CollisionManager* collisionManager = nullptr;
-        TextureManager* textureManager = nullptr;
-        EntityManager* entityManager = nullptr;
-        DebugManager* debugManager = nullptr;
+            sge::PhysicsManager* physicsManager = nullptr;
+            sge::CollisionManager* collisionManager = nullptr;
+            sge::TextureManager* textureManager = nullptr;
+            sge::EntityManager* entityManager = nullptr;
+            sge::DebugManager* debugManager = nullptr;
 
-    private:
-        sf::RenderWindow* m_windowPtr;
+        private:
+            sf::RenderWindow* m_windowPtr;
 
-        sf::Clock m_deltaClock;
-        
-        std::vector<std::function<void()>> m_controllers;
-        std::vector<std::function<void(sf::Event event)>> m_eventHandlers;
-};
+            sf::Clock m_deltaClock;
+            
+            std::vector<std::function<void()>> m_controllers;
+            std::vector<std::function<void(sf::Event event)>> m_eventHandlers;
+    };
+}
 
 #endif
 
@@ -53,29 +56,33 @@ class Universe{
 #ifndef TEXTURE_SHEET_SIZES_H
 #define TEXTURE_SHEET_SIZES_H
 
-struct TextureSheetSizes{
-    int textureSizeX;
-    int textureSizeY;
-    int numTexturesX;
-    int numTexturesY;
-};
+namespace sge{
+    struct TextureSheetSizes{
+        int textureSizeX;
+        int textureSizeY;
+        int numTexturesX;
+        int numTexturesY;
+    };
+}
 
 #endif
 
-// TODO texturesheet with gaps between textures
-class TextureSheet{
-    public:
-        TextureSheet(TextureSheetSizes textureSheetSizes, std::string location);
+namespace sge{
+    // TODO texturesheet with gaps between textures
+    class TextureSheet{
+        public:
+            TextureSheet(sge::TextureSheetSizes textureSheetSizes, std::string location);
 
-        std::string getLocation();
-        sf::Texture* getTextureSheet();
-        sf::IntRect getTextureRect(int textureN);
+            std::string getLocation();
+            sf::Texture* getTextureSheet();
+            sf::IntRect getTextureRect(int textureN);
 
-    private:
-        std::string m_location;
-        sf::Texture m_textureSheet;
-        std::vector<sf::IntRect> m_textureRects;
-};
+        private:
+            std::string m_location;
+            sf::Texture m_textureSheet;
+            std::vector<sf::IntRect> m_textureRects;
+    };
+}
 
 #endif
 
@@ -86,59 +93,67 @@ class TextureSheet{
 #include <unordered_map>
 #include <vector>
 
-class TextureSheet;
-class Animation;
+namespace sge{
+    class TextureSheet;
+    class Animation;
 
-class TextureManager{
-    public:
-        void loadTexture(std::string location, std::string name, TextureSheetSizes textureSheetSizes);
-        TextureSheet* getTexture(std::string name);
+    class TextureManager{
+        public:
+            void loadTexture(std::string location, std::string name, sge::TextureSheetSizes textureSheetSizes);
+            sge::TextureSheet* getTexture(std::string name);
 
-        void registerAnimation(Animation* animation);
-        void deregisterAnimation(Animation* animation);
+            void registerAnimation(sge::Animation* animation);
+            void deregisterAnimation(sge::Animation* animation);
 
-        void initAnimationClocks();
-        void updateAnimations();
+            void initAnimationClocks();
+            void updateAnimations();
 
-    private:
-        std::unordered_map<std::string, TextureSheet*> m_loadedTextures;
-        std::vector<Animation*> m_animations;
-};
+        private:
+            std::unordered_map<std::string, sge::TextureSheet*> m_loadedTextures;
+            std::vector<sge::Animation*> m_animations;
+    };
+}
 
 #endif
 #ifndef ANIMATION_H
 #define ANIMATION_H
 
 #include <SFML/Graphics.hpp>
-class TextureSheet;
+#include <string>
+#include <unordered_map>
+#include <vector>
 
-// TODO Animations should switch immediately
-class Animation{
-    public:
-        Animation(TextureSheet* textureSheet, sf::Sprite* owner, int initialTextureN);
-    
+namespace sge{
+    class TextureSheet;
+
+    // TODO Animations should switch immediately
+    class Animation{
+        public:
+            Animation(sge::TextureSheet* textureSheet, sf::Sprite* owner, int initialTextureN);
         
-        void addTextureSequence(std::string name, std::vector<int> textureSequence);
-        void setCurrentTextureSequence(std::string name);
-    
-
-        // ?
-        // runForward -> 1,2,3,1,2,3
-        // runCycle -> 1,2,3,2,1,2
-        // ?
-        void run();
-        void restartClock();
-
-    private:
-        sf::Sprite* m_owner;
-        TextureSheet* m_textureSheet;
+            
+            void addTextureSequence(std::string name, std::vector<int> textureSequence);
+            void setCurrentTextureSequence(std::string name);
         
-        sf::Clock m_clock;
-        std::unordered_map<std::string, std::vector<int>> m_textureSequences; // e.g. "idle": [5, 6, 7, 8]
-        std::string m_currentTextureSequence;
-        int m_currentTextureN = 0;
 
-};
+            // ?
+            // runForward -> 1,2,3,1,2,3
+            // runCycle -> 1,2,3,2,1,2
+            // ?
+            void run();
+            void restartClock();
+
+        private:
+            sf::Sprite* m_owner;
+            sge::TextureSheet* m_textureSheet;
+            
+            sf::Clock m_clock;
+            std::unordered_map<std::string, std::vector<int>> m_textureSequences; // e.g. "idle": [5, 6, 7, 8]
+            std::string m_currentTextureSequence;
+            int m_currentTextureN = 0;
+
+    };
+}
 
 #endif
 
@@ -146,19 +161,22 @@ class Animation{
 #define PHYSICS_MANAGER_H
 
 #include <vector>
-class PhysicalObject;
 
-class PhysicsManager{
-    public:
-        void registerPhysicalObject(PhysicalObject* physicalObject);
-        void deregisterPhysicalObject(PhysicalObject* physicalObject);
-        std::vector<PhysicalObject*> getAllPhysicalObjects();
+namespace sge{
+    class PhysicalObject;
 
-        void updatePhysics(float dt);
+    class PhysicsManager{
+        public:
+            void registerPhysicalObject(sge::PhysicalObject* physicalObject);
+            void deregisterPhysicalObject(sge::PhysicalObject* physicalObject);
+            std::vector<sge::PhysicalObject*> getAllPhysicalObjects();
 
-    private:
-        std::vector<PhysicalObject*> m_physicalObjects;
-};
+            void updatePhysics(float dt);
+
+        private:
+            std::vector<sge::PhysicalObject*> m_physicalObjects;
+    };
+}
 
 #endif
 #ifndef PHYSICAL_OBJECT_H
@@ -170,28 +188,30 @@ class PhysicsManager{
 #include <unordered_map>
 #include <functional>
 
-class PhysicalObject : public sf::Sprite{
-    public:
-        sf::Vector2f velocity = sf::Vector2f(0, 0);
-        sf::Vector2f acceleration = sf::Vector2f(0, 0);
+namespace sge{
+    class PhysicalObject : public sf::Sprite{
+        public:
+            sf::Vector2f velocity = sf::Vector2f(0, 0);
+            sf::Vector2f acceleration = sf::Vector2f(0, 0);
 
-        void createAction(std::string name, std::function<void()> action);
-        void doAction(std::string name);
+            void createAction(std::string name, std::function<void()> action);
+            void doAction(std::string name);
 
-        void createContinuousComputation(std::string name, std::function<void(PhysicalObject*, float)> computation);
+            void createContinuousComputation(std::string name, std::function<void(sge::PhysicalObject*, float)> computation);
 
-        void createFlag(std::string name);
-        bool getFlag(std::string flagName);
-        void setFlag(std::string flagName, bool value);        
+            void createFlag(std::string name);
+            bool getFlag(std::string flagName);
+            void setFlag(std::string flagName, bool value);        
 
-        void update(float dt);
+            void update(float dt);
 
-    private:
-        std::unordered_map<std::string, std::function<void()>> m_actions;
-        std::unordered_map<std::string, std::function<void(PhysicalObject*, float)>> m_continuousComputations;
-        std::vector<std::string> m_continuousComputationOrder;
-        std::unordered_map<std::string, bool> m_flags;
-};
+        private:
+            std::unordered_map<std::string, std::function<void()>> m_actions;
+            std::unordered_map<std::string, std::function<void(sge::PhysicalObject*, float)>> m_continuousComputations;
+            std::vector<std::string> m_continuousComputationOrder;
+            std::unordered_map<std::string, bool> m_flags;
+    };
+}
 
 #endif
 #ifndef COMPUTATIONS_H
@@ -199,213 +219,252 @@ class PhysicalObject : public sf::Sprite{
 
 #include <SFML/Graphics.hpp>
 #include <functional>
-struct ContinuousComputation;
-class PhysicalObject;
 
-std::function<void(PhysicalObject*, float)> updatePositionBasedOnVelocity();
+namespace sge{
+    class PhysicalObject;
 
-std::function<void(PhysicalObject*, float)> updateVelocityBasedOnAcceleration(sf::Vector2f speedLimit=sf::Vector2f(9999, 9999));
+    std::function<void(sge::PhysicalObject*, float)> updatePositionBasedOnVelocity();
+
+    std::function<void(sge::PhysicalObject*, float)> updateVelocityBasedOnAcceleration(sf::Vector2f speedLimit=sf::Vector2f(9999, 9999));
+}
 
 #endif
 
 #ifndef COLLISION_MANAGER_H
 #define COLLISION_MANAGER_H
 
-struct Collision;
-struct CollisionPair;
-class CollisionShape;
+#include <string>
+#include <vector>
+#include <unordered_map>
+#include <functional>
 
-class CollisionManager{
-    public:
-        void registerCollisionShape(CollisionShape* collisionShape);
-        void deregisterCollisionShape(CollisionShape* collisionShape);
-        void registerCollisionShapes(std::vector<CollisionShape*> collisionShapes);
-        void degisterCollisionShapes(std::vector<CollisionShape*> collisionShapes);
-        std::vector<CollisionShape*> getAllCollisionShapes();
-        void alignCollisionShapes();
+namespace sge{
+    struct Collision;
+    struct CollisionPair;
+    class CollisionShape;
 
-        void registerCollisionGroup(std::string name, std::vector<CollisionShape*> collisionGroup);
-        void deregisterCollisionGroup(std::string name);
-        void registerCollisionGroups(std::unordered_map<std::string, std::vector<CollisionShape*>> collisionGroups);
-        void deregisterCollisionGroups(std::unordered_map<std::string, std::vector<CollisionShape*>> collisionGroups);
-        std::unordered_map<std::string, std::vector<CollisionShape*>> getCollisionGroups();
+    class CollisionManager{
+        public:
+            void registerCollisionShape(sge::CollisionShape* collisionShape);
+            void deregisterCollisionShape(sge::CollisionShape* collisionShape);
+            void registerCollisionShapes(std::vector<sge::CollisionShape*> collisionShapes);
+            void degisterCollisionShapes(std::vector<sge::CollisionShape*> collisionShapes);
+            std::vector<sge::CollisionShape*> getAllCollisionShapes();
+            void alignCollisionShapes();
 
-        void createCollisionPair(std::string name, std::string initiatorGroup, std::string recipientGroup);
-        void setPairCollisionDetectionAlgorithm(std::string collisionPairName, std::function<bool(CollisionShape* initiator, CollisionShape* recipient)> collisionDetectionAlgorithm);
-        void setPairCollisionResponse(std::string collisionPairName, std::string collisionPhase, std::function<void(std::vector<Collision>)> response);
+            void registerCollisionGroup(std::string name, std::vector<sge::CollisionShape*> collisionGroup);
+            void deregisterCollisionGroup(std::string name);
+            void registerCollisionGroups(std::unordered_map<std::string, std::vector<sge::CollisionShape*>> collisionGroups);
+            void deregisterCollisionGroups(std::unordered_map<std::string, std::vector<sge::CollisionShape*>> collisionGroups);
+            std::unordered_map<std::string, std::vector<sge::CollisionShape*>> getCollisionGroups();
 
-        void updateCollisions();
+            void createCollisionPair(std::string name, std::string initiatorGroup, std::string recipientGroup);
+            void setPairCollisionDetectionAlgorithm(std::string collisionPairName, std::function<bool(sge::CollisionShape*, sge::CollisionShape*)> collisionDetectionAlgorithm);
+            void setPairCollisionResponse(std::string collisionPairName, std::string collisionPhase, std::function<void(std::vector<sge::Collision>)> response);
 
-    private:
-        std::vector<CollisionShape*> m_allCollisionShapes;
-        std::unordered_map<std::string, std::vector<CollisionShape*>> m_collisionGroups;
-        std::unordered_map<std::string, CollisionPair*> m_collisionPairs;
-        std::vector<std::string> m_collisionPairsOrder;
-};
+            void updateCollisions();
+
+        private:
+            std::vector<sge::CollisionShape*> m_allCollisionShapes;
+            std::unordered_map<std::string, std::vector<sge::CollisionShape*>> m_collisionGroups;
+            std::unordered_map<std::string, sge::CollisionPair*> m_collisionPairs;
+            std::vector<std::string> m_collisionPairsOrder;
+    };
+}
 
 #endif
 #ifndef COLLISION_PAIR_H
 #define COLLISION_PAIR_H
 
-struct Collision;
-class CollisionShape;
+#include <functional>
+#include <unordered_map>
+#include <vector>
+#include <utility>
+#include <string>
 
-struct CollisionPair{
-    std::pair<std::string, std::string> collisionGroups;
-    
-    std::function<void(std::vector<Collision>)> startPhaseCollisionResponse;
-    std::function<void(std::vector<Collision>)> continuousPhaseCollisionResponse;
-    std::function<void(std::vector<Collision>)> endPhaseCollisionResponse;
+namespace sge{
+    struct Collision;
+    class CollisionShape;
 
-    std::unordered_map<CollisionShape*, std::vector<Collision>> pastCollisions;
-    
-    std::function<bool(CollisionShape *initiator, CollisionShape *recipient)> checkCollision;
-};
+    struct CollisionPair{
+        std::pair<std::string, std::string> collisionGroups;
+        
+        std::function<void(std::vector<sge::Collision>)> startPhaseCollisionResponse;
+        std::function<void(std::vector<sge::Collision>)> continuousPhaseCollisionResponse;
+        std::function<void(std::vector<sge::Collision>)> endPhaseCollisionResponse;
+
+        std::unordered_map<sge::CollisionShape*, std::vector<sge::Collision>> pastCollisions;
+        
+        std::function<bool(sge::CollisionShape *initiator, sge::CollisionShape *recipient)> checkCollision;
+    };
+}
 
 #endif
 #ifndef COLLISION_SIDE_H
 #define COLLISION_SIDE_H
 
-enum CollisionSide : int{ left, right, top, bottom };
+namespace sge{
+    enum CollisionSide : int{ left, right, top, bottom };
+}
 
 #endif
 #ifndef COLLISION_H
 #define COLLISION_H
 
-enum CollisionSide : int;
-class CollisionShape;
+namespace sge{
+    enum CollisionSide : int;
+    class CollisionShape;
 
-struct Collision{
-    CollisionShape *initiator;
-    CollisionShape *recipient;
-    CollisionSide initiatorImpactSide;
-    CollisionSide recipientImpactSide;
+    struct Collision{
+        sge::CollisionShape *initiator;
+        sge::CollisionShape *recipient;
+        sge::CollisionSide initiatorImpactSide;
+        sge::CollisionSide recipientImpactSide;
 
-    friend bool operator< (const Collision a, const Collision b);
-    friend bool operator> (const Collision a, const Collision b);
-    friend bool operator== (const Collision a, const Collision b);
-    friend bool operator!= (const Collision a, const Collision b);
-};
+        friend bool operator< (const sge::Collision a, const sge::Collision b){ return a.recipient < b.recipient; }
+        friend bool operator> (const sge::Collision a, const sge::Collision b){ return a.recipient > b.recipient; }
+        friend bool operator== (const sge::Collision a, const sge::Collision b){ return a.recipient == b.recipient; }
+        friend bool operator!= (const sge::Collision a, const sge::Collision b){ return a.recipient != b.recipient; }
+    };
+}
 
 #endif
 #ifndef COLLISION_UTILS_H
 #define COLLISION_UTILS_H
 
-class CollisionShape;
-enum CollisionSide : int;
+namespace sge{
+    class CollisionShape;
+    enum CollisionSide : int;
 
-float determineCollisionDepth(CollisionSide initiatorImpactSide, CollisionShape *initiator, CollisionShape *recipient);
+    float determineCollisionDepth(sge::CollisionSide initiatorImpactSide, sge::CollisionShape *initiator, sge::CollisionShape *recipient);
 
-CollisionSide determineInitiatorImpactSide(CollisionShape *initiator, CollisionShape *recipient);
+    sge::CollisionSide determineInitiatorImpactSide(sge::CollisionShape *initiator, sge::CollisionShape *recipient);
 
-CollisionSide flipInitiatorImpactSide(CollisionSide initiatorImpactSide);
+    sge::CollisionSide flipInitiatorImpactSide(sge::CollisionSide initiatorImpactSide);
+}
 
 #endif
 #ifndef COLLISION_SHAPE_H
 #define COLLISION_SHAPE_H
 
 #include <SFML/Graphics.hpp>
-class Entity;
-struct Measurements;
 
-class CollisionShape : public sf::RectangleShape{
-    public:
-        CollisionShape(Entity* ownerEntityPtr);
+namespace sge{
+    class Entity;
+    struct Measurements;
 
-        sf::Vector2f offset = sf::Vector2f(0, 0);
+    class CollisionShape : public sf::RectangleShape{
+        public:
+            CollisionShape(sge::Entity* ownerEntityPtr);
 
-        Entity* getOwnerEntity();
-        Measurements getMeasurements();
-        void align();
+            sf::Vector2f offset = sf::Vector2f(0, 0);
 
-    private:
-        Entity* m_ownerEntityPtr;
-};
+            sge::Entity* getOwnerEntity();
+            sge::Measurements getMeasurements();
+            void align();
+
+        private:
+            sge::Entity* m_ownerEntityPtr;
+    };
+}
 
 #endif
 #ifndef COLLISION_RESPONSES_H
 #define COLLISION_RESPONSES_H
 
 #include <vector>
-struct Collision;
 
-void resolveAABB(std::vector<Collision> collisions);
+namespace sge{
+    struct Collision;
+    
+    void resolveAABB(std::vector<sge::Collision> collisions);
 
-void initiatorStandOnTopOfRecipient(std::vector<Collision> collisions);
+    void initiatorStandOnTopOfRecipient(std::vector<sge::Collision> collisions);
+}
 
 #endif
 #ifndef COLLISION_DETECTION_ALGORITHMS_H
 #define COLLISION_DETECTION_ALGORITHMS_H
 
-class CollisionShape;
+namespace sge{
+    class CollisionShape;
+    
+    bool boundingBox(sge::CollisionShape* initiator, sge::CollisionShape* recipient);
 
-bool boundingBox(CollisionShape* initiator, CollisionShape* recipient);
-
-// TODO
-// bool rayRect(){}
+    // TODO
+    // bool rayRect(){}
+}
 
 #endif
 
 #ifndef ENTITY_H
 #define ENTITY_H
 
-class PhysicalObject;
-class CollisionShape;
-class Animation;
+namespace sge{
+    class PhysicalObject;
+    class CollisionShape;
+    class Animation;
 
-struct Entity{
-    PhysicalObject* physicalObject;
-    std::unordered_map<std::string, CollisionShape*> collisionShapes; 
-    Animation* animation = nullptr;
-};
+    struct Entity{
+        sge::PhysicalObject* physicalObject;
+        std::unordered_map<std::string, sge::CollisionShape*> collisionShapes; 
+        sge::Animation* animation = nullptr;
+    };
+}
 
 #endif
 #ifndef ENTITY_MANAGER_H
 #define ENTITY_MANAGER_H
 
 #include <vector>
-class Entity;
-class PhysicsManager;
-class CollisionManager;
-class TextureManager;
 
-class EntityManager{
-    public:
-        EntityManager(PhysicsManager* physicsManager, CollisionManager* collisionManager, TextureManager* textureManager);
+namespace sge{
+    class Entity;
+    class PhysicsManager;
+    class CollisionManager;
+    class TextureManager;
 
-        void registerEntity(Entity* entity);
-        void registerEntities(std::vector<Entity*> entities);
-        // void destroyEntity(Entity* entity);
-        std::vector<Entity*> getAllEntities();
+    class EntityManager{
+        public:
+            EntityManager(sge::PhysicsManager* physicsManager, sge::CollisionManager* collisionManager, sge::TextureManager* textureManager);
 
-    private:
-        std::vector<Entity*> m_entities;
+            void registerEntity(sge::Entity* entity);
+            void registerEntities(std::vector<sge::Entity*> entities);
+            // void destroyEntity(sge::Entity* entity);
+            std::vector<sge::Entity*> getAllEntities();
 
-        PhysicsManager* m_physicsManagerPtr;
-        CollisionManager* m_collisionManagerPtr;
-        TextureManager* m_textureManagerPtr;
+        private:
+            std::vector<sge::Entity*> m_entities;
 
-};
+            sge::PhysicsManager* m_physicsManagerPtr;
+            sge::CollisionManager* m_collisionManagerPtr;
+            sge::TextureManager* m_textureManagerPtr;
+
+    };
+}
 
 #endif
 #ifndef ENTITY_BUILDERS_H
 #define ENTITY_BUILDERS_H
 
 #include <SFML/Graphics.hpp>
-class Entity;
 
-// Builds Entity that consists only of PhysicalObject
-Entity* buildPlainEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position);
+namespace sge{
+    class Entity;
+    
+    // Builds Entity that consists only of PhysicalObject
+    Entity* buildPlainEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position);
 
-// Builds Entity that consists of PhysicalObject* and "globalBounds" -> CollisionShape*
-Entity* buildStaticEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position);
+    // Builds Entity that consists of PhysicalObject* and "globalBounds" -> CollisionShape*
+    Entity* buildStaticEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position);
 
-// Builds Entity that consists of PhysicalObject* and "globalBounds" -> CollisionShape*
-//
-// PhysicalObject added continuous computations:
-// "updateVelocity" -> updateVelocityBasedOnAcceleration()
-// "updatePosition" -> updatePositionBasedOnVelocity()
-Entity* buildMobileEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position);
+    // Builds Entity that consists of PhysicalObject* and "globalBounds" -> CollisionShape*
+    //
+    // PhysicalObject added continuous computations:
+    // "updateVelocity" -> updateVelocityBasedOnAcceleration()
+    // "updatePosition" -> updatePositionBasedOnVelocity()
+    Entity* buildMobileEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position);
+}
 
 #endif
 
@@ -423,31 +482,36 @@ Entity* buildMobileEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vec
 
 #include <SFML/Graphics.hpp>
 
-struct CollisionShapeBorderSettings{
-    sf::Color color = sf::Color::Blue;
-    float thickness = .5;
-};
+namespace sge{
+    struct CollisionShapeBorderSettings{
+        sf::Color color = sf::Color::Blue;
+        float thickness = .5;
+    };
+}
 
 #endif
-class Entity;
-class CollisionShapeBorder;
 
-class DebugEntity{
-    public:
-        DebugEntity(Entity* relatedEntity);
+namespace sge{
+    class Entity;
+    class CollisionShapeBorder;
 
-        bool drawCollisionShapeBorders = true;
-        std::unordered_map<std::string, CollisionShapeBorderSettings> customCollisionShapeBorderSettings;
-        std::vector<CollisionShapeBorder*> generateCollisionShapeBorders();
+    class DebugEntity{
+        public:
+            DebugEntity(sge::Entity* relatedEntity);
 
-        void addExtraDebugFunction(std::function<void(sf::RenderWindow* windowPtr)> extraDebugFunction);
-        std::vector<std::function<void(sf::RenderWindow* windowPtr)>> getExtraDebugFunctions();
+            bool drawCollisionShapeBorders = true;
+            std::unordered_map<std::string, sge::CollisionShapeBorderSettings> customCollisionShapeBorderSettings;
+            std::vector<sge::CollisionShapeBorder*> generateCollisionShapeBorders();
 
-    private:
-        Entity* m_relatedEntity;
-        CollisionShapeBorderSettings m_defaultCollisionShapeBorderSettings = CollisionShapeBorderSettings();
-        std::vector<std::function<void(sf::RenderWindow* windowPtr)>> m_extraDebugFunctions;
-};
+            void addExtraDebugFunction(std::function<void(sf::RenderWindow* windowPtr)> extraDebugFunction);
+            std::vector<std::function<void(sf::RenderWindow* windowPtr)>> getExtraDebugFunctions();
+
+        private:
+            sge::Entity* m_relatedEntity;
+            sge::CollisionShapeBorderSettings m_defaultCollisionShapeBorderSettings = sge::CollisionShapeBorderSettings();
+            std::vector<std::function<void(sf::RenderWindow* windowPtr)>> m_extraDebugFunctions;
+    };
+}
 
 #endif
 #ifndef DEBUG_MANAGER_H
@@ -456,54 +520,63 @@ class DebugEntity{
 #include <SFML/Graphics.hpp>
 #include <vector>
 
-class DebugEntity;
+namespace sge{
+    class DebugEntity;
 
-class DebugManager{
-    public:
-        void registerDebugEntity(DebugEntity* debugEntity);
+    class DebugManager{
+        public:
+            void registerDebugEntity(sge::DebugEntity* debugEntity);
 
-        void showDebugInfo(sf::RenderWindow* windowPtr);
+            void showDebugInfo(sf::RenderWindow* windowPtr);
 
-    private:
-        std::vector<DebugEntity*> m_debugEntities; // ? map<Entity -> DebugEntity> ?
-};
+        private:
+            std::vector<sge::DebugEntity*> m_debugEntities; // ? map<Entity -> DebugEntity> ?
+    };
+}
 
 #endif
 #ifndef COLLISION_SHAPE_BORDER_H
 #define COLLISION_SHAPE_BORDER_H
 
 #include <SFML/Graphics.hpp>
-class CollisionShape;
-struct CollisionShapeBorderSettings;
 
-class CollisionShapeBorder : public sf::RectangleShape{
-    public:
-        CollisionShapeBorder(CollisionShape* owner, CollisionShapeBorderSettings settings);
-};
+namespace sge{
+    class CollisionShape;
+    struct CollisionShapeBorderSettings;
+
+    class CollisionShapeBorder : public sf::RectangleShape{
+        public:
+            CollisionShapeBorder(sge::CollisionShape* owner, sge::CollisionShapeBorderSettings settings);
+    };
+}
 
 #endif
 
 #ifndef APPROACH_H
 #define APPROACH_H
 
-float approach(float goal, float current, float dt){
-    float diff = goal - current;
+namespace sge{
+    float approach(float goal, float current, float dt){
+        float diff = goal - current;
 
-    if(diff > dt) return current + dt;
-    if(diff < -dt) return current - dt;
-    return goal;
+        if(diff > dt) return current + dt;
+        if(diff < -dt) return current - dt;
+        return goal;
+    }
 }
 
 #endif
 #ifndef MEASUREMENTS_H
 #define MEASUREMENTS_H
 
-struct Measurements{
-    float x;
-    float y;
-    float height;
-    float width;
-};
+namespace sge{
+    struct Measurements{
+        float x;
+        float y;
+        float height;
+        float width;
+    };
+}
 
 #endif
 
@@ -511,11 +584,11 @@ struct Measurements{
 
 #ifndef SGE_MAIN
 
-Universe::Universe(bool DEBUG){
-    PhysicsManager* PM = new PhysicsManager();
-    CollisionManager* CM = new CollisionManager();
-    TextureManager* TM = new TextureManager();
-    EntityManager* EM = new EntityManager(PM, CM, TM);
+sge::Universe::Universe(bool DEBUG){
+    sge::PhysicsManager* PM = new sge::PhysicsManager();
+    sge::CollisionManager* CM = new sge::CollisionManager();
+    sge::TextureManager* TM = new sge::TextureManager();
+    sge::EntityManager* EM = new sge::EntityManager(PM, CM, TM);
     
     physicsManager = PM;
     collisionManager = CM;
@@ -523,16 +596,16 @@ Universe::Universe(bool DEBUG){
     entityManager = EM;
 
     if(DEBUG){
-        debugManager = new DebugManager();
+        debugManager = new sge::DebugManager();
     }
 }
 
-void Universe::setupWindow(sf::RenderWindow *window){ m_windowPtr = window; }
+void sge::Universe::setupWindow(sf::RenderWindow *window){ m_windowPtr = window; }
 
-void Universe::addController(std::function<void()> controller){ m_controllers.push_back(controller); }
-void Universe::addEventHandler(std::function<void(sf::Event event)> eventHandler){ m_eventHandlers.push_back(eventHandler); }
+void sge::Universe::addController(std::function<void()> controller){ m_controllers.push_back(controller); }
+void sge::Universe::addEventHandler(std::function<void(sf::Event event)> eventHandler){ m_eventHandlers.push_back(eventHandler); }
 
-void Universe::loop(){
+void sge::Universe::loop(){
     if(!m_windowPtr){
         printf("RenderWindow is not initialized. Use setupWindow method to initialize RenderWindow before(!) looping the Universe.\n");
         exit(1);
@@ -580,7 +653,7 @@ void Universe::loop(){
         // Game draws
         m_windowPtr->clear();
         
-        for(PhysicalObject* physicalObject : physicsManager->getAllPhysicalObjects()){
+        for(sge::PhysicalObject* physicalObject : physicsManager->getAllPhysicalObjects()){
             m_windowPtr->draw(*physicalObject);
         }
 
@@ -594,7 +667,7 @@ void Universe::loop(){
 }
 
 
-TextureSheet::TextureSheet(TextureSheetSizes textureSheetSizes, std::string location){
+sge::TextureSheet::TextureSheet(sge::TextureSheetSizes textureSheetSizes, std::string location){
     m_location = location;
     m_textureSheet.loadFromFile(location);
 
@@ -605,31 +678,31 @@ TextureSheet::TextureSheet(TextureSheetSizes textureSheetSizes, std::string loca
     }
 }
 
-std::string TextureSheet::getLocation(){ return m_location; }
-sf::Texture* TextureSheet::getTextureSheet(){ return &m_textureSheet; }
-sf::IntRect TextureSheet::getTextureRect(int textureN){ return m_textureRects[textureN]; }
+std::string sge::TextureSheet::getLocation(){ return m_location; }
+sf::Texture* sge::TextureSheet::getTextureSheet(){ return &m_textureSheet; }
+sf::IntRect sge::TextureSheet::getTextureRect(int textureN){ return m_textureRects[textureN]; }
 
 
-void TextureManager::loadTexture(std::string location, std::string name, TextureSheetSizes textureSheetSizes){ m_loadedTextures[name] = new TextureSheet(textureSheetSizes, location); }
-TextureSheet* TextureManager::getTexture(std::string name){ return m_loadedTextures[name]; }
+void sge::TextureManager::loadTexture(std::string location, std::string name, sge::TextureSheetSizes textureSheetSizes){ m_loadedTextures[name] = new sge::TextureSheet(textureSheetSizes, location); }
+sge::TextureSheet* sge::TextureManager::getTexture(std::string name){ return m_loadedTextures[name]; }
 
-void TextureManager::registerAnimation(Animation* animation){ m_animations.push_back(animation); }
-void TextureManager::deregisterAnimation(Animation* animation){ m_animations.erase(std::remove(m_animations.begin(), m_animations.end(), animation), m_animations.end()); }
+void sge::TextureManager::registerAnimation(sge::Animation* animation){ m_animations.push_back(animation); }
+void sge::TextureManager::deregisterAnimation(sge::Animation* animation){ m_animations.erase(std::remove(m_animations.begin(), m_animations.end(), animation), m_animations.end()); }
 
-void TextureManager::initAnimationClocks(){
-    for(Animation* animation : m_animations){
+void sge::TextureManager::initAnimationClocks(){
+    for(sge::Animation* animation : m_animations){
         animation->restartClock();
     }
 }
 
-void TextureManager::updateAnimations(){
-    for(Animation* animation : m_animations){
+void sge::TextureManager::updateAnimations(){
+    for(sge::Animation* animation : m_animations){
         animation->run();
     }
 }
 
 
-Animation::Animation(TextureSheet* textureSheet, sf::Sprite* owner, int initialTextureN){
+sge::Animation::Animation(sge::TextureSheet* textureSheet, sf::Sprite* owner, int initialTextureN){
     m_textureSheet = textureSheet;
     m_owner = owner;
     
@@ -637,8 +710,8 @@ Animation::Animation(TextureSheet* textureSheet, sf::Sprite* owner, int initialT
     m_owner->setTextureRect(textureSheet->getTextureRect(initialTextureN));
 }
 
-void Animation::addTextureSequence(std::string name, std::vector<int> textureSequence){ m_textureSequences[name] = textureSequence; }
-void Animation::setCurrentTextureSequence(std::string name){
+void sge::Animation::addTextureSequence(std::string name, std::vector<int> textureSequence){ m_textureSequences[name] = textureSequence; }
+void sge::Animation::setCurrentTextureSequence(std::string name){
     if(m_currentTextureSequence != name){
         m_currentTextureSequence = name;
         m_currentTextureN = 0;
@@ -646,7 +719,7 @@ void Animation::setCurrentTextureSequence(std::string name){
     }
 }
 
-void Animation::run(){
+void sge::Animation::run(){
     if(!m_textureSequences.size()){
         printf("No texture sequences initialized.\n");
         exit(1);
@@ -669,32 +742,32 @@ void Animation::run(){
         m_clock.restart();
     }
 }
-void Animation::restartClock(){ m_clock.restart(); }
+void sge::Animation::restartClock(){ m_clock.restart(); }
 
-void PhysicsManager::registerPhysicalObject(PhysicalObject* physicalObject){ m_physicalObjects.push_back(physicalObject); }
-void PhysicsManager::deregisterPhysicalObject(PhysicalObject* physicalObject){ m_physicalObjects.erase(std::remove(m_physicalObjects.begin(), m_physicalObjects.end(), physicalObject), m_physicalObjects.end()); }
-std::vector<PhysicalObject*> PhysicsManager::getAllPhysicalObjects(){ return m_physicalObjects; }
+void sge::PhysicsManager::registerPhysicalObject(sge::PhysicalObject* physicalObject){ m_physicalObjects.push_back(physicalObject); }
+void sge::PhysicsManager::deregisterPhysicalObject(sge::PhysicalObject* physicalObject){ m_physicalObjects.erase(std::remove(m_physicalObjects.begin(), m_physicalObjects.end(), physicalObject), m_physicalObjects.end()); }
+std::vector<sge::PhysicalObject*> sge::PhysicsManager::getAllPhysicalObjects(){ return m_physicalObjects; }
 
-void PhysicsManager::updatePhysics(float dt){
-    for(PhysicalObject* physicalObject : m_physicalObjects){
+void sge::PhysicsManager::updatePhysics(float dt){
+    for(sge::PhysicalObject* physicalObject : m_physicalObjects){
         physicalObject->update(dt);
     }
 }
 
 
-void PhysicalObject::createAction(std::string name, std::function<void()> action){ m_actions[name] = action; }
-void PhysicalObject::doAction(std::string name){ m_actions[name](); }
+void sge::PhysicalObject::createAction(std::string name, std::function<void()> action){ m_actions[name] = action; }
+void sge::PhysicalObject::doAction(std::string name){ m_actions[name](); }
 
-void PhysicalObject::createContinuousComputation(std::string name, std::function<void(PhysicalObject*, float)> computation){
+void sge::PhysicalObject::createContinuousComputation(std::string name, std::function<void(sge::PhysicalObject*, float)> computation){
     m_continuousComputations[name] = computation;
     m_continuousComputationOrder.push_back(name);
 }
 
-void PhysicalObject::createFlag(std::string name){ m_flags[name] = false; }
-bool PhysicalObject::getFlag(std::string flagName){ return m_flags[flagName]; }
-void PhysicalObject::setFlag(std::string flagName, bool value){ m_flags[flagName] = value; }
+void sge::PhysicalObject::createFlag(std::string name){ m_flags[name] = false; }
+bool sge::PhysicalObject::getFlag(std::string flagName){ return m_flags[flagName]; }
+void sge::PhysicalObject::setFlag(std::string flagName, bool value){ m_flags[flagName] = value; }
 
-void PhysicalObject::update(float dt){
+void sge::PhysicalObject::update(float dt){
     // Run continuous computations in order of insertion
     for(std::string computation : m_continuousComputationOrder){
         m_continuousComputations[computation](this, dt);
@@ -702,14 +775,14 @@ void PhysicalObject::update(float dt){
 };
 
 
-std::function<void(PhysicalObject*, float)> updatePositionBasedOnVelocity(){
-    return [](PhysicalObject* thisPhysicalObject, float dt){
+std::function<void(sge::PhysicalObject*, float)> sge::updatePositionBasedOnVelocity(){
+    return [](sge::PhysicalObject* thisPhysicalObject, float dt){
         thisPhysicalObject->setPosition(thisPhysicalObject->getPosition() + thisPhysicalObject->velocity * dt);
     };
 }
 
-std::function<void(PhysicalObject*, float)> updateVelocityBasedOnAcceleration(sf::Vector2f speedLimit){
-    return [speedLimit](PhysicalObject* thisPhysicalObject, float dt){
+std::function<void(sge::PhysicalObject*, float)> sge::updateVelocityBasedOnAcceleration(sf::Vector2f speedLimit){
+    return [speedLimit](sge::PhysicalObject* thisPhysicalObject, float dt){
         if(abs(thisPhysicalObject->velocity.x) >= speedLimit.x){
             thisPhysicalObject->velocity.x = speedLimit.x;
         }
@@ -727,42 +800,42 @@ std::function<void(PhysicalObject*, float)> updateVelocityBasedOnAcceleration(sf
 }
 
 
-void CollisionManager::registerCollisionShape(CollisionShape* collisionShape){ m_allCollisionShapes.push_back(collisionShape); }
-void CollisionManager::deregisterCollisionShape(CollisionShape* collisionShape){ m_allCollisionShapes.erase(std::remove(m_allCollisionShapes.begin(), m_allCollisionShapes.end(), collisionShape), m_allCollisionShapes.end()); }
-void CollisionManager::registerCollisionShapes(std::vector<CollisionShape*> collisionShapes){ m_allCollisionShapes.insert(m_allCollisionShapes.end(), collisionShapes.begin(), collisionShapes.end()); }
-void CollisionManager::degisterCollisionShapes(std::vector<CollisionShape*> collisionShapes){
-    for(CollisionShape* collisionShape : collisionShapes){
+void sge::CollisionManager::registerCollisionShape(sge::CollisionShape* collisionShape){ m_allCollisionShapes.push_back(collisionShape); }
+void sge::CollisionManager::deregisterCollisionShape(sge::CollisionShape* collisionShape){ m_allCollisionShapes.erase(std::remove(m_allCollisionShapes.begin(), m_allCollisionShapes.end(), collisionShape), m_allCollisionShapes.end()); }
+void sge::CollisionManager::registerCollisionShapes(std::vector<sge::CollisionShape*> collisionShapes){ m_allCollisionShapes.insert(m_allCollisionShapes.end(), collisionShapes.begin(), collisionShapes.end()); }
+void sge::CollisionManager::degisterCollisionShapes(std::vector<sge::CollisionShape*> collisionShapes){
+    for(sge::CollisionShape* collisionShape : collisionShapes){
         deregisterCollisionShape(collisionShape);
     }
 }
-std::vector<CollisionShape*> CollisionManager::getAllCollisionShapes(){ return m_allCollisionShapes; }
-void CollisionManager::alignCollisionShapes(){
-    for(CollisionShape* collisionShape : m_allCollisionShapes){
+std::vector<sge::CollisionShape*> sge::CollisionManager::getAllCollisionShapes(){ return m_allCollisionShapes; }
+void sge::CollisionManager::alignCollisionShapes(){
+    for(sge::CollisionShape* collisionShape : m_allCollisionShapes){
         collisionShape->align();
     }
 }
 
-void CollisionManager::registerCollisionGroup(std::string name, std::vector<CollisionShape*> collisionGroup){ m_collisionGroups[name] = collisionGroup; } 
-void CollisionManager::deregisterCollisionGroup(std::string name){ m_collisionGroups.erase(name); }
-void CollisionManager::registerCollisionGroups(std::unordered_map<std::string, std::vector<CollisionShape*>> collisionGroups){ m_collisionGroups.insert(collisionGroups.begin(), collisionGroups.end()); }
-void CollisionManager::deregisterCollisionGroups(std::unordered_map<std::string, std::vector<CollisionShape*>> collisionGroups){
+void sge::CollisionManager::registerCollisionGroup(std::string name, std::vector<sge::CollisionShape*> collisionGroup){ m_collisionGroups[name] = collisionGroup; } 
+void sge::CollisionManager::deregisterCollisionGroup(std::string name){ m_collisionGroups.erase(name); }
+void sge::CollisionManager::registerCollisionGroups(std::unordered_map<std::string, std::vector<sge::CollisionShape*>> collisionGroups){ m_collisionGroups.insert(collisionGroups.begin(), collisionGroups.end()); }
+void sge::CollisionManager::deregisterCollisionGroups(std::unordered_map<std::string, std::vector<sge::CollisionShape*>> collisionGroups){
     for(auto& [name, _] : collisionGroups){
         deregisterCollisionGroup(name);
     }
 }
-std::unordered_map<std::string, std::vector<CollisionShape*>> CollisionManager::getCollisionGroups(){ return m_collisionGroups; }
+std::unordered_map<std::string, std::vector<sge::CollisionShape*>> sge::CollisionManager::getCollisionGroups(){ return m_collisionGroups; }
 
-void CollisionManager::createCollisionPair(std::string name, std::string initiatorGroup, std::string recipientGroup){
+void sge::CollisionManager::createCollisionPair(std::string name, std::string initiatorGroup, std::string recipientGroup){
     if(!m_collisionGroups.count(initiatorGroup) && !m_collisionGroups.count(recipientGroup)){
         printf("Can not create %s - %s collision m_collisionPairs[pair].", initiatorGroup.c_str(), recipientGroup.c_str());
         exit(1);
     }
 
-    m_collisionPairs[name] = new CollisionPair{std::make_pair(initiatorGroup, recipientGroup)};
+    m_collisionPairs[name] = new sge::CollisionPair{std::make_pair(initiatorGroup, recipientGroup)};
     m_collisionPairsOrder.push_back(name);
 }
-void CollisionManager::setPairCollisionDetectionAlgorithm(std::string collisionPairName, std::function<bool(CollisionShape *CS1, CollisionShape *CS2)> collisionDetectionAlgorithm){ m_collisionPairs[collisionPairName]->checkCollision = collisionDetectionAlgorithm; }
-void CollisionManager::setPairCollisionResponse(std::string collisionPairName, std::string collisionPhase, std::function<void(std::vector<Collision>)> response){
+void sge::CollisionManager::setPairCollisionDetectionAlgorithm(std::string collisionPairName, std::function<bool(sge::CollisionShape*, sge::CollisionShape*)> collisionDetectionAlgorithm){ m_collisionPairs[collisionPairName]->checkCollision = collisionDetectionAlgorithm; }
+void sge::CollisionManager::setPairCollisionResponse(std::string collisionPairName, std::string collisionPhase, std::function<void(std::vector<sge::Collision>)> response){
     if(collisionPhase == "start_phase"){
         m_collisionPairs[collisionPairName]->startPhaseCollisionResponse = response;
     }
@@ -774,19 +847,19 @@ void CollisionManager::setPairCollisionResponse(std::string collisionPairName, s
     }
 }
 
-void CollisionManager::updateCollisions(){
-    std::vector<Collision> presentCollisions;
+void sge::CollisionManager::updateCollisions(){
+    std::vector<sge::Collision> presentCollisions;
 
     // TODO check in order of insertion ?
     for(std::string pair : m_collisionPairsOrder){
 
-        for(CollisionShape* initiator : m_collisionGroups[m_collisionPairs[pair]->collisionGroups.first]){
+        for(sge::CollisionShape* initiator : m_collisionGroups[m_collisionPairs[pair]->collisionGroups.first]){
             // Register all present collisions
-            for(CollisionShape* recipient : m_collisionGroups[m_collisionPairs[pair]->collisionGroups.second]){
+            for(sge::CollisionShape* recipient : m_collisionGroups[m_collisionPairs[pair]->collisionGroups.second]){
                 if(m_collisionPairs[pair]->checkCollision(initiator, recipient)){
                     CollisionSide initiatorImpactSide = determineInitiatorImpactSide(initiator, recipient);
 
-                    presentCollisions.push_back(Collision{
+                    presentCollisions.push_back(sge::Collision{
                         initiator,
                         recipient,
                         initiatorImpactSide,
@@ -796,30 +869,30 @@ void CollisionManager::updateCollisions(){
             }
             //
 
-            std::vector<Collision> pastCollisions = m_collisionPairs[pair]->pastCollisions[initiator];
+            std::vector<sge::Collision> pastCollisions = m_collisionPairs[pair]->pastCollisions[initiator];
 
             // Determine collision phase
             std::sort(presentCollisions.begin(), presentCollisions.end());
             std::sort(pastCollisions.begin(), pastCollisions.end());
 
-            // std::vector<Collision> startPhaseCollisions;
+            // std::vector<sge::Collision> startPhaseCollisions;
             // std::set_difference(presentCollisions.begin(),presentCollisions.end(), pastCollisions.begin(),pastCollisions.end(), std::back_inserter(startPhaseCollisions));
 
-            // std::vector<Collision> continuousPhaseCollisions;
+            // std::vector<sge::Collision> continuousPhaseCollisions;
             // std::set_intersection(pastCollisions.begin(),pastCollisions.end(), presentCollisions.begin(),presentCollisions.end(), std::back_inserter(continuousPhaseCollisions));
 
-            // std::vector<Collision> endPhaseCollisions;
+            // std::vector<sge::Collision> endPhaseCollisions;
             // std::set_difference(pastCollisions.begin(),pastCollisions.end(), presentCollisions.begin(),presentCollisions.end(), std::back_inserter(endPhaseCollisions));
 
             // Either works
 
-            std::vector<Collision> continuousPhaseCollisions;
+            std::vector<sge::Collision> continuousPhaseCollisions;
             std::set_intersection(pastCollisions.begin(),pastCollisions.end(), presentCollisions.begin(),presentCollisions.end(), std::back_inserter(continuousPhaseCollisions));
 
-            std::vector<Collision> startPhaseCollisions;
+            std::vector<sge::Collision> startPhaseCollisions;
             std::set_difference(presentCollisions.begin(),presentCollisions.end(), continuousPhaseCollisions.begin(),continuousPhaseCollisions.end(), std::back_inserter(startPhaseCollisions));
 
-            std::vector<Collision> endPhaseCollisions;
+            std::vector<sge::Collision> endPhaseCollisions;
             std::set_difference(pastCollisions.begin(),pastCollisions.end(), continuousPhaseCollisions.begin(),continuousPhaseCollisions.end(), std::back_inserter(endPhaseCollisions));
             //
 
@@ -844,39 +917,33 @@ void CollisionManager::updateCollisions(){
         }
     }
 }
-
-
-bool operator< (const Collision a, const Collision b){ return a.recipient < b.recipient; }
-bool operator> (const Collision a, const Collision b){ return a.recipient > b.recipient; }
-bool operator== (const Collision a, const Collision b){ return a.recipient == b.recipient; }
-bool operator!= (const Collision a, const Collision b){ return a.recipient != b.recipient; }
 #include <limits>
 
-float determineCollisionDepth(CollisionSide initiatorImpactSide, CollisionShape *initiator, CollisionShape *recipient){
+float sge::determineCollisionDepth(sge::CollisionSide initiatorImpactSide, sge::CollisionShape *initiator, sge::CollisionShape *recipient){
     auto [x1, y1, height1, width1] = initiator->getMeasurements();
     auto [x2, y2, height2, width2] = recipient->getMeasurements();
     
-    if(initiatorImpactSide == CollisionSide::left) return x2 + width2 - x1;
-    if(initiatorImpactSide == CollisionSide::right) return x1 + width1 - x2;
-    if(initiatorImpactSide == CollisionSide::top) return y2 + height2 - y1;
-    if(initiatorImpactSide == CollisionSide::bottom) return y1 + height1 - y2;
+    if(initiatorImpactSide == sge::CollisionSide::left) return x2 + width2 - x1;
+    if(initiatorImpactSide == sge::CollisionSide::right) return x1 + width1 - x2;
+    if(initiatorImpactSide == sge::CollisionSide::top) return y2 + height2 - y1;
+    if(initiatorImpactSide == sge::CollisionSide::bottom) return y1 + height1 - y2;
 
     return 0;
 }
 
-CollisionSide determineInitiatorImpactSide(CollisionShape *initiator, CollisionShape *recipient){
-    std::vector<CollisionSide> allImpactSides;
+sge::CollisionSide sge::determineInitiatorImpactSide(sge::CollisionShape *initiator, sge::CollisionShape *recipient){
+    std::vector<sge::CollisionSide> allImpactSides;
 
-    if(initiator->getPosition().x > recipient->getPosition().x) allImpactSides.push_back(CollisionSide::left);
-    if(initiator->getPosition().x < recipient->getPosition().x) allImpactSides.push_back(CollisionSide::right);
-    if(initiator->getPosition().y > recipient->getPosition().y) allImpactSides.push_back(CollisionSide::top);
-    if(initiator->getPosition().y < recipient->getPosition().y) allImpactSides.push_back(CollisionSide::bottom);
+    if(initiator->getPosition().x > recipient->getPosition().x) allImpactSides.push_back(sge::CollisionSide::left);
+    if(initiator->getPosition().x < recipient->getPosition().x) allImpactSides.push_back(sge::CollisionSide::right);
+    if(initiator->getPosition().y > recipient->getPosition().y) allImpactSides.push_back(sge::CollisionSide::top);
+    if(initiator->getPosition().y < recipient->getPosition().y) allImpactSides.push_back(sge::CollisionSide::bottom);
 
-    CollisionSide lowestDepthSide;
+    sge::CollisionSide lowestDepthSide;
     float lowestDepth = std::numeric_limits<float>::infinity();
     
-    for(CollisionSide collisionSide : allImpactSides){
-        float depth = determineCollisionDepth(collisionSide, initiator, recipient);
+    for(sge::CollisionSide collisionSide : allImpactSides){
+        float depth = sge::determineCollisionDepth(collisionSide, initiator, recipient);
         if(depth <= lowestDepth){
             lowestDepthSide = collisionSide;
             lowestDepth = depth;
@@ -886,57 +953,57 @@ CollisionSide determineInitiatorImpactSide(CollisionShape *initiator, CollisionS
     return lowestDepthSide;
 }
 
-CollisionSide flipInitiatorImpactSide(CollisionSide initiatorImpactSide){
-    if(initiatorImpactSide == CollisionSide::top) return CollisionSide::bottom;
-    if(initiatorImpactSide == CollisionSide::bottom) return CollisionSide::top;
-    if(initiatorImpactSide == CollisionSide::right) return CollisionSide::left;
-    if(initiatorImpactSide == CollisionSide::left) return CollisionSide::right;
+sge::CollisionSide sge::flipInitiatorImpactSide(sge::CollisionSide initiatorImpactSide){
+    if(initiatorImpactSide == sge::CollisionSide::top) return sge::CollisionSide::bottom;
+    if(initiatorImpactSide == sge::CollisionSide::bottom) return sge::CollisionSide::top;
+    if(initiatorImpactSide == sge::CollisionSide::right) return sge::CollisionSide::left;
+    if(initiatorImpactSide == sge::CollisionSide::left) return sge::CollisionSide::right;
 
-    return CollisionSide::bottom;
+    return sge::CollisionSide::bottom;
 }
 
 
-CollisionShape::CollisionShape(Entity* ownerEntityPtr){
+sge::CollisionShape::CollisionShape(sge::Entity* ownerEntityPtr){
     m_ownerEntityPtr = ownerEntityPtr;
 
     this->setFillColor(sf::Color(0,0,0,0));
     this->setSize(sf::Vector2f(ownerEntityPtr->physicalObject->getGlobalBounds().width, ownerEntityPtr->physicalObject->getGlobalBounds().height));
 }
 
-Entity* CollisionShape::getOwnerEntity(){ return m_ownerEntityPtr; }
-Measurements CollisionShape::getMeasurements(){
+sge::Entity* sge::CollisionShape::getOwnerEntity(){ return m_ownerEntityPtr; }
+sge::Measurements sge::CollisionShape::getMeasurements(){
     return { this->getPosition().x, this->getPosition().y, this->getGlobalBounds().height, this->getGlobalBounds().width };
 }
-void CollisionShape::align(){
+void sge::CollisionShape::align(){
     this->setPosition(m_ownerEntityPtr->physicalObject->getPosition() + offset);
 }
 
 
-void resolveAABB(std::vector<Collision> collisions){
-    for(Collision collision : collisions){
-        PhysicalObject *initiatorPhysicalObject = collision.initiator->getOwnerEntity()->physicalObject;
-        PhysicalObject *recipientPhysicalObject = collision.recipient->getOwnerEntity()->physicalObject;
+void sge::resolveAABB(std::vector<sge::Collision> collisions){
+    for(sge::Collision collision : collisions){
+        sge::PhysicalObject *initiatorPhysicalObject = collision.initiator->getOwnerEntity()->physicalObject;
+        sge::PhysicalObject *recipientPhysicalObject = collision.recipient->getOwnerEntity()->physicalObject;
         
         // Align initiator based on impact side
-        if(collision.initiatorImpactSide == CollisionSide::left){
+        if(collision.initiatorImpactSide == sge::CollisionSide::left){
             initiatorPhysicalObject->setPosition(
                 recipientPhysicalObject->getPosition().x + recipientPhysicalObject->getGlobalBounds().width - collision.initiator->offset.x,
                 initiatorPhysicalObject->getPosition().y
             );
         }
-        else if(collision.initiatorImpactSide == CollisionSide::right){
+        else if(collision.initiatorImpactSide == sge::CollisionSide::right){
             initiatorPhysicalObject->setPosition(
                 recipientPhysicalObject->getPosition().x - collision.initiator->getGlobalBounds().width - collision.initiator->offset.x,
                 initiatorPhysicalObject->getPosition().y
             );
         }
-        else if(collision.initiatorImpactSide == CollisionSide::top){
+        else if(collision.initiatorImpactSide == sge::CollisionSide::top){
             initiatorPhysicalObject->setPosition(
                 initiatorPhysicalObject->getPosition().x,
                 recipientPhysicalObject->getPosition().y + recipientPhysicalObject->getGlobalBounds().height - collision.initiator->offset.y
             );
         }
-        else if(collision.initiatorImpactSide == CollisionSide::bottom){
+        else if(collision.initiatorImpactSide == sge::CollisionSide::bottom){
             initiatorPhysicalObject->setPosition(
                 initiatorPhysicalObject->getPosition().x,
                 recipientPhysicalObject->getPosition().y - collision.initiator->getGlobalBounds().height - collision.initiator->offset.y
@@ -946,27 +1013,27 @@ void resolveAABB(std::vector<Collision> collisions){
     }
 }
 
-void initiatorStandOnTopOfRecipient(std::vector<Collision> collisions){
-    for(Collision collision : collisions){
-        if(collision.initiatorImpactSide == CollisionSide::bottom){
+void sge::initiatorStandOnTopOfRecipient(std::vector<sge::Collision> collisions){
+    for(sge::Collision collision : collisions){
+        if(collision.initiatorImpactSide == sge::CollisionSide::bottom){
             collision.initiator->getOwnerEntity()->physicalObject->velocity.y = 0;
         }
     }
 }
 
 
-bool boundingBox(CollisionShape* initiator, CollisionShape* recipient){
+bool sge::boundingBox(sge::CollisionShape* initiator, sge::CollisionShape* recipient){
     return initiator->getGlobalBounds().intersects(recipient->getGlobalBounds());
 }
 
 
-EntityManager::EntityManager(PhysicsManager* physicsManager, CollisionManager* collisionManager, TextureManager* textureManager){
+sge::EntityManager::EntityManager(sge::PhysicsManager* physicsManager, sge::CollisionManager* collisionManager, sge::TextureManager* textureManager){
     m_physicsManagerPtr = physicsManager;
     m_collisionManagerPtr = collisionManager;
     m_textureManagerPtr = textureManager;
 }
 
-void EntityManager::registerEntity(Entity* entity){
+void sge::EntityManager::registerEntity(sge::Entity* entity){
     m_physicsManagerPtr->registerPhysicalObject(entity->physicalObject);
         
     if(entity->collisionShapes.size()){
@@ -978,35 +1045,21 @@ void EntityManager::registerEntity(Entity* entity){
     if(entity->animation){
         m_textureManagerPtr->registerAnimation(entity->animation);
     }
+
+    m_entities.push_back(entity);
 }
 
-void EntityManager::registerEntities(std::vector<Entity*> entities){
-    for(Entity* entity : entities){
-        m_physicsManagerPtr->registerPhysicalObject(entity->physicalObject);
-        
-        if(entity->collisionShapes.size()){
-            // Map to vector
-            std::vector<CollisionShape*> entityCollisionShapes;
-            for(auto& [_, collisionShape] : entity->collisionShapes){
-                entityCollisionShapes.push_back(collisionShape);
-            }
-            //
-            m_collisionManagerPtr->registerCollisionShapes(entityCollisionShapes);
-        }
-        
-        if(entity->animation){
-            m_textureManagerPtr->registerAnimation(entity->animation);
-        }
-
-        m_entities.push_back(entity);
+void sge::EntityManager::registerEntities(std::vector<sge::Entity*> entities){
+    for(sge::Entity* entity : entities){
+        registerEntity(entity);
     }
 }
 
-std::vector<Entity*> EntityManager::getAllEntities(){ return m_entities; }
+std::vector<sge::Entity*> sge::EntityManager::getAllEntities(){ return m_entities; }
 
 
-Entity* buildPlainEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position){
-    Entity* e = new Entity{ new PhysicalObject() };
+sge::Entity* sge::buildPlainEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position){
+    sge::Entity* e = new sge::Entity{ new sge::PhysicalObject() };
     e->physicalObject->setTexture(*texture);
     e->physicalObject->setTextureRect(textureRect);
     e->physicalObject->setPosition(position);
@@ -1014,48 +1067,48 @@ Entity* buildPlainEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vect
     return e;
 }
 
-Entity* buildStaticEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position){
-    Entity* e = buildPlainEntity(texture, textureRect, position);
+sge::Entity* sge::buildStaticEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position){
+    sge::Entity* e = sge::buildPlainEntity(texture, textureRect, position);
 
-    e->collisionShapes["globalBounds"] = new CollisionShape(e);
-
-    return e;
-}
-
-Entity* buildMobileEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position){
-    Entity* e = buildStaticEntity(texture, textureRect, position);
-
-    e->physicalObject->createContinuousComputation("updateVelocity", updateVelocityBasedOnAcceleration());
-    e->physicalObject->createContinuousComputation("updatePosition", updatePositionBasedOnVelocity());
+    e->collisionShapes["globalBounds"] = new sge::CollisionShape(e);
 
     return e;
 }
 
+sge::Entity* sge::buildMobileEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position){
+    sge::Entity* e = sge::buildStaticEntity(texture, textureRect, position);
 
-DebugEntity::DebugEntity(Entity* relatedEntity){ m_relatedEntity = relatedEntity; }
+    e->physicalObject->createContinuousComputation("updateVelocity", sge::updateVelocityBasedOnAcceleration());
+    e->physicalObject->createContinuousComputation("updatePosition", sge::updatePositionBasedOnVelocity());
 
-std::vector<CollisionShapeBorder*> DebugEntity::generateCollisionShapeBorders(){
-    std::vector<CollisionShapeBorder*> collisionShapeBorders;
+    return e;
+}
+
+
+sge::DebugEntity::DebugEntity(sge::Entity* relatedEntity){ m_relatedEntity = relatedEntity; }
+
+std::vector<sge::CollisionShapeBorder*> sge::DebugEntity::generateCollisionShapeBorders(){
+    std::vector<sge::CollisionShapeBorder*> collisionShapeBorders;
     for(auto &[name, collisionShape] : m_relatedEntity->collisionShapes){
         if(customCollisionShapeBorderSettings.count(name)){
-            collisionShapeBorders.push_back(new CollisionShapeBorder(collisionShape, customCollisionShapeBorderSettings[name]));
+            collisionShapeBorders.push_back(new sge::CollisionShapeBorder(collisionShape, customCollisionShapeBorderSettings[name]));
         }
         else{
-            collisionShapeBorders.push_back(new CollisionShapeBorder(collisionShape, m_defaultCollisionShapeBorderSettings));
+            collisionShapeBorders.push_back(new sge::CollisionShapeBorder(collisionShape, m_defaultCollisionShapeBorderSettings));
         }
     }
 
     return collisionShapeBorders;
 }
 
-void DebugEntity::addExtraDebugFunction(std::function<void(sf::RenderWindow* windowPtr)> extraDebugFunction){ m_extraDebugFunctions.push_back(extraDebugFunction); }
-std::vector<std::function<void(sf::RenderWindow* windowPtr)>> DebugEntity::getExtraDebugFunctions(){ return m_extraDebugFunctions; }
+void sge::DebugEntity::addExtraDebugFunction(std::function<void(sf::RenderWindow* windowPtr)> extraDebugFunction){ m_extraDebugFunctions.push_back(extraDebugFunction); }
+std::vector<std::function<void(sf::RenderWindow* windowPtr)>> sge::DebugEntity::getExtraDebugFunctions(){ return m_extraDebugFunctions; }
 
 
-void DebugManager::registerDebugEntity(DebugEntity* debugEntity){ m_debugEntities.push_back(debugEntity); }
+void sge::DebugManager::registerDebugEntity(sge::DebugEntity* debugEntity){ m_debugEntities.push_back(debugEntity); }
 
-void DebugManager::showDebugInfo(sf::RenderWindow* windowPtr){
-    for(DebugEntity* debugEntity : m_debugEntities){
+void sge::DebugManager::showDebugInfo(sf::RenderWindow* windowPtr){
+    for(sge::DebugEntity* debugEntity : m_debugEntities){
         // Run extraDebugFunctions
         for(std::function<void(sf::RenderWindow* renderWindow)> extraDebugFunction : debugEntity->getExtraDebugFunctions()){
             extraDebugFunction(windowPtr);
@@ -1064,7 +1117,7 @@ void DebugManager::showDebugInfo(sf::RenderWindow* windowPtr){
 
         // Draw collision shape borders
         if(debugEntity->drawCollisionShapeBorders){
-            for(CollisionShapeBorder* collisionShapeBorder : debugEntity->generateCollisionShapeBorders()){
+            for(sge::CollisionShapeBorder* collisionShapeBorder : debugEntity->generateCollisionShapeBorders()){
                 windowPtr->draw(*collisionShapeBorder);
             }
         }
@@ -1073,7 +1126,7 @@ void DebugManager::showDebugInfo(sf::RenderWindow* windowPtr){
 }
 
 
-CollisionShapeBorder::CollisionShapeBorder(CollisionShape* owner, CollisionShapeBorderSettings settings){
+sge::CollisionShapeBorder::CollisionShapeBorder(sge::CollisionShape* owner, sge::CollisionShapeBorderSettings settings){
     this->setFillColor(sf::Color(0,0,0,0));
 
     this->setOutlineColor(settings.color);
@@ -1085,5 +1138,3 @@ CollisionShapeBorder::CollisionShapeBorder(CollisionShape* owner, CollisionShape
 
 
 #endif
-
-}
