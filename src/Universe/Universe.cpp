@@ -5,22 +5,23 @@
 #include "../Texture/TextureManager.h"
 #include "../Entity/EntityManager.h"
 #include "../Debug/DebugManager.h"
+#include "../Scene/SceneManager.h"
 
 
-sge::Universe::Universe(bool DEBUG){
+sge::Universe::Universe(){
     sge::PhysicsManager* PM = new sge::PhysicsManager();
     sge::CollisionManager* CM = new sge::CollisionManager();
     sge::TextureManager* TM = new sge::TextureManager();
     sge::EntityManager* EM = new sge::EntityManager(PM, CM, TM);
-    
+    sge::DebugManager* DM = new sge::DebugManager();
+    sge::SceneManager* SM = new sge::SceneManager(PM, CM, TM, EM, DM);
+
     physicsManager = PM;
     collisionManager = CM;
     textureManager = TM;
     entityManager = EM;
-
-    if(DEBUG){
-        debugManager = new sge::DebugManager();
-    }
+    debugManager = DM;
+    sceneManager = SM;
 }
 
 
@@ -86,9 +87,7 @@ void sge::Universe::loop(){
             m_windowPtr->draw(*physicalObject);
         }
 
-        if(debugManager){
-            debugManager->showDebugInfo(m_windowPtr);
-        }
+        debugManager->showDebugInfo(m_windowPtr);
         //
 
         m_windowPtr->display();

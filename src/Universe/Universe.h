@@ -13,10 +13,11 @@ namespace sge{
     class TextureManager;
     class EntityManager;
     class DebugManager;
+    class SceneManager;
     
     class Universe{
         public:
-            Universe(bool DEBUG = false);
+            Universe();
 
 
             void setupWindow(sf::RenderWindow* window);
@@ -34,6 +35,7 @@ namespace sge{
             sge::TextureManager* textureManager = nullptr;
             sge::EntityManager* entityManager = nullptr;
             sge::DebugManager* debugManager = nullptr;
+            sge::SceneManager* sceneManager = nullptr;
 
         private:
             sf::RenderWindow* m_windowPtr;
