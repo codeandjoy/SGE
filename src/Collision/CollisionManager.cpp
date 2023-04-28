@@ -7,13 +7,22 @@
 
 
 void sge::CollisionManager::registerCollisionShape(sge::CollisionShape* collisionShape){ m_allCollisionShapes.push_back(collisionShape); }
-void sge::CollisionManager::deregisterCollisionShape(sge::CollisionShape* collisionShape){ m_allCollisionShapes.erase(std::remove(m_allCollisionShapes.begin(), m_allCollisionShapes.end(), collisionShape), m_allCollisionShapes.end()); }
+void sge::CollisionManager::deregisterCollisionShape(sge::CollisionShape* collisionShape){
+    m_allCollisionShapes.erase(std::remove(m_allCollisionShapes.begin(), m_allCollisionShapes.end(), collisionShape), m_allCollisionShapes.end());
+
+    // Remove from collision groups, if needed
+    for(auto [_, collisionGroup] : m_collisionGroups){
+        collisionGroup.erase(std::remove(collisionGroup.begin(), collisionGroup.end(), collisionShape), collisionGroup.end());
+    }
+    //
+}
 void sge::CollisionManager::registerCollisionShapes(std::vector<sge::CollisionShape*> collisionShapes){ m_allCollisionShapes.insert(m_allCollisionShapes.end(), collisionShapes.begin(), collisionShapes.end()); }
-void sge::CollisionManager::degisterCollisionShapes(std::vector<sge::CollisionShape*> collisionShapes){
+void sge::CollisionManager::deregisterCollisionShapes(std::vector<sge::CollisionShape*> collisionShapes){
     for(sge::CollisionShape* collisionShape : collisionShapes){
         deregisterCollisionShape(collisionShape);
     }
 }
+void sge::CollisionManager::deregisterAllCollisionShapes(){ m_allCollisionShapes.clear(); }
 std::vector<sge::CollisionShape*> sge::CollisionManager::getAllCollisionShapes(){ return m_allCollisionShapes; }
 void sge::CollisionManager::alignCollisionShapes(){
     for(sge::CollisionShape* collisionShape : m_allCollisionShapes){
@@ -24,17 +33,40 @@ void sge::CollisionManager::alignCollisionShapes(){
 
 
 void sge::CollisionManager::registerCollisionGroup(std::string name, std::vector<sge::CollisionShape*> collisionGroup){ m_collisionGroups[name] = collisionGroup; } 
-void sge::CollisionManager::deregisterCollisionGroup(std::string name){ m_collisionGroups.erase(name); }
+void sge::CollisionManager::deregisterCollisionGroup(std::string name){
+    // Remove related collision pairs
+    std::vector<std::string> pairsToRemove;
+    for(auto& [pairName, collisionPair] : m_collisionPairs){
+        if(collisionPair->collisionGroups.first == name || collisionPair->collisionGroups.second == name){
+            pairsToRemove.push_back(pairName);
+        }
+    }
+    for(std::string pairToRemove : pairsToRemove){
+        deregisterCollisionPair(pairToRemove);
+    }
+    //
+
+    m_collisionGroups.erase(name);
+}
 void sge::CollisionManager::registerCollisionGroups(std::unordered_map<std::string, std::vector<sge::CollisionShape*>> collisionGroups){ m_collisionGroups.insert(collisionGroups.begin(), collisionGroups.end()); }
 void sge::CollisionManager::deregisterCollisionGroups(std::unordered_map<std::string, std::vector<sge::CollisionShape*>> collisionGroups){
     for(auto& [name, _] : collisionGroups){
         deregisterCollisionGroup(name);
     }
 }
+void sge::CollisionManager::deregisterAllCollisionGroups(){ m_collisionGroups.clear(); }
 std::unordered_map<std::string, std::vector<sge::CollisionShape*>> sge::CollisionManager::getCollisionGroups(){ return m_collisionGroups; }
 
 
 
+void sge::CollisionManager::registerCollisionPair(std::string name, sge::CollisionPair* collisionPair){
+    m_collisionPairs[name] = collisionPair;
+    m_collisionPairsOrder.push_back(name);
+};
+void sge::CollisionManager::registerCollisionPairs(std::unordered_map<std::string, CollisionPair*> collisionPairs){
+    m_collisionPairs.insert(collisionPairs.begin(), collisionPairs.end());
+}
+void sge::CollisionManager::setCollisionPairsOrder(std::vector<std::string> order){ m_collisionPairsOrder = order; }
 void sge::CollisionManager::createCollisionPair(std::string name, std::string initiatorGroup, std::string recipientGroup){
     if(!m_collisionGroups.count(initiatorGroup) && !m_collisionGroups.count(recipientGroup)){
         printf("Can not create %s - %s collision m_collisionPairs[pair].", initiatorGroup.c_str(), recipientGroup.c_str());
@@ -56,8 +88,14 @@ void sge::CollisionManager::setPairCollisionResponse(std::string collisionPairNa
         m_collisionPairs[collisionPairName]->endPhaseCollisionResponse = response;
     }
 }
-
-
+void sge::CollisionManager::deregisterCollisionPair(std::string name){
+    m_collisionPairs.erase(name);
+    m_collisionPairsOrder.erase(std::remove(m_collisionPairsOrder.begin(), m_collisionPairsOrder.end(), name), m_collisionPairsOrder.end());
+}
+void sge::CollisionManager::deregisterAllCollisionPairs(){
+    m_collisionPairs.clear();
+    m_collisionPairsOrder.clear();
+}
 
 
 

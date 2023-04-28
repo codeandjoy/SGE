@@ -19,6 +19,7 @@ namespace sge{
 
             void registerAnimation(sge::Animation* animation);
             void deregisterAnimation(sge::Animation* animation);
+            void deregisterAllAnimations();
 
 
             void initAnimationClocks();

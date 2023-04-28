@@ -11,6 +11,9 @@ namespace sge{
     class DebugManager{
         public:
             void registerDebugEntity(sge::DebugEntity* debugEntity);
+            void registerDebugEntities(std::vector<sge::DebugEntity*> debugEntities);
+            void deregisterDebugEntity(sge::DebugEntity* debugEntity);
+            void deregisterAllDebugEntities();
 
             void showDebugInfo(sf::RenderWindow* windowPtr);
 

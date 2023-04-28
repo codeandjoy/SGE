@@ -4,6 +4,13 @@
 
 
 void sge::DebugManager::registerDebugEntity(sge::DebugEntity* debugEntity){ m_debugEntities.push_back(debugEntity); }
+void sge::DebugManager::registerDebugEntities(std::vector<sge::DebugEntity*> debugEntities){
+    for(DebugEntity* debugEntity : debugEntities){
+        registerDebugEntity(debugEntity);
+    }
+}
+void sge::DebugManager::deregisterDebugEntity(sge::DebugEntity* debugEntity){ m_debugEntities.erase(std::remove(m_debugEntities.begin(), m_debugEntities.end(), debugEntity), m_debugEntities.end()); }
+void sge::DebugManager::deregisterAllDebugEntities(){ m_debugEntities.clear(); }
 
 
 

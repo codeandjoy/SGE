@@ -34,4 +34,26 @@ void sge::EntityManager::registerEntities(std::vector<sge::Entity*> entities){
     }
 }
 
+void sge::EntityManager::deregisterEntity(sge::Entity* entity){
+    m_physicsManagerPtr->deregisterPhysicalObject(entity->physicalObject);
+    // map to vector
+    std::vector<CollisionShape*> collisionShapes;
+    for(auto[_, collisionShape] : entity->collisionShapes){
+        collisionShapes.push_back(collisionShape);
+    }
+    //
+    m_collisionManagerPtr->deregisterCollisionShapes(collisionShapes);
+    m_textureManagerPtr->deregisterAnimation(entity->animation);
+
+    m_entities.erase(std::remove(m_entities.begin(), m_entities.end(), entity), m_entities.end());    
+}
+
+void sge::EntityManager::deregisterAllEntities(){
+    for(Entity* entity : m_entities){
+        deregisterEntity(entity);
+    }
+
+    m_entities.clear();
+}
+
 std::vector<sge::Entity*> sge::EntityManager::getAllEntities(){ return m_entities; }

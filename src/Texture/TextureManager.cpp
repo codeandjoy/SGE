@@ -9,6 +9,7 @@ sge::TextureSheet* sge::TextureManager::getTexture(std::string name){ return m_l
 
 void sge::TextureManager::registerAnimation(sge::Animation* animation){ m_animations.push_back(animation); }
 void sge::TextureManager::deregisterAnimation(sge::Animation* animation){ m_animations.erase(std::remove(m_animations.begin(), m_animations.end(), animation), m_animations.end()); }
+void sge::TextureManager::deregisterAllAnimations(){ m_animations.clear(); }
 
 
 void sge::TextureManager::initAnimationClocks(){

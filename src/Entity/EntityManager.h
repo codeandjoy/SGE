@@ -16,7 +16,8 @@ namespace sge{
 
             void registerEntity(sge::Entity* entity);
             void registerEntities(std::vector<sge::Entity*> entities);
-            // void destroyEntity(sge::Entity* entity);
+            void deregisterEntity(sge::Entity* entity);
+            void deregisterAllEntities();
             std::vector<sge::Entity*> getAllEntities();
 
         private:

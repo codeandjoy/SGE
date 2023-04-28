@@ -11,6 +11,7 @@ namespace sge{
         public:
             void registerPhysicalObject(sge::PhysicalObject* physicalObject);
             void deregisterPhysicalObject(sge::PhysicalObject* physicalObject);
+            void deregisterAllPhysicalObjects();
             std::vector<sge::PhysicalObject*> getAllPhysicalObjects();
 
 
