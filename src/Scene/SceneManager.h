@@ -25,10 +25,13 @@ namespace sge{
 
 
             void registerScene(std::string name, sge::Scene* scene);
-            void loadScene(std::string name);
+            void setCurrentScene(std::string name);
+            void alignScene();
         
         private:
             std::unordered_map<std::string, sge::Scene*> m_scenes;
+            std::string m_currentScene = "";
+            std::string m_loadedScene = "";
 
             sge::PhysicsManager* m_physicsManager;
             sge::CollisionManager* m_collisionManagerPtr;

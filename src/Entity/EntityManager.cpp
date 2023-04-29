@@ -49,10 +49,6 @@ void sge::EntityManager::deregisterEntity(sge::Entity* entity){
 }
 
 void sge::EntityManager::deregisterAllEntities(){
-    for(Entity* entity : m_entities){
-        deregisterEntity(entity);
-    }
-
     m_entities.clear();
 }
 

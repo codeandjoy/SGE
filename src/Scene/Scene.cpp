@@ -2,7 +2,17 @@
 
 
 void sge::Scene::registerEntity(sge::Entity* entity){ m_entities.push_back(entity); }
+void sge::Scene::registerEntities(std::vector<sge::Entity*> entities){
+    for(Entity* entity : entities){
+        registerEntity(entity);
+    }
+}
 void sge::Scene::registerDebugEntity(sge::DebugEntity* debugEntity){ m_debugEntities.push_back(debugEntity); }
+void sge::Scene::registerDebugEntities(std::vector<DebugEntity*> debugEntities){
+    for(DebugEntity* debugEntity : debugEntities){
+        registerDebugEntity(debugEntity);
+    }
+}
 void sge::Scene::registerCollisionGroup(std::string name, std::vector<sge::CollisionShape*> collisionShapes){ m_collisionGroups[name] = collisionShapes; }
 void sge::Scene::registerCollisionPair(std::string name, sge::CollisionPair* collisionPair){
     m_collisionPairs[name] = collisionPair;

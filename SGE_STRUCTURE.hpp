@@ -32,12 +32,16 @@
 #include "./src/Debug/CollisionShapeBorder.h"
 #include "./src/Debug/CollisionShapeBorderSettings.h"
 
+#include "./src/Scene/Scene.h"
+#include "./src/Scene/SceneManager.h"
+
 #include "./src/utils/Approach.h"
 #include "./src/utils/Measurements.h"
 
 #endif
 
 #ifndef SGE_MAIN
+#define SGE_MAIN
 
 // -> stitch <-
 

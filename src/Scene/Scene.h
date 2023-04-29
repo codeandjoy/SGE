@@ -15,7 +15,9 @@ namespace sge{
     class Scene{
         public:
             void registerEntity(sge::Entity* entity);
+            void registerEntities(std::vector<sge::Entity*> entities);
             void registerDebugEntity(sge::DebugEntity* debugEntity);
+            void registerDebugEntities(std::vector<sge::DebugEntity*> debugEntities);
             void registerCollisionGroup(std::string name, std::vector<sge::CollisionShape*> collisionShapes);
             void registerCollisionPair(std::string name, sge::CollisionPair* collisionPair);
         

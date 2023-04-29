@@ -78,6 +78,7 @@ void sge::Universe::loop(){
         collisionManager->alignCollisionShapes();
         collisionManager->updateCollisions();
         textureManager->updateAnimations();
+        sceneManager->alignScene(); // Scene can be reset only after all managers finished their updates to prevent segfaults
         // 
 
         // Game draws

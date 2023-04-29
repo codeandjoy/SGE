@@ -3,36 +3,36 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "world.tmx",
+    "activeFile": "level_1.tmx",
     "expandedProjectPaths": [
         "."
     ],
     "fileStates": {
-        "tiles.tsx": {
-            "scaleInDock": 3,
-            "scaleInEditor": 1
-        },
-        "world.tmx": {
+        "level_1.tmx": {
+            "expandedObjectLayers": [
+                2
+            ],
             "scale": 4.314583333333333,
             "selectedLayer": 0,
             "viewCenter": {
                 "x": 119.36262675036217,
                 "y": 79.61371318203767
             }
+        },
+        "tiles.tsx": {
+            "scaleInDock": 3
         }
     },
-    "last.imagePath": "/home/owner/Projects/SGE/examples/collision_phase/assets",
+    "last.imagePath": "/home/owner/Projects/SGE/examples/scene/assets",
     "map.lastUsedFormat": "tmx",
     "map.tileHeight": 8,
     "map.tileWidth": 8,
     "openFiles": [
-        "world.tmx",
-        "tiles.tsx"
+        "level_1.tmx"
     ],
-    "project": "map.tiled-project",
+    "project": "scene.tiled-project",
     "recentFiles": [
-        "tiles.tsx",
-        "world.tmx"
+        "level_1.tmx"
     ],
     "tileset.lastUsedFormat": "tsx",
     "tileset.tileSize": {

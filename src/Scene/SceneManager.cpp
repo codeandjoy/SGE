@@ -24,19 +24,26 @@ sge::SceneManager::SceneManager(
 
 
 
-void sge::SceneManager::SceneManager::registerScene(std::string name, sge::Scene* scene){ m_scenes[name] = scene; }
-void sge::SceneManager::loadScene(std::string name){
-    m_physicsManager->deregisterAllPhysicalObjects();
-    m_collisionManagerPtr->deregisterAllCollisionShapes();
-    m_collisionManagerPtr->deregisterAllCollisionGroups();
-    m_collisionManagerPtr->deregisterAllCollisionPairs();
-    m_entityManagerPtr->deregisterAllEntities();
-    m_debugManager->deregisterAllDebugEntities();
+void sge::SceneManager::registerScene(std::string name, sge::Scene* scene){ m_scenes[name] = scene; }
+void sge::SceneManager::setCurrentScene(std::string name){ m_currentScene = name; }
+void sge::SceneManager::alignScene(){
+    if(m_currentScene.length()){
+        if(m_loadedScene != m_currentScene){
+            m_physicsManager->deregisterAllPhysicalObjects();
+            m_collisionManagerPtr->deregisterAllCollisionShapes();
+            m_collisionManagerPtr->deregisterAllCollisionGroups();
+            m_collisionManagerPtr->deregisterAllCollisionPairs();
+            m_entityManagerPtr->deregisterAllEntities();
+            m_debugManager->deregisterAllDebugEntities();
 
 
-    m_entityManagerPtr->registerEntities(m_scenes[name]->getEntities());
-    m_debugManager->registerDebugEntities(m_scenes[name]->getDebugEntities());
-    m_collisionManagerPtr->registerCollisionGroups(m_scenes[name]->getCollisionGroups());
-    m_collisionManagerPtr->registerCollisionPairs(m_scenes[name]->getCollisionPairs());
-    m_collisionManagerPtr->setCollisionPairsOrder(m_scenes[name]->getCollisionPairsOrder());
+            m_entityManagerPtr->registerEntities(m_scenes[m_currentScene]->getEntities());
+            m_debugManager->registerDebugEntities(m_scenes[m_currentScene]->getDebugEntities());
+            m_collisionManagerPtr->registerCollisionGroups(m_scenes[m_currentScene]->getCollisionGroups());
+            m_collisionManagerPtr->registerCollisionPairs(m_scenes[m_currentScene]->getCollisionPairs());
+            m_collisionManagerPtr->setCollisionPairsOrder(m_scenes[m_currentScene]->getCollisionPairsOrder());
+
+            m_loadedScene = m_currentScene;
+        }
+    }
 }

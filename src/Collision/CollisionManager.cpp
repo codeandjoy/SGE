@@ -18,6 +18,7 @@ void sge::CollisionManager::deregisterCollisionShape(sge::CollisionShape* collis
 }
 void sge::CollisionManager::registerCollisionShapes(std::vector<sge::CollisionShape*> collisionShapes){ m_allCollisionShapes.insert(m_allCollisionShapes.end(), collisionShapes.begin(), collisionShapes.end()); }
 void sge::CollisionManager::deregisterCollisionShapes(std::vector<sge::CollisionShape*> collisionShapes){
+    // ! segfault
     for(sge::CollisionShape* collisionShape : collisionShapes){
         deregisterCollisionShape(collisionShape);
     }
@@ -50,6 +51,7 @@ void sge::CollisionManager::deregisterCollisionGroup(std::string name){
 }
 void sge::CollisionManager::registerCollisionGroups(std::unordered_map<std::string, std::vector<sge::CollisionShape*>> collisionGroups){ m_collisionGroups.insert(collisionGroups.begin(), collisionGroups.end()); }
 void sge::CollisionManager::deregisterCollisionGroups(std::unordered_map<std::string, std::vector<sge::CollisionShape*>> collisionGroups){
+    // ! segfault
     for(auto& [name, _] : collisionGroups){
         deregisterCollisionGroup(name);
     }
