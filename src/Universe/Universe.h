@@ -7,6 +7,7 @@
 
 
 namespace sge{
+    class SpriteManager;
     class PhysicsManager;
     class PhysicalObject;
     class CollisionManager;
@@ -33,6 +34,7 @@ namespace sge{
             void loop();
 
 
+            sge::SpriteManager* spriteManager = nullptr;
             sge::PhysicsManager* physicsManager = nullptr;
             sge::CollisionManager* collisionManager = nullptr;
             sge::TextureManager* textureManager = nullptr;

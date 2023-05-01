@@ -1,4 +1,5 @@
 #include "Universe.h"
+#include "../SpriteManager/SpriteManager.h"
 #include "../Physics/PhysicsManager.h"
 #include "../Physics/PhysicalObject.h"
 #include "../Collision/CollisionManager.h"
@@ -9,19 +10,21 @@
 
 
 sge::Universe::Universe(){
+    sge::SpriteManager* SpM = new sge::SpriteManager();
     sge::PhysicsManager* PM = new sge::PhysicsManager();
     sge::CollisionManager* CM = new sge::CollisionManager();
     sge::TextureManager* TM = new sge::TextureManager();
     sge::EntityManager* EM = new sge::EntityManager(PM, CM, TM);
     sge::DebugManager* DM = new sge::DebugManager();
-    sge::SceneManager* SM = new sge::SceneManager(PM, CM, TM, EM, DM);
+    sge::SceneManager* ScM = new sge::SceneManager(PM, CM, TM, EM, DM);
 
+    spriteManager = SpM;
     physicsManager = PM;
     collisionManager = CM;
     textureManager = TM;
     entityManager = EM;
     debugManager = DM;
-    sceneManager = SM;
+    sceneManager = ScM;
 }
 
 
@@ -87,9 +90,15 @@ void sge::Universe::loop(){
         // Game draws
         m_windowPtr->clear();
         
+        for(sf::Sprite* sprite : spriteManager->getSprites()){
+            m_windowPtr->draw(*sprite);
+        }
+
+        // ! REMOVE
         for(sge::PhysicalObject* physicalObject : physicsManager->getAllPhysicalObjects()){
             m_windowPtr->draw(*physicalObject);
         }
+        // !
 
         debugManager->showDebugInfo(m_windowPtr);
         //
