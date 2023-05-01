@@ -9,7 +9,7 @@ namespace constants{
 }
 
 int main(){
-    sge::Universe* universe = new sge::Universe(true);
+    sge::Universe* universe = new sge::Universe();
 
     universe->textureManager->loadTexture(
         std::filesystem::current_path().string() + "/examples/collision_phase/assets/pico_8_tiles.png",

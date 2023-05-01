@@ -13,7 +13,7 @@ int main(){
 
 
 
-    sge::Universe* universe = new sge::Universe(true);
+    sge::Universe* universe = new sge::Universe();
 
 
 
