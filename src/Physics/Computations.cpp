@@ -5,7 +5,7 @@
 
 std::function<void(sge::PhysicalObject*, float)> sge::updatePositionBasedOnVelocity(){
     return [](sge::PhysicalObject* thisPhysicalObject, float dt){
-        thisPhysicalObject->setPosition(thisPhysicalObject->getPosition() + thisPhysicalObject->velocity * dt);
+        thisPhysicalObject->getOwnerSprite()->setPosition(thisPhysicalObject->getOwnerSprite()->getPosition() + thisPhysicalObject->velocity * dt);
     };
 }
 

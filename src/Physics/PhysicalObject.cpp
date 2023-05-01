@@ -1,6 +1,14 @@
 #include "PhysicalObject.h"
 
 
+sge::PhysicalObject::PhysicalObject(sf::Sprite* ownerSprite){ m_ownerSpritePtr = ownerSprite; }
+
+
+
+sf::Sprite* sge::PhysicalObject::getOwnerSprite(){ return m_ownerSpritePtr; }
+
+
+
 void sge::PhysicalObject::createAction(std::string name, std::function<void()> action){ m_actions[name] = action; }
 void sge::PhysicalObject::doAction(std::string name){ m_actions[name](); }
 

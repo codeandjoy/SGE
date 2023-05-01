@@ -13,7 +13,7 @@ namespace sge{
     // TODO Animations should switch immediately
     class Animation{
         public:
-            Animation(sge::TextureSheet* textureSheet, sf::Sprite* owner, int initialTextureN);
+            Animation(sge::TextureSheet* textureSheet, sf::Sprite* ownerSprite, int initialTextureN);
         
             
             void addTextureSequence(std::string name, std::vector<int> textureSequence);
@@ -28,7 +28,7 @@ namespace sge{
             void restartClock();
 
         private:
-            sf::Sprite* m_owner;
+            sf::Sprite* m_ownerSpritePtr;
             sge::TextureSheet* m_textureSheet;
             
             sf::Clock m_clock;

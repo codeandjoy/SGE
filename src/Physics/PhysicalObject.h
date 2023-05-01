@@ -9,8 +9,14 @@
 
 
 namespace sge{
-    class PhysicalObject : public sf::Sprite{
+    class PhysicalObject{
         public:
+            PhysicalObject(sf::Sprite* ownerSprite);
+
+            
+            sf::Sprite* getOwnerSprite();
+
+
             sf::Vector2f velocity = sf::Vector2f(0, 0);
             sf::Vector2f acceleration = sf::Vector2f(0, 0);
 
@@ -30,6 +36,8 @@ namespace sge{
             void update(float dt);
 
         private:
+            sf::Sprite* m_ownerSpritePtr;
+
             std::unordered_map<std::string, std::function<void()>> m_actions;
             std::unordered_map<std::string, std::function<void(sge::PhysicalObject*, float)>> m_continuousComputations;
             std::vector<std::string> m_continuousComputationOrder;

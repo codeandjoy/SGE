@@ -8,7 +8,8 @@ namespace sge{
     class Animation;
 
     struct Entity{
-        sge::PhysicalObject* physicalObject;
+        sf::Sprite* sprite;
+        sge::PhysicalObject* physicalObject = nullptr;
         std::unordered_map<std::string, sge::CollisionShape*> collisionShapes; 
         sge::Animation* animation = nullptr;
     };

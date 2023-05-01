@@ -11,6 +11,7 @@
 #include <vector>
 
 namespace sge{
+    class SpriteManager;
     class PhysicsManager;
     class PhysicalObject;
     class CollisionManager;
@@ -32,6 +33,7 @@ namespace sge{
 
             void loop();
 
+            sge::SpriteManager* spriteManager = nullptr;
             sge::PhysicsManager* physicsManager = nullptr;
             sge::CollisionManager* collisionManager = nullptr;
             sge::TextureManager* textureManager = nullptr;
@@ -134,7 +136,7 @@ namespace sge{
     // TODO Animations should switch immediately
     class Animation{
         public:
-            Animation(sge::TextureSheet* textureSheet, sf::Sprite* owner, int initialTextureN);
+            Animation(sge::TextureSheet* textureSheet, sf::Sprite* ownerSprite, int initialTextureN);
         
             
             void addTextureSequence(std::string name, std::vector<int> textureSequence);
@@ -149,7 +151,7 @@ namespace sge{
             void restartClock();
 
         private:
-            sf::Sprite* m_owner;
+            sf::Sprite* m_ownerSpritePtr;
             sge::TextureSheet* m_textureSheet;
             
             sf::Clock m_clock;
@@ -195,8 +197,13 @@ namespace sge{
 #include <functional>
 
 namespace sge{
-    class PhysicalObject : public sf::Sprite{
+    class PhysicalObject{
         public:
+            PhysicalObject(sf::Sprite* ownerSprite);
+
+            
+            sf::Sprite* getOwnerSprite();
+
             sf::Vector2f velocity = sf::Vector2f(0, 0);
             sf::Vector2f acceleration = sf::Vector2f(0, 0);
 
@@ -212,6 +219,8 @@ namespace sge{
             void update(float dt);
 
         private:
+            sf::Sprite* m_ownerSpritePtr;
+
             std::unordered_map<std::string, std::function<void()>> m_actions;
             std::unordered_map<std::string, std::function<void(sge::PhysicalObject*, float)>> m_continuousComputations;
             std::vector<std::string> m_continuousComputationOrder;
@@ -370,7 +379,7 @@ namespace sge{
 
     class CollisionShape : public sf::RectangleShape{
         public:
-            CollisionShape(sge::Entity* ownerEntityPtr);
+            CollisionShape(sge::Entity* ownerEntity);
 
             sf::Vector2f offset = sf::Vector2f(0, 0);
 
@@ -421,7 +430,8 @@ namespace sge{
     class Animation;
 
     struct Entity{
-        sge::PhysicalObject* physicalObject;
+        sf::Sprite* sprite;
+        sge::PhysicalObject* physicalObject = nullptr;
         std::unordered_map<std::string, sge::CollisionShape*> collisionShapes; 
         sge::Animation* animation = nullptr;
     };
@@ -435,13 +445,14 @@ namespace sge{
 
 namespace sge{
     class Entity;
+    class SpriteManager;
     class PhysicsManager;
     class CollisionManager;
     class TextureManager;
 
     class EntityManager{
         public:
-            EntityManager(sge::PhysicsManager* physicsManager, sge::CollisionManager* collisionManager, sge::TextureManager* textureManager);
+            EntityManager(sge::SpriteManager* spriteManager, sge::PhysicsManager* physicsManager, sge::CollisionManager* collisionManager, sge::TextureManager* textureManager);
 
             void registerEntity(sge::Entity* entity);
             void registerEntities(std::vector<sge::Entity*> entities);
@@ -452,6 +463,7 @@ namespace sge{
         private:
             std::vector<sge::Entity*> m_entities;
 
+            sge::SpriteManager* m_spriteManagerPtr;
             sge::PhysicsManager* m_physicsManagerPtr;
             sge::CollisionManager* m_collisionManagerPtr;
             sge::TextureManager* m_textureManagerPtr;
@@ -688,20 +700,43 @@ namespace sge{
 #ifndef SGE_MAIN
 #define SGE_MAIN
 
+#ifndef SPRITE_MANAGER_H
+#define SPRITE_MANAGER_H
+
+#include <vector>
+#include <SFML/Graphics.hpp>
+
+namespace sge{
+    class SpriteManager{
+        public:
+            void registerSprite(sf::Sprite* sprite);
+            void deregisterSprite(sf::Sprite* sprite);
+            void deregisterAllSprites();
+            std::vector<sf::Sprite*> getSprites();            
+
+        private:
+            std::vector<sf::Sprite*> m_sprites;
+    };
+}
+
+#endif
+
 sge::Universe::Universe(){
+    sge::SpriteManager* SpM = new sge::SpriteManager();
     sge::PhysicsManager* PM = new sge::PhysicsManager();
     sge::CollisionManager* CM = new sge::CollisionManager();
     sge::TextureManager* TM = new sge::TextureManager();
-    sge::EntityManager* EM = new sge::EntityManager(PM, CM, TM);
+    sge::EntityManager* EM = new sge::EntityManager(SpM, PM, CM, TM);
     sge::DebugManager* DM = new sge::DebugManager();
-    sge::SceneManager* SM = new sge::SceneManager(PM, CM, TM, EM, DM);
+    sge::SceneManager* ScM = new sge::SceneManager(PM, CM, TM, EM, DM);
 
+    spriteManager = SpM;
     physicsManager = PM;
     collisionManager = CM;
     textureManager = TM;
     entityManager = EM;
     debugManager = DM;
-    sceneManager = SM;
+    sceneManager = ScM;
 }
 
 void sge::Universe::setupWindow(sf::RenderWindow *window){ m_windowPtr = window; }
@@ -761,9 +796,15 @@ void sge::Universe::loop(){
         // Game draws
         m_windowPtr->clear();
         
-        for(sge::PhysicalObject* physicalObject : physicsManager->getAllPhysicalObjects()){
-            m_windowPtr->draw(*physicalObject);
+        for(sf::Sprite* sprite : spriteManager->getSprites()){
+            m_windowPtr->draw(*sprite);
         }
+
+        // ! REMOVE
+        // for(sge::PhysicalObject* physicalObject : physicsManager->getAllPhysicalObjects()){
+        //     m_windowPtr->draw(*physicalObject);
+        // }
+        // !
 
         debugManager->showDebugInfo(m_windowPtr);
         //
@@ -809,12 +850,12 @@ void sge::TextureManager::updateAnimations(){
 }
 
 
-sge::Animation::Animation(sge::TextureSheet* textureSheet, sf::Sprite* owner, int initialTextureN){
+sge::Animation::Animation(sge::TextureSheet* textureSheet, sf::Sprite* ownerSprite, int initialTextureN){
     m_textureSheet = textureSheet;
-    m_owner = owner;
+    m_ownerSpritePtr = ownerSprite;
     
-    m_owner->setTexture(*textureSheet->getTextureSheet());
-    m_owner->setTextureRect(textureSheet->getTextureRect(initialTextureN));
+    m_ownerSpritePtr->setTexture(*textureSheet->getTextureSheet());
+    m_ownerSpritePtr->setTextureRect(textureSheet->getTextureRect(initialTextureN));
 }
 
 void sge::Animation::addTextureSequence(std::string name, std::vector<int> textureSequence){ m_textureSequences[name] = textureSequence; }
@@ -838,7 +879,7 @@ void sge::Animation::run(){
 
     // TODO dynamic animation delay (for each animation ?)
     if(m_clock.getElapsedTime().asMilliseconds() > 100){
-        m_owner->setTextureRect(m_textureSheet->getTextureRect(m_textureSequences[m_currentTextureSequence].at(m_currentTextureN)));
+        m_ownerSpritePtr->setTextureRect(m_textureSheet->getTextureRect(m_textureSequences[m_currentTextureSequence].at(m_currentTextureN)));
         
         if(m_currentTextureN+1 == m_textureSequences[m_currentTextureSequence].size()){
             m_currentTextureN = 0;
@@ -863,6 +904,10 @@ void sge::PhysicsManager::updatePhysics(float dt){
 }
 
 
+sge::PhysicalObject::PhysicalObject(sf::Sprite* ownerSprite){ m_ownerSpritePtr = ownerSprite; }
+
+sf::Sprite* sge::PhysicalObject::getOwnerSprite(){ return m_ownerSpritePtr; }
+
 void sge::PhysicalObject::createAction(std::string name, std::function<void()> action){ m_actions[name] = action; }
 void sge::PhysicalObject::doAction(std::string name){ m_actions[name](); }
 
@@ -885,7 +930,7 @@ void sge::PhysicalObject::update(float dt){
 
 std::function<void(sge::PhysicalObject*, float)> sge::updatePositionBasedOnVelocity(){
     return [](sge::PhysicalObject* thisPhysicalObject, float dt){
-        thisPhysicalObject->setPosition(thisPhysicalObject->getPosition() + thisPhysicalObject->velocity * dt);
+        thisPhysicalObject->getOwnerSprite()->setPosition(thisPhysicalObject->getOwnerSprite()->getPosition() + thisPhysicalObject->velocity * dt);
     };
 }
 
@@ -1113,11 +1158,11 @@ sge::CollisionSide sge::flipInitiatorImpactSide(sge::CollisionSide initiatorImpa
 }
 
 
-sge::CollisionShape::CollisionShape(sge::Entity* ownerEntityPtr){
-    m_ownerEntityPtr = ownerEntityPtr;
+sge::CollisionShape::CollisionShape(sge::Entity* ownerEntity){
+    m_ownerEntityPtr = ownerEntity;
 
     this->setFillColor(sf::Color(0,0,0,0));
-    this->setSize(sf::Vector2f(ownerEntityPtr->physicalObject->getGlobalBounds().width, ownerEntityPtr->physicalObject->getGlobalBounds().height));
+    this->setSize(sf::Vector2f(ownerEntity->sprite->getGlobalBounds().width, ownerEntity->sprite->getGlobalBounds().height));
 }
 
 sge::Entity* sge::CollisionShape::getOwnerEntity(){ return m_ownerEntityPtr; }
@@ -1125,38 +1170,38 @@ sge::Measurements sge::CollisionShape::getMeasurements(){
     return { this->getPosition().x, this->getPosition().y, this->getGlobalBounds().height, this->getGlobalBounds().width };
 }
 void sge::CollisionShape::align(){
-    this->setPosition(m_ownerEntityPtr->physicalObject->getPosition() + offset);
+    this->setPosition(m_ownerEntityPtr->sprite->getPosition() + offset);
 }
 
 
 void sge::resolveAABB(std::vector<sge::Collision> collisions){
     for(sge::Collision collision : collisions){
-        sge::PhysicalObject *initiatorPhysicalObject = collision.initiator->getOwnerEntity()->physicalObject;
-        sge::PhysicalObject *recipientPhysicalObject = collision.recipient->getOwnerEntity()->physicalObject;
+        sf::Sprite *initiatorSprite = collision.initiator->getOwnerEntity()->sprite;
+        sf::Sprite *recipientSprite = collision.recipient->getOwnerEntity()->sprite;
         
         // Align initiator based on impact side
         if(collision.initiatorImpactSide == sge::CollisionSide::left){
-            initiatorPhysicalObject->setPosition(
-                recipientPhysicalObject->getPosition().x + recipientPhysicalObject->getGlobalBounds().width - collision.initiator->offset.x,
-                initiatorPhysicalObject->getPosition().y
+            initiatorSprite->setPosition(
+                recipientSprite->getPosition().x + recipientSprite->getGlobalBounds().width - collision.initiator->offset.x,
+                initiatorSprite->getPosition().y
             );
         }
         else if(collision.initiatorImpactSide == sge::CollisionSide::right){
-            initiatorPhysicalObject->setPosition(
-                recipientPhysicalObject->getPosition().x - collision.initiator->getGlobalBounds().width - collision.initiator->offset.x,
-                initiatorPhysicalObject->getPosition().y
+            initiatorSprite->setPosition(
+                recipientSprite->getPosition().x - collision.initiator->getGlobalBounds().width - collision.initiator->offset.x,
+                initiatorSprite->getPosition().y
             );
         }
         else if(collision.initiatorImpactSide == sge::CollisionSide::top){
-            initiatorPhysicalObject->setPosition(
-                initiatorPhysicalObject->getPosition().x,
-                recipientPhysicalObject->getPosition().y + recipientPhysicalObject->getGlobalBounds().height - collision.initiator->offset.y
+            initiatorSprite->setPosition(
+                initiatorSprite->getPosition().x,
+                recipientSprite->getPosition().y + recipientSprite->getGlobalBounds().height - collision.initiator->offset.y
             );
         }
         else if(collision.initiatorImpactSide == sge::CollisionSide::bottom){
-            initiatorPhysicalObject->setPosition(
-                initiatorPhysicalObject->getPosition().x,
-                recipientPhysicalObject->getPosition().y - collision.initiator->getGlobalBounds().height - collision.initiator->offset.y
+            initiatorSprite->setPosition(
+                initiatorSprite->getPosition().x,
+                recipientSprite->getPosition().y - collision.initiator->getGlobalBounds().height - collision.initiator->offset.y
             );
         }
         //
@@ -1177,14 +1222,19 @@ bool sge::boundingBox(sge::CollisionShape* initiator, sge::CollisionShape* recip
 }
 
 
-sge::EntityManager::EntityManager(sge::PhysicsManager* physicsManager, sge::CollisionManager* collisionManager, sge::TextureManager* textureManager){
+sge::EntityManager::EntityManager(sge::SpriteManager* spriteManager, sge::PhysicsManager* physicsManager, sge::CollisionManager* collisionManager, sge::TextureManager* textureManager){
+    m_spriteManagerPtr = spriteManager;
     m_physicsManagerPtr = physicsManager;
     m_collisionManagerPtr = collisionManager;
     m_textureManagerPtr = textureManager;
 }
 
 void sge::EntityManager::registerEntity(sge::Entity* entity){
-    m_physicsManagerPtr->registerPhysicalObject(entity->physicalObject);
+    m_spriteManagerPtr->registerSprite(entity->sprite);
+
+    if(entity->physicalObject){
+        m_physicsManagerPtr->registerPhysicalObject(entity->physicalObject);
+    }
         
     if(entity->collisionShapes.size()){
         for(auto& [_, collisionShape] : entity->collisionShapes){
@@ -1206,15 +1256,25 @@ void sge::EntityManager::registerEntities(std::vector<sge::Entity*> entities){
 }
 
 void sge::EntityManager::deregisterEntity(sge::Entity* entity){
-    m_physicsManagerPtr->deregisterPhysicalObject(entity->physicalObject);
-    // map to vector
-    std::vector<CollisionShape*> collisionShapes;
-    for(auto[_, collisionShape] : entity->collisionShapes){
-        collisionShapes.push_back(collisionShape);
+    m_spriteManagerPtr->deregisterSprite(entity->sprite);
+
+    if(entity->physicalObject){
+        m_physicsManagerPtr->deregisterPhysicalObject(entity->physicalObject);
     }
-    //
-    m_collisionManagerPtr->deregisterCollisionShapes(collisionShapes);
-    m_textureManagerPtr->deregisterAnimation(entity->animation);
+
+    if(entity->collisionShapes.size()){
+        // map to vector
+        std::vector<CollisionShape*> collisionShapes;
+        for(auto[_, collisionShape] : entity->collisionShapes){
+            collisionShapes.push_back(collisionShape);
+        }
+        //
+        m_collisionManagerPtr->deregisterCollisionShapes(collisionShapes);
+    }
+
+    if(entity->animation){
+        m_textureManagerPtr->deregisterAnimation(entity->animation);
+    }
 
     m_entities.erase(std::remove(m_entities.begin(), m_entities.end(), entity), m_entities.end());    
 }
@@ -1227,10 +1287,10 @@ std::vector<sge::Entity*> sge::EntityManager::getAllEntities(){ return m_entitie
 
 
 sge::Entity* sge::buildPlainEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position){
-    sge::Entity* e = new sge::Entity{ new sge::PhysicalObject() };
-    e->physicalObject->setTexture(*texture);
-    e->physicalObject->setTextureRect(textureRect);
-    e->physicalObject->setPosition(position);
+    sge::Entity* e = new sge::Entity{ new sf::Sprite() };
+    e->sprite->setTexture(*texture);
+    e->sprite->setTextureRect(textureRect);
+    e->sprite->setPosition(position);
 
     return e;
 }
@@ -1245,6 +1305,8 @@ sge::Entity* sge::buildStaticEntity(sf::Texture* texture, sf::IntRect textureRec
 
 sge::Entity* sge::buildMobileEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position){
     sge::Entity* e = sge::buildStaticEntity(texture, textureRect, position);
+
+    e->physicalObject = new PhysicalObject(e->sprite);
 
     e->physicalObject->createContinuousComputation("updateVelocity", sge::updateVelocityBasedOnAcceleration());
     e->physicalObject->createContinuousComputation("updatePosition", sge::updatePositionBasedOnVelocity());
@@ -1376,6 +1438,12 @@ void sge::SceneManager::alignScene(){
         }
     }
 }
+
+
+void sge::SpriteManager::registerSprite(sf::Sprite* sprite){ m_sprites.push_back(sprite); }
+void sge::SpriteManager::deregisterSprite(sf::Sprite* sprite){ m_sprites.erase(std::remove(m_sprites.begin(), m_sprites.end(), sprite), m_sprites.end()); }
+void sge::SpriteManager::deregisterAllSprites(){ m_sprites.clear(); }
+std::vector<sf::Sprite*> sge::SpriteManager::getSprites(){ return m_sprites; }
 
 
 #endif

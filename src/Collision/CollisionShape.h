@@ -10,7 +10,7 @@ namespace sge{
 
     class CollisionShape : public sf::RectangleShape{
         public:
-            CollisionShape(sge::Entity* ownerEntityPtr);
+            CollisionShape(sge::Entity* ownerEntity);
 
             sf::Vector2f offset = sf::Vector2f(0, 0);
 

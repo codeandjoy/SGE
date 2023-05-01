@@ -7,10 +7,10 @@
 
 
 sge::Entity* sge::buildPlainEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position){
-    sge::Entity* e = new sge::Entity{ new sge::PhysicalObject() };
-    e->physicalObject->setTexture(*texture);
-    e->physicalObject->setTextureRect(textureRect);
-    e->physicalObject->setPosition(position);
+    sge::Entity* e = new sge::Entity{ new sf::Sprite() };
+    e->sprite->setTexture(*texture);
+    e->sprite->setTextureRect(textureRect);
+    e->sprite->setPosition(position);
 
     return e;
 }
@@ -25,6 +25,8 @@ sge::Entity* sge::buildStaticEntity(sf::Texture* texture, sf::IntRect textureRec
 
 sge::Entity* sge::buildMobileEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position){
     sge::Entity* e = sge::buildStaticEntity(texture, textureRect, position);
+
+    e->physicalObject = new PhysicalObject(e->sprite);
 
     e->physicalObject->createContinuousComputation("updateVelocity", sge::updateVelocityBasedOnAcceleration());
     e->physicalObject->createContinuousComputation("updatePosition", sge::updatePositionBasedOnVelocity());

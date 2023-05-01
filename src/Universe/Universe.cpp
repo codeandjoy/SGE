@@ -14,7 +14,7 @@ sge::Universe::Universe(){
     sge::PhysicsManager* PM = new sge::PhysicsManager();
     sge::CollisionManager* CM = new sge::CollisionManager();
     sge::TextureManager* TM = new sge::TextureManager();
-    sge::EntityManager* EM = new sge::EntityManager(PM, CM, TM);
+    sge::EntityManager* EM = new sge::EntityManager(SpM, PM, CM, TM);
     sge::DebugManager* DM = new sge::DebugManager();
     sge::SceneManager* ScM = new sge::SceneManager(PM, CM, TM, EM, DM);
 
@@ -95,9 +95,9 @@ void sge::Universe::loop(){
         }
 
         // ! REMOVE
-        for(sge::PhysicalObject* physicalObject : physicsManager->getAllPhysicalObjects()){
-            m_windowPtr->draw(*physicalObject);
-        }
+        // for(sge::PhysicalObject* physicalObject : physicsManager->getAllPhysicalObjects()){
+        //     m_windowPtr->draw(*physicalObject);
+        // }
         // !
 
         debugManager->showDebugInfo(m_windowPtr);

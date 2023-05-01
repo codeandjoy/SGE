@@ -91,7 +91,7 @@ int main(){
 
     playerEntity->physicalObject->acceleration.y = GRAVITY;
 
-    sge::Animation* playerAnimation = new sge::Animation(universe->textureManager->getTexture("knight"), playerEntity->physicalObject, 9);
+    sge::Animation* playerAnimation = new sge::Animation(universe->textureManager->getTexture("knight"), playerEntity->sprite, 9);
     playerAnimation->addTextureSequence("idle", std::vector<int>{9});
     playerAnimation->addTextureSequence("runRight", std::vector<int>{33, 34, 35});
     playerAnimation->addTextureSequence("runLeft", std::vector<int>{45, 46, 47});
