@@ -3,14 +3,14 @@
 #include "../SpriteManager/SpriteManager.h"
 #include "../Physics/PhysicsManager.h"
 #include "../Collision/CollisionManager.h"
-#include "../Texture/TextureManager.h"
+#include "../Animation/AnimationManager.h"
 
 
-sge::EntityManager::EntityManager(sge::SpriteManager* spriteManager, sge::PhysicsManager* physicsManager, sge::CollisionManager* collisionManager, sge::TextureManager* textureManager){
+sge::EntityManager::EntityManager(sge::SpriteManager* spriteManager, sge::PhysicsManager* physicsManager, sge::CollisionManager* collisionManager, sge::AnimationManager* animationManager){
     m_spriteManagerPtr = spriteManager;
     m_physicsManagerPtr = physicsManager;
     m_collisionManagerPtr = collisionManager;
-    m_textureManagerPtr = textureManager;
+    m_animationManagerPtr = animationManager;
 }
 
 
@@ -28,7 +28,7 @@ void sge::EntityManager::registerEntity(sge::Entity* entity){
     }
     
     if(entity->animation){
-        m_textureManagerPtr->registerAnimation(entity->animation);
+        m_animationManagerPtr->registerAnimation(entity->animation);
     }
 
     m_entities.push_back(entity);
@@ -58,7 +58,7 @@ void sge::EntityManager::deregisterEntity(sge::Entity* entity){
     }
 
     if(entity->animation){
-        m_textureManagerPtr->deregisterAnimation(entity->animation);
+        m_animationManagerPtr->deregisterAnimation(entity->animation);
     }
 
     m_entities.erase(std::remove(m_entities.begin(), m_entities.end(), entity), m_entities.end());    

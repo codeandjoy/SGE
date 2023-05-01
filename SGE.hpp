@@ -11,11 +11,12 @@
 #include <vector>
 
 namespace sge{
+    class AssetsManager;
     class SpriteManager;
     class PhysicsManager;
     class PhysicalObject;
     class CollisionManager;
-    class TextureManager;
+    class AnimationManager;
     class EntityManager;
     class DebugManager;
     class SceneManager;
@@ -33,10 +34,11 @@ namespace sge{
 
             void loop();
 
+            sge::AssetsManager* assetsManager = nullptr;
             sge::SpriteManager* spriteManager = nullptr;
             sge::PhysicsManager* physicsManager = nullptr;
             sge::CollisionManager* collisionManager = nullptr;
-            sge::TextureManager* textureManager = nullptr;
+            sge::AnimationManager* animationManager = nullptr;
             sge::EntityManager* entityManager = nullptr;
             sge::DebugManager* debugManager = nullptr;
             sge::SceneManager* sceneManager = nullptr;
@@ -53,12 +55,12 @@ namespace sge{
 
 #endif
 
-#ifndef TEXTURESHEET_H
-#define TEXTURESHEET_H
+#ifndef ASSETS_MANAGER_H
+#define ASSETS_MANAGER_H
 
-#include <SFML/Graphics.hpp>
+#include <unordered_map>
 #include <string>
-#include <vector>
+
 #ifndef TEXTURE_SHEET_SIZES_H
 #define TEXTURE_SHEET_SIZES_H
 
@@ -74,91 +76,38 @@ namespace sge{
 #endif
 
 namespace sge{
-    // TODO texturesheet with gaps between textures
-    class TextureSheet{
-        public:
-            TextureSheet(sge::TextureSheetSizes textureSheetSizes, std::string location);
-
-            std::string getLocation();
-            sf::Texture* getTextureSheet();
-            sf::IntRect getTextureRect(int textureN);
-
-        private:
-            std::string m_location;
-            sf::Texture m_textureSheet;
-            std::vector<sf::IntRect> m_textureRects;
-    };
-}
-
-#endif
-
-#ifndef TEXTURE_MANAGER_H
-#define TEXTURE_MANAGER_H
-
-#include <string>
-#include <unordered_map>
-#include <vector>
-
-namespace sge{
     class TextureSheet;
-    class Animation;
 
-    class TextureManager{
+    class AssetsManager{
         public:
-            void loadTexture(std::string location, std::string name, sge::TextureSheetSizes textureSheetSizes);
-            sge::TextureSheet* getTexture(std::string name);
+            void loadTextureSheet(std::string location, std::string name, sge::TextureSheetSizes textureSheetSizes);
+            sge::TextureSheet* getTextureSheet(std::string name);
 
-            void registerAnimation(sge::Animation* animation);
-            void deregisterAnimation(sge::Animation* animation);
-            void deregisterAllAnimations();
-
-            void initAnimationClocks();
-            void updateAnimations();
+            // TODO fonts
 
         private:
-            std::unordered_map<std::string, sge::TextureSheet*> m_loadedTextures;
-            std::vector<sge::Animation*> m_animations;
+            std::unordered_map<std::string, sge::TextureSheet*> m_textures;
     };
 }
 
 #endif
-#ifndef ANIMATION_H
-#define ANIMATION_H
 
+#ifndef SPRITE_MANAGER_H
+#define SPRITE_MANAGER_H
+
+#include <vector>
 #include <SFML/Graphics.hpp>
-#include <string>
-#include <unordered_map>
-#include <vector>
 
 namespace sge{
-    class TextureSheet;
-
-    // TODO Animations should switch immediately
-    class Animation{
+    class SpriteManager{
         public:
-            Animation(sge::TextureSheet* textureSheet, sf::Sprite* ownerSprite, int initialTextureN);
-        
-            
-            void addTextureSequence(std::string name, std::vector<int> textureSequence);
-            void setCurrentTextureSequence(std::string name);
-        
-
-            // ?
-            // runForward -> 1,2,3,1,2,3
-            // runCycle -> 1,2,3,2,1,2
-            // ?
-            void run();
-            void restartClock();
+            void registerSprite(sf::Sprite* sprite);
+            void deregisterSprite(sf::Sprite* sprite);
+            void deregisterAllSprites();
+            std::vector<sf::Sprite*> getSprites();            
 
         private:
-            sf::Sprite* m_ownerSpritePtr;
-            sge::TextureSheet* m_textureSheet;
-            
-            sf::Clock m_clock;
-            std::unordered_map<std::string, std::vector<int>> m_textureSequences; // e.g. "idle": [5, 6, 7, 8]
-            std::string m_currentTextureSequence;
-            int m_currentTextureN = 0;
-
+            std::vector<sf::Sprite*> m_sprites;
     };
 }
 
@@ -421,6 +370,92 @@ namespace sge{
 
 #endif
 
+#include <vector>
+
+namespace sge{
+    class Animation;    
+
+    class AnimationManager{
+        public:
+            void registerAnimation(sge::Animation* animation);
+            void deregisterAnimation(sge::Animation* animation);
+            void deregisterAllAnimations();
+
+            void initAnimationClocks();
+            void updateAnimations();
+
+        private:
+            std::vector<sge::Animation*> m_animations;
+    };
+}
+#ifndef ANIMATION_H
+#define ANIMATION_H
+
+#include <SFML/Graphics.hpp>
+#include <string>
+#include <unordered_map>
+#include <vector>
+
+namespace sge{
+    class TextureSheet;
+
+    // TODO Animations should switch immediately
+    class Animation{
+        public:
+            Animation(sge::TextureSheet* textureSheet, sf::Sprite* ownerSprite, int initialTextureN);
+        
+            
+            void addTextureSequence(std::string name, std::vector<int> textureSequence);
+            void setCurrentTextureSequence(std::string name);
+        
+
+            // ?
+            // runForward -> 1,2,3,1,2,3
+            // runCycle -> 1,2,3,2,1,2
+            // ?
+            void run();
+            void restartClock();
+
+        private:
+            sf::Sprite* m_ownerSpritePtr;
+            sge::TextureSheet* m_textureSheet;
+            
+            sf::Clock m_clock;
+            std::unordered_map<std::string, std::vector<int>> m_textureSequences; // e.g. "idle": [5, 6, 7, 8]
+            std::string m_currentTextureSequence;
+            int m_currentTextureN = 0;
+
+    };
+}
+
+#endif
+
+#ifndef TEXTURESHEET_H
+#define TEXTURESHEET_H
+
+#include <SFML/Graphics.hpp>
+#include <string>
+#include <vector>
+
+namespace sge{
+    // TODO texturesheet with gaps between textures
+    class TextureSheet{
+        public:
+            TextureSheet(sge::TextureSheetSizes textureSheetSizes, std::string location);
+
+            std::string getLocation();
+            sf::Texture* getTexture();
+            sf::IntRect getTextureRect(int textureN);
+
+        private:
+            std::string m_location;
+            sf::Texture m_textureSheet;
+            std::vector<sf::IntRect> m_textureRects;
+    };
+}
+
+#endif
+
 #ifndef ENTITY_H
 #define ENTITY_H
 
@@ -448,11 +483,11 @@ namespace sge{
     class SpriteManager;
     class PhysicsManager;
     class CollisionManager;
-    class TextureManager;
+    class AnimationManager;
 
     class EntityManager{
         public:
-            EntityManager(sge::SpriteManager* spriteManager, sge::PhysicsManager* physicsManager, sge::CollisionManager* collisionManager, sge::TextureManager* textureManager);
+            EntityManager(sge::SpriteManager* spriteManager, sge::PhysicsManager* physicsManager, sge::CollisionManager* collisionManager, sge::AnimationManager* animationManager);
 
             void registerEntity(sge::Entity* entity);
             void registerEntities(std::vector<sge::Entity*> entities);
@@ -466,7 +501,7 @@ namespace sge{
             sge::SpriteManager* m_spriteManagerPtr;
             sge::PhysicsManager* m_physicsManagerPtr;
             sge::CollisionManager* m_collisionManagerPtr;
-            sge::TextureManager* m_textureManagerPtr;
+            sge::AnimationManager* m_animationManagerPtr;
 
     };
 }
@@ -633,7 +668,7 @@ namespace sge{
 namespace sge{
     class PhysicsManager;
     class CollisionManager;
-    class TextureManager;
+    class AnimationManager;
     class EntityManager;
     class DebugManager;
     class Scene;
@@ -643,7 +678,7 @@ namespace sge{
             SceneManager(
                 sge::PhysicsManager* physicsManger,
                 sge::CollisionManager* collisionManager,
-                sge::TextureManager* textureManager,
+                sge::AnimationManager* animationManager,
                 sge::EntityManager* entityManager,
                 sge::DebugManager* debugManager
             );
@@ -657,11 +692,11 @@ namespace sge{
             std::string m_currentScene = "";
             std::string m_loadedScene = "";
 
-            sge::PhysicsManager* m_physicsManager;
+            sge::PhysicsManager* m_physicsManagerPtr;
             sge::CollisionManager* m_collisionManagerPtr;
-            sge::TextureManager* m_textureManager;
+            sge::AnimationManager* m_animationManagerPtr;
             sge::EntityManager* m_entityManagerPtr;
-            sge::DebugManager* m_debugManager;
+            sge::DebugManager* m_debugManagerPtr;
     };
 }
 
@@ -700,40 +735,21 @@ namespace sge{
 #ifndef SGE_MAIN
 #define SGE_MAIN
 
-#ifndef SPRITE_MANAGER_H
-#define SPRITE_MANAGER_H
-
-#include <vector>
-#include <SFML/Graphics.hpp>
-
-namespace sge{
-    class SpriteManager{
-        public:
-            void registerSprite(sf::Sprite* sprite);
-            void deregisterSprite(sf::Sprite* sprite);
-            void deregisterAllSprites();
-            std::vector<sf::Sprite*> getSprites();            
-
-        private:
-            std::vector<sf::Sprite*> m_sprites;
-    };
-}
-
-#endif
-
 sge::Universe::Universe(){
+    sge::AssetsManager* AsM = new sge::AssetsManager();
     sge::SpriteManager* SpM = new sge::SpriteManager();
     sge::PhysicsManager* PM = new sge::PhysicsManager();
     sge::CollisionManager* CM = new sge::CollisionManager();
-    sge::TextureManager* TM = new sge::TextureManager();
-    sge::EntityManager* EM = new sge::EntityManager(SpM, PM, CM, TM);
+    sge::AnimationManager* AnM = new sge::AnimationManager();
+    sge::EntityManager* EM = new sge::EntityManager(SpM, PM, CM, AnM);
     sge::DebugManager* DM = new sge::DebugManager();
-    sge::SceneManager* ScM = new sge::SceneManager(PM, CM, TM, EM, DM);
+    sge::SceneManager* ScM = new sge::SceneManager(PM, CM, AnM, EM, DM);
 
+    assetsManager = AsM;
     spriteManager = SpM;
     physicsManager = PM;
     collisionManager = CM;
-    textureManager = TM;
+    animationManager = AnM;
     entityManager = EM;
     debugManager = DM;
     sceneManager = ScM;
@@ -752,7 +768,7 @@ void sge::Universe::loop(){
 
     // Clocks initialization
     // ! Remove in the future (init on animation creation?)
-    textureManager->initAnimationClocks();
+    animationManager->initAnimationClocks();
     // !
 
     m_deltaClock.restart();
@@ -788,7 +804,7 @@ void sge::Universe::loop(){
             physicsManager->updatePhysics(dt);
             collisionManager->alignCollisionShapes();
             collisionManager->updateCollisions();
-            textureManager->updateAnimations();
+            animationManager->updateAnimations();
             sceneManager->alignScene(); // Scene can be reset only after all managers finished their updates to prevent segfaults
         }
         // 
@@ -814,83 +830,15 @@ void sge::Universe::loop(){
 }
 
 
-sge::TextureSheet::TextureSheet(sge::TextureSheetSizes textureSheetSizes, std::string location){
-    m_location = location;
-    m_textureSheet.loadFromFile(location);
-
-    for(int i = 0; i < textureSheetSizes.numTexturesY*textureSheetSizes.textureSizeY; i += textureSheetSizes.textureSizeY){
-        for(int j = 0; j < textureSheetSizes.numTexturesX*textureSheetSizes.textureSizeX; j += textureSheetSizes.textureSizeX){
-            m_textureRects.push_back(sf::IntRect(j, i, textureSheetSizes.textureSizeX, textureSheetSizes.textureSizeY));
-        }
-    }
-}
-
-std::string sge::TextureSheet::getLocation(){ return m_location; }
-sf::Texture* sge::TextureSheet::getTextureSheet(){ return &m_textureSheet; }
-sf::IntRect sge::TextureSheet::getTextureRect(int textureN){ return m_textureRects[textureN]; }
+void sge::AssetsManager::loadTextureSheet(std::string location, std::string name, sge::TextureSheetSizes textureSheetSizes){ m_textures[name] = new sge::TextureSheet(textureSheetSizes, location); }
+sge::TextureSheet* sge::AssetsManager::getTextureSheet(std::string name){ return m_textures[name]; }
 
 
-void sge::TextureManager::loadTexture(std::string location, std::string name, sge::TextureSheetSizes textureSheetSizes){ m_loadedTextures[name] = new sge::TextureSheet(textureSheetSizes, location); }
-sge::TextureSheet* sge::TextureManager::getTexture(std::string name){ return m_loadedTextures[name]; }
+void sge::SpriteManager::registerSprite(sf::Sprite* sprite){ m_sprites.push_back(sprite); }
+void sge::SpriteManager::deregisterSprite(sf::Sprite* sprite){ m_sprites.erase(std::remove(m_sprites.begin(), m_sprites.end(), sprite), m_sprites.end()); }
+void sge::SpriteManager::deregisterAllSprites(){ m_sprites.clear(); }
+std::vector<sf::Sprite*> sge::SpriteManager::getSprites(){ return m_sprites; }
 
-void sge::TextureManager::registerAnimation(sge::Animation* animation){ m_animations.push_back(animation); }
-void sge::TextureManager::deregisterAnimation(sge::Animation* animation){ m_animations.erase(std::remove(m_animations.begin(), m_animations.end(), animation), m_animations.end()); }
-void sge::TextureManager::deregisterAllAnimations(){ m_animations.clear(); }
-
-void sge::TextureManager::initAnimationClocks(){
-    for(sge::Animation* animation : m_animations){
-        animation->restartClock();
-    }
-}
-
-void sge::TextureManager::updateAnimations(){
-    for(sge::Animation* animation : m_animations){
-        animation->run();
-    }
-}
-
-
-sge::Animation::Animation(sge::TextureSheet* textureSheet, sf::Sprite* ownerSprite, int initialTextureN){
-    m_textureSheet = textureSheet;
-    m_ownerSpritePtr = ownerSprite;
-    
-    m_ownerSpritePtr->setTexture(*textureSheet->getTextureSheet());
-    m_ownerSpritePtr->setTextureRect(textureSheet->getTextureRect(initialTextureN));
-}
-
-void sge::Animation::addTextureSequence(std::string name, std::vector<int> textureSequence){ m_textureSequences[name] = textureSequence; }
-void sge::Animation::setCurrentTextureSequence(std::string name){
-    if(m_currentTextureSequence != name){
-        m_currentTextureSequence = name;
-        m_currentTextureN = 0;
-        m_clock.restart();
-    }
-}
-
-void sge::Animation::run(){
-    if(!m_textureSequences.size()){
-        printf("No texture sequences initialized.\n");
-        exit(1);
-    }
-    if(!m_currentTextureSequence.length()){
-        printf("Can not run animation if no current texture sequence is set.\n"); // ? Default to first added ?
-        exit(1);
-    }
-
-    // TODO dynamic animation delay (for each animation ?)
-    if(m_clock.getElapsedTime().asMilliseconds() > 100){
-        m_ownerSpritePtr->setTextureRect(m_textureSheet->getTextureRect(m_textureSequences[m_currentTextureSequence].at(m_currentTextureN)));
-        
-        if(m_currentTextureN+1 == m_textureSequences[m_currentTextureSequence].size()){
-            m_currentTextureN = 0;
-        }
-        else m_currentTextureN++;
-
-        
-        m_clock.restart();
-    }
-}
-void sge::Animation::restartClock(){ m_clock.restart(); }
 
 void sge::PhysicsManager::registerPhysicalObject(sge::PhysicalObject* physicalObject){ m_physicalObjects.push_back(physicalObject); }
 void sge::PhysicsManager::deregisterPhysicalObject(sge::PhysicalObject* physicalObject){ m_physicalObjects.erase(std::remove(m_physicalObjects.begin(), m_physicalObjects.end(), physicalObject), m_physicalObjects.end()); }
@@ -1222,11 +1170,86 @@ bool sge::boundingBox(sge::CollisionShape* initiator, sge::CollisionShape* recip
 }
 
 
-sge::EntityManager::EntityManager(sge::SpriteManager* spriteManager, sge::PhysicsManager* physicsManager, sge::CollisionManager* collisionManager, sge::TextureManager* textureManager){
+void sge::AnimationManager::registerAnimation(sge::Animation* animation){ m_animations.push_back(animation); }
+void sge::AnimationManager::deregisterAnimation(sge::Animation* animation){ m_animations.erase(std::remove(m_animations.begin(), m_animations.end(), animation), m_animations.end()); }
+void sge::AnimationManager::deregisterAllAnimations(){ m_animations.clear(); }
+
+void sge::AnimationManager::initAnimationClocks(){
+    for(sge::Animation* animation : m_animations){
+        animation->restartClock();
+    }
+}
+
+void sge::AnimationManager::updateAnimations(){
+    for(sge::Animation* animation : m_animations){
+        animation->run();
+    }
+}
+
+
+sge::Animation::Animation(sge::TextureSheet* textureSheet, sf::Sprite* ownerSprite, int initialTextureN){
+    m_textureSheet = textureSheet;
+    m_ownerSpritePtr = ownerSprite;
+    
+    m_ownerSpritePtr->setTexture(*textureSheet->getTexture());
+    m_ownerSpritePtr->setTextureRect(textureSheet->getTextureRect(initialTextureN));
+}
+
+void sge::Animation::addTextureSequence(std::string name, std::vector<int> textureSequence){ m_textureSequences[name] = textureSequence; }
+void sge::Animation::setCurrentTextureSequence(std::string name){
+    if(m_currentTextureSequence != name){
+        m_currentTextureSequence = name;
+        m_currentTextureN = 0;
+        m_clock.restart();
+    }
+}
+
+void sge::Animation::run(){
+    if(!m_textureSequences.size()){
+        printf("No texture sequences initialized.\n");
+        exit(1);
+    }
+    if(!m_currentTextureSequence.length()){
+        printf("Can not run animation if no current texture sequence is set.\n"); // ? Default to first added ?
+        exit(1);
+    }
+
+    // TODO dynamic animation delay (for each animation ?)
+    if(m_clock.getElapsedTime().asMilliseconds() > 100){
+        m_ownerSpritePtr->setTextureRect(m_textureSheet->getTextureRect(m_textureSequences[m_currentTextureSequence].at(m_currentTextureN)));
+        
+        if(m_currentTextureN+1 == m_textureSequences[m_currentTextureSequence].size()){
+            m_currentTextureN = 0;
+        }
+        else m_currentTextureN++;
+
+        
+        m_clock.restart();
+    }
+}
+void sge::Animation::restartClock(){ m_clock.restart(); }
+
+sge::TextureSheet::TextureSheet(sge::TextureSheetSizes textureSheetSizes, std::string location){
+    m_location = location;
+    m_textureSheet.loadFromFile(location);
+
+    for(int i = 0; i < textureSheetSizes.numTexturesY*textureSheetSizes.textureSizeY; i += textureSheetSizes.textureSizeY){
+        for(int j = 0; j < textureSheetSizes.numTexturesX*textureSheetSizes.textureSizeX; j += textureSheetSizes.textureSizeX){
+            m_textureRects.push_back(sf::IntRect(j, i, textureSheetSizes.textureSizeX, textureSheetSizes.textureSizeY));
+        }
+    }
+}
+
+std::string sge::TextureSheet::getLocation(){ return m_location; }
+sf::Texture* sge::TextureSheet::getTexture(){ return &m_textureSheet; }
+sf::IntRect sge::TextureSheet::getTextureRect(int textureN){ return m_textureRects[textureN]; }
+
+
+sge::EntityManager::EntityManager(sge::SpriteManager* spriteManager, sge::PhysicsManager* physicsManager, sge::CollisionManager* collisionManager, sge::AnimationManager* animationManager){
     m_spriteManagerPtr = spriteManager;
     m_physicsManagerPtr = physicsManager;
     m_collisionManagerPtr = collisionManager;
-    m_textureManagerPtr = textureManager;
+    m_animationManagerPtr = animationManager;
 }
 
 void sge::EntityManager::registerEntity(sge::Entity* entity){
@@ -1243,7 +1266,7 @@ void sge::EntityManager::registerEntity(sge::Entity* entity){
     }
     
     if(entity->animation){
-        m_textureManagerPtr->registerAnimation(entity->animation);
+        m_animationManagerPtr->registerAnimation(entity->animation);
     }
 
     m_entities.push_back(entity);
@@ -1273,7 +1296,7 @@ void sge::EntityManager::deregisterEntity(sge::Entity* entity){
     }
 
     if(entity->animation){
-        m_textureManagerPtr->deregisterAnimation(entity->animation);
+        m_animationManagerPtr->deregisterAnimation(entity->animation);
     }
 
     m_entities.erase(std::remove(m_entities.begin(), m_entities.end(), entity), m_entities.end());    
@@ -1404,16 +1427,16 @@ std::vector<std::string> sge::Scene::getCollisionPairsOrder(){ return m_collisio
 sge::SceneManager::SceneManager(
         sge::PhysicsManager* physicsManager,
         sge::CollisionManager* collisionManager,
-        sge::TextureManager* textureManager,
+        sge::AnimationManager* animationManager,
         sge::EntityManager* entityManager,
         sge::DebugManager* debugManager
     ){
     
-    m_physicsManager = physicsManager;
+    m_physicsManagerPtr = physicsManager;
     m_collisionManagerPtr = collisionManager;
-    m_textureManager = textureManager;
+    m_animationManagerPtr = animationManager;
     m_entityManagerPtr = entityManager;
-    m_debugManager = debugManager;
+    m_debugManagerPtr = debugManager;
 }
 
 void sge::SceneManager::registerScene(std::string name, sge::Scene* scene){ m_scenes[name] = scene; }
@@ -1421,15 +1444,16 @@ void sge::SceneManager::setCurrentScene(std::string name){ m_currentScene = name
 void sge::SceneManager::alignScene(){
     if(m_currentScene.length()){
         if(m_loadedScene != m_currentScene){
-            m_physicsManager->deregisterAllPhysicalObjects();
+            m_physicsManagerPtr->deregisterAllPhysicalObjects();
             m_collisionManagerPtr->deregisterAllCollisionShapes();
             m_collisionManagerPtr->deregisterAllCollisionGroups();
             m_collisionManagerPtr->deregisterAllCollisionPairs();
+            m_animationManagerPtr->deregisterAllAnimations();
             m_entityManagerPtr->deregisterAllEntities();
-            m_debugManager->deregisterAllDebugEntities();
+            m_debugManagerPtr->deregisterAllDebugEntities();
 
             m_entityManagerPtr->registerEntities(m_scenes[m_currentScene]->getEntities());
-            m_debugManager->registerDebugEntities(m_scenes[m_currentScene]->getDebugEntities());
+            m_debugManagerPtr->registerDebugEntities(m_scenes[m_currentScene]->getDebugEntities());
             m_collisionManagerPtr->registerCollisionGroups(m_scenes[m_currentScene]->getCollisionGroups());
             m_collisionManagerPtr->registerCollisionPairs(m_scenes[m_currentScene]->getCollisionPairs());
             m_collisionManagerPtr->setCollisionPairsOrder(m_scenes[m_currentScene]->getCollisionPairsOrder());
@@ -1438,12 +1462,6 @@ void sge::SceneManager::alignScene(){
         }
     }
 }
-
-
-void sge::SpriteManager::registerSprite(sf::Sprite* sprite){ m_sprites.push_back(sprite); }
-void sge::SpriteManager::deregisterSprite(sf::Sprite* sprite){ m_sprites.erase(std::remove(m_sprites.begin(), m_sprites.end(), sprite), m_sprites.end()); }
-void sge::SpriteManager::deregisterAllSprites(){ m_sprites.clear(); }
-std::vector<sf::Sprite*> sge::SpriteManager::getSprites(){ return m_sprites; }
 
 
 #endif

@@ -1,12 +1,12 @@
 #include "Animation.h"
-#include "TextureSheet.h"
+#include "../Texture/TextureSheet.h"
 
 
 sge::Animation::Animation(sge::TextureSheet* textureSheet, sf::Sprite* ownerSprite, int initialTextureN){
     m_textureSheet = textureSheet;
     m_ownerSpritePtr = ownerSprite;
     
-    m_ownerSpritePtr->setTexture(*textureSheet->getTextureSheet());
+    m_ownerSpritePtr->setTexture(*textureSheet->getTexture());
     m_ownerSpritePtr->setTextureRect(textureSheet->getTextureRect(initialTextureN));
 }
 

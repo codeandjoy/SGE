@@ -15,5 +15,5 @@ sge::TextureSheet::TextureSheet(sge::TextureSheetSizes textureSheetSizes, std::s
 
 
 std::string sge::TextureSheet::getLocation(){ return m_location; }
-sf::Texture* sge::TextureSheet::getTextureSheet(){ return &m_textureSheet; }
+sf::Texture* sge::TextureSheet::getTexture(){ return &m_textureSheet; }
 sf::IntRect sge::TextureSheet::getTextureRect(int textureN){ return m_textureRects[textureN]; }

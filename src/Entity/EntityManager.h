@@ -9,11 +9,11 @@ namespace sge{
     class SpriteManager;
     class PhysicsManager;
     class CollisionManager;
-    class TextureManager;
+    class AnimationManager;
 
     class EntityManager{
         public:
-            EntityManager(sge::SpriteManager* spriteManager, sge::PhysicsManager* physicsManager, sge::CollisionManager* collisionManager, sge::TextureManager* textureManager);
+            EntityManager(sge::SpriteManager* spriteManager, sge::PhysicsManager* physicsManager, sge::CollisionManager* collisionManager, sge::AnimationManager* animationManager);
 
             void registerEntity(sge::Entity* entity);
             void registerEntities(std::vector<sge::Entity*> entities);
@@ -27,7 +27,7 @@ namespace sge{
             sge::SpriteManager* m_spriteManagerPtr;
             sge::PhysicsManager* m_physicsManagerPtr;
             sge::CollisionManager* m_collisionManagerPtr;
-            sge::TextureManager* m_textureManagerPtr;
+            sge::AnimationManager* m_animationManagerPtr;
 
     };
 }

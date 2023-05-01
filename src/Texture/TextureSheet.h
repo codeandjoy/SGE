@@ -14,7 +14,7 @@ namespace sge{
             TextureSheet(sge::TextureSheetSizes textureSheetSizes, std::string location);
 
             std::string getLocation();
-            sf::Texture* getTextureSheet();
+            sf::Texture* getTexture();
             sf::IntRect getTextureRect(int textureN);
 
         private:

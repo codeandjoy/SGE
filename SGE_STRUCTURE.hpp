@@ -5,10 +5,9 @@
 
 #include "./src/Universe/Universe.h"
 
-#include "./src/Texture/TextureSheet.h"
-#include "./src/Texture/TextureSheetSizes.h"
-#include "./src/Texture/TextureManager.h"
-#include "./src/Texture/Animation.h"
+#include "./src/AssetsManager/AssetsManager.h"
+
+#include "./src/SpriteManager/SpriteManager.h"
 
 #include "./src/Physics/PhysicsManager.h"
 #include "./src/Physics/PhysicalObject.h"
@@ -22,6 +21,12 @@
 #include "./src/Collision/CollisionShape.h"
 #include "./src/Collision/CollisionResponses.h"
 #include "./src/Collision/CollisionDetectionAlgorithms.h"
+
+#include "./src/Animation/AnimationManager.h"
+#include "./src/Animation/Animation.h"
+
+#include "./src/Texture/TextureSheetSizes.h"
+#include "./src/Texture/TextureSheet.h"
 
 #include "./src/Entity/Entity.h"
 #include "./src/Entity/EntityManager.h"

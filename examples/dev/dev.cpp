@@ -18,8 +18,8 @@ int main(){
 
 
     // Load all textures
-    universe->textureManager->loadTexture(std::filesystem::current_path().string() + "/examples/dev/assets/pico_8_knight_sprite.png", "knight", sge::TextureSheetSizes{8, 8, 12, 12});
-    universe->textureManager->loadTexture(std::filesystem::current_path().string() + "/examples/dev/assets/pico_8_tiles.png", "picoTiles", sge::TextureSheetSizes{8, 8, 12, 12});
+    universe->assetsManager->loadTextureSheet(std::filesystem::current_path().string() + "/examples/dev/assets/pico_8_knight_sprite.png", "knight", sge::TextureSheetSizes{8, 8, 12, 12});
+    universe->assetsManager->loadTextureSheet(std::filesystem::current_path().string() + "/examples/dev/assets/pico_8_tiles.png", "picoTiles", sge::TextureSheetSizes{8, 8, 12, 12});
     //
 
 
@@ -45,8 +45,8 @@ int main(){
         for(int j = 0; j < map.getTileCount().x; j++){
             if(tiles[map.getTileCount().x*i+j].ID != 0){
                 mapTileEntities.push_back(sge::buildStaticEntity(
-                    universe->textureManager->getTexture("picoTiles")->getTextureSheet(),
-                    universe->textureManager->getTexture("picoTiles")->getTextureRect(tiles[map.getTileCount().x*i+j].ID-1),
+                    universe->assetsManager->getTextureSheet("picoTiles")->getTexture(),
+                    universe->assetsManager->getTextureSheet("picoTiles")->getTextureRect(tiles[map.getTileCount().x*i+j].ID-1),
                     sf::Vector2f(j*map.getTileSize().x, i*map.getTileSize().y)
                 ));
             }
@@ -62,8 +62,8 @@ int main(){
     auto& box = boxes[0];
 
     sge::Entity* boxEntity = sge::buildMobileEntity(
-        universe->textureManager->getTexture("picoTiles")->getTextureSheet(),
-        universe->textureManager->getTexture("picoTiles")->getTextureRect(box.getTileID()-1),
+        universe->assetsManager->getTextureSheet("picoTiles")->getTexture(),
+        universe->assetsManager->getTextureSheet("picoTiles")->getTextureRect(box.getTileID()-1),
         sf::Vector2f(box.getPosition().x, box.getPosition().y)
     );
 
@@ -81,8 +81,8 @@ int main(){
 
     // Player
     sge::Entity* playerEntity = sge::buildMobileEntity(
-        universe->textureManager->getTexture("knight")->getTextureSheet(),
-        universe->textureManager->getTexture("knight")->getTextureRect(9),
+        universe->assetsManager->getTextureSheet("knight")->getTexture(),
+        universe->assetsManager->getTextureSheet("knight")->getTextureRect(9),
         sf::Vector2f(100, 50)
     );
 
@@ -91,7 +91,7 @@ int main(){
 
     playerEntity->physicalObject->acceleration.y = GRAVITY;
 
-    sge::Animation* playerAnimation = new sge::Animation(universe->textureManager->getTexture("knight"), playerEntity->sprite, 9);
+    sge::Animation* playerAnimation = new sge::Animation(universe->assetsManager->getTextureSheet("knight"), playerEntity->sprite, 9);
     playerAnimation->addTextureSequence("idle", std::vector<int>{9});
     playerAnimation->addTextureSequence("runRight", std::vector<int>{33, 34, 35});
     playerAnimation->addTextureSequence("runLeft", std::vector<int>{45, 46, 47});

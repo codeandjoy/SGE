@@ -7,11 +7,12 @@
 
 
 namespace sge{
+    class AssetsManager;
     class SpriteManager;
     class PhysicsManager;
     class PhysicalObject;
     class CollisionManager;
-    class TextureManager;
+    class AnimationManager;
     class EntityManager;
     class DebugManager;
     class SceneManager;
@@ -34,10 +35,11 @@ namespace sge{
             void loop();
 
 
+            sge::AssetsManager* assetsManager = nullptr;
             sge::SpriteManager* spriteManager = nullptr;
             sge::PhysicsManager* physicsManager = nullptr;
             sge::CollisionManager* collisionManager = nullptr;
-            sge::TextureManager* textureManager = nullptr;
+            sge::AnimationManager* animationManager = nullptr;
             sge::EntityManager* entityManager = nullptr;
             sge::DebugManager* debugManager = nullptr;
             sge::SceneManager* sceneManager = nullptr;

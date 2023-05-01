@@ -1,27 +1,30 @@
 #include "Universe.h"
+#include "../AssetsManager/AssetsManager.h"
 #include "../SpriteManager/SpriteManager.h"
 #include "../Physics/PhysicsManager.h"
 #include "../Physics/PhysicalObject.h"
 #include "../Collision/CollisionManager.h"
-#include "../Texture/TextureManager.h"
+#include "../Animation/AnimationManager.h"
 #include "../Entity/EntityManager.h"
 #include "../Debug/DebugManager.h"
 #include "../Scene/SceneManager.h"
 
 
 sge::Universe::Universe(){
+    sge::AssetsManager* AsM = new sge::AssetsManager();
     sge::SpriteManager* SpM = new sge::SpriteManager();
     sge::PhysicsManager* PM = new sge::PhysicsManager();
     sge::CollisionManager* CM = new sge::CollisionManager();
-    sge::TextureManager* TM = new sge::TextureManager();
-    sge::EntityManager* EM = new sge::EntityManager(SpM, PM, CM, TM);
+    sge::AnimationManager* AnM = new sge::AnimationManager();
+    sge::EntityManager* EM = new sge::EntityManager(SpM, PM, CM, AnM);
     sge::DebugManager* DM = new sge::DebugManager();
-    sge::SceneManager* ScM = new sge::SceneManager(PM, CM, TM, EM, DM);
+    sge::SceneManager* ScM = new sge::SceneManager(PM, CM, AnM, EM, DM);
 
+    assetsManager = AsM;
     spriteManager = SpM;
     physicsManager = PM;
     collisionManager = CM;
-    textureManager = TM;
+    animationManager = AnM;
     entityManager = EM;
     debugManager = DM;
     sceneManager = ScM;
@@ -46,7 +49,7 @@ void sge::Universe::loop(){
 
     // Clocks initialization
     // ! Remove in the future (init on animation creation?)
-    textureManager->initAnimationClocks();
+    animationManager->initAnimationClocks();
     // !
 
     m_deltaClock.restart();
@@ -82,7 +85,7 @@ void sge::Universe::loop(){
             physicsManager->updatePhysics(dt);
             collisionManager->alignCollisionShapes();
             collisionManager->updateCollisions();
-            textureManager->updateAnimations();
+            animationManager->updateAnimations();
             sceneManager->alignScene(); // Scene can be reset only after all managers finished their updates to prevent segfaults
         }
         // 

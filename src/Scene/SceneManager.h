@@ -8,7 +8,7 @@
 namespace sge{
     class PhysicsManager;
     class CollisionManager;
-    class TextureManager;
+    class AnimationManager;
     class EntityManager;
     class DebugManager;
     class Scene;
@@ -18,7 +18,7 @@ namespace sge{
             SceneManager(
                 sge::PhysicsManager* physicsManger,
                 sge::CollisionManager* collisionManager,
-                sge::TextureManager* textureManager,
+                sge::AnimationManager* animationManager,
                 sge::EntityManager* entityManager,
                 sge::DebugManager* debugManager
             );
@@ -33,11 +33,11 @@ namespace sge{
             std::string m_currentScene = "";
             std::string m_loadedScene = "";
 
-            sge::PhysicsManager* m_physicsManager;
+            sge::PhysicsManager* m_physicsManagerPtr;
             sge::CollisionManager* m_collisionManagerPtr;
-            sge::TextureManager* m_textureManager;
+            sge::AnimationManager* m_animationManagerPtr;
             sge::EntityManager* m_entityManagerPtr;
-            sge::DebugManager* m_debugManager;
+            sge::DebugManager* m_debugManagerPtr;
     };
 }
 
