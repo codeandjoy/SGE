@@ -73,12 +73,15 @@ void sge::Universe::loop(){
         float dt = deltaTime.asSeconds();
         if(dt > 0.15f) dt = 0.15f;
         //
-
-        physicsManager->updatePhysics(dt);
-        collisionManager->alignCollisionShapes();
-        collisionManager->updateCollisions();
-        textureManager->updateAnimations();
-        sceneManager->alignScene(); // Scene can be reset only after all managers finished their updates to prevent segfaults
+        
+        
+        if(!isPaused){
+            physicsManager->updatePhysics(dt);
+            collisionManager->alignCollisionShapes();
+            collisionManager->updateCollisions();
+            textureManager->updateAnimations();
+            sceneManager->alignScene(); // Scene can be reset only after all managers finished their updates to prevent segfaults
+        }
         // 
 
         // Game draws

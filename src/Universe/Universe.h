@@ -20,6 +20,9 @@ namespace sge{
             Universe();
 
 
+            bool isPaused = false;
+
+
             void setupWindow(sf::RenderWindow* window);
 
 
