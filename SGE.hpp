@@ -96,10 +96,12 @@ namespace sge{
             void loadTextureSheet(std::string location, std::string name, sge::TextureSheetSizes textureSheetSizes);
             sge::TextureSheet* getTextureSheet(std::string name);
 
-            // TODO fonts
+            void loadFont(std::string location, std::string name);
+            sf::Font* getFont(std::string name);
 
         private:
             std::unordered_map<std::string, sge::TextureSheet*> m_textures;
+            std::unordered_map<std::string, sf::Font*> m_fonts;
     };
 }
 
@@ -1064,6 +1066,14 @@ void sge::Universe::loop(){
 
 void sge::AssetsManager::loadTextureSheet(std::string location, std::string name, sge::TextureSheetSizes textureSheetSizes){ m_textures[name] = new sge::TextureSheet(textureSheetSizes, location); }
 sge::TextureSheet* sge::AssetsManager::getTextureSheet(std::string name){ return m_textures[name]; }
+
+void sge::AssetsManager::loadFont(std::string location, std::string name){
+    sf::Font* font = new sf::Font;
+    font->loadFromFile(location);
+
+    m_fonts[name] = font;
+}
+sf::Font* sge::AssetsManager::getFont(std::string name){ return m_fonts[name]; }
 
 
 void sge::SpriteManager::registerSprite(sf::Sprite* sprite){ m_sprites.push_back(sprite); }

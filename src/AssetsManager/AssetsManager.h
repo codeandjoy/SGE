@@ -15,10 +15,12 @@ namespace sge{
             void loadTextureSheet(std::string location, std::string name, sge::TextureSheetSizes textureSheetSizes);
             sge::TextureSheet* getTextureSheet(std::string name);
 
-            // TODO fonts
+            void loadFont(std::string location, std::string name);
+            sf::Font* getFont(std::string name);
 
         private:
             std::unordered_map<std::string, sge::TextureSheet*> m_textures;
+            std::unordered_map<std::string, sf::Font*> m_fonts;
     };
 }
 
