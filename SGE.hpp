@@ -12,6 +12,7 @@
 
 namespace sge{
     class AssetsManager;
+
     class SpriteManager;
     class PhysicsManager;
     class PhysicalObject;
@@ -21,6 +22,12 @@ namespace sge{
     class DebugManager;
     class SceneManager;
     
+    class UISpriteManager;
+    class ClickableShapeManager;
+    class SpriteTextManager;
+    class UIAnimationManager;
+    class UIEntityManager;
+
     class Universe{
         public:
             Universe();
@@ -42,6 +49,12 @@ namespace sge{
             sge::EntityManager* entityManager = nullptr;
             sge::DebugManager* debugManager = nullptr;
             sge::SceneManager* sceneManager = nullptr;
+
+            sge::UISpriteManager* uiSpriteManager = nullptr;
+            sge::ClickableShapeManager* clickableShapeManager = nullptr;
+            sge::SpriteTextManager* spriteTextManager = nullptr;
+            sge::UIAnimationManager* uiAnimationManager = nullptr;
+            sge::UIEntityManager* uiEntityManager = nullptr;
 
         private:
             sf::RenderWindow* m_windowPtr;
@@ -756,7 +769,7 @@ namespace sge{
         public:
             void registerClickableShape(sge::ClickableShape* clickableShape);
             void deregsiterClickableShape(sge::ClickableShape* clickableShape);
-            
+            std::vector<sge::ClickableShape*> getAllActiveClickableShapes();
 
             void activateClickableShape(sge::ClickableShape* clickableShape);
             void deactivateClickableShape(sge::ClickableShape* clickableShape);
@@ -777,7 +790,7 @@ namespace sge{
 #include <SFML/Graphics.hpp>
 
 namespace sge{
-    class SpriteText : sf::Text{
+    class SpriteText : public sf::Text{
         public:
             SpriteText(sf::Sprite* ownerSprite);
 
@@ -830,9 +843,13 @@ namespace sge{
         public:
             void registerAnimation(sge::Animation* animation);
             void deregisterAnimation(sge::Animation* animation);
+            std::vector<sge::Animation*> getAllActiveAnimations();
 
             void activateAnimation(sge::Animation* animation);
             void deactivateAnimation(sge::Animation* animation);
+
+            void initAnimationClocks();
+            void updateActiveAnimations();
 
         private:
             std::vector<sge::Animation*> m_activeAnimations;
@@ -880,6 +897,7 @@ namespace sge{
             void registerUIEntity(sge::UIEntity* uiEntity);
             void deregisterUIEntity(sge::UIEntity* uiEntity);
             void deregisterAllUIEntities();
+            std::vector<sge::UIEntity*> getAllUIEntities();
 
             void showUIEntity(sge::UIEntity* uiEntity);
             void hideUIEntity(sge::UIEntity* uiEntity);
@@ -907,6 +925,7 @@ namespace sge{
         public:
             void registerSprite(sf::Sprite* sprite);
             void deregisterSprite(sf::Sprite* sprite);
+            std::vector<sf::Sprite*> getAllVisibleSprites();
 
             void showSprite(sf::Sprite* sprite);
             void hideSprite(sf::Sprite* sprite);
@@ -943,6 +962,18 @@ sge::Universe::Universe(){
     entityManager = EM;
     debugManager = DM;
     sceneManager = ScM;
+    
+    sge::UISpriteManager* UISM = new sge::UISpriteManager();
+    sge::ClickableShapeManager* UICSM = new sge::ClickableShapeManager();
+    sge::SpriteTextManager* UISTM = new SpriteTextManager();
+    sge::UIAnimationManager* UIAM = new UIAnimationManager();
+    sge::UIEntityManager* UIEM = new UIEntityManager(UISM, UICSM, UISTM, UIAM);
+
+    uiSpriteManager = UISM;
+    clickableShapeManager = UICSM;
+    spriteTextManager = UISTM;
+    uiAnimationManager = UIAM;
+    uiEntityManager = UIEM;
 }
 
 void sge::Universe::setupWindow(sf::RenderWindow *window){ m_windowPtr = window; }
@@ -973,6 +1004,14 @@ void sge::Universe::loop(){
             for(std::function eventHandler : m_eventHandlers){
                 eventHandler(event);
             }
+
+            // UI events
+            for(ClickableShape* clickableShape : clickableShapeManager->getAllActiveClickableShapes()){
+                if(clickableShape->clickHandler){
+                    clickableShape->clickHandler(event);
+                }
+            }
+            //
         }
         //
 
@@ -989,7 +1028,6 @@ void sge::Universe::loop(){
         if(dt > 0.15f) dt = 0.15f;
         //
         
-        
         if(!isPaused){
             physicsManager->updatePhysics(dt);
             collisionManager->alignCollisionShapes();
@@ -997,7 +1035,11 @@ void sge::Universe::loop(){
             animationManager->updateAnimations();
             sceneManager->alignScene(); // Scene can be reset only after all managers finished their updates to prevent segfaults
         }
-        // 
+
+        uiAnimationManager->updateActiveAnimations();
+        //
+
+        
 
         // Game draws
         m_windowPtr->clear();
@@ -1005,14 +1047,14 @@ void sge::Universe::loop(){
         for(sf::Sprite* sprite : spriteManager->getSprites()){
             m_windowPtr->draw(*sprite);
         }
-
-        // ! REMOVE
-        // for(sge::PhysicalObject* physicalObject : physicsManager->getAllPhysicalObjects()){
-        //     m_windowPtr->draw(*physicalObject);
-        // }
-        // !
-
         debugManager->showDebugInfo(m_windowPtr);
+
+        for(sf::Sprite* sprite : uiSpriteManager->getAllVisibleSprites()){
+            m_windowPtr->draw(*sprite);
+        }
+        for(sge::SpriteText* spriteText : spriteTextManager->getAllVisibleSpriteTextObjects()){
+            m_windowPtr->draw(*spriteText);
+        }
         //
 
         m_windowPtr->display();
@@ -1659,6 +1701,7 @@ void sge::ClickableShapeManager::deregsiterClickableShape(sge::ClickableShape* c
     m_activeClickableShapes.erase(std::remove(m_activeClickableShapes.begin(), m_activeClickableShapes.end(), clickableShape), m_activeClickableShapes.end());
     m_inactiveClickableShapes.erase(std::remove(m_inactiveClickableShapes.begin(), m_inactiveClickableShapes.end(), clickableShape), m_inactiveClickableShapes.end());
 }
+std::vector<sge::ClickableShape*> sge::ClickableShapeManager::getAllActiveClickableShapes(){ return m_activeClickableShapes; }
 
 void sge::ClickableShapeManager::activateClickableShape(sge::ClickableShape* clickableShape){
     deregsiterClickableShape(clickableShape);
@@ -1710,6 +1753,7 @@ void sge::UIAnimationManager::deregisterAnimation(sge::Animation* animation){
     m_activeAnimations.erase(std::remove(m_activeAnimations.begin(), m_activeAnimations.end(), animation), m_activeAnimations.end());
     m_inactiveAnimations.erase(std::remove(m_inactiveAnimations.begin(), m_inactiveAnimations.end(), animation), m_inactiveAnimations.end());
 }
+std::vector<sge::Animation*> sge::UIAnimationManager::getAllActiveAnimations(){ return m_activeAnimations; }
 
 void sge::UIAnimationManager::activateAnimation(sge::Animation* animation){
     deregisterAnimation(animation);
@@ -1718,6 +1762,18 @@ void sge::UIAnimationManager::activateAnimation(sge::Animation* animation){
 void sge::UIAnimationManager::deactivateAnimation(sge::Animation* animation){
     deregisterAnimation(animation);
     m_inactiveAnimations.push_back(animation);
+}
+
+void sge::UIAnimationManager::initAnimationClocks(){
+    for(sge::Animation* animation : m_activeAnimations){
+        animation->restartClock();
+    }
+}
+
+void sge::UIAnimationManager::updateActiveAnimations(){
+    for(sge::Animation* animation : m_activeAnimations){
+        animation->run();
+    }
 }
 
 
@@ -1767,6 +1823,7 @@ void sge::UIEntityManager::deregisterAllUIEntities(){
         deregisterUIEntity(uiEntity);
     }
 }
+std::vector<sge::UIEntity*> sge::UIEntityManager::getAllUIEntities(){ return m_uiEntities; }
 
 void sge::UIEntityManager::showUIEntity(sge::UIEntity* uiEntity){
     m_uiSpriteManager->showSprite(uiEntity->sprite);
@@ -1806,6 +1863,7 @@ void sge::UISpriteManager::deregisterSprite(sf::Sprite* sprite){
     m_hiddenSprites.erase(std::remove(m_hiddenSprites.begin(), m_hiddenSprites.end(), sprite), m_hiddenSprites.end());
 
 }
+std::vector<sf::Sprite*> sge::UISpriteManager::getAllVisibleSprites(){ return m_visibleSprites; }
 
 void sge::UISpriteManager::showSprite(sf::Sprite* sprite){
     deregisterSprite(sprite);
