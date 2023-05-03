@@ -6,7 +6,7 @@ void sge::UISpriteManager::deregisterSprite(sf::Sprite* sprite){
     m_hiddenSprites.erase(std::remove(m_hiddenSprites.begin(), m_hiddenSprites.end(), sprite), m_hiddenSprites.end());
 
 }
-
+std::vector<sf::Sprite*> sge::UISpriteManager::getAllVisibleSprites(){ return m_visibleSprites; }
 
 
 void sge::UISpriteManager::showSprite(sf::Sprite* sprite){

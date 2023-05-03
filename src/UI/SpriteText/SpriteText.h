@@ -5,7 +5,7 @@
 
 
 namespace sge{
-    class SpriteText : sf::Text{
+    class SpriteText : public sf::Text{
         public:
             SpriteText(sf::Sprite* ownerSprite);
 

@@ -54,6 +54,7 @@ void sge::UIEntityManager::deregisterAllUIEntities(){
         deregisterUIEntity(uiEntity);
     }
 }
+std::vector<sge::UIEntity*> sge::UIEntityManager::getAllUIEntities(){ return m_uiEntities; }
 
 
 

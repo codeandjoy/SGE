@@ -19,6 +19,7 @@ namespace sge{
             void registerUIEntity(sge::UIEntity* uiEntity);
             void deregisterUIEntity(sge::UIEntity* uiEntity);
             void deregisterAllUIEntities();
+            std::vector<sge::UIEntity*> getAllUIEntities();
 
 
             void showUIEntity(sge::UIEntity* uiEntity);

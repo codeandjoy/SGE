@@ -10,7 +10,7 @@ namespace sge{
         public:
             void registerSprite(sf::Sprite* sprite);
             void deregisterSprite(sf::Sprite* sprite);
-
+            std::vector<sf::Sprite*> getAllVisibleSprites();
 
             void showSprite(sf::Sprite* sprite);
             void hideSprite(sf::Sprite* sprite);

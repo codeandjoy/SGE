@@ -8,7 +8,13 @@
 #include "../Entity/EntityManager.h"
 #include "../Debug/DebugManager.h"
 #include "../Scene/SceneManager.h"
-
+#include "../UI/UISpriteManager/UISpriteManager.h"
+#include "../UI/ClickableShape/ClickableShape.h"
+#include "../UI/ClickableShape/ClickableShapeManager.h"
+#include "../UI/SpriteText/SpriteText.h"
+#include "../UI/SpriteText/SpriteTextManager.h"
+#include "../UI/UIAnimationManager/UIAnimationManager.h"
+#include "../UI/UIEntity/UIEntityManager.h"
 
 sge::Universe::Universe(){
     sge::AssetsManager* AsM = new sge::AssetsManager();
@@ -28,6 +34,18 @@ sge::Universe::Universe(){
     entityManager = EM;
     debugManager = DM;
     sceneManager = ScM;
+    
+    sge::UISpriteManager* UISM = new sge::UISpriteManager();
+    sge::ClickableShapeManager* UICSM = new sge::ClickableShapeManager();
+    sge::SpriteTextManager* UISTM = new SpriteTextManager();
+    sge::UIAnimationManager* UIAM = new UIAnimationManager();
+    sge::UIEntityManager* UIEM = new UIEntityManager(UISM, UICSM, UISTM, UIAM);
+
+    uiSpriteManager = UISM;
+    clickableShapeManager = UICSM;
+    spriteTextManager = UISTM;
+    uiAnimationManager = UIAM;
+    uiEntityManager = UIEM;
 }
 
 
@@ -64,6 +82,14 @@ void sge::Universe::loop(){
             for(std::function eventHandler : m_eventHandlers){
                 eventHandler(event);
             }
+
+            // UI events
+            for(ClickableShape* clickableShape : clickableShapeManager->getAllActiveClickableShapes()){
+                if(clickableShape->clickHandler){
+                    clickableShape->clickHandler(event);
+                }
+            }
+            //
         }
         //
 
@@ -80,7 +106,6 @@ void sge::Universe::loop(){
         if(dt > 0.15f) dt = 0.15f;
         //
         
-        
         if(!isPaused){
             physicsManager->updatePhysics(dt);
             collisionManager->alignCollisionShapes();
@@ -88,7 +113,11 @@ void sge::Universe::loop(){
             animationManager->updateAnimations();
             sceneManager->alignScene(); // Scene can be reset only after all managers finished their updates to prevent segfaults
         }
-        // 
+
+        uiAnimationManager->updateActiveAnimations();
+        //
+
+        
 
         // Game draws
         m_windowPtr->clear();
@@ -96,14 +125,14 @@ void sge::Universe::loop(){
         for(sf::Sprite* sprite : spriteManager->getSprites()){
             m_windowPtr->draw(*sprite);
         }
-
-        // ! REMOVE
-        // for(sge::PhysicalObject* physicalObject : physicsManager->getAllPhysicalObjects()){
-        //     m_windowPtr->draw(*physicalObject);
-        // }
-        // !
-
         debugManager->showDebugInfo(m_windowPtr);
+
+        for(sf::Sprite* sprite : uiSpriteManager->getAllVisibleSprites()){
+            m_windowPtr->draw(*sprite);
+        }
+        for(sge::SpriteText* spriteText : spriteTextManager->getAllVisibleSpriteTextObjects()){
+            m_windowPtr->draw(*spriteText);
+        }
         //
 
         m_windowPtr->display();

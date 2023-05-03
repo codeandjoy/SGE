@@ -11,7 +11,8 @@ namespace sge{
         public:
             void registerClickableShape(sge::ClickableShape* clickableShape);
             void deregsiterClickableShape(sge::ClickableShape* clickableShape);
-            
+            std::vector<sge::ClickableShape*> getAllActiveClickableShapes();
+
 
             void activateClickableShape(sge::ClickableShape* clickableShape);
             void deactivateClickableShape(sge::ClickableShape* clickableShape);

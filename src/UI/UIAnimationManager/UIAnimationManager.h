@@ -11,10 +11,14 @@ namespace sge{
         public:
             void registerAnimation(sge::Animation* animation);
             void deregisterAnimation(sge::Animation* animation);
+            std::vector<sge::Animation*> getAllActiveAnimations();
 
 
             void activateAnimation(sge::Animation* animation);
             void deactivateAnimation(sge::Animation* animation);
+
+            void initAnimationClocks();
+            void updateActiveAnimations();
 
         private:
             std::vector<sge::Animation*> m_activeAnimations;

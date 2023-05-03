@@ -8,6 +8,7 @@
 
 namespace sge{
     class AssetsManager;
+
     class SpriteManager;
     class PhysicsManager;
     class PhysicalObject;
@@ -17,6 +18,12 @@ namespace sge{
     class DebugManager;
     class SceneManager;
     
+    class UISpriteManager;
+    class ClickableShapeManager;
+    class SpriteTextManager;
+    class UIAnimationManager;
+    class UIEntityManager;
+
     class Universe{
         public:
             Universe();
@@ -43,6 +50,12 @@ namespace sge{
             sge::EntityManager* entityManager = nullptr;
             sge::DebugManager* debugManager = nullptr;
             sge::SceneManager* sceneManager = nullptr;
+
+            sge::UISpriteManager* uiSpriteManager = nullptr;
+            sge::ClickableShapeManager* clickableShapeManager = nullptr;
+            sge::SpriteTextManager* spriteTextManager = nullptr;
+            sge::UIAnimationManager* uiAnimationManager = nullptr;
+            sge::UIEntityManager* uiEntityManager = nullptr;
 
         private:
             sf::RenderWindow* m_windowPtr;
