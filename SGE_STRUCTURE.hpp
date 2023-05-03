@@ -43,6 +43,21 @@
 #include "./src/utils/Approach.h"
 #include "./src/utils/Measurements.h"
 
+// UI
+#include "./src/UI/ClickableShape/ClickableShape.h"
+#include "./src/UI/ClickableShape/ClickableShapeManager.h"
+
+#include "./src/UI/SpriteText/SpriteText.h"
+#include "./src/UI/SpriteText/SpriteTextManager.h"
+
+#include "./src/UI/UIAnimationManager/UIAnimationManager.h"
+
+#include "./src/UI/UIEntity/UIEntity.h"
+#include "./src/UI/UIEntity/UIEntityManager.h"
+
+#include "./src/UI/UISpriteManager/UISpriteManager.h"
+//
+
 #endif
 
 #ifndef SGE_MAIN
