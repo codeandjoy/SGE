@@ -8,12 +8,12 @@
 int main(){
     sge::Universe* universe = new sge::Universe();
 
-    universe->textureManager->loadTexture(
+    universe->assetsManager->loadTextureSheet(
         std::filesystem::current_path().string() + "/examples/scenes/assets/pico_8_tiles.png",
         "picoTiles",
         sge::TextureSheetSizes{8, 8, 12, 12}
     );
-    universe->textureManager->loadTexture(
+    universe->assetsManager->loadTextureSheet(
         std::filesystem::current_path().string() + "/examples/scenes/assets/pico_8_knight_sprite.png",
         "knight",
         sge::TextureSheetSizes{8, 8, 12, 12}

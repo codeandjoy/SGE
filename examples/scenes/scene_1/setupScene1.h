@@ -64,7 +64,7 @@ sge::Scene* setupScene1(sge::Universe* universe, sge::Entity* playerEntity){
     player_coin->collisionGroups = std::make_pair("player", "coin");
     player_coin->checkCollision = sge::boundingBox;
     player_coin->startPhaseCollisionResponse = [universe, playerEntity](auto _){
-        playerEntity->physicalObject->setPosition(sf::Vector2f(100, 50));
+        playerEntity->sprite->setPosition(sf::Vector2f(100, 50));
         universe->sceneManager->setCurrentScene("level_2");
     };
 

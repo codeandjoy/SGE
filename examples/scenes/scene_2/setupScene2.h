@@ -64,7 +64,7 @@ sge::Scene* setupScene2(sge::Universe* universe, sge::Entity* playerEntity){
     player_heart->collisionGroups = std::make_pair("player", "heart");
     player_heart->checkCollision = sge::boundingBox;
     player_heart->startPhaseCollisionResponse = [universe, playerEntity](auto _){
-        playerEntity->physicalObject->setPosition(sf::Vector2f(100, 50));
+        playerEntity->sprite->setPosition(sf::Vector2f(100, 50));
         universe->sceneManager->setCurrentScene("level_1");
     };
 

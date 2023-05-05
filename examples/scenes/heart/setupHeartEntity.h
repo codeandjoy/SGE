@@ -5,12 +5,12 @@
 
 sge::Entity* setupHeartEntity(sge::Universe* universe, auto heartLayer){
     sge::Entity* heartEntity = sge::buildStaticEntity(
-        universe->textureManager->getTexture("picoTiles")->getTextureSheet(),
-        universe->textureManager->getTexture("picoTiles")->getTextureRect(66),
+        universe->assetsManager->getTextureSheet("picoTiles")->getTexture(),
+        universe->assetsManager->getTextureSheet("picoTiles")->getTextureRect(66),
         sf::Vector2f(heartLayer[0].getPosition().x, heartLayer[0].getPosition().y-10)
     );
 
-    sge::Animation* heartAnimation = new sge::Animation(universe->textureManager->getTexture("picoTiles"), heartEntity->physicalObject, 66);
+    sge::Animation* heartAnimation = new sge::Animation(universe->assetsManager->getTextureSheet("picoTiles"), heartEntity->sprite, 66);
     heartAnimation->addTextureSequence("spin", std::vector<int>{66, 67, 68, 69, 70, 71});
     heartAnimation->setCurrentTextureSequence("spin");
 
