@@ -1,7 +1,7 @@
 #include "CollisionResponses.h"
 #include "Collision.h"
 #include "CollisionSide.h"
-#include "CollisionShape.h"
+#include "../CollisionShape/CollisionShape.h"
 #include "../Entity/Entity.h"
 #include "../Physics/PhysicalObject.h"
 

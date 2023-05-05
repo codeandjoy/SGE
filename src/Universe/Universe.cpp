@@ -5,8 +5,9 @@
 #include "../Logic/SpriteManager/SpriteManager.h"
 #include "../Logic/Physics/PhysicsManager.h"
 #include "../Logic/Physics/PhysicalObject.h"
-#include "../Logic/Collision/CollisionManager.h"
+#include "../Logic/CollisionShape/CollisionShapeManager.h"
 #include "../Logic/AnimationManager/AnimationManager.h"
+#include "../Logic/Collision/CollisionManager.h"
 #include "../Logic/Entity/EntityManager.h"
 #include "../Logic/Debug/DebugManager.h"
 #include "../Logic/Scene/SceneManager.h"
@@ -16,21 +17,24 @@
 #include "../UI/UIAnimationManager/UIAnimationManager.h"
 #include "../UI/UIEntity/UIEntityManager.h"
 
+
 sge::Universe::Universe(){
     sge::AssetsManager* AsM = new sge::AssetsManager();
     sge::SpriteManager* SpM = new sge::SpriteManager();
     sge::PhysicsManager* PM = new sge::PhysicsManager();
-    sge::CollisionManager* CM = new sge::CollisionManager();
+    sge::CollisionShapeManager* CSM = new sge::CollisionShapeManager();
     sge::AnimationManager* AnM = new sge::AnimationManager();
-    sge::EntityManager* EM = new sge::EntityManager(SpM, PM, CM, AnM);
+    sge::CollisionManager* CM = new sge::CollisionManager();
+    sge::EntityManager* EM = new sge::EntityManager(SpM, PM, CSM, AnM, CM);
     sge::DebugManager* DM = new sge::DebugManager();
-    sge::SceneManager* ScM = new sge::SceneManager(PM, CM, AnM, EM, DM);
+    sge::SceneManager* ScM = new sge::SceneManager(SpM, PM, CSM, AnM, CM, EM, DM);
 
     assetsManager = AsM;
     spriteManager = SpM;
     physicsManager = PM;
-    collisionManager = CM;
+    collisionShapeManager = CSM;
     animationManager = AnM;
+    collisionManager = CM;
     entityManager = EM;
     debugManager = DM;
     sceneManager = ScM;
@@ -106,7 +110,7 @@ void sge::Universe::loop(){
         
         if(!isPaused){
             physicsManager->updatePhysics(dt);
-            collisionManager->alignCollisionShapes();
+            collisionShapeManager->alignCollisionShapes();
             collisionManager->updateCollisions();
             animationManager->updateAnimations();
             sceneManager->alignScene(); // Scene can be reset only after all managers finished their updates to prevent segfaults

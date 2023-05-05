@@ -3,7 +3,7 @@
 
 #include <functional>
 #include <SFML/Graphics.hpp>
-#include "../../Logic/Collision/CollisionShape.h"
+#include "../../Logic/CollisionShape/CollisionShape.h"
 
 
 namespace sge{

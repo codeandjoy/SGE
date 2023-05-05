@@ -1,4 +1,4 @@
-#include "../Collision/CollisionShape.h"
+#include "../CollisionShape/CollisionShape.h"
 #include "CollisionShapeBorder.h"
 #include "CollisionShapeBorderSettings.h"
 

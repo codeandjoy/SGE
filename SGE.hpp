@@ -16,8 +16,9 @@ namespace sge{
     class SpriteManager;
     class PhysicsManager;
     class PhysicalObject;
-    class CollisionManager;
+    class CollisionShapeManager;
     class AnimationManager;
+    class CollisionManager;
     class EntityManager;
     class DebugManager;
     class SceneManager;
@@ -44,8 +45,9 @@ namespace sge{
             sge::AssetsManager* assetsManager = nullptr;
             sge::SpriteManager* spriteManager = nullptr;
             sge::PhysicsManager* physicsManager = nullptr;
-            sge::CollisionManager* collisionManager = nullptr;
+            sge::CollisionShapeManager* collisionShapeManager = nullptr;
             sge::AnimationManager* animationManager = nullptr;
+            sge::CollisionManager* collisionManager = nullptr;
             sge::EntityManager* entityManager = nullptr;
             sge::DebugManager* debugManager = nullptr;
             sge::SceneManager* sceneManager = nullptr;
@@ -388,36 +390,22 @@ namespace sge{
 
     class CollisionManager{
         public:
-            void registerCollisionShape(sge::CollisionShape* collisionShape);
-            void deregisterCollisionShape(sge::CollisionShape* collisionShape);
-            void registerCollisionShapes(std::vector<sge::CollisionShape*> collisionShapes);
-            void deregisterCollisionShapes(std::vector<sge::CollisionShape*> collisionShapes);
-            void deregisterAllCollisionShapes();
-            std::vector<sge::CollisionShape*> getAllCollisionShapes();
-            void alignCollisionShapes();
-
             void registerCollisionGroup(std::string name, std::vector<sge::CollisionShape*> collisionGroup);
             void deregisterCollisionGroup(std::string name);
             void registerCollisionGroups(std::unordered_map<std::string, std::vector<sge::CollisionShape*>> collisionGroups);
-            void deregisterCollisionGroups(std::unordered_map<std::string, std::vector<sge::CollisionShape*>> collisionGroups);
             void deregisterAllCollisionGroups();
             std::unordered_map<std::string, std::vector<sge::CollisionShape*>> getCollisionGroups();
+            void deregisterCollisionShapeFromCollisionGroups(CollisionShape* collisionShape);
 
             void registerCollisionPair(std::string name, sge::CollisionPair* collisionPair);
+            void deregisterCollisionPair(std::string name);
             void registerCollisionPairs(std::unordered_map<std::string, CollisionPair*> collisionPairs);
             void setCollisionPairsOrder(std::vector<std::string> order);
-            // ! remove
-            void createCollisionPair(std::string name, std::string initiatorGroup, std::string recipientGroup);
-            void setPairCollisionDetectionAlgorithm(std::string collisionPairName, std::function<bool(sge::CollisionShape*, sge::CollisionShape*)> collisionDetectionAlgorithm);
-            void setPairCollisionResponse(std::string collisionPairName, std::string collisionPhase, std::function<void(std::vector<sge::Collision>)> response);
-            // ! remove
-            void deregisterCollisionPair(std::string name);
             void deregisterAllCollisionPairs();
 
             void updateCollisions();
 
         private:
-            std::vector<sge::CollisionShape*> m_allCollisionShapes;
             std::unordered_map<std::string, std::vector<sge::CollisionShape*>> m_collisionGroups;
             std::unordered_map<std::string, sge::CollisionPair*> m_collisionPairs;
             std::vector<std::string> m_collisionPairsOrder;
@@ -497,6 +485,33 @@ namespace sge{
 
 #endif
 
+#ifndef COLLISION_SHAPE_MANAGER_H
+#define COLLISION_SHAPE_MANAGER_H
+
+#include <vector>
+
+namespace sge{
+    class CollisionShape;
+
+    class CollisionShapeManager{
+        public:
+            void registerCollisionShape(sge::CollisionShape* collisionShape);
+            void deregisterCollisionShape(sge::CollisionShape* collisionShape);
+            void registerCollisionShapes(std::vector<sge::CollisionShape*> collisionShapes);
+            void deregisterAllCollisionShapes();
+            
+
+            std::vector<sge::CollisionShape*> getCollisionShapes();
+            
+            
+            void alignCollisionShapes();
+
+        private:
+            std::vector<CollisionShape*> m_collisionShapes;
+    };
+}
+
+#endif
 #ifndef COLLISION_RESPONSES_H
 #define COLLISION_RESPONSES_H
 
@@ -570,12 +585,13 @@ namespace sge{
     class Entity;
     class SpriteManager;
     class PhysicsManager;
-    class CollisionManager;
+    class CollisionShapeManager;
     class AnimationManager;
+    class CollisionManager;
 
     class EntityManager{
         public:
-            EntityManager(sge::SpriteManager* spriteManager, sge::PhysicsManager* physicsManager, sge::CollisionManager* collisionManager, sge::AnimationManager* animationManager);
+            EntityManager(sge::SpriteManager* spriteManager, sge::PhysicsManager* physicsManager, sge::CollisionShapeManager* collisionShapeManager, sge::AnimationManager* animationManager, sge::CollisionManager* collisionManager);
 
             void registerEntity(sge::Entity* entity);
             void registerEntities(std::vector<sge::Entity*> entities);
@@ -588,9 +604,11 @@ namespace sge{
 
             sge::SpriteManager* m_spriteManagerPtr;
             sge::PhysicsManager* m_physicsManagerPtr;
-            sge::CollisionManager* m_collisionManagerPtr;
+            sge::CollisionShapeManager* m_collisionShapeManager;
             sge::AnimationManager* m_animationManagerPtr;
+            sge::CollisionManager* m_collisionManager;
 
+            void m_deregisterEntityFromCoreManagers(sge::Entity* entity);
     };
 }
 
@@ -754,9 +772,11 @@ namespace sge{
 #include <string>
 
 namespace sge{
+    class SpriteManager;
     class PhysicsManager;
-    class CollisionManager;
+    class CollisionShapeManager;
     class AnimationManager;
+    class CollisionManager;
     class EntityManager;
     class DebugManager;
     class Scene;
@@ -764,9 +784,11 @@ namespace sge{
     class SceneManager{
         public:
             SceneManager(
-                sge::PhysicsManager* physicsManger,
-                sge::CollisionManager* collisionManager,
+                sge::SpriteManager* spriteManager,
+                sge::PhysicsManager* physicsManager,
+                sge::CollisionShapeManager* collisionShapeManager,
                 sge::AnimationManager* animationManager,
+                sge::CollisionManager* collisionManager,
                 sge::EntityManager* entityManager,
                 sge::DebugManager* debugManager
             );
@@ -780,9 +802,11 @@ namespace sge{
             std::string m_currentScene = "";
             std::string m_loadedScene = "";
 
+            sge::SpriteManager* m_spriteManagerPtr;
             sge::PhysicsManager* m_physicsManagerPtr;
-            sge::CollisionManager* m_collisionManagerPtr;
+            sge::CollisionShapeManager* m_collisionShapeManagerPtr;
             sge::AnimationManager* m_animationManagerPtr;
+            sge::CollisionManager* m_collisionManagerPtr;
             sge::EntityManager* m_entityManagerPtr;
             sge::DebugManager* m_debugManagerPtr;
     };
@@ -986,17 +1010,19 @@ sge::Universe::Universe(){
     sge::AssetsManager* AsM = new sge::AssetsManager();
     sge::SpriteManager* SpM = new sge::SpriteManager();
     sge::PhysicsManager* PM = new sge::PhysicsManager();
-    sge::CollisionManager* CM = new sge::CollisionManager();
+    sge::CollisionShapeManager* CSM = new sge::CollisionShapeManager();
     sge::AnimationManager* AnM = new sge::AnimationManager();
-    sge::EntityManager* EM = new sge::EntityManager(SpM, PM, CM, AnM);
+    sge::CollisionManager* CM = new sge::CollisionManager();
+    sge::EntityManager* EM = new sge::EntityManager(SpM, PM, CSM, AnM, CM);
     sge::DebugManager* DM = new sge::DebugManager();
-    sge::SceneManager* ScM = new sge::SceneManager(PM, CM, AnM, EM, DM);
+    sge::SceneManager* ScM = new sge::SceneManager(SpM, PM, CSM, AnM, CM, EM, DM);
 
     assetsManager = AsM;
     spriteManager = SpM;
     physicsManager = PM;
-    collisionManager = CM;
+    collisionShapeManager = CSM;
     animationManager = AnM;
+    collisionManager = CM;
     entityManager = EM;
     debugManager = DM;
     sceneManager = ScM;
@@ -1066,7 +1092,7 @@ void sge::Universe::loop(){
         
         if(!isPaused){
             physicsManager->updatePhysics(dt);
-            collisionManager->alignCollisionShapes();
+            collisionShapeManager->alignCollisionShapes();
             collisionManager->updateCollisions();
             animationManager->updateAnimations();
             sceneManager->alignScene(); // Scene can be reset only after all managers finished their updates to prevent segfaults
@@ -1285,32 +1311,7 @@ std::function<void(sge::PhysicalObject*, float)> sge::updateVelocityBasedOnAccel
         }
     };
 }
-
-
-void sge::CollisionManager::registerCollisionShape(sge::CollisionShape* collisionShape){ m_allCollisionShapes.push_back(collisionShape); }
-void sge::CollisionManager::deregisterCollisionShape(sge::CollisionShape* collisionShape){
-    m_allCollisionShapes.erase(std::remove(m_allCollisionShapes.begin(), m_allCollisionShapes.end(), collisionShape), m_allCollisionShapes.end());
-
-    // Remove from collision groups, if needed
-    for(auto [_, collisionGroup] : m_collisionGroups){
-        collisionGroup.erase(std::remove(collisionGroup.begin(), collisionGroup.end(), collisionShape), collisionGroup.end());
-    }
-    //
-}
-void sge::CollisionManager::registerCollisionShapes(std::vector<sge::CollisionShape*> collisionShapes){ m_allCollisionShapes.insert(m_allCollisionShapes.end(), collisionShapes.begin(), collisionShapes.end()); }
-void sge::CollisionManager::deregisterCollisionShapes(std::vector<sge::CollisionShape*> collisionShapes){
-    // ! segfault
-    for(sge::CollisionShape* collisionShape : collisionShapes){
-        deregisterCollisionShape(collisionShape);
-    }
-}
-void sge::CollisionManager::deregisterAllCollisionShapes(){ m_allCollisionShapes.clear(); }
-std::vector<sge::CollisionShape*> sge::CollisionManager::getAllCollisionShapes(){ return m_allCollisionShapes; }
-void sge::CollisionManager::alignCollisionShapes(){
-    for(sge::CollisionShape* collisionShape : m_allCollisionShapes){
-        collisionShape->align();
-    }
-}
+#include <algorithm>
 
 void sge::CollisionManager::registerCollisionGroup(std::string name, std::vector<sge::CollisionShape*> collisionGroup){ m_collisionGroups[name] = collisionGroup; } 
 void sge::CollisionManager::deregisterCollisionGroup(std::string name){
@@ -1329,44 +1330,23 @@ void sge::CollisionManager::deregisterCollisionGroup(std::string name){
     m_collisionGroups.erase(name);
 }
 void sge::CollisionManager::registerCollisionGroups(std::unordered_map<std::string, std::vector<sge::CollisionShape*>> collisionGroups){ m_collisionGroups.insert(collisionGroups.begin(), collisionGroups.end()); }
-void sge::CollisionManager::deregisterCollisionGroups(std::unordered_map<std::string, std::vector<sge::CollisionShape*>> collisionGroups){
-    // ! segfault
-    for(auto& [name, _] : collisionGroups){
-        deregisterCollisionGroup(name);
+void sge::CollisionManager::deregisterAllCollisionGroups(){
+    m_collisionGroups.clear();
+    m_collisionPairs.clear();
+}
+std::unordered_map<std::string, std::vector<sge::CollisionShape*>> sge::CollisionManager::getCollisionGroups(){ return m_collisionGroups; }
+void sge::CollisionManager::deregisterCollisionShapeFromCollisionGroups(CollisionShape* collisionShape){
+    for(auto [_, collisionGroup] : m_collisionGroups){
+        collisionGroup.erase(std::remove(collisionGroup.begin(), collisionGroup.end(), collisionShape), collisionGroup.end());
     }
 }
-void sge::CollisionManager::deregisterAllCollisionGroups(){ m_collisionGroups.clear(); }
-std::unordered_map<std::string, std::vector<sge::CollisionShape*>> sge::CollisionManager::getCollisionGroups(){ return m_collisionGroups; }
 
 void sge::CollisionManager::registerCollisionPair(std::string name, sge::CollisionPair* collisionPair){
     m_collisionPairs[name] = collisionPair;
     m_collisionPairsOrder.push_back(name);
 };
-void sge::CollisionManager::registerCollisionPairs(std::unordered_map<std::string, CollisionPair*> collisionPairs){
-    m_collisionPairs.insert(collisionPairs.begin(), collisionPairs.end());
-}
+void sge::CollisionManager::registerCollisionPairs(std::unordered_map<std::string, CollisionPair*> collisionPairs){ m_collisionPairs.insert(collisionPairs.begin(), collisionPairs.end()); }
 void sge::CollisionManager::setCollisionPairsOrder(std::vector<std::string> order){ m_collisionPairsOrder = order; }
-void sge::CollisionManager::createCollisionPair(std::string name, std::string initiatorGroup, std::string recipientGroup){
-    if(!m_collisionGroups.count(initiatorGroup) && !m_collisionGroups.count(recipientGroup)){
-        printf("Can not create %s - %s collision m_collisionPairs[pair].", initiatorGroup.c_str(), recipientGroup.c_str());
-        exit(1);
-    }
-
-    m_collisionPairs[name] = new sge::CollisionPair{std::make_pair(initiatorGroup, recipientGroup)};
-    m_collisionPairsOrder.push_back(name);
-}
-void sge::CollisionManager::setPairCollisionDetectionAlgorithm(std::string collisionPairName, std::function<bool(sge::CollisionShape*, sge::CollisionShape*)> collisionDetectionAlgorithm){ m_collisionPairs[collisionPairName]->checkCollision = collisionDetectionAlgorithm; }
-void sge::CollisionManager::setPairCollisionResponse(std::string collisionPairName, std::string collisionPhase, std::function<void(std::vector<sge::Collision>)> response){
-    if(collisionPhase == "start_phase"){
-        m_collisionPairs[collisionPairName]->startPhaseCollisionResponse = response;
-    }
-    else if(collisionPhase == "continuous_phase"){
-        m_collisionPairs[collisionPairName]->continuousPhaseCollisionResponse = response;
-    }
-    else if(collisionPhase == "end_phase"){
-        m_collisionPairs[collisionPairName]->endPhaseCollisionResponse = response;
-    }
-}
 void sge::CollisionManager::deregisterCollisionPair(std::string name){
     m_collisionPairs.erase(name);
     m_collisionPairsOrder.erase(std::remove(m_collisionPairsOrder.begin(), m_collisionPairsOrder.end(), name), m_collisionPairsOrder.end());
@@ -1379,7 +1359,6 @@ void sge::CollisionManager::deregisterAllCollisionPairs(){
 void sge::CollisionManager::updateCollisions(){
     std::vector<sge::Collision> presentCollisions;
 
-    // TODO check in order of insertion ?
     for(std::string pair : m_collisionPairsOrder){
 
         for(sge::CollisionShape* initiator : m_collisionGroups[m_collisionPairs[pair]->collisionGroups.first]){
@@ -1403,17 +1382,6 @@ void sge::CollisionManager::updateCollisions(){
             // Determine collision phase
             std::sort(presentCollisions.begin(), presentCollisions.end());
             std::sort(pastCollisions.begin(), pastCollisions.end());
-
-            // std::vector<sge::Collision> startPhaseCollisions;
-            // std::set_difference(presentCollisions.begin(),presentCollisions.end(), pastCollisions.begin(),pastCollisions.end(), std::back_inserter(startPhaseCollisions));
-
-            // std::vector<sge::Collision> continuousPhaseCollisions;
-            // std::set_intersection(pastCollisions.begin(),pastCollisions.end(), presentCollisions.begin(),presentCollisions.end(), std::back_inserter(continuousPhaseCollisions));
-
-            // std::vector<sge::Collision> endPhaseCollisions;
-            // std::set_difference(pastCollisions.begin(),pastCollisions.end(), presentCollisions.begin(),presentCollisions.end(), std::back_inserter(endPhaseCollisions));
-
-            // Either works
 
             std::vector<sge::Collision> continuousPhaseCollisions;
             std::set_intersection(pastCollisions.begin(),pastCollisions.end(), presentCollisions.begin(),presentCollisions.end(), std::back_inserter(continuousPhaseCollisions));
@@ -1490,6 +1458,20 @@ sge::CollisionSide sge::flipInitiatorImpactSide(sge::CollisionSide initiatorImpa
 
     return sge::CollisionSide::bottom;
 }
+#include <algorithm>
+
+void sge::CollisionShapeManager::registerCollisionShape(sge::CollisionShape* collisionShape){ m_collisionShapes.push_back(collisionShape); }
+void sge::CollisionShapeManager::deregisterCollisionShape(sge::CollisionShape* collisionShape){ m_collisionShapes.erase(std::remove(m_collisionShapes.begin(), m_collisionShapes.end(), collisionShape), m_collisionShapes.end()); }
+void sge::CollisionShapeManager::registerCollisionShapes(std::vector<sge::CollisionShape*> collisionShapes){ m_collisionShapes.insert(m_collisionShapes.end(), collisionShapes.begin(), collisionShapes.end()); }
+void sge::CollisionShapeManager::deregisterAllCollisionShapes(){ m_collisionShapes.clear(); }
+
+std::vector<sge::CollisionShape*> sge::CollisionShapeManager::getCollisionShapes(){ return m_collisionShapes; }
+
+void sge::CollisionShapeManager::alignCollisionShapes(){
+    for(sge::CollisionShape* collisionShape : m_collisionShapes){
+        collisionShape->align();
+    }
+}
 
 
 void sge::resolveAABB(std::vector<sge::Collision> collisions){
@@ -1557,11 +1539,12 @@ void sge::AnimationManager::updateAnimations(){
 }
 
 
-sge::EntityManager::EntityManager(sge::SpriteManager* spriteManager, sge::PhysicsManager* physicsManager, sge::CollisionManager* collisionManager, sge::AnimationManager* animationManager){
+sge::EntityManager::EntityManager(sge::SpriteManager* spriteManager, sge::PhysicsManager* physicsManager, sge::CollisionShapeManager* collisionShapeManager, sge::AnimationManager* animationManager, sge::CollisionManager* collisionManager){
     m_spriteManagerPtr = spriteManager;
     m_physicsManagerPtr = physicsManager;
-    m_collisionManagerPtr = collisionManager;
+    m_collisionShapeManager = collisionShapeManager;
     m_animationManagerPtr = animationManager;
+    m_collisionManager = collisionManager;
 }
 
 void sge::EntityManager::registerEntity(sge::Entity* entity){
@@ -1573,7 +1556,7 @@ void sge::EntityManager::registerEntity(sge::Entity* entity){
         
     if(entity->collisionShapes.size()){
         for(auto& [_, collisionShape] : entity->collisionShapes){
-            m_collisionManagerPtr->registerCollisionShape(collisionShape);
+            m_collisionShapeManager->registerCollisionShape(collisionShape);
         }
     }
     
@@ -1591,6 +1574,22 @@ void sge::EntityManager::registerEntities(std::vector<sge::Entity*> entities){
 }
 
 void sge::EntityManager::deregisterEntity(sge::Entity* entity){
+    m_deregisterEntityFromCoreManagers(entity);
+
+    m_entities.erase(std::remove(m_entities.begin(), m_entities.end(), entity), m_entities.end());    
+}
+
+void sge::EntityManager::deregisterAllEntities(){
+    for(Entity* entity : m_entities){
+        m_deregisterEntityFromCoreManagers(entity);
+    }
+
+    m_entities.clear();
+}
+
+std::vector<sge::Entity*> sge::EntityManager::getAllEntities(){ return m_entities; }
+
+void sge::EntityManager::m_deregisterEntityFromCoreManagers(sge::Entity* entity){
     m_spriteManagerPtr->deregisterSprite(entity->sprite);
 
     if(entity->physicalObject){
@@ -1598,27 +1597,16 @@ void sge::EntityManager::deregisterEntity(sge::Entity* entity){
     }
 
     if(entity->collisionShapes.size()){
-        // map to vector
-        std::vector<CollisionShape*> collisionShapes;
         for(auto[_, collisionShape] : entity->collisionShapes){
-            collisionShapes.push_back(collisionShape);
+            m_collisionShapeManager->deregisterCollisionShape(collisionShape);
+            m_collisionManager->deregisterCollisionShapeFromCollisionGroups(collisionShape);
         }
-        //
-        m_collisionManagerPtr->deregisterCollisionShapes(collisionShapes);
     }
 
     if(entity->animation){
         m_animationManagerPtr->deregisterAnimation(entity->animation);
     }
-
-    m_entities.erase(std::remove(m_entities.begin(), m_entities.end(), entity), m_entities.end());    
 }
-
-void sge::EntityManager::deregisterAllEntities(){
-    m_entities.clear();
-}
-
-std::vector<sge::Entity*> sge::EntityManager::getAllEntities(){ return m_entities; }
 
 
 sge::Entity* sge::buildPlainEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position){
@@ -1737,16 +1725,21 @@ std::vector<std::string> sge::Scene::getCollisionPairsOrder(){ return m_collisio
 
 
 sge::SceneManager::SceneManager(
+        sge::SpriteManager* spriteManager,
         sge::PhysicsManager* physicsManager,
-        sge::CollisionManager* collisionManager,
+        sge::CollisionShapeManager* collisionShapeManager,
         sge::AnimationManager* animationManager,
+        sge::CollisionManager* collisionManager,
         sge::EntityManager* entityManager,
         sge::DebugManager* debugManager
     ){
     
+    
+    m_spriteManagerPtr = spriteManager;
     m_physicsManagerPtr = physicsManager;
-    m_collisionManagerPtr = collisionManager;
+    m_collisionShapeManagerPtr = collisionShapeManager;
     m_animationManagerPtr = animationManager;
+    m_collisionManagerPtr = collisionManager;
     m_entityManagerPtr = entityManager;
     m_debugManagerPtr = debugManager;
 }
@@ -1756,12 +1749,13 @@ void sge::SceneManager::setCurrentScene(std::string name){ m_currentScene = name
 void sge::SceneManager::alignScene(){
     if(m_currentScene.length()){
         if(m_loadedScene != m_currentScene){
+            m_entityManagerPtr->deregisterAllEntities();
+            m_spriteManagerPtr->deregisterAllSprites();
             m_physicsManagerPtr->deregisterAllPhysicalObjects();
-            m_collisionManagerPtr->deregisterAllCollisionShapes();
+            m_collisionShapeManagerPtr->deregisterAllCollisionShapes();
             m_collisionManagerPtr->deregisterAllCollisionGroups();
             m_collisionManagerPtr->deregisterAllCollisionPairs();
             m_animationManagerPtr->deregisterAllAnimations();
-            m_entityManagerPtr->deregisterAllEntities();
             m_debugManagerPtr->deregisterAllDebugEntities();
 
             m_entityManagerPtr->registerEntities(m_scenes[m_currentScene]->getEntities());

@@ -12,8 +12,9 @@ namespace sge{
     class SpriteManager;
     class PhysicsManager;
     class PhysicalObject;
-    class CollisionManager;
+    class CollisionShapeManager;
     class AnimationManager;
+    class CollisionManager;
     class EntityManager;
     class DebugManager;
     class SceneManager;
@@ -45,8 +46,9 @@ namespace sge{
             sge::AssetsManager* assetsManager = nullptr;
             sge::SpriteManager* spriteManager = nullptr;
             sge::PhysicsManager* physicsManager = nullptr;
-            sge::CollisionManager* collisionManager = nullptr;
+            sge::CollisionShapeManager* collisionShapeManager = nullptr;
             sge::AnimationManager* animationManager = nullptr;
+            sge::CollisionManager* collisionManager = nullptr;
             sge::EntityManager* entityManager = nullptr;
             sge::DebugManager* debugManager = nullptr;
             sge::SceneManager* sceneManager = nullptr;

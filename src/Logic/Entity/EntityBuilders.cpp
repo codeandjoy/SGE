@@ -3,7 +3,7 @@
 #include "./Entity.h"
 #include "../Physics/Computations.h"
 #include "../Physics/PhysicalObject.h"
-#include "../Collision/CollisionShape.h"
+#include "../CollisionShape/CollisionShape.h"
 
 
 sge::Entity* sge::buildPlainEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position){

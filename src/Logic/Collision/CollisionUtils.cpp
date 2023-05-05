@@ -1,6 +1,6 @@
 #include <limits>
 #include "CollisionUtils.h"
-#include "CollisionShape.h"
+#include "../CollisionShape/CollisionShape.h"
 #include "CollisionSide.h"
 
 

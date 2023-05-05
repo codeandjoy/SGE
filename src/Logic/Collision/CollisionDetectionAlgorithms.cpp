@@ -1,5 +1,5 @@
 #include "CollisionDetectionAlgorithms.h"
-#include "CollisionShape.h"
+#include "../CollisionShape/CollisionShape.h"
 
 
 bool sge::boundingBox(sge::CollisionShape* initiator, sge::CollisionShape* recipient){

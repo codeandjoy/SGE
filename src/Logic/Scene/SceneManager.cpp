@@ -1,23 +1,30 @@
 #include "SceneManager.h"
 #include "Scene.h"
+#include "../SpriteManager/SpriteManager.h"
 #include "../Physics/PhysicsManager.h"
-#include "../Collision/CollisionManager.h"
+#include "../CollisionShape/CollisionShapeManager.h"
 #include "../AnimationManager/AnimationManager.h"
+#include "../Collision/CollisionManager.h"
 #include "../Entity/EntityManager.h"
 #include "../Debug/DebugManager.h"
 
 
 sge::SceneManager::SceneManager(
+        sge::SpriteManager* spriteManager,
         sge::PhysicsManager* physicsManager,
-        sge::CollisionManager* collisionManager,
+        sge::CollisionShapeManager* collisionShapeManager,
         sge::AnimationManager* animationManager,
+        sge::CollisionManager* collisionManager,
         sge::EntityManager* entityManager,
         sge::DebugManager* debugManager
     ){
     
+    
+    m_spriteManagerPtr = spriteManager;
     m_physicsManagerPtr = physicsManager;
-    m_collisionManagerPtr = collisionManager;
+    m_collisionShapeManagerPtr = collisionShapeManager;
     m_animationManagerPtr = animationManager;
+    m_collisionManagerPtr = collisionManager;
     m_entityManagerPtr = entityManager;
     m_debugManagerPtr = debugManager;
 }
@@ -29,12 +36,13 @@ void sge::SceneManager::setCurrentScene(std::string name){ m_currentScene = name
 void sge::SceneManager::alignScene(){
     if(m_currentScene.length()){
         if(m_loadedScene != m_currentScene){
+            m_entityManagerPtr->deregisterAllEntities();
+            m_spriteManagerPtr->deregisterAllSprites();
             m_physicsManagerPtr->deregisterAllPhysicalObjects();
-            m_collisionManagerPtr->deregisterAllCollisionShapes();
+            m_collisionShapeManagerPtr->deregisterAllCollisionShapes();
             m_collisionManagerPtr->deregisterAllCollisionGroups();
             m_collisionManagerPtr->deregisterAllCollisionPairs();
             m_animationManagerPtr->deregisterAllAnimations();
-            m_entityManagerPtr->deregisterAllEntities();
             m_debugManagerPtr->deregisterAllDebugEntities();
 
 

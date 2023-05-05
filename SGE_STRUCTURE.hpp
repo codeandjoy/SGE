@@ -32,7 +32,8 @@
 #include "./src/Logic/Collision/CollisionSide.h"
 #include "./src/Logic/Collision/Collision.h"
 #include "./src/Logic/Collision/CollisionUtils.h"
-#include "./src/Logic/Collision/CollisionShape.h"
+#include "./src/Logic/CollisionShape/CollisionShape.h"
+#include "./src/Logic/CollisionShape/CollisionShapeManager.h"
 #include "./src/Logic/Collision/CollisionResponses.h"
 #include "./src/Logic/Collision/CollisionDetectionAlgorithms.h"
 
