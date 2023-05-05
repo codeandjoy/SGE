@@ -1,6 +1,6 @@
 #include "CollisionShape.h"
 #include "../Entity/Entity.h"
-#include "../utils/Measurements.h"
+#include "../../utils/Measurements.h"
 
 
 sge::CollisionShape::CollisionShape(sge::Entity* ownerEntity){

@@ -1,5 +1,5 @@
 #include "AnimationManager.h"
-#include "Animation.h"
+#include "../../Common/Animation/Animation.h"
 
 
 void sge::AnimationManager::registerAnimation(sge::Animation* animation){ m_animations.push_back(animation); }

@@ -1,9 +1,9 @@
 #include "UIEntityManager.h"
 #include "../UISpriteManager/UISpriteManager.h"
-#include "../ClickableShape/ClickableShapeManager.h"
+#include "../../Common/ClickableShape/ClickableShapeManager.h"
 #include "../SpriteText/SpriteTextManager.h"
 #include "../UIAnimationManager/UIAnimationManager.h"
-#include "../UIEntity/UIEntity.h"
+#include "UIEntity.h"
 
 
 sge::UIEntityManager::UIEntityManager(sge::UISpriteManager* uiSpriteManager, sge::ClickableShapeManager* clickableShapeManager, sge::SpriteTextManager* spriteTextManager, sge::UIAnimationManager* uiAnimationManager){

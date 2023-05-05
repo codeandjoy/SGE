@@ -3,7 +3,7 @@
 #include "../SpriteManager/SpriteManager.h"
 #include "../Physics/PhysicsManager.h"
 #include "../Collision/CollisionManager.h"
-#include "../Animation/AnimationManager.h"
+#include "../AnimationManager/AnimationManager.h"
 
 
 sge::EntityManager::EntityManager(sge::SpriteManager* spriteManager, sge::PhysicsManager* physicsManager, sge::CollisionManager* collisionManager, sge::AnimationManager* animationManager){

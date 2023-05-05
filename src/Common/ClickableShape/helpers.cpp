@@ -1,7 +1,7 @@
 #include "helpers.h"
 
 #include "ClickableShape.h"
-#include "../UIEntity/UIEntity.h"
+#include "../../UI/UIEntity/UIEntity.h"
 
 
 bool sge::isMouseOverClickableShape(ClickableShape* clickableShape, sf::RenderWindow* window){

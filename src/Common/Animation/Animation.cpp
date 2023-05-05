@@ -1,5 +1,5 @@
 #include "Animation.h"
-#include "../Texture/TextureSheet.h"
+#include "../../Assets/Texture/TextureSheet.h"
 
 
 sge::Animation::Animation(sge::TextureSheet* textureSheet, sf::Sprite* ownerSprite, int initialTextureN){

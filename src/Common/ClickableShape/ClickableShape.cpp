@@ -1,5 +1,5 @@
 #include "ClickableShape.h"
-#include "../UIEntity/UIEntity.h"
+#include "../../UI/UIEntity/UIEntity.h"
 
 
 sge::ClickableShape::ClickableShape(sge::UIEntity* ownerUIEntity){ m_ownerUIEntityPtr = ownerUIEntity; }
