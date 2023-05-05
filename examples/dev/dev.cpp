@@ -158,31 +158,40 @@ int main(){
     // ? to remove the need of creating extra collision groups like "tiles+box"
 
     // To work properly, all AABB shapes should be checked together
-    universe->collisionManager->createCollisionPair("playerAABB", "player", "tiles+box");
-    universe->collisionManager->setPairCollisionDetectionAlgorithm("playerAABB", sge::boundingBox);
-    universe->collisionManager->setPairCollisionResponse("playerAABB", "start_phase", [](std::vector<sge::Collision> collisions){
+    sge::CollisionPair* playerAABB = new sge::CollisionPair();
+    playerAABB->collisionGroups = std::make_pair("player", "tiles+box");
+    playerAABB->checkCollision = sge::boundingBox;
+    playerAABB->startPhaseCollisionResponse = [](std::vector<sge::Collision> collisions){
         printf("start_phase\n");
-    });
-    universe->collisionManager->setPairCollisionResponse("playerAABB", "continuous_phase", [](std::vector<sge::Collision> collisions){
+    };
+    playerAABB->continuousPhaseCollisionResponse = [](std::vector<sge::Collision> collisions){
         // printf("continuous_phase\n");
         sge::resolveAABB(collisions);
         sge::initiatorStandOnTopOfRecipient(collisions);
-    });
-    universe->collisionManager->setPairCollisionResponse("playerAABB", "end_phase", [](std::vector<sge::Collision> collisions){
+    };
+    playerAABB->endPhaseCollisionResponse = [](std::vector<sge::Collision> collisions){
         printf("end_phase\n");
-    });
+    };
+
+    universe->collisionManager->registerCollisionPair("playerAABB", playerAABB);
+
 
     // To work properly, all AABB shapes should be checked together
-    universe->collisionManager->createCollisionPair("boxAABB", "box", "tiles");
-    universe->collisionManager->setPairCollisionDetectionAlgorithm("boxAABB", sge::boundingBox);
-    universe->collisionManager->setPairCollisionResponse("boxAABB", "continuous_phase", [](std::vector<sge::Collision> collisions){
+    sge::CollisionPair* boxAABB = new sge::CollisionPair();
+    boxAABB->collisionGroups = std::make_pair("box", "tiles");
+    boxAABB->checkCollision = sge::boundingBox;
+    boxAABB->continuousPhaseCollisionResponse = [](std::vector<sge::Collision> collisions){
         sge::resolveAABB(collisions);
         sge::initiatorStandOnTopOfRecipient(collisions);
-    });
+    };
 
-    universe->collisionManager->createCollisionPair("PB", "player", "box");
-    universe->collisionManager->setPairCollisionDetectionAlgorithm("PB", sge::boundingBox);
-    universe->collisionManager->setPairCollisionResponse("PB", "start_phase", [boxDE](std::vector<sge::Collision> collisions){
+    universe->collisionManager->registerCollisionPair("boxAABB", boxAABB);
+    
+
+    sge::CollisionPair* player_box = new sge::CollisionPair();
+    player_box->collisionGroups = std::make_pair("player", "box");
+    player_box->checkCollision = sge::boundingBox;
+    player_box->startPhaseCollisionResponse = [boxDE](std::vector<sge::Collision> collisions){
         boxDE->customCollisionShapeBorderSettings["globalBounds"] = sge::CollisionShapeBorderSettings{sf::Color::Red};
 
         // Refactor as pushRecipient(float velocity);
@@ -194,15 +203,17 @@ int main(){
                 collision.recipient->getOwnerEntity()->physicalObject->velocity.x = 10;
             }
         }
-    });
-    universe->collisionManager->setPairCollisionResponse("PB", "end_phase", [boxDE](std::vector<sge::Collision> collisions){
+    };
+    player_box->endPhaseCollisionResponse = [boxDE](std::vector<sge::Collision> collisions){
         boxDE->customCollisionShapeBorderSettings["globalBounds"] = sge::CollisionShapeBorderSettings{sf::Color::Green};
         
         for(sge::Collision collision : collisions){
             // TODO remove (minus) push force in the future
             collision.recipient->getOwnerEntity()->physicalObject->velocity.x = 0;
         }
-    });
+    };
+
+    universe->collisionManager->registerCollisionPair("player_box", player_box);
     //
 
 
