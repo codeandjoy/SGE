@@ -11,12 +11,12 @@ namespace constants{
 int main(){
     sge::Universe* universe = new sge::Universe();
 
-    universe->textureManager->loadTexture(
+    universe->assetsManager->loadTextureSheet(
         std::filesystem::current_path().string() + "/examples/collision_phase/assets/pico_8_tiles.png",
         "picoTiles",
         sge::TextureSheetSizes{8, 8, 12, 12}
     );
-    universe->textureManager->loadTexture(
+    universe->assetsManager->loadTextureSheet(
         std::filesystem::current_path().string() + "/examples/collision_phase/assets/pico_8_knight_sprite.png",
         "knight",
         sge::TextureSheetSizes{8, 8, 12, 12}
@@ -35,8 +35,8 @@ int main(){
         for(int j = 0; j < map.getTileCount().x; j++){
             if(surface[map.getTileCount().x*i+j].ID != 0){
                 surfaceEntities.push_back(sge::buildStaticEntity(
-                    universe->textureManager->getTexture("picoTiles")->getTextureSheet(),
-                    universe->textureManager->getTexture("picoTiles")->getTextureRect(surface[map.getTileCount().x*i+j].ID-1),
+                    universe->assetsManager->getTextureSheet("picoTiles")->getTexture(),
+                    universe->assetsManager->getTextureSheet("picoTiles")->getTextureRect(surface[map.getTileCount().x*i+j].ID-1),
                     sf::Vector2f(j*map.getTileSize().x, i*map.getTileSize().y)
                 ));
             }
@@ -56,14 +56,14 @@ int main(){
 
 
     sge::Entity* playerEntity = sge::buildMobileEntity(
-        universe->textureManager->getTexture("knight")->getTextureSheet(),
-        universe->textureManager->getTexture("knight")->getTextureRect(9),
+        universe->assetsManager->getTextureSheet("knight")->getTexture(),
+        universe->assetsManager->getTextureSheet("knight")->getTextureRect(9),
         sf::Vector2f(100,50)
     );
 
     playerEntity->physicalObject->acceleration.y = constants::GRAVITY;
 
-    sge::Animation* playerAnimation = new sge::Animation(universe->textureManager->getTexture("knight"), playerEntity->physicalObject, 9);
+    sge::Animation* playerAnimation = new sge::Animation(universe->assetsManager->getTextureSheet("knight"), playerEntity->sprite, 9);
     playerAnimation->addTextureSequence("idle", std::vector<int>{9});
     playerAnimation->addTextureSequence("runRight", std::vector<int>{33, 34, 35});
     playerAnimation->addTextureSequence("runLeft", std::vector<int>{45, 46, 47});
@@ -89,9 +89,10 @@ int main(){
     universe->collisionManager->registerCollisionGroup("player", playerCollisionGroup);
     universe->collisionManager->registerCollisionGroup("surface", surfaceCollisionGroup);
 
-    universe->collisionManager->createCollisionPair("player_AABB", "player", "surface");
-    universe->collisionManager->setPairCollisionDetectionAlgorithm("player_AABB", sge::boundingBox);
-    universe->collisionManager->setPairCollisionResponse("player_AABB", "start_phase", [surfaceDebugEntities](std::vector<sge::Collision> collisions){
+    sge::CollisionPair* player_surface = new sge::CollisionPair();
+    player_surface->collisionGroups = std::make_pair("player", "surface");
+    player_surface->checkCollision = sge::boundingBox;
+    player_surface->startPhaseCollisionResponse = [surfaceDebugEntities](std::vector<sge::Collision> collisions){
         for(sge::Collision collision : collisions){
             for(sge::DebugEntity* surfaceDebugEntitity : surfaceDebugEntities){
                 if(surfaceDebugEntitity->getRelatedEntity() == collision.recipient->getOwnerEntity()){
@@ -99,12 +100,12 @@ int main(){
                 }
             }
         }
-    });
-    universe->collisionManager->setPairCollisionResponse("player_AABB", "continuous_phase", [](std::vector<sge::Collision> collisions){
+    };
+    player_surface->continuousPhaseCollisionResponse = [](std::vector<sge::Collision> collisions){
         sge::resolveAABB(collisions);
         sge::initiatorStandOnTopOfRecipient(collisions);
-    });
-    universe->collisionManager->setPairCollisionResponse("player_AABB", "end_phase", [surfaceDebugEntities](std::vector<sge::Collision> collisions){
+    };
+    player_surface->endPhaseCollisionResponse = [surfaceDebugEntities](std::vector<sge::Collision> collisions){
         for(sge::Collision collision : collisions){
             for(sge::DebugEntity* surfaceDebugEntitity : surfaceDebugEntities){
                 if(surfaceDebugEntitity->getRelatedEntity() == collision.recipient->getOwnerEntity()){
@@ -112,9 +113,9 @@ int main(){
                 }
             }
         }
-    });
+    };
 
-
+    universe->collisionManager->registerCollisionPair("player_surface", player_surface);
 
     universe->addController([playerEntity, playerAnimation](){
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::A)){
