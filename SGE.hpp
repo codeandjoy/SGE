@@ -753,8 +753,22 @@ namespace sge{
 #include <SFML/Graphics.hpp>
 
 namespace sge{
-    struct ClickableShape : public CollisionShape{
-        std::function<void(sf::Event event)> clickHandler;
+    class UIEntity;
+
+    class ClickableShape : public sf::RectangleShape{
+        public:
+            ClickableShape(sge::UIEntity* ownerUIEntity);
+
+            std::function<void(sge::ClickableShape* thisClickableShape, sf::Event event)> action;
+            
+            sf::Vector2f offset = sf::Vector2f(0, 0);
+
+            
+            sge::UIEntity* getOwnerUIEntity();
+            void align();
+
+        private:
+            sge::UIEntity* m_ownerUIEntityPtr;
     };
 }
 
@@ -782,6 +796,18 @@ namespace sge{
             std::vector<sge::ClickableShape*> m_activeClickableShapes;
             std::vector<sge::ClickableShape*> m_inactiveClickableShapes;
     };
+}
+
+#endif
+#ifndef CLICKABLE_SHAPE_HELPERS_H
+#define CLICKABLE_SHAPE_HELPERS_H
+
+#include <SFML/Graphics.hpp>
+
+namespace sge{
+    class ClickableShape;
+
+    bool isMouseOverClickableShape(ClickableShape* clickableShape, sf::RenderWindow* window);
 }
 
 #endif
@@ -1009,9 +1035,7 @@ void sge::Universe::loop(){
 
             // UI events
             for(ClickableShape* clickableShape : clickableShapeManager->getAllActiveClickableShapes()){
-                if(clickableShape->clickHandler){
-                    clickableShape->clickHandler(event);
-                }
+                clickableShape->action(clickableShape, event);
             }
             //
         }
@@ -1038,6 +1062,8 @@ void sge::Universe::loop(){
             sceneManager->alignScene(); // Scene can be reset only after all managers finished their updates to prevent segfaults
         }
 
+        clickableShapeManager->alignClickableShapes();
+        spriteTextManager->alignSpriteTextObjects();
         uiAnimationManager->updateActiveAnimations();
         //
 
@@ -1704,6 +1730,12 @@ void sge::SceneManager::alignScene(){
         }
     }
 }
+
+
+sge::ClickableShape::ClickableShape(sge::UIEntity* ownerUIEntity){ m_ownerUIEntityPtr = ownerUIEntity; }
+
+sge::UIEntity* sge::ClickableShape::getOwnerUIEntity(){ return m_ownerUIEntityPtr; }
+void sge::ClickableShape::align(){ this->setPosition(m_ownerUIEntityPtr->sprite->getPosition() + offset); }
 #include <algorithm>
 
 void sge::ClickableShapeManager::registerClickableShape(sge::ClickableShape* clickableShape){ m_activeClickableShapes.push_back(clickableShape); }
@@ -1729,9 +1761,16 @@ void sge::ClickableShapeManager::alignClickableShapes(){
 }
 
 
+bool sge::isMouseOverClickableShape(ClickableShape* clickableShape, sf::RenderWindow* window){
+    return clickableShape->getOwnerUIEntity()->sprite->getGlobalBounds().contains(window->mapPixelToCoords(sf::Mouse::getPosition(*window)));
+}
+
+
 sge::SpriteText::SpriteText(sf::Sprite* ownerSprite){ m_ownerSpritePtr = ownerSprite; }
 void sge::SpriteText::align(){
-    this->setPosition(m_ownerSpritePtr->getPosition() + offset);
+    sf::Vector2f pos = m_ownerSpritePtr->getPosition() + offset; 
+    
+    this->setPosition((int)pos.x, (int)pos.y);
 }
 #include <algorithm>
 

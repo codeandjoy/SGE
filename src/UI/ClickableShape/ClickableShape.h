@@ -7,8 +7,22 @@
 
 
 namespace sge{
-    struct ClickableShape : public CollisionShape{
-        std::function<void(sf::Event event)> clickHandler;
+    class UIEntity;
+
+    class ClickableShape : public sf::RectangleShape{
+        public:
+            ClickableShape(sge::UIEntity* ownerUIEntity);
+
+            std::function<void(sge::ClickableShape* thisClickableShape, sf::Event event)> action;
+            
+            sf::Vector2f offset = sf::Vector2f(0, 0);
+
+            
+            sge::UIEntity* getOwnerUIEntity();
+            void align();
+
+        private:
+            sge::UIEntity* m_ownerUIEntityPtr;
     };
 }
 

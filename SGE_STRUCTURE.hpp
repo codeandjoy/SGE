@@ -46,6 +46,7 @@
 // UI
 #include "./src/UI/ClickableShape/ClickableShape.h"
 #include "./src/UI/ClickableShape/ClickableShapeManager.h"
+#include "./src/UI/ClickableShape/helpers.h"
 
 #include "./src/UI/SpriteText/SpriteText.h"
 #include "./src/UI/SpriteText/SpriteTextManager.h"

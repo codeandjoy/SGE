@@ -85,9 +85,7 @@ void sge::Universe::loop(){
 
             // UI events
             for(ClickableShape* clickableShape : clickableShapeManager->getAllActiveClickableShapes()){
-                if(clickableShape->clickHandler){
-                    clickableShape->clickHandler(event);
-                }
+                clickableShape->action(clickableShape, event);
             }
             //
         }
@@ -114,6 +112,8 @@ void sge::Universe::loop(){
             sceneManager->alignScene(); // Scene can be reset only after all managers finished their updates to prevent segfaults
         }
 
+        clickableShapeManager->alignClickableShapes();
+        spriteTextManager->alignSpriteTextObjects();
         uiAnimationManager->updateActiveAnimations();
         //
 
