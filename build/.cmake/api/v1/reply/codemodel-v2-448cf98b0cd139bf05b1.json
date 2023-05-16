@@ -1,0 +1,176 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1,
+						2,
+						3,
+						4,
+						5
+					],
+					"jsonFile" : "directory-.-Debug-f5ebdc15457944623624.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.22"
+					},
+					"projectIndex" : 0,
+					"source" : "."
+				},
+				{
+					"build" : "examples/dev",
+					"jsonFile" : "directory-examples.dev-Debug-1bc63d39dbe5a1ac8003.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.22"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "examples/dev",
+					"targetIndexes" : 
+					[
+						1
+					]
+				},
+				{
+					"build" : "examples/collision_phase",
+					"jsonFile" : "directory-examples.collision_phase-Debug-61181449a83cd97ed5a6.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.22"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "examples/collision_phase",
+					"targetIndexes" : 
+					[
+						0
+					]
+				},
+				{
+					"build" : "examples/scenes",
+					"jsonFile" : "directory-examples.scenes-Debug-c3d8950c4fc9b805d18b.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.22"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "examples/scenes",
+					"targetIndexes" : 
+					[
+						3
+					]
+				},
+				{
+					"build" : "examples/ui",
+					"jsonFile" : "directory-examples.ui-Debug-544289f3061616b81f1d.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.22"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "examples/ui",
+					"targetIndexes" : 
+					[
+						4
+					]
+				},
+				{
+					"build" : "examples/pong",
+					"jsonFile" : "directory-examples.pong-Debug-a983d50831a11d86df61.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.22"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "examples/pong",
+					"targetIndexes" : 
+					[
+						2
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5
+					],
+					"name" : "SGE",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 2,
+					"id" : "collision_phase.out::@9ec7fca46fbb12905ded",
+					"jsonFile" : "target-collision_phase.out-Debug-0657331c4c42c45db544.json",
+					"name" : "collision_phase.out",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "dev.out::@1d9fd940fd7bdbb6b17d",
+					"jsonFile" : "target-dev.out-Debug-613f353740bb3493f1d3.json",
+					"name" : "dev.out",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 5,
+					"id" : "pong.out::@0fd55196ccca7bcc3e8d",
+					"jsonFile" : "target-pong.out-Debug-5709dc0102172dfb854f.json",
+					"name" : "pong.out",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 3,
+					"id" : "scenes.out::@ee7620dac1312d096563",
+					"jsonFile" : "target-scenes.out-Debug-145fdc50b10019c57f7a.json",
+					"name" : "scenes.out",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 4,
+					"id" : "ui.out::@483987ac552f1f5b8414",
+					"jsonFile" : "target-ui.out-Debug-afe34b7c2cd70a740e52.json",
+					"name" : "ui.out",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/home/owner/Projects/SGE/build",
+		"source" : "/home/owner/Projects/SGE"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 3
+	}
+}

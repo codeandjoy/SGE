@@ -624,6 +624,9 @@ namespace sge{
     // Builds sge::Entity that consists only of sf::Sprite*
     Entity* buildPlainEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position);
 
+    // Builds sge::Entity that consists of sf::Sprite* with empty textture and "globalBounds" -> sge::CollisionShape*
+    Entity* buildVoidEntity(sf::Vector2f size, sf::Vector2f position);
+
     // Builds sge::Entity that consists of sf::Sprite* and "globalBounds" -> sge::CollisionShape*
     Entity* buildStaticEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position);
 
@@ -1476,32 +1479,34 @@ void sge::CollisionShapeManager::alignCollisionShapes(){
 
 void sge::resolveAABB(std::vector<sge::Collision> collisions){
     for(sge::Collision collision : collisions){
+        sge::CollisionShape* initiatorCollisionShape = collision.initiator;
+        sge::CollisionShape* recipientCollisionShape = collision.recipient;
         sf::Sprite *initiatorSprite = collision.initiator->getOwnerEntity()->sprite;
         sf::Sprite *recipientSprite = collision.recipient->getOwnerEntity()->sprite;
         
         // Align initiator based on impact side
         if(collision.initiatorImpactSide == sge::CollisionSide::left){
             initiatorSprite->setPosition(
-                recipientSprite->getPosition().x + recipientSprite->getGlobalBounds().width - collision.initiator->offset.x,
-                initiatorSprite->getPosition().y
+                recipientCollisionShape->getPosition().x + recipientCollisionShape->getGlobalBounds().width - initiatorCollisionShape->offset.x,
+                initiatorCollisionShape->getPosition().y
             );
         }
         else if(collision.initiatorImpactSide == sge::CollisionSide::right){
             initiatorSprite->setPosition(
-                recipientSprite->getPosition().x - collision.initiator->getGlobalBounds().width - collision.initiator->offset.x,
-                initiatorSprite->getPosition().y
+                recipientCollisionShape->getPosition().x - initiatorCollisionShape->getGlobalBounds().width - initiatorCollisionShape->offset.x,
+                initiatorCollisionShape->getPosition().y
             );
         }
         else if(collision.initiatorImpactSide == sge::CollisionSide::top){
             initiatorSprite->setPosition(
-                initiatorSprite->getPosition().x,
-                recipientSprite->getPosition().y + recipientSprite->getGlobalBounds().height - collision.initiator->offset.y
+                initiatorCollisionShape->getPosition().x,
+                recipientCollisionShape->getPosition().y + recipientCollisionShape->getGlobalBounds().height - initiatorCollisionShape->offset.y
             );
         }
         else if(collision.initiatorImpactSide == sge::CollisionSide::bottom){
             initiatorSprite->setPosition(
-                initiatorSprite->getPosition().x,
-                recipientSprite->getPosition().y - collision.initiator->getGlobalBounds().height - collision.initiator->offset.y
+                initiatorCollisionShape->getPosition().x,
+                recipientCollisionShape->getPosition().y - initiatorCollisionShape->getGlobalBounds().height - initiatorCollisionShape->offset.y
             );
         }
         //
@@ -1614,6 +1619,16 @@ sge::Entity* sge::buildPlainEntity(sf::Texture* texture, sf::IntRect textureRect
     e->sprite->setTexture(*texture);
     e->sprite->setTextureRect(textureRect);
     e->sprite->setPosition(position);
+
+    return e;
+}
+
+sge::Entity* sge::buildVoidEntity(sf::Vector2f size, sf::Vector2f position){
+    sge::Entity* e = new sge::Entity{ new sf::Sprite() };
+    e->sprite->setPosition(position);
+
+    e->collisionShapes["globalBounds"] = new sge::CollisionShape(e);
+    e->collisionShapes["globalBounds"]->setSize(size);
 
     return e;
 }

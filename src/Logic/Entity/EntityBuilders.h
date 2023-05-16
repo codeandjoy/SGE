@@ -10,6 +10,9 @@ namespace sge{
     // Builds sge::Entity that consists only of sf::Sprite*
     Entity* buildPlainEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position);
 
+    // Builds sge::Entity that consists of sf::Sprite* with empty textture and "globalBounds" -> sge::CollisionShape*
+    Entity* buildVoidEntity(sf::Vector2f size, sf::Vector2f position);
+
     // Builds sge::Entity that consists of sf::Sprite* and "globalBounds" -> sge::CollisionShape*
     Entity* buildStaticEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position);
 
