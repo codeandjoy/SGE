@@ -60,7 +60,7 @@ void sge::CollisionManager::updateCollisions(){
         for(sge::CollisionShape* initiator : m_collisionGroups[m_collisionPairs[pair]->collisionGroups.first]){
             // Register all present collisions
             for(sge::CollisionShape* recipient : m_collisionGroups[m_collisionPairs[pair]->collisionGroups.second]){
-                if(m_collisionPairs[pair]->checkCollision(initiator, recipient)){
+                if(m_collisionPairs[pair]->algorithm(initiator, recipient)){
                     CollisionSide initiatorImpactSide = determineInitiatorImpactSide(initiator, recipient);
 
                     presentCollisions.push_back(sge::Collision{

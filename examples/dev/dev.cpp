@@ -160,7 +160,7 @@ int main(){
     // To work properly, all AABB shapes should be checked together
     sge::CollisionPair* playerAABB = new sge::CollisionPair();
     playerAABB->collisionGroups = std::make_pair("player", "tiles+box");
-    playerAABB->checkCollision = sge::boundingBox;
+    playerAABB->algorithm = sge::boundingBox;
     playerAABB->startPhaseCollisionResponse = [](std::vector<sge::Collision> collisions){
         printf("start_phase\n");
     };
@@ -179,7 +179,7 @@ int main(){
     // To work properly, all AABB shapes should be checked together
     sge::CollisionPair* boxAABB = new sge::CollisionPair();
     boxAABB->collisionGroups = std::make_pair("box", "tiles");
-    boxAABB->checkCollision = sge::boundingBox;
+    boxAABB->algorithm = sge::boundingBox;
     boxAABB->continuousPhaseCollisionResponse = [](std::vector<sge::Collision> collisions){
         sge::resolveAABB(collisions);
         sge::initiatorStandOnTopOfRecipient(collisions);
@@ -190,7 +190,7 @@ int main(){
 
     sge::CollisionPair* player_box = new sge::CollisionPair();
     player_box->collisionGroups = std::make_pair("player", "box");
-    player_box->checkCollision = sge::boundingBox;
+    player_box->algorithm = sge::boundingBox;
     player_box->startPhaseCollisionResponse = [boxDE](std::vector<sge::Collision> collisions){
         boxDE->customCollisionShapeBorderSettings["globalBounds"] = sge::CollisionShapeBorderSettings{sf::Color::Red};
 

@@ -21,7 +21,7 @@ namespace sge{
 
         std::unordered_map<sge::CollisionShape*, std::vector<sge::Collision>> pastCollisions;
         
-        std::function<bool(sge::CollisionShape *initiator, sge::CollisionShape *recipient)> checkCollision;
+        std::function<bool(sge::CollisionShape *initiator, sge::CollisionShape *recipient)> algorithm;
     };
 }
 

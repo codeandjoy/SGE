@@ -91,7 +91,7 @@ int main(){
 
     sge::CollisionPair* player_surface = new sge::CollisionPair();
     player_surface->collisionGroups = std::make_pair("player", "surface");
-    player_surface->checkCollision = sge::boundingBox;
+    player_surface->algorithm = sge::boundingBox;
     player_surface->startPhaseCollisionResponse = [surfaceDebugEntities](std::vector<sge::Collision> collisions){
         for(sge::Collision collision : collisions){
             for(sge::DebugEntity* surfaceDebugEntitity : surfaceDebugEntities){

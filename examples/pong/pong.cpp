@@ -158,11 +158,11 @@ int main(){
 
     sge::CollisionPair* racket_racket_borders = new sge::CollisionPair();
     racket_racket_borders->collisionGroups = std::make_pair("racket", "racket_borders");
-    racket_racket_borders->checkCollision = sge::boundingBox;
+    racket_racket_borders->algorithm = sge::boundingBox;
     racket_racket_borders->continuousPhaseCollisionResponse = sge::resolveAABB;
     sge::CollisionPair* ball_bouncy = new sge::CollisionPair();
     ball_bouncy->collisionGroups = std::make_pair("ball", "bouncy"); // TODO move to CollisionPari constructor
-    ball_bouncy->checkCollision = sge::boundingBox;
+    ball_bouncy->algorithm = sge::boundingBox;
     ball_bouncy->startPhaseCollisionResponse = [ballEntity](std::vector<sge::Collision> collisions){
         for(sge::Collision collision : collisions){
             if(
@@ -181,7 +181,7 @@ int main(){
     };
     sge::CollisionPair* ball_goal = new sge::CollisionPair();
     ball_goal->collisionGroups = std::make_pair("ball", "goal");
-    ball_goal->checkCollision = sge::boundingBox;
+    ball_goal->algorithm = sge::boundingBox;
     ball_goal->startPhaseCollisionResponse = [&p1_score, &p2_score, ballEntity, p1ScoreUIEntity, p2ScoreUIEntity](std::vector<sge::Collision> collisions){
         for(sge::Collision collision : collisions){
             if(ballEntity->physicalObject->velocity.y < 0){
