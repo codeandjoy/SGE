@@ -13,7 +13,8 @@ namespace sge{
     class CollisionShape;
 
     struct CollisionPair{
-        std::pair<std::string, std::string> collisionGroups;
+        std::string initiatorGroupName;
+        std::string recipientGroupName;
         
         std::function<void(std::vector<sge::Collision>)> startPhaseCollisionResponse;
         std::function<void(std::vector<sge::Collision>)> continuousPhaseCollisionResponse;

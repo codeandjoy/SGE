@@ -11,7 +11,7 @@ void sge::CollisionManager::deregisterCollisionGroup(std::string name){
     // Remove related collision pairs
     std::vector<std::string> pairsToRemove;
     for(auto& [pairName, collisionPair] : m_collisionPairs){
-        if(collisionPair->collisionGroups.first == name || collisionPair->collisionGroups.second == name){
+        if(collisionPair->initiatorGroupName == name || collisionPair->recipientGroupName == name){
             pairsToRemove.push_back(pairName);
         }
     }
@@ -57,9 +57,9 @@ void sge::CollisionManager::updateCollisions(){
 
     for(std::string pair : m_collisionPairsOrder){
 
-        for(sge::CollisionShape* initiator : m_collisionGroups[m_collisionPairs[pair]->collisionGroups.first]){
+        for(sge::CollisionShape* initiator : m_collisionGroups[m_collisionPairs[pair]->initiatorGroupName]){
             // Register all present collisions
-            for(sge::CollisionShape* recipient : m_collisionGroups[m_collisionPairs[pair]->collisionGroups.second]){
+            for(sge::CollisionShape* recipient : m_collisionGroups[m_collisionPairs[pair]->recipientGroupName]){
                 if(m_collisionPairs[pair]->algorithm(initiator, recipient)){
                     CollisionSide initiatorImpactSide = determineInitiatorImpactSide(initiator, recipient);
 
