@@ -68,23 +68,14 @@ void sge::Universe::loop(){
         exit(1);
     }
 
-    // Clocks initialization
-    // ! Remove in the future (init on animation creation?)
-    animationManager->initAnimationClocks();
-    // !
-
     m_deltaClock.restart();
-    //
 
     while(m_windowPtr->isOpen()){
-        // Calculate dt
         sf::Time deltaTime = m_deltaClock.restart();
         float dt = deltaTime.asSeconds();
         if(dt > 0.15f) dt = 0.15f;
-        //
 
 
-        // Events
         sf::Event event;
         while(m_windowPtr->pollEvent(event)){
             if (event.type == sf::Event::Closed) m_windowPtr->close();
@@ -99,10 +90,8 @@ void sge::Universe::loop(){
             }
             //
         }
-        //
 
 
-        // Game updates
         if(!isPaused){
             physicsManager->updatePhysics(dt);
             collisionShapeManager->alignCollisionShapes();
@@ -110,28 +99,23 @@ void sge::Universe::loop(){
             animationManager->updateAnimations();
             sceneManager->alignScene(); // Scene can be reset only after all managers finished their updates to prevent segfaults
         }
-
         clickableShapeManager->alignClickableShapes();
         spriteTextManager->alignSpriteTextObjects();
         uiAnimationManager->updateActiveAnimations();
-        //
 
         
-        // Game draws
         m_windowPtr->clear();
         
         for(sf::Sprite* sprite : spriteManager->getSprites()){
             m_windowPtr->draw(*sprite);
         }
         debugManager->showDebugInfo(m_windowPtr);
-
         for(sf::Sprite* sprite : uiSpriteManager->getAllVisibleSprites()){
             m_windowPtr->draw(*sprite);
         }
         for(sge::SpriteText* spriteText : spriteTextManager->getAllVisibleSpriteTextObjects()){
             m_windowPtr->draw(*spriteText);
         }
-        //
 
         m_windowPtr->display();
     }

@@ -17,7 +17,7 @@ namespace sge{
             void activateAnimation(sge::Animation* animation);
             void deactivateAnimation(sge::Animation* animation);
 
-            void initAnimationClocks();
+
             void updateActiveAnimations();
 
         private:

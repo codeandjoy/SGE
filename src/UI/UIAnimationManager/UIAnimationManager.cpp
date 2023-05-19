@@ -21,14 +21,10 @@ void sge::UIAnimationManager::deactivateAnimation(sge::Animation* animation){
     m_inactiveAnimations.push_back(animation);
 }
 
-void sge::UIAnimationManager::initAnimationClocks(){
-    for(sge::Animation* animation : m_activeAnimations){
-        animation->restartClock();
-    }
-}
+
 
 void sge::UIAnimationManager::updateActiveAnimations(){
     for(sge::Animation* animation : m_activeAnimations){
-        animation->run();
+        animation->runForward();
     }
 }

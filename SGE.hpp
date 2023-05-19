@@ -175,17 +175,15 @@ namespace sge{
         public:
             Animation(sge::TextureSheet* textureSheet, sf::Sprite* ownerSprite, int initialTextureN);
         
+            int animationDelayMilliseconds = 100;
             
             void addTextureSequence(std::string name, std::vector<int> textureSequence);
             void setCurrentTextureSequence(std::string name);
         
-
-            // ?
-            // runForward -> 1,2,3,1,2,3
-            // runCycle -> 1,2,3,2,1,2
-            // ?
-            void run();
-            void restartClock();
+            void runForward();
+            // TODO
+            // animationType : forward or cycle, run function in manager based on animation type
+            // runCycle()  1 2 3 2 1
 
         private:
             sf::Sprite* m_ownerSpritePtr;
@@ -572,7 +570,6 @@ namespace sge{
             void deregisterAnimation(sge::Animation* animation);
             void deregisterAllAnimations();
 
-            void initAnimationClocks();
             void updateAnimations();
 
         private:
@@ -983,7 +980,6 @@ namespace sge{
             void activateAnimation(sge::Animation* animation);
             void deactivateAnimation(sge::Animation* animation);
 
-            void initAnimationClocks();
             void updateActiveAnimations();
 
         private:
@@ -1075,22 +1071,13 @@ void sge::Universe::loop(){
         exit(1);
     }
 
-    // Clocks initialization
-    // ! Remove in the future (init on animation creation?)
-    animationManager->initAnimationClocks();
-    // !
-
     m_deltaClock.restart();
-    //
 
     while(m_windowPtr->isOpen()){
-        // Calculate dt
         sf::Time deltaTime = m_deltaClock.restart();
         float dt = deltaTime.asSeconds();
         if(dt > 0.15f) dt = 0.15f;
-        //
 
-        // Events
         sf::Event event;
         while(m_windowPtr->pollEvent(event)){
             if (event.type == sf::Event::Closed) m_windowPtr->close();
@@ -1105,9 +1092,7 @@ void sge::Universe::loop(){
             }
             //
         }
-        //
 
-        // Game updates
         if(!isPaused){
             physicsManager->updatePhysics(dt);
             collisionShapeManager->alignCollisionShapes();
@@ -1115,28 +1100,23 @@ void sge::Universe::loop(){
             animationManager->updateAnimations();
             sceneManager->alignScene(); // Scene can be reset only after all managers finished their updates to prevent segfaults
         }
-
         clickableShapeManager->alignClickableShapes();
         spriteTextManager->alignSpriteTextObjects();
         uiAnimationManager->updateActiveAnimations();
-        //
 
         
-        // Game draws
         m_windowPtr->clear();
         
         for(sf::Sprite* sprite : spriteManager->getSprites()){
             m_windowPtr->draw(*sprite);
         }
         debugManager->showDebugInfo(m_windowPtr);
-
         for(sf::Sprite* sprite : uiSpriteManager->getAllVisibleSprites()){
             m_windowPtr->draw(*sprite);
         }
         for(sge::SpriteText* spriteText : spriteTextManager->getAllVisibleSpriteTextObjects()){
             m_windowPtr->draw(*spriteText);
         }
-        //
 
         m_windowPtr->display();
     }
@@ -1191,14 +1171,14 @@ sge::Animation::Animation(sge::TextureSheet* textureSheet, sf::Sprite* ownerSpri
 
 void sge::Animation::addTextureSequence(std::string name, std::vector<int> textureSequence){ m_textureSequences[name] = textureSequence; }
 void sge::Animation::setCurrentTextureSequence(std::string name){
-    if(m_currentTextureSequence != name){
-        m_currentTextureSequence = name;
-        m_currentTextureN = 0;
-        m_clock.restart();
-    }
+    m_clock.restart();
+    m_currentTextureSequence = name;
+    m_currentTextureN = 0;
+
+    m_ownerSpritePtr->setTextureRect(m_textureSheet->getTextureRect(m_textureSequences[m_currentTextureSequence].at(m_currentTextureN)));
 }
 
-void sge::Animation::run(){
+void sge::Animation::runForward(){
     if(!m_textureSequences.size()){
         printf("No texture sequences initialized.\n");
         exit(1);
@@ -1208,8 +1188,7 @@ void sge::Animation::run(){
         exit(1);
     }
 
-    // TODO dynamic animation delay (for each animation ?)
-    if(m_clock.getElapsedTime().asMilliseconds() > 100){
+    if(m_clock.getElapsedTime().asMilliseconds() > animationDelayMilliseconds){
         m_ownerSpritePtr->setTextureRect(m_textureSheet->getTextureRect(m_textureSequences[m_currentTextureSequence].at(m_currentTextureN)));
         
         if(m_currentTextureN+1 == m_textureSequences[m_currentTextureSequence].size()){
@@ -1217,11 +1196,10 @@ void sge::Animation::run(){
         }
         else m_currentTextureN++;
 
-        
         m_clock.restart();
     }
 }
-void sge::Animation::restartClock(){ m_clock.restart(); }
+
 
 sge::CollisionShape::CollisionShape(sge::Entity* ownerEntity){
     m_ownerEntityPtr = ownerEntity;
@@ -1555,15 +1533,9 @@ void sge::AnimationManager::registerAnimation(sge::Animation* animation){ m_anim
 void sge::AnimationManager::deregisterAnimation(sge::Animation* animation){ m_animations.erase(std::remove(m_animations.begin(), m_animations.end(), animation), m_animations.end()); }
 void sge::AnimationManager::deregisterAllAnimations(){ m_animations.clear(); }
 
-void sge::AnimationManager::initAnimationClocks(){
-    for(sge::Animation* animation : m_animations){
-        animation->restartClock();
-    }
-}
-
 void sge::AnimationManager::updateAnimations(){
     for(sge::Animation* animation : m_animations){
-        animation->run();
+        animation->runForward();
     }
 }
 
@@ -1954,15 +1926,9 @@ void sge::UIAnimationManager::deactivateAnimation(sge::Animation* animation){
     m_inactiveAnimations.push_back(animation);
 }
 
-void sge::UIAnimationManager::initAnimationClocks(){
-    for(sge::Animation* animation : m_activeAnimations){
-        animation->restartClock();
-    }
-}
-
 void sge::UIAnimationManager::updateActiveAnimations(){
     for(sge::Animation* animation : m_activeAnimations){
-        animation->run();
+        animation->runForward();
     }
 }
 

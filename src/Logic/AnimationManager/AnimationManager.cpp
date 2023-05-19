@@ -7,14 +7,8 @@ void sge::AnimationManager::deregisterAnimation(sge::Animation* animation){ m_an
 void sge::AnimationManager::deregisterAllAnimations(){ m_animations.clear(); }
 
 
-void sge::AnimationManager::initAnimationClocks(){
-    for(sge::Animation* animation : m_animations){
-        animation->restartClock();
-    }
-}
-
 void sge::AnimationManager::updateAnimations(){
     for(sge::Animation* animation : m_animations){
-        animation->run();
+        animation->runForward();
     }
 }

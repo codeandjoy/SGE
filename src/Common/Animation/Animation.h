@@ -15,17 +15,15 @@ namespace sge{
         public:
             Animation(sge::TextureSheet* textureSheet, sf::Sprite* ownerSprite, int initialTextureN);
         
+            int animationDelayMilliseconds = 100;
             
             void addTextureSequence(std::string name, std::vector<int> textureSequence);
             void setCurrentTextureSequence(std::string name);
         
-
-            // ?
-            // runForward -> 1,2,3,1,2,3
-            // runCycle -> 1,2,3,2,1,2
-            // ?
-            void run();
-            void restartClock();
+            void runForward();
+            // TODO
+            // animationType : forward or cycle, run function in manager based on animation type
+            // runCycle()  1 2 3 2 1
 
         private:
             sf::Sprite* m_ownerSpritePtr;

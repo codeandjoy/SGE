@@ -14,16 +14,16 @@ sge::Animation::Animation(sge::TextureSheet* textureSheet, sf::Sprite* ownerSpri
 
 void sge::Animation::addTextureSequence(std::string name, std::vector<int> textureSequence){ m_textureSequences[name] = textureSequence; }
 void sge::Animation::setCurrentTextureSequence(std::string name){
-    if(m_currentTextureSequence != name){
-        m_currentTextureSequence = name;
-        m_currentTextureN = 0;
-        m_clock.restart();
-    }
+    m_clock.restart();
+    m_currentTextureSequence = name;
+    m_currentTextureN = 0;
+
+    m_ownerSpritePtr->setTextureRect(m_textureSheet->getTextureRect(m_textureSequences[m_currentTextureSequence].at(m_currentTextureN)));
 }
 
 
 
-void sge::Animation::run(){
+void sge::Animation::runForward(){
     if(!m_textureSequences.size()){
         printf("No texture sequences initialized.\n");
         exit(1);
@@ -33,8 +33,7 @@ void sge::Animation::run(){
         exit(1);
     }
 
-    // TODO dynamic animation delay (for each animation ?)
-    if(m_clock.getElapsedTime().asMilliseconds() > 100){
+    if(m_clock.getElapsedTime().asMilliseconds() > animationDelayMilliseconds){
         m_ownerSpritePtr->setTextureRect(m_textureSheet->getTextureRect(m_textureSequences[m_currentTextureSequence].at(m_currentTextureN)));
         
         if(m_currentTextureN+1 == m_textureSequences[m_currentTextureSequence].size()){
@@ -42,8 +41,6 @@ void sge::Animation::run(){
         }
         else m_currentTextureN++;
 
-        
         m_clock.restart();
     }
 }
-void sge::Animation::restartClock(){ m_clock.restart(); }
