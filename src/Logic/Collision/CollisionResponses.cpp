@@ -16,26 +16,26 @@ void sge::resolveAABB(std::vector<sge::Collision> collisions){
         // Align initiator based on impact side
         if(collision.initiatorImpactSide == sge::CollisionSide::left){
             initiatorSprite->setPosition(
-                recipientSprite->getPosition().x + recipientSprite->getGlobalBounds().width - collision.initiator->offset.x,
+                recipientSprite->getPosition().x + recipientSprite->getGlobalBounds().width - collision.initiator->offset.x + collision.recipient->offset.x,
                 initiatorSprite->getPosition().y
             );
         }
         else if(collision.initiatorImpactSide == sge::CollisionSide::right){
             initiatorSprite->setPosition(
-                recipientSprite->getPosition().x - collision.initiator->getGlobalBounds().width - collision.initiator->offset.x,
+                recipientSprite->getPosition().x - collision.initiator->getGlobalBounds().width - collision.initiator->offset.x + collision.recipient->offset.x,
                 initiatorSprite->getPosition().y
             );
         }
         else if(collision.initiatorImpactSide == sge::CollisionSide::top){
             initiatorSprite->setPosition(
                 initiatorSprite->getPosition().x,
-                recipientSprite->getPosition().y + recipientSprite->getGlobalBounds().height - collision.initiator->offset.y
+                recipientSprite->getPosition().y + recipientSprite->getGlobalBounds().height - collision.initiator->offset.y + collision.recipient->offset.y
             );
         }
         else if(collision.initiatorImpactSide == sge::CollisionSide::bottom){
             initiatorSprite->setPosition(
                 initiatorSprite->getPosition().x,
-                recipientSprite->getPosition().y - collision.initiator->getGlobalBounds().height - collision.initiator->offset.y
+                recipientSprite->getPosition().y - collision.initiator->getGlobalBounds().height - collision.initiator->offset.y + collision.recipient->offset.y
             );
         }
         //
