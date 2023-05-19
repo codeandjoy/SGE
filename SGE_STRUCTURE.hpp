@@ -11,6 +11,10 @@
 #include "./src/Assets/Texture/TextureSheet.h"
 //
 
+// ControllerManager
+#include "./src/Controller/ControllerManager.h"
+//
+
 // Common
 #include "./src/Common/Animation/Animation.h"
 

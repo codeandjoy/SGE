@@ -1,5 +1,6 @@
 #include "Universe.h"
 #include "../Assets/AssetsManager/AssetsManager.h"
+#include "../Controller/ControllerManager.h"
 #include "../Common/ClickableShape/ClickableShape.h"
 #include "../Common/ClickableShape/ClickableShapeManager.h"
 #include "../Logic/SpriteManager/SpriteManager.h"
@@ -20,6 +21,8 @@
 
 sge::Universe::Universe(){
     sge::AssetsManager* AsM = new sge::AssetsManager();
+    sge::ControllerManager* CoM = new sge::ControllerManager();
+
     sge::SpriteManager* SpM = new sge::SpriteManager();
     sge::PhysicsManager* PM = new sge::PhysicsManager();
     sge::CollisionShapeManager* CSM = new sge::CollisionShapeManager();
@@ -30,6 +33,7 @@ sge::Universe::Universe(){
     sge::SceneManager* ScM = new sge::SceneManager(SpM, PM, CSM, AnM, CM, EM, DM);
 
     assetsManager = AsM;
+    controllerManager = CoM;
     spriteManager = SpM;
     physicsManager = PM;
     collisionShapeManager = CSM;
@@ -58,11 +62,6 @@ void sge::Universe::setupWindow(sf::RenderWindow *window){ m_windowPtr = window;
 
 
 
-void sge::Universe::addController(std::function<void()> controller){ m_controllers.push_back(controller); }
-void sge::Universe::addEventHandler(std::function<void(sf::Event event)> eventHandler){ m_eventHandlers.push_back(eventHandler); }
-
-
-
 void sge::Universe::loop(){
     if(!m_windowPtr){
         printf("RenderWindow is not initialized. Use setupWindow method to initialize RenderWindow before(!) looping the Universe.\n");
@@ -78,13 +77,20 @@ void sge::Universe::loop(){
     //
 
     while(m_windowPtr->isOpen()){
+        // Calculate dt
+        sf::Time deltaTime = m_deltaClock.restart();
+        float dt = deltaTime.asSeconds();
+        if(dt > 0.15f) dt = 0.15f;
+        //
+
+
         // Events
         sf::Event event;
         while(m_windowPtr->pollEvent(event)){
             if (event.type == sf::Event::Closed) m_windowPtr->close();
         
-            for(std::function eventHandler : m_eventHandlers){
-                eventHandler(event);
+            for(std::function controller : controllerManager->getAllControllers()){
+                controller(event);
             }
 
             // UI events
@@ -95,19 +101,8 @@ void sge::Universe::loop(){
         }
         //
 
-        // Controllers
-        for(std::function controller : m_controllers){
-            controller();
-        }
-        //
 
         // Game updates
-        // Calculate dt
-        sf::Time deltaTime = m_deltaClock.restart();
-        float dt = deltaTime.asSeconds();
-        if(dt > 0.15f) dt = 0.15f;
-        //
-        
         if(!isPaused){
             physicsManager->updatePhysics(dt);
             collisionShapeManager->alignCollisionShapes();
@@ -122,7 +117,6 @@ void sge::Universe::loop(){
         //
 
         
-
         // Game draws
         m_windowPtr->clear();
         

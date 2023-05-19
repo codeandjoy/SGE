@@ -8,6 +8,7 @@
 
 namespace sge{
     class AssetsManager;
+    class ControllerManager;
 
     class SpriteManager;
     class PhysicsManager;
@@ -29,21 +30,15 @@ namespace sge{
         public:
             Universe();
 
-
             bool isPaused = false;
 
-
             void setupWindow(sf::RenderWindow* window);
-
-
-            void addController(std::function<void()> controller);
-            void addEventHandler(std::function<void(sf::Event event)> eventHandler);
-
-
             void loop();
 
 
             sge::AssetsManager* assetsManager = nullptr;
+            sge::ControllerManager* controllerManager = nullptr;
+
             sge::SpriteManager* spriteManager = nullptr;
             sge::PhysicsManager* physicsManager = nullptr;
             sge::CollisionShapeManager* collisionShapeManager = nullptr;
@@ -63,9 +58,6 @@ namespace sge{
             sf::RenderWindow* m_windowPtr;
 
             sf::Clock m_deltaClock;
-            
-            std::vector<std::function<void()>> m_controllers;
-            std::vector<std::function<void(sf::Event event)>> m_eventHandlers;
     };
 }
 

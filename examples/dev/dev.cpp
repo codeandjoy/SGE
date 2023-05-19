@@ -219,7 +219,7 @@ int main(){
 
 
     // Controllers and events
-    universe->addController([playerEntity, playerAnimation](){
+    universe->controllerManager->registerController([playerEntity, playerAnimation, universe](sf::Event event){
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::A)){
             playerEntity->physicalObject->velocity.x = -70;
             playerAnimation->setCurrentTextureSequence("runLeft");
@@ -232,16 +232,14 @@ int main(){
             playerEntity->physicalObject->velocity.x = 0;
             playerAnimation->setCurrentTextureSequence("idle");
         }
-    });
 
-    universe->addEventHandler([universe, playerEntity](sf::Event event){
         if(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space){
             playerEntity->physicalObject->velocity.y = -120;
         }
         if(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::P){
             universe->isPaused = !universe->isPaused;
         }
-    }); 
+    });
     //
 
 

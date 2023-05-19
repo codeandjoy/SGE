@@ -12,6 +12,7 @@
 
 namespace sge{
     class AssetsManager;
+    class ControllerManager;
 
     class SpriteManager;
     class PhysicsManager;
@@ -36,13 +37,11 @@ namespace sge{
             bool isPaused = false;
 
             void setupWindow(sf::RenderWindow* window);
-
-            void addController(std::function<void()> controller);
-            void addEventHandler(std::function<void(sf::Event event)> eventHandler);
-
             void loop();
 
             sge::AssetsManager* assetsManager = nullptr;
+            sge::ControllerManager* controllerManager = nullptr;
+
             sge::SpriteManager* spriteManager = nullptr;
             sge::PhysicsManager* physicsManager = nullptr;
             sge::CollisionShapeManager* collisionShapeManager = nullptr;
@@ -62,9 +61,6 @@ namespace sge{
             sf::RenderWindow* m_windowPtr;
 
             sf::Clock m_deltaClock;
-            
-            std::vector<std::function<void()>> m_controllers;
-            std::vector<std::function<void(sf::Event event)>> m_eventHandlers;
     };
 }
 
@@ -131,6 +127,31 @@ namespace sge{
             std::string m_location;
             sf::Texture m_textureSheet;
             std::vector<sf::IntRect> m_textureRects;
+    };
+}
+
+#endif
+//
+
+// ControllerManager
+#ifndef CONTROLLER_MANAGER_H
+#define CONTROLLER_MANAGER_H
+
+#include <functional>
+#include <vector>
+
+#include <SFML/Graphics.hpp>
+
+namespace sge{
+    class ControllerManager{
+        public:
+            void registerController(std::function<void(sf::Event)> controller);
+            std::vector<std::function<void(sf::Event)>> getAllControllers();       
+
+            void updateControllers(sf::Event event);
+            
+        private:
+            std::vector<std::function<void(sf::Event)>> m_controllers;
     };
 }
 
@@ -1011,6 +1032,8 @@ namespace sge{
 
 sge::Universe::Universe(){
     sge::AssetsManager* AsM = new sge::AssetsManager();
+    sge::ControllerManager* CoM = new sge::ControllerManager();
+
     sge::SpriteManager* SpM = new sge::SpriteManager();
     sge::PhysicsManager* PM = new sge::PhysicsManager();
     sge::CollisionShapeManager* CSM = new sge::CollisionShapeManager();
@@ -1021,6 +1044,7 @@ sge::Universe::Universe(){
     sge::SceneManager* ScM = new sge::SceneManager(SpM, PM, CSM, AnM, CM, EM, DM);
 
     assetsManager = AsM;
+    controllerManager = CoM;
     spriteManager = SpM;
     physicsManager = PM;
     collisionShapeManager = CSM;
@@ -1045,9 +1069,6 @@ sge::Universe::Universe(){
 
 void sge::Universe::setupWindow(sf::RenderWindow *window){ m_windowPtr = window; }
 
-void sge::Universe::addController(std::function<void()> controller){ m_controllers.push_back(controller); }
-void sge::Universe::addEventHandler(std::function<void(sf::Event event)> eventHandler){ m_eventHandlers.push_back(eventHandler); }
-
 void sge::Universe::loop(){
     if(!m_windowPtr){
         printf("RenderWindow is not initialized. Use setupWindow method to initialize RenderWindow before(!) looping the Universe.\n");
@@ -1063,13 +1084,19 @@ void sge::Universe::loop(){
     //
 
     while(m_windowPtr->isOpen()){
+        // Calculate dt
+        sf::Time deltaTime = m_deltaClock.restart();
+        float dt = deltaTime.asSeconds();
+        if(dt > 0.15f) dt = 0.15f;
+        //
+
         // Events
         sf::Event event;
         while(m_windowPtr->pollEvent(event)){
             if (event.type == sf::Event::Closed) m_windowPtr->close();
         
-            for(std::function eventHandler : m_eventHandlers){
-                eventHandler(event);
+            for(std::function controller : controllerManager->getAllControllers()){
+                controller(event);
             }
 
             // UI events
@@ -1080,19 +1107,7 @@ void sge::Universe::loop(){
         }
         //
 
-        // Controllers
-        for(std::function controller : m_controllers){
-            controller();
-        }
-        //
-
         // Game updates
-        // Calculate dt
-        sf::Time deltaTime = m_deltaClock.restart();
-        float dt = deltaTime.asSeconds();
-        if(dt > 0.15f) dt = 0.15f;
-        //
-        
         if(!isPaused){
             physicsManager->updatePhysics(dt);
             collisionShapeManager->alignCollisionShapes();
@@ -1107,7 +1122,6 @@ void sge::Universe::loop(){
         //
 
         
-
         // Game draws
         m_windowPtr->clear();
         
@@ -1155,6 +1169,16 @@ sge::TextureSheet::TextureSheet(sge::TextureSheetSizes textureSheetSizes, std::s
 std::string sge::TextureSheet::getLocation(){ return m_location; }
 sf::Texture* sge::TextureSheet::getTexture(){ return &m_textureSheet; }
 sf::IntRect sge::TextureSheet::getTextureRect(int textureN){ return m_textureRects[textureN]; }
+
+
+void sge::ControllerManager::registerController(std::function<void(sf::Event)> controller){ m_controllers.push_back(controller); }
+std::vector<std::function<void(sf::Event)>> sge::ControllerManager::getAllControllers(){ return m_controllers; }
+
+void sge::ControllerManager::updateControllers(sf::Event event){
+    for(std::function<void(sf::Event)> controller : m_controllers){
+        controller(event);
+    }
+}
 
 
 sge::Animation::Animation(sge::TextureSheet* textureSheet, sf::Sprite* ownerSprite, int initialTextureN){
