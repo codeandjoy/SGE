@@ -16,26 +16,26 @@ void sge::resolveAABB(std::vector<sge::Collision> collisions){
         // Align initiator based on impact side
         if(collision.initiatorImpactSide == sge::CollisionSide::left){
             initiatorSprite->setPosition(
-                recipientCollisionShape->getPosition().x + recipientCollisionShape->getGlobalBounds().width - initiatorCollisionShape->offset.x,
-                initiatorCollisionShape->getPosition().y
+                recipientSprite->getPosition().x + recipientSprite->getGlobalBounds().width - collision.initiator->offset.x,
+                initiatorSprite->getPosition().y
             );
         }
         else if(collision.initiatorImpactSide == sge::CollisionSide::right){
             initiatorSprite->setPosition(
-                recipientCollisionShape->getPosition().x - initiatorCollisionShape->getGlobalBounds().width - initiatorCollisionShape->offset.x,
-                initiatorCollisionShape->getPosition().y
+                recipientSprite->getPosition().x - collision.initiator->getGlobalBounds().width - collision.initiator->offset.x,
+                initiatorSprite->getPosition().y
             );
         }
         else if(collision.initiatorImpactSide == sge::CollisionSide::top){
             initiatorSprite->setPosition(
-                initiatorCollisionShape->getPosition().x,
-                recipientCollisionShape->getPosition().y + recipientCollisionShape->getGlobalBounds().height - initiatorCollisionShape->offset.y
+                initiatorSprite->getPosition().x,
+                recipientSprite->getPosition().y + recipientSprite->getGlobalBounds().height - collision.initiator->offset.y
             );
         }
         else if(collision.initiatorImpactSide == sge::CollisionSide::bottom){
             initiatorSprite->setPosition(
-                initiatorCollisionShape->getPosition().x,
-                recipientCollisionShape->getPosition().y - initiatorCollisionShape->getGlobalBounds().height - initiatorCollisionShape->offset.y
+                initiatorSprite->getPosition().x,
+                recipientSprite->getPosition().y - collision.initiator->getGlobalBounds().height - collision.initiator->offset.y
             );
         }
         //
