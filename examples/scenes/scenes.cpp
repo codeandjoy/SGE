@@ -32,7 +32,7 @@ int main(){
 
 
 
-    universe->addController([playerEntity](){
+    universe->controllerManager->registerController([playerEntity](sf::Event event){
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::A)){
             playerEntity->physicalObject->velocity.x = -70;
             playerEntity->animation->setCurrentTextureSequence("runLeft");
@@ -45,9 +45,7 @@ int main(){
             playerEntity->physicalObject->velocity.x = 0;
             playerEntity->animation->setCurrentTextureSequence("idle");
         }
-    });
 
-    universe->addEventHandler([playerEntity](sf::Event event){
         if(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space){
             playerEntity->physicalObject->velocity.y = -120;
         }

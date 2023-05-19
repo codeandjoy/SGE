@@ -89,8 +89,7 @@ int main(){
     universe->collisionManager->registerCollisionGroup("player", playerCollisionGroup);
     universe->collisionManager->registerCollisionGroup("surface", surfaceCollisionGroup);
 
-    sge::CollisionPair* player_surface = new sge::CollisionPair();
-    player_surface->collisionGroups = std::make_pair("player", "surface");
+    sge::CollisionPair* player_surface = new sge::CollisionPair{ "player", "surface" };
     player_surface->algorithm = sge::boundingBox;
     player_surface->startPhaseCollisionResponse = [surfaceDebugEntities](std::vector<sge::Collision> collisions){
         for(sge::Collision collision : collisions){
@@ -117,7 +116,7 @@ int main(){
 
     universe->collisionManager->registerCollisionPair("player_surface", player_surface);
 
-    universe->addController([playerEntity, playerAnimation](){
+    universe->controllerManager->registerController([playerEntity, playerAnimation](sf::Event event){
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::A)){
             playerEntity->physicalObject->velocity.x = -70;
             playerAnimation->setCurrentTextureSequence("runLeft");
@@ -130,9 +129,7 @@ int main(){
             playerEntity->physicalObject->velocity.x = 0;
             playerAnimation->setCurrentTextureSequence("idle");
         }
-    });
 
-    universe->addEventHandler([playerEntity](sf::Event event){
         if(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space){
             playerEntity->physicalObject->velocity.y = -120;
         }

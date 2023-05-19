@@ -156,12 +156,10 @@ int main(){
     collisionManager->registerCollisionGroup("bouncy", bouncyCollisionGroup);
     collisionManager->registerCollisionGroup("goal", goalCollisionGroup);
 
-    sge::CollisionPair* racket_racket_borders = new sge::CollisionPair();
-    racket_racket_borders->collisionGroups = std::make_pair("racket", "racket_borders");
+    sge::CollisionPair* racket_racket_borders = new sge::CollisionPair{ "racket", "racket_borders" };
     racket_racket_borders->algorithm = sge::boundingBox;
     racket_racket_borders->continuousPhaseCollisionResponse = sge::resolveAABB;
-    sge::CollisionPair* ball_bouncy = new sge::CollisionPair();
-    ball_bouncy->collisionGroups = std::make_pair("ball", "bouncy"); // TODO move to CollisionPari constructor
+    sge::CollisionPair* ball_bouncy = new sge::CollisionPair{ "ball", "bouncy" };
     ball_bouncy->algorithm = sge::boundingBox;
     ball_bouncy->startPhaseCollisionResponse = [ballEntity](std::vector<sge::Collision> collisions){
         for(sge::Collision collision : collisions){
@@ -179,8 +177,7 @@ int main(){
             }
         }
     };
-    sge::CollisionPair* ball_goal = new sge::CollisionPair();
-    ball_goal->collisionGroups = std::make_pair("ball", "goal");
+    sge::CollisionPair* ball_goal = new sge::CollisionPair{ "ball", "goal" };
     ball_goal->algorithm = sge::boundingBox;
     ball_goal->startPhaseCollisionResponse = [&p1_score, &p2_score, ballEntity, p1ScoreUIEntity, p2ScoreUIEntity](std::vector<sge::Collision> collisions){
         for(sge::Collision collision : collisions){
@@ -203,7 +200,7 @@ int main(){
 
 
 
-    universe->addController([racket1Entity](){
+    universe->controllerManager->registerController([racket1Entity](auto _){
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::A)){
             racket1Entity->physicalObject->velocity.x = -400;
         }
@@ -214,7 +211,7 @@ int main(){
             racket1Entity->physicalObject->velocity.x = 0;
         }
     });
-    universe->addController([racket2Entity](){
+    universe->controllerManager->registerController([racket2Entity](auto _){
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left)){
             racket2Entity->physicalObject->velocity.x = -400;
         }

@@ -50,8 +50,7 @@ sge::Scene* setupScene1(sge::Universe* universe, sge::Entity* playerEntity){
 
 
 
-    sge::CollisionPair* player_surface = new sge::CollisionPair();
-    player_surface->collisionGroups = std::make_pair("player", "surface");
+    sge::CollisionPair* player_surface = new sge::CollisionPair{ "player", "surface" };
     player_surface->algorithm = sge::boundingBox;
     player_surface->continuousPhaseCollisionResponse = [](std::vector<sge::Collision> collisions){
         sge::resolveAABB(collisions);
@@ -60,8 +59,7 @@ sge::Scene* setupScene1(sge::Universe* universe, sge::Entity* playerEntity){
 
     level1Scene->registerCollisionPair("player_surface", player_surface);
 
-    sge::CollisionPair* player_coin = new sge::CollisionPair();
-    player_coin->collisionGroups = std::make_pair("player", "coin");
+    sge::CollisionPair* player_coin = new sge::CollisionPair{ "player", "coin" };
     player_coin->algorithm = sge::boundingBox;
     player_coin->startPhaseCollisionResponse = [universe, playerEntity](auto _){
         playerEntity->sprite->setPosition(sf::Vector2f(100, 50));
