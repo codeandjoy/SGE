@@ -271,6 +271,7 @@ namespace sge{
             void deactivateClickableShape(sge::ClickableShape* clickableShape);
 
             void alignClickableShapes();
+            void updateClickableShapes(sf::Event event);
 
         private:
             std::vector<sge::ClickableShape*> m_activeClickableShapes;
@@ -307,6 +308,8 @@ namespace sge{
             void deregisterSprite(sf::Sprite* sprite);
             void deregisterAllSprites();
             std::vector<sf::Sprite*> getSprites();            
+
+            void drawSprites(sf::RenderWindow* windowPtr);
 
         private:
             std::vector<sf::Sprite*> m_sprites;
@@ -856,6 +859,8 @@ namespace sge{
             void showSprite(sf::Sprite* sprite);
             void hideSprite(sf::Sprite* sprite);
 
+            void drawUISprites(sf::RenderWindow* windowPtr);
+
         private:
             std::vector<sf::Sprite*> m_visibleSprites;
             std::vector<sf::Sprite*> m_hiddenSprites;
@@ -888,6 +893,7 @@ namespace sge{
 #define SPRITE_TEXT_MANAGER_H
 
 #include <vector>
+#include <SFML/Graphics.hpp>
 
 namespace sge{
     class SpriteText;
@@ -902,6 +908,7 @@ namespace sge{
             void hideSpriteText(sge::SpriteText* spriteText);
 
             void alignSpriteTextObjects();
+            void drawSpriteTextObjects(sf::RenderWindow* windowPtr);
 
         private:
             std::vector<sge::SpriteText*> m_visibleSpriteTextObjects;
@@ -1085,15 +1092,8 @@ void sge::Universe::loop(){
         while(m_windowPtr->pollEvent(event)){
             if (event.type == sf::Event::Closed) m_windowPtr->close();
         
-            for(std::function controller : controllerManager->getAllControllers()){
-                controller(event);
-            }
-
-            // UI events
-            for(ClickableShape* clickableShape : clickableShapeManager->getAllActiveClickableShapes()){
-                clickableShape->action(clickableShape, event);
-            }
-            //
+            controllerManager->updateControllers(event);
+            clickableShapeManager->updateClickableShapes(event);
         }
 
         if(!isPaused){
@@ -1110,16 +1110,10 @@ void sge::Universe::loop(){
         
         m_windowPtr->clear();
         
-        for(sf::Sprite* sprite : spriteManager->getSprites()){
-            m_windowPtr->draw(*sprite);
-        }
+        spriteManager->drawSprites(m_windowPtr);
         debugManager->showDebugInfo(m_windowPtr);
-        for(sf::Sprite* sprite : uiSpriteManager->getAllVisibleSprites()){
-            m_windowPtr->draw(*sprite);
-        }
-        for(sge::SpriteText* spriteText : spriteTextManager->getAllVisibleSpriteTextObjects()){
-            m_windowPtr->draw(*spriteText);
-        }
+        uiSpriteManager->drawUISprites(m_windowPtr);
+        spriteTextManager->drawSpriteTextObjects(m_windowPtr);
 
         m_windowPtr->display();
     }
@@ -1225,6 +1219,7 @@ sge::ClickableShape::ClickableShape(sge::UIEntity* ownerUIEntity){ m_ownerUIEnti
 sge::UIEntity* sge::ClickableShape::getOwnerUIEntity(){ return m_ownerUIEntityPtr; }
 void sge::ClickableShape::align(){ this->setPosition(m_ownerUIEntityPtr->sprite->getPosition() + offset); }
 #include <algorithm>
+#include <SFML/Graphics.hpp>
 
 void sge::ClickableShapeManager::registerClickableShape(sge::ClickableShape* clickableShape){ m_activeClickableShapes.push_back(clickableShape); }
 void sge::ClickableShapeManager::deregsiterClickableShape(sge::ClickableShape* clickableShape){
@@ -1248,6 +1243,12 @@ void sge::ClickableShapeManager::alignClickableShapes(){
     }
 }
 
+void sge::ClickableShapeManager::updateClickableShapes(sf::Event event){
+    for(ClickableShape* thisClickableShape : m_activeClickableShapes){
+        thisClickableShape->action(thisClickableShape, event);
+    }
+}
+
 
 bool sge::isMouseOverClickableShape(ClickableShape* clickableShape, sf::RenderWindow* window){
     return clickableShape->getOwnerUIEntity()->sprite->getGlobalBounds().contains(window->mapPixelToCoords(sf::Mouse::getPosition(*window)));
@@ -1258,6 +1259,12 @@ void sge::SpriteManager::registerSprite(sf::Sprite* sprite){ m_sprites.push_back
 void sge::SpriteManager::deregisterSprite(sf::Sprite* sprite){ m_sprites.erase(std::remove(m_sprites.begin(), m_sprites.end(), sprite), m_sprites.end()); }
 void sge::SpriteManager::deregisterAllSprites(){ m_sprites.clear(); }
 std::vector<sf::Sprite*> sge::SpriteManager::getSprites(){ return m_sprites; }
+
+void sge::SpriteManager::drawSprites(sf::RenderWindow* windowPtr){
+    for(sf::Sprite* sprite : m_sprites){
+        windowPtr->draw(*sprite);
+    }
+}
 
 
 void sge::PhysicsManager::registerPhysicalObject(sge::PhysicalObject* physicalObject){ m_physicalObjects.push_back(physicalObject); }
@@ -1801,6 +1808,12 @@ void sge::UISpriteManager::hideSprite(sf::Sprite* sprite){
     m_hiddenSprites.push_back(sprite);
 }
 
+void sge::UISpriteManager::drawUISprites(sf::RenderWindow* windowPtr){
+    for(sf::Sprite* sprite : m_visibleSprites){
+        windowPtr->draw(*sprite);
+    }
+}
+
 
 sge::SpriteText::SpriteText(sf::Sprite* ownerSprite){ m_ownerSpritePtr = ownerSprite; }
 void sge::SpriteText::align(){
@@ -1829,6 +1842,11 @@ void sge::SpriteTextManager::hideSpriteText(sge::SpriteText* spriteText){
 void sge::SpriteTextManager::alignSpriteTextObjects(){
     for(sge::SpriteText* spriteText : m_visibleSpriteTextObjects){
         spriteText->align();
+    }
+}
+void sge::SpriteTextManager::drawSpriteTextObjects(sf::RenderWindow* windowPtr){
+    for(SpriteText* spriteText : m_visibleSpriteTextObjects){
+        windowPtr->draw(*spriteText);
     }
 }
 

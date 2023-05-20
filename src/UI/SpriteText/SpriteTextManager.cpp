@@ -28,3 +28,8 @@ void sge::SpriteTextManager::alignSpriteTextObjects(){
         spriteText->align();
     }
 }
+void sge::SpriteTextManager::drawSpriteTextObjects(sf::RenderWindow* windowPtr){
+    for(SpriteText* spriteText : m_visibleSpriteTextObjects){
+        windowPtr->draw(*spriteText);
+    }
+}

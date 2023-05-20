@@ -13,6 +13,8 @@ namespace sge{
             void deregisterAllSprites();
             std::vector<sf::Sprite*> getSprites();            
 
+            void drawSprites(sf::RenderWindow* windowPtr);
+
         private:
             std::vector<sf::Sprite*> m_sprites;
     };

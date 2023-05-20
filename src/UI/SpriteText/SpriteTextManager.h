@@ -2,6 +2,7 @@
 #define SPRITE_TEXT_MANAGER_H
 
 #include <vector>
+#include <SFML/Graphics.hpp>
 
 
 namespace sge{
@@ -19,6 +20,7 @@ namespace sge{
 
 
             void alignSpriteTextObjects();
+            void drawSpriteTextObjects(sf::RenderWindow* windowPtr);
 
         private:
             std::vector<sge::SpriteText*> m_visibleSpriteTextObjects;

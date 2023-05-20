@@ -19,6 +19,7 @@ namespace sge{
 
 
             void alignClickableShapes();
+            void updateClickableShapes(sf::Event event);
 
         private:
             std::vector<sge::ClickableShape*> m_activeClickableShapes;

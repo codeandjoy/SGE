@@ -15,6 +15,8 @@ namespace sge{
             void showSprite(sf::Sprite* sprite);
             void hideSprite(sf::Sprite* sprite);
 
+            void drawUISprites(sf::RenderWindow* windowPtr);
+
         private:
             std::vector<sf::Sprite*> m_visibleSprites;
             std::vector<sf::Sprite*> m_hiddenSprites;

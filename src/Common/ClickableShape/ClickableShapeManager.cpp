@@ -1,4 +1,6 @@
 #include <algorithm>
+#include <SFML/Graphics.hpp>
+
 #include "ClickableShapeManager.h"
 #include "ClickableShape.h"
 
@@ -26,5 +28,11 @@ void sge::ClickableShapeManager::deactivateClickableShape(sge::ClickableShape* c
 void sge::ClickableShapeManager::alignClickableShapes(){
     for(sge::ClickableShape* clickableShape : m_activeClickableShapes){
         clickableShape->align();
+    }
+}
+
+void sge::ClickableShapeManager::updateClickableShapes(sf::Event event){
+    for(ClickableShape* thisClickableShape : m_activeClickableShapes){
+        thisClickableShape->action(thisClickableShape, event);
     }
 }

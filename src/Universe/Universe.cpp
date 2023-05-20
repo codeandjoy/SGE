@@ -80,15 +80,8 @@ void sge::Universe::loop(){
         while(m_windowPtr->pollEvent(event)){
             if (event.type == sf::Event::Closed) m_windowPtr->close();
         
-            for(std::function controller : controllerManager->getAllControllers()){
-                controller(event);
-            }
-
-            // UI events
-            for(ClickableShape* clickableShape : clickableShapeManager->getAllActiveClickableShapes()){
-                clickableShape->action(clickableShape, event);
-            }
-            //
+            controllerManager->updateControllers(event);
+            clickableShapeManager->updateClickableShapes(event);
         }
 
 
@@ -106,16 +99,10 @@ void sge::Universe::loop(){
         
         m_windowPtr->clear();
         
-        for(sf::Sprite* sprite : spriteManager->getSprites()){
-            m_windowPtr->draw(*sprite);
-        }
+        spriteManager->drawSprites(m_windowPtr);
         debugManager->showDebugInfo(m_windowPtr);
-        for(sf::Sprite* sprite : uiSpriteManager->getAllVisibleSprites()){
-            m_windowPtr->draw(*sprite);
-        }
-        for(sge::SpriteText* spriteText : spriteTextManager->getAllVisibleSpriteTextObjects()){
-            m_windowPtr->draw(*spriteText);
-        }
+        uiSpriteManager->drawUISprites(m_windowPtr);
+        spriteTextManager->drawSpriteTextObjects(m_windowPtr);
 
         m_windowPtr->display();
     }

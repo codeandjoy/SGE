@@ -17,3 +17,10 @@ void sge::UISpriteManager::hideSprite(sf::Sprite* sprite){
     deregisterSprite(sprite);
     m_hiddenSprites.push_back(sprite);
 }
+
+
+void sge::UISpriteManager::drawUISprites(sf::RenderWindow* windowPtr){
+    for(sf::Sprite* sprite : m_visibleSprites){
+        windowPtr->draw(*sprite);
+    }
+}
