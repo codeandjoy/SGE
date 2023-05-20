@@ -8,6 +8,8 @@ namespace sge{
         int textureSizeY;
         int numTexturesX;
         int numTexturesY;
+        int gapX = 0;
+        int gapY = 0;
     };
 }
 
