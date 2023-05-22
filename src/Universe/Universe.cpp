@@ -3,6 +3,7 @@
 #include "../Controller/ControllerManager.h"
 #include "../Common/ClickableShape/ClickableShape.h"
 #include "../Common/ClickableShape/ClickableShapeManager.h"
+#include "../Logic/ScriptedView/ScriptedViewManager.h"
 #include "../Logic/SpriteManager/SpriteManager.h"
 #include "../Logic/Physics/PhysicsManager.h"
 #include "../Logic/Physics/PhysicalObject.h"
@@ -23,6 +24,7 @@ sge::Universe::Universe(){
     sge::AssetsManager* AsM = new sge::AssetsManager();
     sge::ControllerManager* CoM = new sge::ControllerManager();
 
+    sge::ScriptedViewManager* VM = new sge::ScriptedViewManager();
     sge::SpriteManager* SpM = new sge::SpriteManager();
     sge::PhysicsManager* PM = new sge::PhysicsManager();
     sge::CollisionShapeManager* CSM = new sge::CollisionShapeManager();
@@ -34,6 +36,8 @@ sge::Universe::Universe(){
 
     assetsManager = AsM;
     controllerManager = CoM;
+
+    scriptedViewManager = VM;
     spriteManager = SpM;
     physicsManager = PM;
     collisionShapeManager = CSM;
@@ -58,7 +62,10 @@ sge::Universe::Universe(){
 
 
 
-void sge::Universe::setupWindow(sf::RenderWindow *window){ m_windowPtr = window; }
+void sge::Universe::setupWindow(sf::RenderWindow *window){
+    m_windowPtr = window;
+    m_uiView = window->getDefaultView();
+}
 
 
 
@@ -78,8 +85,14 @@ void sge::Universe::loop(){
 
         sf::Event event;
         while(m_windowPtr->pollEvent(event)){
-            if (event.type == sf::Event::Closed) m_windowPtr->close();
-        
+            if(event.type == sf::Event::Closed) m_windowPtr->close();
+            if(event.type == sf::Event::Resized){
+                m_uiView.setSize({
+                    static_cast<float>(event.size.width),
+                    static_cast<float>(event.size.height)
+                });
+            }
+
             controllerManager->updateControllers(event);
             clickableShapeManager->updateClickableShapes(event);
         }
@@ -90,6 +103,7 @@ void sge::Universe::loop(){
             collisionShapeManager->alignCollisionShapes();
             collisionManager->updateCollisions();
             animationManager->updateAnimations();
+            scriptedViewManager->runViewScripts();
             sceneManager->alignScene(); // Scene can be reset only after all managers finished their updates to prevent segfaults
         }
         clickableShapeManager->alignClickableShapes();
@@ -100,7 +114,9 @@ void sge::Universe::loop(){
         m_windowPtr->clear();
         
         spriteManager->drawSprites(m_windowPtr);
-        debugManager->showDebugInfo(m_windowPtr);
+        debugManager->showDebugInfo(m_windowPtr); // ? show in ui view
+       
+        m_windowPtr->setView(m_uiView);
         uiSpriteManager->drawUISprites(m_windowPtr);
         spriteTextManager->drawSpriteTextObjects(m_windowPtr);
 

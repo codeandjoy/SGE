@@ -14,6 +14,7 @@ namespace sge{
     class AssetsManager;
     class ControllerManager;
 
+    class ScriptedViewManager;
     class SpriteManager;
     class PhysicsManager;
     class PhysicalObject;
@@ -42,6 +43,7 @@ namespace sge{
             sge::AssetsManager* assetsManager = nullptr;
             sge::ControllerManager* controllerManager = nullptr;
 
+            sge::ScriptedViewManager* scriptedViewManager = nullptr;
             sge::SpriteManager* spriteManager = nullptr;
             sge::PhysicsManager* physicsManager = nullptr;
             sge::CollisionShapeManager* collisionShapeManager = nullptr;
@@ -59,6 +61,7 @@ namespace sge{
 
         private:
             sf::RenderWindow* m_windowPtr;
+            sf::View m_uiView;
 
             sf::Clock m_deltaClock;
     };
@@ -295,24 +298,60 @@ namespace sge{
 //
 
 // Logic
+#ifndef SCRIPTED_VIEW_H
+#define SCRIPTED_VIEW_H
+
+#include <functional>
+#include <SFML/Graphics.hpp>
+
+namespace sge{
+    struct ScriptedView : public sf::View{
+        std::function<void(sge::ScriptedView*)> script;
+    };
+}
+
+#endif
+#ifndef SCRIPTED_VIEW_MANAGER_H
+#define SCRIPTED_VIEW_MANAGER_H
+
+#include <SFML/Graphics.hpp>
+#include <vector>
+#include <string>
+
+namespace sge{
+    struct ScriptedView;
+
+    class ScriptedViewManager{
+        public:
+            void registerScriptedView(sge::ScriptedView* scriptedView);
+
+            void runViewScripts();
+
+        private:
+            std::vector<sge::ScriptedView*> m_scriptedViews;
+    };
+}
+
+#endif
 #ifndef SPRITE_MANAGER_H
 #define SPRITE_MANAGER_H
 
+#include <unordered_map>
 #include <vector>
 #include <SFML/Graphics.hpp>
 
 namespace sge{
     class SpriteManager{
         public:
-            void registerSprite(sf::Sprite* sprite);
-            void deregisterSprite(sf::Sprite* sprite);
+            void registerSprite(sf::View*, sf::Sprite* sprite);
+            void deregisterSprite(sf::View*, sf::Sprite* sprite);
             void deregisterAllSprites();
-            std::vector<sf::Sprite*> getSprites();            
+            std::vector<sf::Sprite*> getViewSprites(sf::View* view);
 
             void drawSprites(sf::RenderWindow* windowPtr);
 
         private:
-            std::vector<sf::Sprite*> m_sprites;
+            std::unordered_map<sf::View*, std::vector<sf::Sprite*>> m_sprites;
     };
 }
 
@@ -603,10 +642,12 @@ namespace sge{
 #ifndef ENTITY_MANAGER_H
 #define ENTITY_MANAGER_H
 
+#include <unordered_map>
 #include <vector>
+#include <SFML/Graphics.hpp>
 
 namespace sge{
-    class Entity;
+    struct Entity;
     class SpriteManager;
     class PhysicsManager;
     class CollisionShapeManager;
@@ -617,14 +658,14 @@ namespace sge{
         public:
             EntityManager(sge::SpriteManager* spriteManager, sge::PhysicsManager* physicsManager, sge::CollisionShapeManager* collisionShapeManager, sge::AnimationManager* animationManager, sge::CollisionManager* collisionManager);
 
-            void registerEntity(sge::Entity* entity);
-            void registerEntities(std::vector<sge::Entity*> entities);
-            void deregisterEntity(sge::Entity* entity);
+            void registerEntity(sf::View* view, sge::Entity* entity);
+            void registerEntities(sf::View* view, std::vector<sge::Entity*> entities);
+            void deregisterEntity(sf::View* view, sge::Entity* entity);
             void deregisterAllEntities();
-            std::vector<sge::Entity*> getAllEntities();
+            std::vector<sge::Entity*> getViewEntities(sf::View* view);
 
         private:
-            std::vector<sge::Entity*> m_entities;
+            std::unordered_map<sf::View*, std::vector<sge::Entity*>> m_entities;
 
             sge::SpriteManager* m_spriteManagerPtr;
             sge::PhysicsManager* m_physicsManagerPtr;
@@ -632,7 +673,7 @@ namespace sge{
             sge::AnimationManager* m_animationManagerPtr;
             sge::CollisionManager* m_collisionManager;
 
-            void m_deregisterEntityFromCoreManagers(sge::Entity* entity);
+            void m_deregisterEntityFromCoreManagers(sf::View* view, sge::Entity* entity);
     };
 }
 
@@ -759,6 +800,7 @@ namespace sge{
 #include <unordered_map>
 #include <vector>
 #include <string>
+#include <SFML/Graphics.hpp>
 
 namespace sge{
     class Entity;
@@ -768,22 +810,25 @@ namespace sge{
 
     class Scene{
         public:
-            void registerEntity(sge::Entity* entity);
-            void registerEntities(std::vector<sge::Entity*> entities);
+            void registerEntity(sf::View* view, sge::Entity* entity);
+            void registerEntities(sf::View* view, std::vector<sge::Entity*> entities);
             void registerDebugEntity(sge::DebugEntity* debugEntity);
             void registerDebugEntities(std::vector<sge::DebugEntity*> debugEntities);
             void registerCollisionGroup(std::string name, std::vector<sge::CollisionShape*> collisionShapes);
             void registerCollisionPair(std::string name, sge::CollisionPair* collisionPair);
         
         
-            std::vector<sge::Entity*> getEntities();
+            std::vector<sge::Entity*> getViewEntities(sf::View* view);
+            std::unordered_map<sf::View*, std::vector<sge::Entity*>> getEntitiesMap();
+
             std::vector<sge::DebugEntity*> getDebugEntities();
+            
             std::unordered_map<std::string, std::vector<sge::CollisionShape*>> getCollisionGroups();
             std::unordered_map<std::string, sge::CollisionPair*> getCollisionPairs();
             std::vector<std::string> getCollisionPairsOrder();
 
         private:
-            std::vector<sge::Entity*> m_entities;
+            std::unordered_map<sf::View*, std::vector<sge::Entity*>> m_entities;
             std::vector<sge::DebugEntity*> m_debugEntities;
             std::unordered_map<std::string, std::vector<sge::CollisionShape*>> m_collisionGroups;
             std::unordered_map<std::string, sge::CollisionPair*> m_collisionPairs;
@@ -1040,6 +1085,7 @@ sge::Universe::Universe(){
     sge::AssetsManager* AsM = new sge::AssetsManager();
     sge::ControllerManager* CoM = new sge::ControllerManager();
 
+    sge::ScriptedViewManager* VM = new sge::ScriptedViewManager();
     sge::SpriteManager* SpM = new sge::SpriteManager();
     sge::PhysicsManager* PM = new sge::PhysicsManager();
     sge::CollisionShapeManager* CSM = new sge::CollisionShapeManager();
@@ -1051,6 +1097,8 @@ sge::Universe::Universe(){
 
     assetsManager = AsM;
     controllerManager = CoM;
+
+    scriptedViewManager = VM;
     spriteManager = SpM;
     physicsManager = PM;
     collisionShapeManager = CSM;
@@ -1073,7 +1121,10 @@ sge::Universe::Universe(){
     uiEntityManager = UIEM;
 }
 
-void sge::Universe::setupWindow(sf::RenderWindow *window){ m_windowPtr = window; }
+void sge::Universe::setupWindow(sf::RenderWindow *window){
+    m_windowPtr = window;
+    m_uiView = window->getDefaultView();
+}
 
 void sge::Universe::loop(){
     if(!m_windowPtr){
@@ -1090,8 +1141,14 @@ void sge::Universe::loop(){
 
         sf::Event event;
         while(m_windowPtr->pollEvent(event)){
-            if (event.type == sf::Event::Closed) m_windowPtr->close();
-        
+            if(event.type == sf::Event::Closed) m_windowPtr->close();
+            if(event.type == sf::Event::Resized){
+                m_uiView.setSize({
+                    static_cast<float>(event.size.width),
+                    static_cast<float>(event.size.height)
+                });
+            }
+
             controllerManager->updateControllers(event);
             clickableShapeManager->updateClickableShapes(event);
         }
@@ -1101,6 +1158,7 @@ void sge::Universe::loop(){
             collisionShapeManager->alignCollisionShapes();
             collisionManager->updateCollisions();
             animationManager->updateAnimations();
+            scriptedViewManager->runViewScripts();
             sceneManager->alignScene(); // Scene can be reset only after all managers finished their updates to prevent segfaults
         }
         clickableShapeManager->alignClickableShapes();
@@ -1111,7 +1169,9 @@ void sge::Universe::loop(){
         m_windowPtr->clear();
         
         spriteManager->drawSprites(m_windowPtr);
-        debugManager->showDebugInfo(m_windowPtr);
+        debugManager->showDebugInfo(m_windowPtr); // ? show in ui view
+       
+        m_windowPtr->setView(m_uiView);
         uiSpriteManager->drawUISprites(m_windowPtr);
         spriteTextManager->drawSpriteTextObjects(m_windowPtr);
 
@@ -1255,14 +1315,29 @@ bool sge::isMouseOverClickableShape(ClickableShape* clickableShape, sf::RenderWi
 }
 
 
-void sge::SpriteManager::registerSprite(sf::Sprite* sprite){ m_sprites.push_back(sprite); }
-void sge::SpriteManager::deregisterSprite(sf::Sprite* sprite){ m_sprites.erase(std::remove(m_sprites.begin(), m_sprites.end(), sprite), m_sprites.end()); }
+void sge::ScriptedViewManager::registerScriptedView(sge::ScriptedView* scriptedView){ m_scriptedViews.push_back(scriptedView); }
+
+void sge::ScriptedViewManager::runViewScripts(){
+    for(sge::ScriptedView* scriptedView : m_scriptedViews){
+        if(scriptedView->script){
+            scriptedView->script(scriptedView);
+        }
+    }
+}
+
+
+void sge::SpriteManager::registerSprite(sf::View* view, sf::Sprite* sprite){ m_sprites[view].push_back(sprite); }
+void sge::SpriteManager::deregisterSprite(sf::View* view, sf::Sprite* sprite){ m_sprites[view].erase(std::remove(m_sprites[view].begin(), m_sprites[view].end(), sprite), m_sprites[view].end()); }
 void sge::SpriteManager::deregisterAllSprites(){ m_sprites.clear(); }
-std::vector<sf::Sprite*> sge::SpriteManager::getSprites(){ return m_sprites; }
+std::vector<sf::Sprite*> sge::SpriteManager::getViewSprites(sf::View* view){ return m_sprites[view]; }
 
 void sge::SpriteManager::drawSprites(sf::RenderWindow* windowPtr){
-    for(sf::Sprite* sprite : m_sprites){
-        windowPtr->draw(*sprite);
+    for(auto [view, sprites] : m_sprites){
+        windowPtr->setView(*view);
+
+        for(sf::Sprite* sprite : sprites){
+            windowPtr->draw(*sprite);
+        }
     }
 }
 
@@ -1558,8 +1633,8 @@ sge::EntityManager::EntityManager(sge::SpriteManager* spriteManager, sge::Physic
     m_collisionManager = collisionManager;
 }
 
-void sge::EntityManager::registerEntity(sge::Entity* entity){
-    m_spriteManagerPtr->registerSprite(entity->sprite);
+void sge::EntityManager::registerEntity(sf::View* view, sge::Entity* entity){
+    m_spriteManagerPtr->registerSprite(view, entity->sprite);
 
     if(entity->physicalObject){
         m_physicsManagerPtr->registerPhysicalObject(entity->physicalObject);
@@ -1575,33 +1650,35 @@ void sge::EntityManager::registerEntity(sge::Entity* entity){
         m_animationManagerPtr->registerAnimation(entity->animation);
     }
 
-    m_entities.push_back(entity);
+    m_entities[view].push_back(entity);
 }
 
-void sge::EntityManager::registerEntities(std::vector<sge::Entity*> entities){
+void sge::EntityManager::registerEntities(sf::View* view, std::vector<sge::Entity*> entities){
     for(sge::Entity* entity : entities){
-        registerEntity(entity);
+        registerEntity(view, entity);
     }
 }
 
-void sge::EntityManager::deregisterEntity(sge::Entity* entity){
-    m_deregisterEntityFromCoreManagers(entity);
+void sge::EntityManager::deregisterEntity(sf::View* view, sge::Entity* entity){
+    m_deregisterEntityFromCoreManagers(view, entity);
 
-    m_entities.erase(std::remove(m_entities.begin(), m_entities.end(), entity), m_entities.end());    
+    m_entities[view].erase(std::remove(m_entities[view].begin(), m_entities[view].end(), entity), m_entities[view].end());    
 }
 
 void sge::EntityManager::deregisterAllEntities(){
-    for(Entity* entity : m_entities){
-        m_deregisterEntityFromCoreManagers(entity);
+    for(auto& [view, entities] : m_entities){
+        for(Entity* entity : entities){
+            m_deregisterEntityFromCoreManagers(view, entity);
+        }
     }
 
     m_entities.clear();
 }
 
-std::vector<sge::Entity*> sge::EntityManager::getAllEntities(){ return m_entities; }
+std::vector<sge::Entity*> sge::EntityManager::getViewEntities(sf::View* view){ return m_entities[view]; }
 
-void sge::EntityManager::m_deregisterEntityFromCoreManagers(sge::Entity* entity){
-    m_spriteManagerPtr->deregisterSprite(entity->sprite);
+void sge::EntityManager::m_deregisterEntityFromCoreManagers(sf::View* view, sge::Entity* entity){
+    m_spriteManagerPtr->deregisterSprite(view, entity->sprite);
 
     if(entity->physicalObject){
         m_physicsManagerPtr->deregisterPhysicalObject(entity->physicalObject);
@@ -1720,10 +1797,10 @@ sge::CollisionShapeBorder::CollisionShapeBorder(sge::CollisionShape* owner, sge:
 }
 
 
-void sge::Scene::registerEntity(sge::Entity* entity){ m_entities.push_back(entity); }
-void sge::Scene::registerEntities(std::vector<sge::Entity*> entities){
+void sge::Scene::registerEntity(sf::View* view, sge::Entity* entity){ m_entities[view].push_back(entity); }
+void sge::Scene::registerEntities(sf::View* view, std::vector<sge::Entity*> entities){
     for(Entity* entity : entities){
-        registerEntity(entity);
+        registerEntity(view, entity);
     }
 }
 void sge::Scene::registerDebugEntity(sge::DebugEntity* debugEntity){ m_debugEntities.push_back(debugEntity); }
@@ -1738,8 +1815,11 @@ void sge::Scene::registerCollisionPair(std::string name, sge::CollisionPair* col
     m_collisionPairsOrder.push_back(name);
 }
 
-std::vector<sge::Entity*> sge::Scene::getEntities(){ return m_entities; }
+std::vector<sge::Entity*> sge::Scene::getViewEntities(sf::View* view){ return m_entities[view]; }
+std::unordered_map<sf::View*, std::vector<sge::Entity*>> sge::Scene::getEntitiesMap(){ return m_entities; };
+
 std::vector<sge::DebugEntity*> sge::Scene::getDebugEntities(){ return m_debugEntities; }
+
 std::unordered_map<std::string, std::vector<sge::CollisionShape*>> sge::Scene::getCollisionGroups(){ return m_collisionGroups; };
 std::unordered_map<std::string, sge::CollisionPair*> sge::Scene::getCollisionPairs(){ return m_collisionPairs; }
 std::vector<std::string> sge::Scene::getCollisionPairsOrder(){ return m_collisionPairsOrder; };
@@ -1779,7 +1859,9 @@ void sge::SceneManager::alignScene(){
             m_animationManagerPtr->deregisterAllAnimations();
             m_debugManagerPtr->deregisterAllDebugEntities();
 
-            m_entityManagerPtr->registerEntities(m_scenes[m_currentScene]->getEntities());
+            for(auto& [view, entities] : m_scenes[m_currentScene]->getEntitiesMap()){
+                m_entityManagerPtr->registerEntities(view, entities);
+            }
             m_debugManagerPtr->registerDebugEntities(m_scenes[m_currentScene]->getDebugEntities());
             m_collisionManagerPtr->registerCollisionGroups(m_scenes[m_currentScene]->getCollisionGroups());
             m_collisionManagerPtr->registerCollisionPairs(m_scenes[m_currentScene]->getCollisionPairs());

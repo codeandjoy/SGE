@@ -10,6 +10,7 @@ namespace sge{
     class AssetsManager;
     class ControllerManager;
 
+    class ScriptedViewManager;
     class SpriteManager;
     class PhysicsManager;
     class PhysicalObject;
@@ -39,6 +40,7 @@ namespace sge{
             sge::AssetsManager* assetsManager = nullptr;
             sge::ControllerManager* controllerManager = nullptr;
 
+            sge::ScriptedViewManager* scriptedViewManager = nullptr;
             sge::SpriteManager* spriteManager = nullptr;
             sge::PhysicsManager* physicsManager = nullptr;
             sge::CollisionShapeManager* collisionShapeManager = nullptr;
@@ -56,6 +58,7 @@ namespace sge{
 
         private:
             sf::RenderWindow* m_windowPtr;
+            sf::View m_uiView;
 
             sf::Clock m_deltaClock;
     };

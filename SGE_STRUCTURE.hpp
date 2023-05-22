@@ -25,6 +25,8 @@
 
 
 // Logic
+#include "./src/Logic/ScriptedView/ScriptedView.h"
+#include "./src/Logic/ScriptedView/ScriptedViewManager.h"
 #include "./src/Logic/SpriteManager/SpriteManager.h"
 
 #include "./src/Logic/Physics/PhysicsManager.h"

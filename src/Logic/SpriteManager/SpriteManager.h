@@ -1,6 +1,7 @@
 #ifndef SPRITE_MANAGER_H
 #define SPRITE_MANAGER_H
 
+#include <unordered_map>
 #include <vector>
 #include <SFML/Graphics.hpp>
 
@@ -8,15 +9,15 @@
 namespace sge{
     class SpriteManager{
         public:
-            void registerSprite(sf::Sprite* sprite);
-            void deregisterSprite(sf::Sprite* sprite);
+            void registerSprite(sf::View*, sf::Sprite* sprite);
+            void deregisterSprite(sf::View*, sf::Sprite* sprite);
             void deregisterAllSprites();
-            std::vector<sf::Sprite*> getSprites();            
+            std::vector<sf::Sprite*> getViewSprites(sf::View* view);
 
             void drawSprites(sf::RenderWindow* windowPtr);
 
         private:
-            std::vector<sf::Sprite*> m_sprites;
+            std::unordered_map<sf::View*, std::vector<sf::Sprite*>> m_sprites;
     };
 }
 

@@ -15,6 +15,16 @@ int main(){
 
     sge::Universe* universe = new sge::Universe();
 
+    sf::RenderWindow *window = new sf::RenderWindow(sf::VideoMode(1000, 600), "Test");
+    sge::ScriptedView *cameraView = new sge::ScriptedView();
+    cameraView->setCenter(sf::Vector2f(100, 100));
+    cameraView->setSize(sf::Vector2f(250, 150));
+    universe->scriptedViewManager->registerScriptedView(cameraView);
+
+
+    window->setKeyRepeatEnabled(false); // For proper keyboard events handling (e.g. jumping)
+    
+    universe->setupWindow(window);
 
 
     // Load all textures
@@ -53,7 +63,7 @@ int main(){
         }
     }
 
-    universe->entityManager->registerEntities(mapTileEntities);
+    universe->entityManager->registerEntities(cameraView, mapTileEntities);
     //
 
 
@@ -69,7 +79,7 @@ int main(){
 
     boxEntity->physicalObject->acceleration.y = GRAVITY;
     
-    universe->entityManager->registerEntity(boxEntity);
+    universe->entityManager->registerEntity(cameraView, boxEntity);
 
 
     sge::DebugEntity* boxDE = new sge::DebugEntity(boxEntity);
@@ -100,7 +110,7 @@ int main(){
     playerEntity->animation = playerAnimation;
     
 
-    universe->entityManager->registerEntity(playerEntity);
+    universe->entityManager->registerEntity(cameraView, playerEntity);
 
 
     sge::DebugEntity* playerDE = new sge::DebugEntity(playerEntity);
@@ -215,6 +225,22 @@ int main(){
 
 
 
+    // Camera script
+    sf::Vector2f scroll(0, 0);
+    cameraView->script = [playerEntity, &scroll](sge::ScriptedView* thisView){
+        sf::Vector2f center = playerEntity->sprite->getPosition();
+        center.x += 4;
+        center.y += 4;
+
+        scroll.x = center.x - thisView->getCenter().x - scroll.x / 100;
+        scroll.y = center.y - thisView->getCenter().y - scroll.y / 100;
+        
+        thisView->setCenter(center - scroll);
+    };
+    // 
+
+
+
     // Controllers and events
     universe->controllerManager->registerController([playerEntity, playerAnimation, universe](sf::Event event){
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::A)){
@@ -241,14 +267,6 @@ int main(){
 
 
 
-    sf::RenderWindow *window = new sf::RenderWindow(sf::VideoMode(1000, 600), "Test");
-    sf::View *view = new sf::View(sf::Vector2f(100, 100), sf::Vector2f(250, 150));
-    
-    window->setView(*view);
-    window->setKeyRepeatEnabled(false); // For proper keyboard events handling (e.g. jumping)
-    
-    universe->setupWindow(window);
-    
     universe->loop();
 
     return 0;

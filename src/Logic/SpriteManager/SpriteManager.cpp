@@ -1,12 +1,16 @@
 #include "SpriteManager.h"
 
-void sge::SpriteManager::registerSprite(sf::Sprite* sprite){ m_sprites.push_back(sprite); }
-void sge::SpriteManager::deregisterSprite(sf::Sprite* sprite){ m_sprites.erase(std::remove(m_sprites.begin(), m_sprites.end(), sprite), m_sprites.end()); }
+void sge::SpriteManager::registerSprite(sf::View* view, sf::Sprite* sprite){ m_sprites[view].push_back(sprite); }
+void sge::SpriteManager::deregisterSprite(sf::View* view, sf::Sprite* sprite){ m_sprites[view].erase(std::remove(m_sprites[view].begin(), m_sprites[view].end(), sprite), m_sprites[view].end()); }
 void sge::SpriteManager::deregisterAllSprites(){ m_sprites.clear(); }
-std::vector<sf::Sprite*> sge::SpriteManager::getSprites(){ return m_sprites; }
+std::vector<sf::Sprite*> sge::SpriteManager::getViewSprites(sf::View* view){ return m_sprites[view]; }
 
 void sge::SpriteManager::drawSprites(sf::RenderWindow* windowPtr){
-    for(sf::Sprite* sprite : m_sprites){
-        windowPtr->draw(*sprite);
+    for(auto [view, sprites] : m_sprites){
+        windowPtr->setView(*view);
+
+        for(sf::Sprite* sprite : sprites){
+            windowPtr->draw(*sprite);
+        }
     }
 }

@@ -17,8 +17,8 @@ sge::EntityManager::EntityManager(sge::SpriteManager* spriteManager, sge::Physic
 
 
 
-void sge::EntityManager::registerEntity(sge::Entity* entity){
-    m_spriteManagerPtr->registerSprite(entity->sprite);
+void sge::EntityManager::registerEntity(sf::View* view, sge::Entity* entity){
+    m_spriteManagerPtr->registerSprite(view, entity->sprite);
 
     if(entity->physicalObject){
         m_physicsManagerPtr->registerPhysicalObject(entity->physicalObject);
@@ -34,35 +34,37 @@ void sge::EntityManager::registerEntity(sge::Entity* entity){
         m_animationManagerPtr->registerAnimation(entity->animation);
     }
 
-    m_entities.push_back(entity);
+    m_entities[view].push_back(entity);
 }
 
-void sge::EntityManager::registerEntities(std::vector<sge::Entity*> entities){
+void sge::EntityManager::registerEntities(sf::View* view, std::vector<sge::Entity*> entities){
     for(sge::Entity* entity : entities){
-        registerEntity(entity);
+        registerEntity(view, entity);
     }
 }
 
-void sge::EntityManager::deregisterEntity(sge::Entity* entity){
-    m_deregisterEntityFromCoreManagers(entity);
+void sge::EntityManager::deregisterEntity(sf::View* view, sge::Entity* entity){
+    m_deregisterEntityFromCoreManagers(view, entity);
 
-    m_entities.erase(std::remove(m_entities.begin(), m_entities.end(), entity), m_entities.end());    
+    m_entities[view].erase(std::remove(m_entities[view].begin(), m_entities[view].end(), entity), m_entities[view].end());    
 }
 
 void sge::EntityManager::deregisterAllEntities(){
-    for(Entity* entity : m_entities){
-        m_deregisterEntityFromCoreManagers(entity);
+    for(auto& [view, entities] : m_entities){
+        for(Entity* entity : entities){
+            m_deregisterEntityFromCoreManagers(view, entity);
+        }
     }
 
     m_entities.clear();
 }
 
-std::vector<sge::Entity*> sge::EntityManager::getAllEntities(){ return m_entities; }
+std::vector<sge::Entity*> sge::EntityManager::getViewEntities(sf::View* view){ return m_entities[view]; }
 
 
 
-void sge::EntityManager::m_deregisterEntityFromCoreManagers(sge::Entity* entity){
-    m_spriteManagerPtr->deregisterSprite(entity->sprite);
+void sge::EntityManager::m_deregisterEntityFromCoreManagers(sf::View* view, sge::Entity* entity){
+    m_spriteManagerPtr->deregisterSprite(view, entity->sprite);
 
     if(entity->physicalObject){
         m_physicsManagerPtr->deregisterPhysicalObject(entity->physicalObject);

@@ -46,7 +46,9 @@ void sge::SceneManager::alignScene(){
             m_debugManagerPtr->deregisterAllDebugEntities();
 
 
-            m_entityManagerPtr->registerEntities(m_scenes[m_currentScene]->getEntities());
+            for(auto& [view, entities] : m_scenes[m_currentScene]->getEntitiesMap()){
+                m_entityManagerPtr->registerEntities(view, entities);
+            }
             m_debugManagerPtr->registerDebugEntities(m_scenes[m_currentScene]->getDebugEntities());
             m_collisionManagerPtr->registerCollisionGroups(m_scenes[m_currentScene]->getCollisionGroups());
             m_collisionManagerPtr->registerCollisionPairs(m_scenes[m_currentScene]->getCollisionPairs());
