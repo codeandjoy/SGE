@@ -59,6 +59,9 @@
 //
 
 // UI
+#include "./src/UI/UIScreen/UIScreen.h"
+#include "./src/UI/UIScreen/UIScreenManager.h"
+
 #include "./src/UI/UISpriteManager/UISpriteManager.h"
 
 #include "./src/UI/SpriteText/SpriteText.h"

@@ -888,6 +888,60 @@ namespace sge{
 //
 
 // UI
+#ifndef UI_SCREEN_H
+#define UI_SCREEN_H
+
+#include <vector>
+#include <string>
+
+namespace sge{
+    struct UIEntity;
+    class UIEntityManager;
+
+    class UIScreen{
+        public:
+            void addUIEntity(sge::UIEntity* uiEntity);
+            void removeUIEntity(sge::UIEntity* uiEntity);
+            std::vector<sge::UIEntity*> getUIEntities();
+
+            bool isVisible = true;
+
+        private:
+            std::vector<sge::UIEntity*> m_uiEntities;
+    };
+}
+
+#endif
+#ifndef UI_SCREEN_MANAGER_H
+#define UI_SCREEN_MANAGER_H
+
+#include <unordered_map>
+#include <string>
+
+namespace sge{
+    class UIScreen;
+    class UIEntityManager;
+
+    class UIScreenManager{
+        public:
+            UIScreenManager(sge::UIEntityManager* uiEntityManager);
+
+            void registerUIScreen(std::string name, sge::UIScreen* uiScreen);
+            void deregisterUIScreen(std::string name);
+            sge::UIScreen* getUIScreen(std::string name);
+
+            void hideUIScreen(std::string name);
+            void showUIScreen(std::string name);
+
+        private:
+            std::unordered_map<std::string, sge::UIScreen*> m_uiScreens;
+
+            sge::UIEntityManager* m_uiEntityManagerPtr;
+    };
+}
+
+#endif
+
 #ifndef UI_SPRITE_MANAGER_H
 #define UI_SPRITE_MANAGER_H
 
@@ -1869,6 +1923,37 @@ void sge::SceneManager::alignScene(){
 
             m_loadedScene = m_currentScene;
         }
+    }
+}
+#include <algorithm>
+
+void sge::UIScreen::addUIEntity(sge::UIEntity* uiEntity){ m_uiEntities.push_back(uiEntity); }
+void sge::UIScreen::removeUIEntity(sge::UIEntity* uiEntity){ m_uiEntities.erase(std::remove(m_uiEntities.begin(), m_uiEntities.end(), uiEntity), m_uiEntities.end()); }
+std::vector<sge::UIEntity*> sge::UIScreen::getUIEntities(){ return m_uiEntities; }
+
+
+sge::UIScreenManager::UIScreenManager(sge::UIEntityManager* uiEntityManager){ m_uiEntityManagerPtr = uiEntityManager; }
+
+void sge::UIScreenManager::registerUIScreen(std::string name, sge::UIScreen* uiScreen){ m_uiScreens[name] = uiScreen; }
+void sge::UIScreenManager::deregisterUIScreen(std::string name){ m_uiScreens.erase(name); }
+sge::UIScreen* sge::UIScreenManager::getUIScreen(std::string name){ return m_uiScreens[name]; }
+
+void sge::UIScreenManager::hideUIScreen(std::string name){
+    if(m_uiScreens[name]->isVisible){
+        for(UIEntity* uiEntity : m_uiScreens[name]->getUIEntities()){
+            m_uiEntityManagerPtr->hideUIEntity(uiEntity);
+        }
+
+        m_uiScreens[name]->isVisible = false;
+    }
+}
+void sge::UIScreenManager::showUIScreen(std::string name){
+    if(!m_uiScreens[name]->isVisible){
+        for(UIEntity* uiEntity : m_uiScreens[name]->getUIEntities()){
+            m_uiEntityManagerPtr->showUIEntity(uiEntity);
+        }
+
+        m_uiScreens[name]->isVisible = true;
     }
 }
 
