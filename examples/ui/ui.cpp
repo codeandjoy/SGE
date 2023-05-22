@@ -6,9 +6,6 @@ int main(){
     sge::Universe* universe = new sge::Universe();
 
     sf::RenderWindow *window = new sf::RenderWindow(sf::VideoMode(1000, 600), "Test");
-    sf::View *view = new sf::View(sf::Vector2f(125, 75), sf::Vector2f(250, 150));
-    window->setView(*view);
-    window->setKeyRepeatEnabled(false); // For proper keyboard events handling (e.g. jumping)
     
     universe->setupWindow(window);
 
@@ -23,29 +20,53 @@ int main(){
 
 
 
+    sge::UIScreen* hiddenUIScreen = new sge::UIScreen();
+
+    sge::UIEntity* uiAnotherTextEntity = new sge::UIEntity{ new sf::Sprite() };
+    uiAnotherTextEntity->sprite->setPosition(424, 300);
+
+    sge::SpriteText* uiAnotherSpriteText = new sge::SpriteText(uiAnotherTextEntity->sprite);
+    uiAnotherSpriteText->setFont(*universe->assetsManager->getFont("m5x7"));
+    uiAnotherSpriteText->setString("Other UI screen");
+    uiAnotherSpriteText->setFillColor(sf::Color::White);
+    uiAnotherSpriteText->setCharacterSize(30);
+
+    uiAnotherTextEntity->spriteText = uiAnotherSpriteText;
+
+    hiddenUIScreen->addUIEntity(uiAnotherTextEntity);
+
+    universe->uiScreenManager->registerUIScreen("hidden", hiddenUIScreen);
+    universe->uiScreenManager->hideUIScreen("hidden");
+
+
+
+    sge::UIScreen* buttonScreen = new sge::UIScreen();
+
     sge::UIEntity* uiTextEntity = new sge::UIEntity{ new sf::Sprite() };
-    uiTextEntity->sprite->setPosition(125, 40);
+    uiTextEntity->sprite->setPosition(484, 40);
 
     sge::SpriteText* spriteText = new sge::SpriteText(uiTextEntity->sprite);
     spriteText->setFont(*universe->assetsManager->getFont("m5x7"));
     spriteText->setString(std::to_string(clickCount));
     spriteText->setFillColor(sf::Color::White);
     spriteText->setCharacterSize(100);
-    spriteText->setScale(sf::Vector2f(.1, .1)); // Fix blurry text
 
     uiTextEntity->spriteText = spriteText;
 
-    universe->uiEntityManager->registerUIEntity(uiTextEntity);
+    buttonScreen->addUIEntity(uiTextEntity);
 
 
 
     sge::UIEntity* uiButtonEntity = new sge::UIEntity{ new sf::Sprite() };
+    uiButtonEntity->sprite->setScale(2,2);
     uiButtonEntity->sprite->setTexture(*universe->assetsManager->getTextureSheet("button")->getTexture());
     uiButtonEntity->sprite->setTextureRect(universe->assetsManager->getTextureSheet("button")->getTextureRect(0));
-    uiButtonEntity->sprite->setPosition(110, 60);
+    uiButtonEntity->sprite->setPosition(468, 200);
 
     sge::ClickableShape* clicakbleShape = new sge::ClickableShape(uiButtonEntity);
-    clicakbleShape->action = [window, universe, &clickCount, uiTextEntity](sge::ClickableShape* thisClickableShape, sf::Event event){
+    clicakbleShape->action = [window, universe, &clickCount, uiTextEntity, hiddenUIScreen](sge::ClickableShape* thisClickableShape, sf::Event event){
+        
+        
         if(sge::isMouseOverClickableShape(thisClickableShape, window)){
             printf("Mouse over Button\n");
         }
@@ -58,16 +79,29 @@ int main(){
         if(event.type == sf::Event::MouseButtonReleased){
             thisClickableShape->getOwnerUIEntity()->sprite->setTextureRect(universe->assetsManager->getTextureSheet("button")->getTextureRect(0));
             
+            // Click count
             if(sge::isMouseOverClickableShape(thisClickableShape, window)){
                 clickCount++;
                 uiTextEntity->spriteText->setString(std::to_string(clickCount));
             }
+            //
+
+            // Toggle ui screen
+            if(!hiddenUIScreen->isVisible){
+                universe->uiScreenManager->showUIScreen("hidden");
+            }
+            else{
+                universe->uiScreenManager->hideUIScreen("hidden");
+            }
+            //
         }
     };
 
     uiButtonEntity->clickableShape = clicakbleShape;
 
-    universe->uiEntityManager->registerUIEntity(uiButtonEntity);
+    buttonScreen->addUIEntity(uiButtonEntity);
+
+    universe->uiScreenManager->registerUIScreen("buttonScreen", buttonScreen);
 
 
 

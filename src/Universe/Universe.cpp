@@ -13,6 +13,7 @@
 #include "../Logic/Entity/EntityManager.h"
 #include "../Logic/Debug/DebugManager.h"
 #include "../Logic/Scene/SceneManager.h"
+#include "../UI/UIScreen/UIScreenManager.h"
 #include "../UI/UISpriteManager/UISpriteManager.h"
 #include "../UI/SpriteText/SpriteText.h"
 #include "../UI/SpriteText/SpriteTextManager.h"
@@ -52,12 +53,14 @@ sge::Universe::Universe(){
     sge::SpriteTextManager* UISTM = new SpriteTextManager();
     sge::UIAnimationManager* UIAM = new UIAnimationManager();
     sge::UIEntityManager* UIEM = new UIEntityManager(UISM, UICSM, UISTM, UIAM);
+    sge::UIScreenManager* UIScM = new sge::UIScreenManager(UIEM);
 
     uiSpriteManager = UISM;
     clickableShapeManager = UICSM;
     spriteTextManager = UISTM;
     uiAnimationManager = UIAM;
     uiEntityManager = UIEM;
+    uiScreenManager = UIScM;
 }
 
 

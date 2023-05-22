@@ -21,6 +21,7 @@ namespace sge{
     class DebugManager;
     class SceneManager;
     
+    class UIScreenManager;
     class UISpriteManager;
     class ClickableShapeManager;
     class SpriteTextManager;
@@ -55,6 +56,7 @@ namespace sge{
             sge::SpriteTextManager* spriteTextManager = nullptr;
             sge::UIAnimationManager* uiAnimationManager = nullptr;
             sge::UIEntityManager* uiEntityManager = nullptr;
+            sge::UIScreenManager* uiScreenManager = nullptr;
 
         private:
             sf::RenderWindow* m_windowPtr;
