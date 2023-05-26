@@ -2,6 +2,7 @@
 #define SGE_HPP
 
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 
 #include "./src/Universe/Universe.h"
 

@@ -2,6 +2,7 @@
 #define SGE_HPP
 
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 
 #ifndef UNIVERSE_H
 #define UNIVERSE_H
@@ -767,6 +768,7 @@ namespace sge{
 #define DEBUG_MANAGER_H
 
 #include <SFML/Graphics.hpp>
+#include <unordered_map>
 #include <vector>
 
 namespace sge{
@@ -774,15 +776,15 @@ namespace sge{
 
     class DebugManager{
         public:
-            void registerDebugEntity(sge::DebugEntity* debugEntity);
-            void registerDebugEntities(std::vector<sge::DebugEntity*> debugEntities);
-            void deregisterDebugEntity(sge::DebugEntity* debugEntity);
+            void registerDebugEntity(sf::View* view, sge::DebugEntity* debugEntity);
+            void registerDebugEntities(sf::View* view, std::vector<sge::DebugEntity*> debugEntities);
+            void deregisterDebugEntity(sf::View* view, sge::DebugEntity* debugEntity);
             void deregisterAllDebugEntities();
 
             void showDebugInfo(sf::RenderWindow* windowPtr);
 
         private:
-            std::vector<sge::DebugEntity*> m_debugEntities; // ? map<Entity -> DebugEntity> ?
+            std::unordered_map<sf::View*, std::vector<sge::DebugEntity*>> m_debugEntities;
     };
 }
 
@@ -822,8 +824,8 @@ namespace sge{
         public:
             void registerEntity(sf::View* view, sge::Entity* entity);
             void registerEntities(sf::View* view, std::vector<sge::Entity*> entities);
-            void registerDebugEntity(sge::DebugEntity* debugEntity);
-            void registerDebugEntities(std::vector<sge::DebugEntity*> debugEntities);
+            void registerDebugEntity(sf::View* view, sge::DebugEntity* debugEntity);
+            void registerDebugEntities(sf::View* view, std::vector<sge::DebugEntity*> debugEntities);
             void registerCollisionGroup(std::string name, std::vector<sge::CollisionShape*> collisionShapes);
             void registerCollisionPair(std::string name, sge::CollisionPair* collisionPair);
         
@@ -831,7 +833,8 @@ namespace sge{
             std::vector<sge::Entity*> getViewEntities(sf::View* view);
             std::unordered_map<sf::View*, std::vector<sge::Entity*>> getEntitiesMap();
 
-            std::vector<sge::DebugEntity*> getDebugEntities();
+            std::vector<sge::DebugEntity*> getViewDebugEntities(sf::View* view);
+            std::unordered_map<sf::View*, std::vector<sge::DebugEntity*>> getDebugEntitiesMap();
             
             std::unordered_map<std::string, std::vector<sge::CollisionShape*>> getCollisionGroups();
             std::unordered_map<std::string, sge::CollisionPair*> getCollisionPairs();
@@ -839,7 +842,7 @@ namespace sge{
 
         private:
             std::unordered_map<sf::View*, std::vector<sge::Entity*>> m_entities;
-            std::vector<sge::DebugEntity*> m_debugEntities;
+            std::unordered_map<sf::View*, std::vector<sge::DebugEntity*>> m_debugEntities;
             std::unordered_map<std::string, std::vector<sge::CollisionShape*>> m_collisionGroups;
             std::unordered_map<std::string, sge::CollisionPair*> m_collisionPairs;
             std::vector<std::string> m_collisionPairsOrder;
@@ -1836,30 +1839,33 @@ void sge::DebugEntity::addExtraDebugFunction(std::function<void(sf::RenderWindow
 std::vector<std::function<void(sf::RenderWindow* windowPtr)>> sge::DebugEntity::getExtraDebugFunctions(){ return m_extraDebugFunctions; }
 
 
-void sge::DebugManager::registerDebugEntity(sge::DebugEntity* debugEntity){ m_debugEntities.push_back(debugEntity); }
-void sge::DebugManager::registerDebugEntities(std::vector<sge::DebugEntity*> debugEntities){
+void sge::DebugManager::registerDebugEntity(sf::View* view, sge::DebugEntity* debugEntity){ m_debugEntities[view].push_back(debugEntity); }
+void sge::DebugManager::registerDebugEntities(sf::View* view, std::vector<sge::DebugEntity*> debugEntities){
     for(DebugEntity* debugEntity : debugEntities){
-        registerDebugEntity(debugEntity);
+        registerDebugEntity(view, debugEntity);
     }
 }
-void sge::DebugManager::deregisterDebugEntity(sge::DebugEntity* debugEntity){ m_debugEntities.erase(std::remove(m_debugEntities.begin(), m_debugEntities.end(), debugEntity), m_debugEntities.end()); }
+void sge::DebugManager::deregisterDebugEntity(sf::View* view, sge::DebugEntity* debugEntity){ m_debugEntities[view].erase(std::remove(m_debugEntities[view].begin(), m_debugEntities[view].end(), debugEntity), m_debugEntities[view].end()); }
 void sge::DebugManager::deregisterAllDebugEntities(){ m_debugEntities.clear(); }
 
 void sge::DebugManager::showDebugInfo(sf::RenderWindow* windowPtr){
-    for(sge::DebugEntity* debugEntity : m_debugEntities){
-        // Run extraDebugFunctions
-        for(std::function<void(sf::RenderWindow* renderWindow)> extraDebugFunction : debugEntity->getExtraDebugFunctions()){
-            extraDebugFunction(windowPtr);
-        }
-        //
-
-        // Draw collision shape borders
-        if(debugEntity->drawCollisionShapeBorders){
-            for(sge::CollisionShapeBorder* collisionShapeBorder : debugEntity->generateCollisionShapeBorders()){
-                windowPtr->draw(*collisionShapeBorder);
+    for(auto& [view, debugEntities]: m_debugEntities){
+        for(sge::DebugEntity* debugEntity : debugEntities){
+            // Run extraDebugFunctions
+            for(std::function<void(sf::RenderWindow* renderWindow)> extraDebugFunction : debugEntity->getExtraDebugFunctions()){
+                extraDebugFunction(windowPtr);
             }
+            //
+
+            // Draw collision shape borders
+            if(debugEntity->drawCollisionShapeBorders){
+                for(sge::CollisionShapeBorder* collisionShapeBorder : debugEntity->generateCollisionShapeBorders()){
+                    windowPtr->setView(*view);
+                    windowPtr->draw(*collisionShapeBorder);
+                }
+            }
+            //
         }
-        //
     }
 }
 
@@ -1881,10 +1887,10 @@ void sge::Scene::registerEntities(sf::View* view, std::vector<sge::Entity*> enti
         registerEntity(view, entity);
     }
 }
-void sge::Scene::registerDebugEntity(sge::DebugEntity* debugEntity){ m_debugEntities.push_back(debugEntity); }
-void sge::Scene::registerDebugEntities(std::vector<DebugEntity*> debugEntities){
+void sge::Scene::registerDebugEntity(sf::View* view, sge::DebugEntity* debugEntity){ m_debugEntities[view].push_back(debugEntity); }
+void sge::Scene::registerDebugEntities(sf::View* view,std::vector<DebugEntity*> debugEntities){
     for(DebugEntity* debugEntity : debugEntities){
-        registerDebugEntity(debugEntity);
+        registerDebugEntity(view, debugEntity);
     }
 }
 void sge::Scene::registerCollisionGroup(std::string name, std::vector<sge::CollisionShape*> collisionShapes){ m_collisionGroups[name] = collisionShapes; }
@@ -1896,7 +1902,8 @@ void sge::Scene::registerCollisionPair(std::string name, sge::CollisionPair* col
 std::vector<sge::Entity*> sge::Scene::getViewEntities(sf::View* view){ return m_entities[view]; }
 std::unordered_map<sf::View*, std::vector<sge::Entity*>> sge::Scene::getEntitiesMap(){ return m_entities; };
 
-std::vector<sge::DebugEntity*> sge::Scene::getDebugEntities(){ return m_debugEntities; }
+std::vector<sge::DebugEntity*> sge::Scene::getViewDebugEntities(sf::View* view){ return m_debugEntities[view]; }
+std::unordered_map<sf::View*, std::vector<sge::DebugEntity*>> sge::Scene::getDebugEntitiesMap(){ return m_debugEntities; }
 
 std::unordered_map<std::string, std::vector<sge::CollisionShape*>> sge::Scene::getCollisionGroups(){ return m_collisionGroups; };
 std::unordered_map<std::string, sge::CollisionPair*> sge::Scene::getCollisionPairs(){ return m_collisionPairs; }
@@ -1940,7 +1947,9 @@ void sge::SceneManager::alignScene(){
             for(auto& [view, entities] : m_scenes[m_currentScene]->getEntitiesMap()){
                 m_entityManagerPtr->registerEntities(view, entities);
             }
-            m_debugManagerPtr->registerDebugEntities(m_scenes[m_currentScene]->getDebugEntities());
+            for(auto& [view, debugEntities] : m_scenes[m_currentScene]->getDebugEntitiesMap()){
+                m_debugManagerPtr->registerDebugEntities(view, debugEntities);
+            }
             m_collisionManagerPtr->registerCollisionGroups(m_scenes[m_currentScene]->getCollisionGroups());
             m_collisionManagerPtr->registerCollisionPairs(m_scenes[m_currentScene]->getCollisionPairs());
             m_collisionManagerPtr->setCollisionPairsOrder(m_scenes[m_currentScene]->getCollisionPairsOrder());

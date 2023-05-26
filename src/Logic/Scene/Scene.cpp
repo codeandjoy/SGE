@@ -7,10 +7,10 @@ void sge::Scene::registerEntities(sf::View* view, std::vector<sge::Entity*> enti
         registerEntity(view, entity);
     }
 }
-void sge::Scene::registerDebugEntity(sge::DebugEntity* debugEntity){ m_debugEntities.push_back(debugEntity); }
-void sge::Scene::registerDebugEntities(std::vector<DebugEntity*> debugEntities){
+void sge::Scene::registerDebugEntity(sf::View* view, sge::DebugEntity* debugEntity){ m_debugEntities[view].push_back(debugEntity); }
+void sge::Scene::registerDebugEntities(sf::View* view,std::vector<DebugEntity*> debugEntities){
     for(DebugEntity* debugEntity : debugEntities){
-        registerDebugEntity(debugEntity);
+        registerDebugEntity(view, debugEntity);
     }
 }
 void sge::Scene::registerCollisionGroup(std::string name, std::vector<sge::CollisionShape*> collisionShapes){ m_collisionGroups[name] = collisionShapes; }
@@ -23,7 +23,9 @@ std::vector<sge::Entity*> sge::Scene::getViewEntities(sf::View* view){ return m_
 std::unordered_map<sf::View*, std::vector<sge::Entity*>> sge::Scene::getEntitiesMap(){ return m_entities; };
 
 
-std::vector<sge::DebugEntity*> sge::Scene::getDebugEntities(){ return m_debugEntities; }
+std::vector<sge::DebugEntity*> sge::Scene::getViewDebugEntities(sf::View* view){ return m_debugEntities[view]; }
+std::unordered_map<sf::View*, std::vector<sge::DebugEntity*>> sge::Scene::getDebugEntitiesMap(){ return m_debugEntities; }
+
 
 std::unordered_map<std::string, std::vector<sge::CollisionShape*>> sge::Scene::getCollisionGroups(){ return m_collisionGroups; };
 std::unordered_map<std::string, sge::CollisionPair*> sge::Scene::getCollisionPairs(){ return m_collisionPairs; }

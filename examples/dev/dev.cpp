@@ -84,7 +84,7 @@ int main(){
 
     sge::DebugEntity* boxDE = new sge::DebugEntity(boxEntity);
     boxDE->customCollisionShapeBorderSettings["globalBounds"] = sge::CollisionShapeBorderSettings{sf::Color::Green};
-    universe->debugManager->registerDebugEntity(boxDE); // ? make it registerDebugEntityGroup for consistency
+    universe->debugManager->registerDebugEntity(cameraView, boxDE); // ? make it registerDebugEntityGroup for consistency
     //
 
 
@@ -120,7 +120,7 @@ int main(){
     //     printf("%f, %f\n", playerEntity->getPosition().x, playerEntity->getPosition().y);
     // });
 
-    universe->debugManager->registerDebugEntity(playerDE);
+    universe->debugManager->registerDebugEntity(cameraView, playerDE);
     //
 
 
