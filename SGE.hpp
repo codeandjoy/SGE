@@ -150,31 +150,6 @@ namespace sge{
 #endif
 //
 
-// ControllerManager
-#ifndef CONTROLLER_MANAGER_H
-#define CONTROLLER_MANAGER_H
-
-#include <functional>
-#include <vector>
-
-#include <SFML/Graphics.hpp>
-
-namespace sge{
-    class ControllerManager{
-        public:
-            void registerController(std::function<void(sf::Event)> controller);
-            std::vector<std::function<void(sf::Event)>> getAllControllers();       
-
-            void updateControllers(sf::Event event);
-            
-        private:
-            std::vector<std::function<void(sf::Event)>> m_controllers;
-    };
-}
-
-#endif
-//
-
 // Common
 #ifndef ANIMATION_H
 #define ANIMATION_H
@@ -310,6 +285,29 @@ namespace sge{
 //
 
 // Logic
+#ifndef CONTROLLER_MANAGER_H
+#define CONTROLLER_MANAGER_H
+
+#include <functional>
+#include <vector>
+
+#include <SFML/Graphics.hpp>
+
+namespace sge{
+    class ControllerManager{
+        public:
+            void registerController(std::function<void(sf::Event)> controller);
+            std::vector<std::function<void(sf::Event)>> getAllControllers();       
+
+            void updateControllers(sf::Event event);
+            
+        private:
+            std::vector<std::function<void(sf::Event)>> m_controllers;
+    };
+}
+
+#endif
+
 #ifndef SCRIPTED_VIEW_H
 #define SCRIPTED_VIEW_H
 
@@ -1288,16 +1286,6 @@ sf::Texture* sge::TextureSheet::getTexture(){ return &m_textureSheet; }
 sf::IntRect sge::TextureSheet::getTextureRect(int textureN){ return m_textureRects[textureN]; }
 
 
-void sge::ControllerManager::registerController(std::function<void(sf::Event)> controller){ m_controllers.push_back(controller); }
-std::vector<std::function<void(sf::Event)>> sge::ControllerManager::getAllControllers(){ return m_controllers; }
-
-void sge::ControllerManager::updateControllers(sf::Event event){
-    for(std::function<void(sf::Event)> controller : m_controllers){
-        controller(event);
-    }
-}
-
-
 sge::Animation::Animation(sge::TextureSheet* textureSheet, sf::Sprite* ownerSprite, int initialTextureN){
     m_textureSheet = textureSheet;
     m_ownerSpritePtr = ownerSprite;
@@ -1392,6 +1380,16 @@ void sge::ClickableShapeManager::updateClickableShapes(sf::Event event){
 
 bool sge::isMouseOverClickableShape(ClickableShape* clickableShape, sf::RenderWindow* window){
     return clickableShape->getOwnerUIEntity()->sprite->getGlobalBounds().contains(window->mapPixelToCoords(sf::Mouse::getPosition(*window)));
+}
+
+
+void sge::ControllerManager::registerController(std::function<void(sf::Event)> controller){ m_controllers.push_back(controller); }
+std::vector<std::function<void(sf::Event)>> sge::ControllerManager::getAllControllers(){ return m_controllers; }
+
+void sge::ControllerManager::updateControllers(sf::Event event){
+    for(std::function<void(sf::Event)> controller : m_controllers){
+        controller(event);
+    }
 }
 
 

@@ -11,9 +11,6 @@
 #include "./src/Assets/Texture/TextureSheet.h"
 //
 
-// ControllerManager
-#include "./src/Controller/ControllerManager.h"
-//
 
 // Common
 #include "./src/Common/Animation/Animation.h"
@@ -25,6 +22,8 @@
 
 
 // Logic
+#include "./src/Logic/Controller/ControllerManager.h"
+
 #include "./src/Logic/ScriptedView/ScriptedView.h"
 #include "./src/Logic/ScriptedView/ScriptedViewManager.h"
 #include "./src/Logic/SpriteManager/SpriteManager.h"
