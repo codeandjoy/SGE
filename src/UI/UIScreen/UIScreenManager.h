@@ -16,7 +16,7 @@ namespace sge{
             void registerUIScreen(std::string name, sge::UIScreen* uiScreen);
             void deregisterUIScreen(std::string name);
             void updateUIScreen(std::string name);            
-            sge::UIScreen* getUIScreen(std::string name);   
+            sge::UIScreen* getUIScreen(std::string name);
 
             void hideUIScreen(std::string name);
             void showUIScreen(std::string name);
