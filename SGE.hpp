@@ -77,6 +77,8 @@ namespace sge{
 
 #include <unordered_map>
 #include <string>
+#include <utility>
+#include <SFML/Audio.hpp>
 
 #ifndef TEXTURE_SHEET_SIZES_H
 #define TEXTURE_SHEET_SIZES_H
@@ -105,9 +107,17 @@ namespace sge{
             void loadFont(std::string location, std::string name);
             sf::Font* getFont(std::string name);
 
+            void loadSFX(std::string location, std::string name);
+            sf::Sound* getSound(std::string name);
+
+            void specifyMusicLocation(std::string location, std::string name);
+            std::string getMusicLocation(std::string name);
+
         private:
             std::unordered_map<std::string, sge::TextureSheet*> m_textures;
             std::unordered_map<std::string, sf::Font*> m_fonts;
+            std::unordered_map<std::string, std::pair<sf::SoundBuffer*, sf::Sound*>> m_sfx;
+            std::unordered_map<std::string, std::string> m_musicLocations;
     };
 }
 
@@ -1248,6 +1258,18 @@ void sge::AssetsManager::loadFont(std::string location, std::string name){
     m_fonts[name] = font;
 }
 sf::Font* sge::AssetsManager::getFont(std::string name){ return m_fonts[name]; }
+
+void sge::AssetsManager::loadSFX(std::string location, std::string name){
+    sf::SoundBuffer* buffer = new sf::SoundBuffer();
+    buffer->loadFromFile(location);
+
+    sf::Sound* sound = new sf::Sound(*buffer);
+    m_sfx[name] = std::make_pair(buffer, sound);
+}
+sf::Sound* sge::AssetsManager::getSound(std::string name){ return m_sfx[name].second; }
+
+void sge::AssetsManager::specifyMusicLocation(std::string location, std::string name){ m_musicLocations[name] = location; }
+std::string sge::AssetsManager::getMusicLocation(std::string name){ return m_musicLocations[name]; }
 
 
 sge::TextureSheet::TextureSheet(sge::TextureSheetSizes textureSheetSizes, std::string location){
