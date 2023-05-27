@@ -16,6 +16,8 @@ void sge::DebugManager::deregisterAllDebugEntities(){ m_debugEntities.clear(); }
 
 void sge::DebugManager::showDebugInfo(sf::RenderWindow* windowPtr){
     for(auto& [view, debugEntities]: m_debugEntities){
+        windowPtr->setView(*view);
+        
         for(sge::DebugEntity* debugEntity : debugEntities){
             // Run extraDebugFunctions
             for(std::function<void(sf::RenderWindow* renderWindow)> extraDebugFunction : debugEntity->getExtraDebugFunctions()){
@@ -26,7 +28,6 @@ void sge::DebugManager::showDebugInfo(sf::RenderWindow* windowPtr){
             // Draw collision shape borders
             if(debugEntity->drawCollisionShapeBorders){
                 for(sge::CollisionShapeBorder* collisionShapeBorder : debugEntity->generateCollisionShapeBorders()){
-                    windowPtr->setView(*view);
                     windowPtr->draw(*collisionShapeBorder);
                 }
             }
