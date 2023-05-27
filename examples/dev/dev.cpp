@@ -14,6 +14,7 @@ int main(){
 
 
     sge::Universe* universe = new sge::Universe();
+    universe->setupDebug();
 
     sf::RenderWindow *window = new sf::RenderWindow(sf::VideoMode(1000, 600), "Test");
     sge::ScriptedView *cameraView = new sge::ScriptedView();

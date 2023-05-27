@@ -32,8 +32,7 @@ sge::Universe::Universe(){
     sge::AnimationManager* AnM = new sge::AnimationManager();
     sge::CollisionManager* CM = new sge::CollisionManager();
     sge::EntityManager* EM = new sge::EntityManager(SpM, PM, CSM, AnM, CM);
-    sge::DebugManager* DM = new sge::DebugManager();
-    sge::SceneManager* ScM = new sge::SceneManager(SpM, PM, CSM, AnM, CM, EM, DM);
+    sge::SceneManager* ScM = new sge::SceneManager(SpM, PM, CSM, AnM, CM, EM);
 
     assetsManager = AsM;
     controllerManager = CoM;
@@ -45,7 +44,6 @@ sge::Universe::Universe(){
     animationManager = AnM;
     collisionManager = CM;
     entityManager = EM;
-    debugManager = DM;
     sceneManager = ScM;
     
     sge::UISpriteManager* UISM = new sge::UISpriteManager();
@@ -69,7 +67,12 @@ void sge::Universe::setupWindow(sf::RenderWindow *window){
     m_windowPtr = window;
     m_uiView = window->getDefaultView();
 }
+void sge::Universe::setupDebug(){
+    sge::DebugManager* debugManagerPtr = new sge::DebugManager();
+    debugManager = debugManagerPtr;
 
+   sceneManager->setupDebug(debugManagerPtr);
+}
 
 
 void sge::Universe::loop(){

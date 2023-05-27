@@ -39,12 +39,15 @@ namespace sge{
 
             bool isPaused = false;
 
-            void setupWindow(sf::RenderWindow* window);
+            void setupWindow(sf::RenderWindow* window); // ! move window init to constructor
+            void setupDebug();
             void loop();
 
             sge::AssetsManager* assetsManager = nullptr;
             sge::ControllerManager* controllerManager = nullptr;
 
+            sge::DebugManager* debugManager = nullptr;
+            
             sge::ScriptedViewManager* scriptedViewManager = nullptr;
             sge::SpriteManager* spriteManager = nullptr;
             sge::PhysicsManager* physicsManager = nullptr;
@@ -52,7 +55,6 @@ namespace sge{
             sge::AnimationManager* animationManager = nullptr;
             sge::CollisionManager* collisionManager = nullptr;
             sge::EntityManager* entityManager = nullptr;
-            sge::DebugManager* debugManager = nullptr;
             sge::SceneManager* sceneManager = nullptr;
 
             sge::UISpriteManager* uiSpriteManager = nullptr;
@@ -877,9 +879,10 @@ namespace sge{
                 sge::CollisionShapeManager* collisionShapeManager,
                 sge::AnimationManager* animationManager,
                 sge::CollisionManager* collisionManager,
-                sge::EntityManager* entityManager,
-                sge::DebugManager* debugManager
+                sge::EntityManager* entityManager
             );
+
+            void setupDebug(sge::DebugManager* debugManager);
 
             void registerScene(std::string name, sge::Scene* scene);
             void setCurrentScene(std::string name);
@@ -890,13 +893,13 @@ namespace sge{
             std::string m_currentScene = "";
             std::string m_loadedScene = "";
 
-            sge::SpriteManager* m_spriteManagerPtr;
-            sge::PhysicsManager* m_physicsManagerPtr;
-            sge::CollisionShapeManager* m_collisionShapeManagerPtr;
-            sge::AnimationManager* m_animationManagerPtr;
-            sge::CollisionManager* m_collisionManagerPtr;
-            sge::EntityManager* m_entityManagerPtr;
-            sge::DebugManager* m_debugManagerPtr;
+            sge::SpriteManager* m_spriteManagerPtr = nullptr;
+            sge::PhysicsManager* m_physicsManagerPtr = nullptr;
+            sge::CollisionShapeManager* m_collisionShapeManagerPtr = nullptr;
+            sge::AnimationManager* m_animationManagerPtr = nullptr;
+            sge::CollisionManager* m_collisionManagerPtr = nullptr;
+            sge::EntityManager* m_entityManagerPtr = nullptr;
+            sge::DebugManager* m_debugManagerPtr = nullptr;
     };
 }
 
@@ -1163,8 +1166,7 @@ sge::Universe::Universe(){
     sge::AnimationManager* AnM = new sge::AnimationManager();
     sge::CollisionManager* CM = new sge::CollisionManager();
     sge::EntityManager* EM = new sge::EntityManager(SpM, PM, CSM, AnM, CM);
-    sge::DebugManager* DM = new sge::DebugManager();
-    sge::SceneManager* ScM = new sge::SceneManager(SpM, PM, CSM, AnM, CM, EM, DM);
+    sge::SceneManager* ScM = new sge::SceneManager(SpM, PM, CSM, AnM, CM, EM);
 
     assetsManager = AsM;
     controllerManager = CoM;
@@ -1176,7 +1178,6 @@ sge::Universe::Universe(){
     animationManager = AnM;
     collisionManager = CM;
     entityManager = EM;
-    debugManager = DM;
     sceneManager = ScM;
     
     sge::UISpriteManager* UISM = new sge::UISpriteManager();
@@ -1197,6 +1198,12 @@ sge::Universe::Universe(){
 void sge::Universe::setupWindow(sf::RenderWindow *window){
     m_windowPtr = window;
     m_uiView = window->getDefaultView();
+}
+void sge::Universe::setupDebug(){
+    sge::DebugManager* debugManagerPtr = new sge::DebugManager();
+    debugManager = debugManagerPtr;
+
+   sceneManager->setupDebug(debugManagerPtr);
 }
 
 void sge::Universe::loop(){
@@ -1921,8 +1928,7 @@ sge::SceneManager::SceneManager(
         sge::CollisionShapeManager* collisionShapeManager,
         sge::AnimationManager* animationManager,
         sge::CollisionManager* collisionManager,
-        sge::EntityManager* entityManager,
-        sge::DebugManager* debugManager
+        sge::EntityManager* entityManager
     ){
     
     
@@ -1932,8 +1938,9 @@ sge::SceneManager::SceneManager(
     m_animationManagerPtr = animationManager;
     m_collisionManagerPtr = collisionManager;
     m_entityManagerPtr = entityManager;
-    m_debugManagerPtr = debugManager;
 }
+
+void sge::SceneManager::setupDebug(sge::DebugManager* debugManager){ m_debugManagerPtr = debugManager; }
 
 void sge::SceneManager::registerScene(std::string name, sge::Scene* scene){ m_scenes[name] = scene; }
 void sge::SceneManager::setCurrentScene(std::string name){ m_currentScene = name; }
@@ -1947,17 +1954,21 @@ void sge::SceneManager::alignScene(){
             m_collisionManagerPtr->deregisterAllCollisionGroups();
             m_collisionManagerPtr->deregisterAllCollisionPairs();
             m_animationManagerPtr->deregisterAllAnimations();
-            m_debugManagerPtr->deregisterAllDebugEntities();
 
             for(auto& [view, entities] : m_scenes[m_currentScene]->getEntitiesMap()){
                 m_entityManagerPtr->registerEntities(view, entities);
             }
-            for(auto& [view, debugEntities] : m_scenes[m_currentScene]->getDebugEntitiesMap()){
-                m_debugManagerPtr->registerDebugEntities(view, debugEntities);
-            }
             m_collisionManagerPtr->registerCollisionGroups(m_scenes[m_currentScene]->getCollisionGroups());
             m_collisionManagerPtr->registerCollisionPairs(m_scenes[m_currentScene]->getCollisionPairs());
             m_collisionManagerPtr->setCollisionPairsOrder(m_scenes[m_currentScene]->getCollisionPairsOrder());
+
+            if(m_debugManagerPtr){
+                m_debugManagerPtr->deregisterAllDebugEntities();
+
+                for(auto& [view, debugEntities] : m_scenes[m_currentScene]->getDebugEntitiesMap()){
+                    m_debugManagerPtr->registerDebugEntities(view, debugEntities);
+                }
+            }
 
             m_loadedScene = m_currentScene;
         }

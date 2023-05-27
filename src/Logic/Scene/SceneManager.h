@@ -23,9 +23,11 @@ namespace sge{
                 sge::CollisionShapeManager* collisionShapeManager,
                 sge::AnimationManager* animationManager,
                 sge::CollisionManager* collisionManager,
-                sge::EntityManager* entityManager,
-                sge::DebugManager* debugManager
+                sge::EntityManager* entityManager
             );
+
+
+            void setupDebug(sge::DebugManager* debugManager);
 
 
             void registerScene(std::string name, sge::Scene* scene);
@@ -37,13 +39,13 @@ namespace sge{
             std::string m_currentScene = "";
             std::string m_loadedScene = "";
 
-            sge::SpriteManager* m_spriteManagerPtr;
-            sge::PhysicsManager* m_physicsManagerPtr;
-            sge::CollisionShapeManager* m_collisionShapeManagerPtr;
-            sge::AnimationManager* m_animationManagerPtr;
-            sge::CollisionManager* m_collisionManagerPtr;
-            sge::EntityManager* m_entityManagerPtr;
-            sge::DebugManager* m_debugManagerPtr;
+            sge::SpriteManager* m_spriteManagerPtr = nullptr;
+            sge::PhysicsManager* m_physicsManagerPtr = nullptr;
+            sge::CollisionShapeManager* m_collisionShapeManagerPtr = nullptr;
+            sge::AnimationManager* m_animationManagerPtr = nullptr;
+            sge::CollisionManager* m_collisionManagerPtr = nullptr;
+            sge::EntityManager* m_entityManagerPtr = nullptr;
+            sge::DebugManager* m_debugManagerPtr = nullptr;
     };
 }
 

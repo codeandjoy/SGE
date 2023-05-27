@@ -15,8 +15,7 @@ sge::SceneManager::SceneManager(
         sge::CollisionShapeManager* collisionShapeManager,
         sge::AnimationManager* animationManager,
         sge::CollisionManager* collisionManager,
-        sge::EntityManager* entityManager,
-        sge::DebugManager* debugManager
+        sge::EntityManager* entityManager
     ){
     
     
@@ -26,8 +25,11 @@ sge::SceneManager::SceneManager(
     m_animationManagerPtr = animationManager;
     m_collisionManagerPtr = collisionManager;
     m_entityManagerPtr = entityManager;
-    m_debugManagerPtr = debugManager;
 }
+
+
+
+void sge::SceneManager::setupDebug(sge::DebugManager* debugManager){ m_debugManagerPtr = debugManager; }
 
 
 
@@ -43,18 +45,24 @@ void sge::SceneManager::alignScene(){
             m_collisionManagerPtr->deregisterAllCollisionGroups();
             m_collisionManagerPtr->deregisterAllCollisionPairs();
             m_animationManagerPtr->deregisterAllAnimations();
-            m_debugManagerPtr->deregisterAllDebugEntities();
 
 
             for(auto& [view, entities] : m_scenes[m_currentScene]->getEntitiesMap()){
                 m_entityManagerPtr->registerEntities(view, entities);
             }
-            for(auto& [view, debugEntities] : m_scenes[m_currentScene]->getDebugEntitiesMap()){
-                m_debugManagerPtr->registerDebugEntities(view, debugEntities);
-            }
             m_collisionManagerPtr->registerCollisionGroups(m_scenes[m_currentScene]->getCollisionGroups());
             m_collisionManagerPtr->registerCollisionPairs(m_scenes[m_currentScene]->getCollisionPairs());
             m_collisionManagerPtr->setCollisionPairsOrder(m_scenes[m_currentScene]->getCollisionPairsOrder());
+
+
+            if(m_debugManagerPtr){
+                m_debugManagerPtr->deregisterAllDebugEntities();
+
+                for(auto& [view, debugEntities] : m_scenes[m_currentScene]->getDebugEntitiesMap()){
+                    m_debugManagerPtr->registerDebugEntities(view, debugEntities);
+                }
+            }
+
 
             m_loadedScene = m_currentScene;
         }

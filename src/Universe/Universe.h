@@ -34,13 +34,16 @@ namespace sge{
 
             bool isPaused = false;
 
-            void setupWindow(sf::RenderWindow* window);
+            void setupWindow(sf::RenderWindow* window); // ! move window init to constructor
+            void setupDebug();
             void loop();
 
 
             sge::AssetsManager* assetsManager = nullptr;
             sge::ControllerManager* controllerManager = nullptr;
 
+            sge::DebugManager* debugManager = nullptr;
+            
             sge::ScriptedViewManager* scriptedViewManager = nullptr;
             sge::SpriteManager* spriteManager = nullptr;
             sge::PhysicsManager* physicsManager = nullptr;
@@ -48,7 +51,6 @@ namespace sge{
             sge::AnimationManager* animationManager = nullptr;
             sge::CollisionManager* collisionManager = nullptr;
             sge::EntityManager* entityManager = nullptr;
-            sge::DebugManager* debugManager = nullptr;
             sge::SceneManager* sceneManager = nullptr;
 
             sge::UISpriteManager* uiSpriteManager = nullptr;
