@@ -1,6 +1,6 @@
 #include "DebugManager.h"
-#include "DebugEntity.h"
-#include "CollisionShapeBorder.h"
+#include "../DebugEntity/DebugEntity.h"
+#include "../CollisionShapeBorder/CollisionShapeBorder.h"
 
 
 void sge::DebugManager::registerDebugEntity(sf::View* view, sge::DebugEntity* debugEntity){ m_debugEntities[view].push_back(debugEntity); }

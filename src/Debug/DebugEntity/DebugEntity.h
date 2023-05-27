@@ -7,7 +7,7 @@
 #include <string>
 #include <functional>
 
-#include "CollisionShapeBorderSettings.h"
+#include "../CollisionShapeBorder/CollisionShapeBorderSettings.h"
 
 
 namespace sge{

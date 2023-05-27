@@ -1,6 +1,6 @@
-#include "../CollisionShape/CollisionShape.h"
 #include "CollisionShapeBorder.h"
 #include "CollisionShapeBorderSettings.h"
+#include "../../Logic/CollisionShape/CollisionShape.h"
 
 
 sge::CollisionShapeBorder::CollisionShapeBorder(sge::CollisionShape* owner, sge::CollisionShapeBorderSettings settings){

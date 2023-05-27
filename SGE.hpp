@@ -285,6 +285,99 @@ namespace sge{
 #endif
 //
 
+// Debug
+#ifndef DEBUG_ENTITY_H
+#define DEBUG_ENTITY_H
+
+#include <SFML/Graphics.hpp> 
+#include <unordered_map>
+#include <vector>
+#include <string>
+#include <functional>
+
+#ifndef COLLISION_SHAPE_BORDER_SETTINGS_H
+#define COLLISION_SHAPE_BORDER_SETTINGS_H
+
+#include <SFML/Graphics.hpp>
+
+namespace sge{
+    struct CollisionShapeBorderSettings{
+        sf::Color color = sf::Color::Blue;
+        float thickness = .5;
+    };
+}
+
+#endif
+
+namespace sge{
+    class Entity;
+    class CollisionShapeBorder;
+
+    class DebugEntity{
+        public:
+            DebugEntity(sge::Entity* relatedEntity);
+
+            sge::Entity* getRelatedEntity();
+
+            bool drawCollisionShapeBorders = true;
+            std::unordered_map<std::string, sge::CollisionShapeBorderSettings> customCollisionShapeBorderSettings;
+            std::vector<sge::CollisionShapeBorder*> generateCollisionShapeBorders();
+
+            void addExtraDebugFunction(std::function<void(sf::RenderWindow* windowPtr)> extraDebugFunction);
+            std::vector<std::function<void(sf::RenderWindow* windowPtr)>> getExtraDebugFunctions();
+
+        private:
+            sge::Entity* m_relatedEntity;
+            sge::CollisionShapeBorderSettings m_defaultCollisionShapeBorderSettings = sge::CollisionShapeBorderSettings();
+            std::vector<std::function<void(sf::RenderWindow* windowPtr)>> m_extraDebugFunctions;
+    };
+}
+
+#endif
+#ifndef DEBUG_MANAGER_H
+#define DEBUG_MANAGER_H
+
+#include <SFML/Graphics.hpp>
+#include <unordered_map>
+#include <vector>
+
+namespace sge{
+    class DebugEntity;
+
+    class DebugManager{
+        public:
+            void registerDebugEntity(sf::View* view, sge::DebugEntity* debugEntity);
+            void registerDebugEntities(sf::View* view, std::vector<sge::DebugEntity*> debugEntities);
+            void deregisterDebugEntity(sf::View* view, sge::DebugEntity* debugEntity);
+            void deregisterAllDebugEntities();
+
+            void showDebugInfo(sf::RenderWindow* windowPtr);
+
+        private:
+            std::unordered_map<sf::View*, std::vector<sge::DebugEntity*>> m_debugEntities;
+    };
+}
+
+#endif
+#ifndef COLLISION_SHAPE_BORDER_H
+#define COLLISION_SHAPE_BORDER_H
+
+#include <SFML/Graphics.hpp>
+
+namespace sge{
+    class CollisionShape;
+    struct CollisionShapeBorderSettings;
+
+    class CollisionShapeBorder : public sf::RectangleShape{
+        public:
+            CollisionShapeBorder(sge::CollisionShape* owner, sge::CollisionShapeBorderSettings settings);
+    };
+}
+
+#endif
+
+//
+
 // Logic
 #ifndef CONTROLLER_MANAGER_H
 #define CONTROLLER_MANAGER_H
@@ -716,96 +809,6 @@ namespace sge{
 
 #endif
 
-#ifndef DEBUG_ENTITY_H
-#define DEBUG_ENTITY_H
-
-#include <SFML/Graphics.hpp> 
-#include <unordered_map>
-#include <vector>
-#include <string>
-#include <functional>
-
-#ifndef COLLISION_SHAPE_BORDER_SETTINGS_H
-#define COLLISION_SHAPE_BORDER_SETTINGS_H
-
-#include <SFML/Graphics.hpp>
-
-namespace sge{
-    struct CollisionShapeBorderSettings{
-        sf::Color color = sf::Color::Blue;
-        float thickness = .5;
-    };
-}
-
-#endif
-
-namespace sge{
-    class Entity;
-    class CollisionShapeBorder;
-
-    class DebugEntity{
-        public:
-            DebugEntity(sge::Entity* relatedEntity);
-
-            sge::Entity* getRelatedEntity();
-
-            bool drawCollisionShapeBorders = true;
-            std::unordered_map<std::string, sge::CollisionShapeBorderSettings> customCollisionShapeBorderSettings;
-            std::vector<sge::CollisionShapeBorder*> generateCollisionShapeBorders();
-
-            void addExtraDebugFunction(std::function<void(sf::RenderWindow* windowPtr)> extraDebugFunction);
-            std::vector<std::function<void(sf::RenderWindow* windowPtr)>> getExtraDebugFunctions();
-
-        private:
-            sge::Entity* m_relatedEntity;
-            sge::CollisionShapeBorderSettings m_defaultCollisionShapeBorderSettings = sge::CollisionShapeBorderSettings();
-            std::vector<std::function<void(sf::RenderWindow* windowPtr)>> m_extraDebugFunctions;
-    };
-}
-
-#endif
-#ifndef DEBUG_MANAGER_H
-#define DEBUG_MANAGER_H
-
-#include <SFML/Graphics.hpp>
-#include <unordered_map>
-#include <vector>
-
-namespace sge{
-    class DebugEntity;
-
-    class DebugManager{
-        public:
-            void registerDebugEntity(sf::View* view, sge::DebugEntity* debugEntity);
-            void registerDebugEntities(sf::View* view, std::vector<sge::DebugEntity*> debugEntities);
-            void deregisterDebugEntity(sf::View* view, sge::DebugEntity* debugEntity);
-            void deregisterAllDebugEntities();
-
-            void showDebugInfo(sf::RenderWindow* windowPtr);
-
-        private:
-            std::unordered_map<sf::View*, std::vector<sge::DebugEntity*>> m_debugEntities;
-    };
-}
-
-#endif
-#ifndef COLLISION_SHAPE_BORDER_H
-#define COLLISION_SHAPE_BORDER_H
-
-#include <SFML/Graphics.hpp>
-
-namespace sge{
-    class CollisionShape;
-    struct CollisionShapeBorderSettings;
-
-    class CollisionShapeBorder : public sf::RectangleShape{
-        public:
-            CollisionShapeBorder(sge::CollisionShape* owner, sge::CollisionShapeBorderSettings settings);
-    };
-}
-
-#endif
-
 #ifndef SCENE_H
 #define SCENE_H
 
@@ -941,6 +944,7 @@ namespace sge{
 
             void registerUIScreen(std::string name, sge::UIScreen* uiScreen);
             void deregisterUIScreen(std::string name);
+            void updateUIScreen(std::string name);            
             sge::UIScreen* getUIScreen(std::string name);
 
             void hideUIScreen(std::string name);
@@ -1386,6 +1390,71 @@ bool sge::isMouseOverClickableShape(ClickableShape* clickableShape, sf::RenderWi
 }
 
 
+sge::DebugEntity::DebugEntity(sge::Entity* relatedEntity){ m_relatedEntity = relatedEntity; }
+
+sge::Entity* sge::DebugEntity::getRelatedEntity(){ return m_relatedEntity; }
+
+std::vector<sge::CollisionShapeBorder*> sge::DebugEntity::generateCollisionShapeBorders(){
+    std::vector<sge::CollisionShapeBorder*> collisionShapeBorders;
+    for(auto &[name, collisionShape] : m_relatedEntity->collisionShapes){
+        if(customCollisionShapeBorderSettings.count(name)){
+            collisionShapeBorders.push_back(new sge::CollisionShapeBorder(collisionShape, customCollisionShapeBorderSettings[name]));
+        }
+        else{
+            collisionShapeBorders.push_back(new sge::CollisionShapeBorder(collisionShape, m_defaultCollisionShapeBorderSettings));
+        }
+    }
+
+    return collisionShapeBorders;
+}
+
+void sge::DebugEntity::addExtraDebugFunction(std::function<void(sf::RenderWindow* windowPtr)> extraDebugFunction){ m_extraDebugFunctions.push_back(extraDebugFunction); }
+std::vector<std::function<void(sf::RenderWindow* windowPtr)>> sge::DebugEntity::getExtraDebugFunctions(){ return m_extraDebugFunctions; }
+
+
+void sge::DebugManager::registerDebugEntity(sf::View* view, sge::DebugEntity* debugEntity){ m_debugEntities[view].push_back(debugEntity); }
+void sge::DebugManager::registerDebugEntities(sf::View* view, std::vector<sge::DebugEntity*> debugEntities){
+    for(DebugEntity* debugEntity : debugEntities){
+        registerDebugEntity(view, debugEntity);
+    }
+}
+void sge::DebugManager::deregisterDebugEntity(sf::View* view, sge::DebugEntity* debugEntity){ m_debugEntities[view].erase(std::remove(m_debugEntities[view].begin(), m_debugEntities[view].end(), debugEntity), m_debugEntities[view].end()); }
+void sge::DebugManager::deregisterAllDebugEntities(){ m_debugEntities.clear(); }
+
+void sge::DebugManager::showDebugInfo(sf::RenderWindow* windowPtr){
+    for(auto& [view, debugEntities]: m_debugEntities){
+        windowPtr->setView(*view);
+        
+        for(sge::DebugEntity* debugEntity : debugEntities){
+            // Run extraDebugFunctions
+            for(std::function<void(sf::RenderWindow* renderWindow)> extraDebugFunction : debugEntity->getExtraDebugFunctions()){
+                extraDebugFunction(windowPtr);
+            }
+            //
+
+            // Draw collision shape borders
+            if(debugEntity->drawCollisionShapeBorders){
+                for(sge::CollisionShapeBorder* collisionShapeBorder : debugEntity->generateCollisionShapeBorders()){
+                    windowPtr->draw(*collisionShapeBorder);
+                }
+            }
+            //
+        }
+    }
+}
+
+
+sge::CollisionShapeBorder::CollisionShapeBorder(sge::CollisionShape* owner, sge::CollisionShapeBorderSettings settings){
+    this->setFillColor(sf::Color(0,0,0,0));
+
+    this->setOutlineColor(settings.color);
+    this->setOutlineThickness(settings.thickness);
+
+    this->setPosition(sf::Vector2f(owner->getPosition().x + settings.thickness, owner->getPosition().y + settings.thickness));
+    this->setSize(sf::Vector2f(owner->getSize().x - settings.thickness*2, owner->getSize().y - settings.thickness*2));
+}
+
+
 void sge::ControllerManager::registerController(std::function<void(sf::Event)> controller){ m_controllers.push_back(controller); }
 std::vector<std::function<void(sf::Event)>> sge::ControllerManager::getAllControllers(){ return m_controllers; }
 
@@ -1817,70 +1886,6 @@ sge::Entity* sge::buildMobileEntity(sf::Texture* texture, sf::IntRect textureRec
 }
 
 
-sge::DebugEntity::DebugEntity(sge::Entity* relatedEntity){ m_relatedEntity = relatedEntity; }
-
-sge::Entity* sge::DebugEntity::getRelatedEntity(){ return m_relatedEntity; }
-
-std::vector<sge::CollisionShapeBorder*> sge::DebugEntity::generateCollisionShapeBorders(){
-    std::vector<sge::CollisionShapeBorder*> collisionShapeBorders;
-    for(auto &[name, collisionShape] : m_relatedEntity->collisionShapes){
-        if(customCollisionShapeBorderSettings.count(name)){
-            collisionShapeBorders.push_back(new sge::CollisionShapeBorder(collisionShape, customCollisionShapeBorderSettings[name]));
-        }
-        else{
-            collisionShapeBorders.push_back(new sge::CollisionShapeBorder(collisionShape, m_defaultCollisionShapeBorderSettings));
-        }
-    }
-
-    return collisionShapeBorders;
-}
-
-void sge::DebugEntity::addExtraDebugFunction(std::function<void(sf::RenderWindow* windowPtr)> extraDebugFunction){ m_extraDebugFunctions.push_back(extraDebugFunction); }
-std::vector<std::function<void(sf::RenderWindow* windowPtr)>> sge::DebugEntity::getExtraDebugFunctions(){ return m_extraDebugFunctions; }
-
-
-void sge::DebugManager::registerDebugEntity(sf::View* view, sge::DebugEntity* debugEntity){ m_debugEntities[view].push_back(debugEntity); }
-void sge::DebugManager::registerDebugEntities(sf::View* view, std::vector<sge::DebugEntity*> debugEntities){
-    for(DebugEntity* debugEntity : debugEntities){
-        registerDebugEntity(view, debugEntity);
-    }
-}
-void sge::DebugManager::deregisterDebugEntity(sf::View* view, sge::DebugEntity* debugEntity){ m_debugEntities[view].erase(std::remove(m_debugEntities[view].begin(), m_debugEntities[view].end(), debugEntity), m_debugEntities[view].end()); }
-void sge::DebugManager::deregisterAllDebugEntities(){ m_debugEntities.clear(); }
-
-void sge::DebugManager::showDebugInfo(sf::RenderWindow* windowPtr){
-    for(auto& [view, debugEntities]: m_debugEntities){
-        for(sge::DebugEntity* debugEntity : debugEntities){
-            // Run extraDebugFunctions
-            for(std::function<void(sf::RenderWindow* renderWindow)> extraDebugFunction : debugEntity->getExtraDebugFunctions()){
-                extraDebugFunction(windowPtr);
-            }
-            //
-
-            // Draw collision shape borders
-            if(debugEntity->drawCollisionShapeBorders){
-                for(sge::CollisionShapeBorder* collisionShapeBorder : debugEntity->generateCollisionShapeBorders()){
-                    windowPtr->setView(*view);
-                    windowPtr->draw(*collisionShapeBorder);
-                }
-            }
-            //
-        }
-    }
-}
-
-
-sge::CollisionShapeBorder::CollisionShapeBorder(sge::CollisionShape* owner, sge::CollisionShapeBorderSettings settings){
-    this->setFillColor(sf::Color(0,0,0,0));
-
-    this->setOutlineColor(settings.color);
-    this->setOutlineThickness(settings.thickness);
-
-    this->setPosition(sf::Vector2f(owner->getPosition().x + settings.thickness, owner->getPosition().y + settings.thickness));
-    this->setSize(sf::Vector2f(owner->getSize().x - settings.thickness*2, owner->getSize().y - settings.thickness*2));
-}
-
-
 void sge::Scene::registerEntity(sf::View* view, sge::Entity* entity){ m_entities[view].push_back(entity); }
 void sge::Scene::registerEntities(sf::View* view, std::vector<sge::Entity*> entities){
     for(Entity* entity : entities){
@@ -1968,24 +1973,30 @@ std::vector<sge::UIEntity*> sge::UIScreen::getUIEntities(){ return m_uiEntities;
 sge::UIScreenManager::UIScreenManager(sge::UIEntityManager* uiEntityManager){ m_uiEntityManagerPtr = uiEntityManager; }
 
 void sge::UIScreenManager::registerUIScreen(std::string name, sge::UIScreen* uiScreen){ 
-    for(UIEntity* uiEntity : uiScreen->getUIEntities()){
+    for(sge::UIEntity* uiEntity : uiScreen->getUIEntities()){
         m_uiEntityManagerPtr->registerUIEntity(uiEntity);
     }
 
     m_uiScreens[name] = uiScreen;
 }
 void sge::UIScreenManager::deregisterUIScreen(std::string name){
-    for(UIEntity* uiEntity : m_uiScreens[name]->getUIEntities()){
+    for(sge::UIEntity* uiEntity : m_uiScreens[name]->getUIEntities()){
         m_uiEntityManagerPtr->deregisterUIEntity(uiEntity);
     }
 
     m_uiScreens.erase(name);
 }
+void sge::UIScreenManager::updateUIScreen(std::string name){
+    sge::UIScreen* uiScreen = m_uiScreens[name];
+
+    deregisterUIScreen(name);
+    registerUIScreen(name, uiScreen);
+}
 sge::UIScreen* sge::UIScreenManager::getUIScreen(std::string name){ return m_uiScreens[name]; }
 
 void sge::UIScreenManager::hideUIScreen(std::string name){
     if(m_uiScreens[name]->isVisible){
-        for(UIEntity* uiEntity : m_uiScreens[name]->getUIEntities()){
+        for(sge::UIEntity* uiEntity : m_uiScreens[name]->getUIEntities()){
             m_uiEntityManagerPtr->hideUIEntity(uiEntity);
         }
 
@@ -1994,7 +2005,7 @@ void sge::UIScreenManager::hideUIScreen(std::string name){
 }
 void sge::UIScreenManager::showUIScreen(std::string name){
     if(!m_uiScreens[name]->isVisible){
-        for(UIEntity* uiEntity : m_uiScreens[name]->getUIEntities()){
+        for(sge::UIEntity* uiEntity : m_uiScreens[name]->getUIEntities()){
             m_uiEntityManagerPtr->showUIEntity(uiEntity);
         }
 

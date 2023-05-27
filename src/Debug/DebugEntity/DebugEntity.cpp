@@ -1,6 +1,6 @@
 #include "DebugEntity.h"
-#include "../Entity/Entity.h"
-#include "CollisionShapeBorder.h"
+#include "../../Logic/Entity/Entity.h"
+#include "../CollisionShapeBorder/CollisionShapeBorder.h"
 
 
 sge::DebugEntity::DebugEntity(sge::Entity* relatedEntity){ m_relatedEntity = relatedEntity; }

@@ -22,6 +22,14 @@
 //
 
 
+// Debug
+#include "./src/Debug/DebugEntity/DebugEntity.h"
+#include "./src/Debug/DebugManager/DebugManager.h"
+#include "./src/Debug/CollisionShapeBorder/CollisionShapeBorder.h"
+#include "./src/Debug/CollisionShapeBorder/CollisionShapeBorderSettings.h"
+//
+
+
 // Logic
 #include "./src/Logic/Controller/ControllerManager.h"
 
@@ -48,11 +56,6 @@
 #include "./src/Logic/Entity/Entity.h"
 #include "./src/Logic/Entity/EntityManager.h"
 #include "./src/Logic/Entity/EntityBuilders.h"
-
-#include "./src/Logic/Debug/DebugEntity.h"
-#include "./src/Logic/Debug/DebugManager.h"
-#include "./src/Logic/Debug/CollisionShapeBorder.h"
-#include "./src/Logic/Debug/CollisionShapeBorderSettings.h"
 
 #include "./src/Logic/Scene/Scene.h"
 #include "./src/Logic/Scene/SceneManager.h"

@@ -6,7 +6,7 @@
 #include "../AnimationManager/AnimationManager.h"
 #include "../Collision/CollisionManager.h"
 #include "../Entity/EntityManager.h"
-#include "../Debug/DebugManager.h"
+#include "../../Debug/DebugManager/DebugManager.h"
 
 
 sge::SceneManager::SceneManager(
