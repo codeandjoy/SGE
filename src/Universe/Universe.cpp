@@ -1,24 +1,18 @@
 #include "Universe.h"
 #include "../Assets/AssetsManager/AssetsManager.h"
-#include "../Common/ClickableShape/ClickableShape.h"
-#include "../Common/ClickableShape/ClickableShapeManager.h"
+#include "../Controller/ControllerManager.h"
 #include "../Debug/DebugManager/DebugManager.h"
-#include "../Logic/Controller/ControllerManager.h"
-#include "../Logic/ScriptedView/ScriptedViewManager.h"
-#include "../Logic/SpriteManager/SpriteManager.h"
+#include "../View/ScriptedViewManager.h"
+
+#include "../Logic/Sprite/SpriteManager.h"
 #include "../Logic/Physics/PhysicsManager.h"
-#include "../Logic/Physics/PhysicalObject.h"
 #include "../Logic/CollisionShape/CollisionShapeManager.h"
-#include "../Logic/AnimationManager/AnimationManager.h"
+#include "../Logic/ClickableShape/ClickableShapeManager.h"
+#include "../Logic/SpriteText/SpriteTextManager.h"
+#include "../Logic/Animation/AnimationManager.h"
 #include "../Logic/Collision/CollisionManager.h"
 #include "../Logic/Entity/EntityManager.h"
 #include "../Logic/Scene/SceneManager.h"
-#include "../UI/UIScreen/UIScreenManager.h"
-#include "../UI/UISpriteManager/UISpriteManager.h"
-#include "../UI/SpriteText/SpriteText.h"
-#include "../UI/SpriteText/SpriteTextManager.h"
-#include "../UI/UIAnimationManager/UIAnimationManager.h"
-#include "../UI/UIEntity/UIEntityManager.h"
 
 
 sge::Universe::Universe(){
@@ -29,6 +23,8 @@ sge::Universe::Universe(){
     sge::SpriteManager* SpM = new sge::SpriteManager();
     sge::PhysicsManager* PM = new sge::PhysicsManager();
     sge::CollisionShapeManager* CSM = new sge::CollisionShapeManager();
+    sge::ClickableShapeManager* ClSM = new sge::ClickableShapeManager();
+    sge::SpriteTextManager* STM = new SpriteTextManager();
     sge::AnimationManager* AnM = new sge::AnimationManager();
     sge::CollisionManager* CM = new sge::CollisionManager();
     sge::EntityManager* EM = new sge::EntityManager(SpM, PM, CSM, AnM, CM);
@@ -36,29 +32,17 @@ sge::Universe::Universe(){
 
     assetsManager = AsM;
     controllerManager = CoM;
-
     scriptedViewManager = VM;
-    spriteManager = SpM;
-    physicsManager = PM;
-    collisionShapeManager = CSM;
-    animationManager = AnM;
+
+    m_spriteManager = SpM;
+    m_physicsManager = PM;
+    m_collisionShapeManager = CSM;
+    m_clickableShapeManager = ClSM;
+    m_spriteTextManager = STM;
+    m_animationManager = AnM;
     collisionManager = CM;
     entityManager = EM;
     sceneManager = ScM;
-    
-    sge::UISpriteManager* UISM = new sge::UISpriteManager();
-    sge::ClickableShapeManager* UICSM = new sge::ClickableShapeManager();
-    sge::SpriteTextManager* UISTM = new SpriteTextManager();
-    sge::UIAnimationManager* UIAM = new UIAnimationManager();
-    sge::UIEntityManager* UIEM = new UIEntityManager(UISM, UICSM, UISTM, UIAM);
-    sge::UIScreenManager* UIScM = new sge::UIScreenManager(UIEM);
-
-    uiSpriteManager = UISM;
-    clickableShapeManager = UICSM;
-    spriteTextManager = UISTM;
-    uiAnimationManager = UIAM;
-    uiEntityManager = UIEM;
-    uiScreenManager = UIScM;
 }
 
 
@@ -100,31 +84,28 @@ void sge::Universe::loop(){
             }
 
             controllerManager->updateControllers(event);
-            clickableShapeManager->updateClickableShapes(event);
+            m_clickableShapeManager->updateClickableShapes(event);
         }
 
 
         if(!isPaused){
-            physicsManager->updatePhysics(dt);
-            collisionShapeManager->alignCollisionShapes();
+            m_physicsManager->updatePhysics(dt);
+            m_collisionShapeManager->alignCollisionShapes();
             collisionManager->updateCollisions();
-            animationManager->updateAnimations();
+            m_animationManager->updateAnimations();
             scriptedViewManager->runViewScripts();
             sceneManager->alignScene(); // Scene can be reset only after all managers finished their updates to prevent segfaults
         }
-        clickableShapeManager->alignClickableShapes();
-        spriteTextManager->alignSpriteTextObjects();
-        uiAnimationManager->updateActiveAnimations();
-
+        m_clickableShapeManager->alignClickableShapes();
+        m_spriteTextManager->alignSpriteTextObjects();
         
         m_windowPtr->clear();
         
-        spriteManager->drawSprites(m_windowPtr);
+        m_spriteManager->drawSprites(m_windowPtr);
         debugManager->showDebugInfo(m_windowPtr); // ? show in ui view
        
         m_windowPtr->setView(m_uiView);
-        uiSpriteManager->drawUISprites(m_windowPtr);
-        spriteTextManager->drawSpriteTextObjects(m_windowPtr);
+        m_spriteTextManager->drawSpriteTextObjects(m_windowPtr);
 
         m_windowPtr->display();
     }

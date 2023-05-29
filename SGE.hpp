@@ -14,24 +14,19 @@
 namespace sge{
     class AssetsManager;
     class ControllerManager;
-
     class ScriptedViewManager;
+    class DebugManager;
+
     class SpriteManager;
     class PhysicsManager;
-    class PhysicalObject;
     class CollisionShapeManager;
+    class ClickableShapeManager;
+    class SpriteTextManager;
     class AnimationManager;
     class CollisionManager;
     class EntityManager;
-    class DebugManager;
     class SceneManager;
     
-    class UIScreenManager;
-    class UISpriteManager;
-    class ClickableShapeManager;
-    class SpriteTextManager;
-    class UIAnimationManager;
-    class UIEntityManager;
 
     class Universe{
         public:
@@ -45,30 +40,26 @@ namespace sge{
 
             sge::AssetsManager* assetsManager = nullptr;
             sge::ControllerManager* controllerManager = nullptr;
-
             sge::DebugManager* debugManager = nullptr;
-            
             sge::ScriptedViewManager* scriptedViewManager = nullptr;
-            sge::SpriteManager* spriteManager = nullptr;
-            sge::PhysicsManager* physicsManager = nullptr;
-            sge::CollisionShapeManager* collisionShapeManager = nullptr;
-            sge::AnimationManager* animationManager = nullptr;
+
             sge::CollisionManager* collisionManager = nullptr;
             sge::EntityManager* entityManager = nullptr;
             sge::SceneManager* sceneManager = nullptr;
 
-            sge::UISpriteManager* uiSpriteManager = nullptr;
-            sge::ClickableShapeManager* clickableShapeManager = nullptr;
-            sge::SpriteTextManager* spriteTextManager = nullptr;
-            sge::UIAnimationManager* uiAnimationManager = nullptr;
-            sge::UIEntityManager* uiEntityManager = nullptr;
-            sge::UIScreenManager* uiScreenManager = nullptr;
-
         private:
             sf::RenderWindow* m_windowPtr;
-            sf::View m_uiView;
+            sf::View m_uiView; // ! remove
 
             sf::Clock m_deltaClock;
+
+            sge::SpriteManager* m_spriteManager = nullptr;
+            sge::PhysicsManager* m_physicsManager = nullptr;
+            sge::CollisionShapeManager* m_collisionShapeManager = nullptr;
+            sge::AnimationManager* m_animationManager = nullptr;
+
+            sge::ClickableShapeManager* m_clickableShapeManager = nullptr;
+            sge::SpriteTextManager* m_spriteTextManager = nullptr;
     };
 }
 
@@ -81,6 +72,7 @@ namespace sge{
 #include <unordered_map>
 #include <string>
 #include <utility>
+#include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 
 #ifndef TEXTURE_SHEET_SIZES_H
@@ -154,137 +146,7 @@ namespace sge{
 //
 
 // Common
-#ifndef ANIMATION_H
-#define ANIMATION_H
 
-#include <SFML/Graphics.hpp>
-#include <string>
-#include <unordered_map>
-#include <vector>
-
-namespace sge{
-    class TextureSheet;
-
-    // TODO Animations should switch immediately
-    class Animation{
-        public:
-            Animation(sge::TextureSheet* textureSheet, sf::Sprite* ownerSprite, int initialTextureN);
-        
-            int animationDelayMilliseconds = 100;
-            
-            void addTextureSequence(std::string name, std::vector<int> textureSequence);
-            void setCurrentTextureSequence(std::string name);
-        
-            void runForward();
-            // TODO
-            // animationType : forward or cycle, run function in manager based on animation type
-            // runCycle()  1 2 3 2 1
-
-        private:
-            sf::Sprite* m_ownerSpritePtr;
-            sge::TextureSheet* m_textureSheet;
-            
-            sf::Clock m_clock;
-            std::unordered_map<std::string, std::vector<int>> m_textureSequences; // e.g. "idle": [5, 6, 7, 8]
-            std::string m_currentTextureSequence;
-            int m_currentTextureN = 0;
-
-    };
-}
-
-#endif
-
-#ifndef CLICKABLE_SHAPE_H
-#define CLICKABLE_SHAPE_H
-
-#include <functional>
-#include <SFML/Graphics.hpp>
-#ifndef COLLISION_SHAPE_H
-#define COLLISION_SHAPE_H
-
-#include <SFML/Graphics.hpp>
-
-namespace sge{
-    class Entity;
-    struct Measurements;
-
-    class CollisionShape : public sf::RectangleShape{
-        public:
-            CollisionShape(sge::Entity* ownerEntity);
-
-            sf::Vector2f offset = sf::Vector2f(0, 0);
-
-            sge::Entity* getOwnerEntity();
-            sge::Measurements getMeasurements();
-            void align();
-
-        private:
-            sge::Entity* m_ownerEntityPtr;
-    };
-}
-
-#endif
-
-namespace sge{
-    class UIEntity;
-
-    class ClickableShape : public sf::RectangleShape{
-        public:
-            ClickableShape(sge::UIEntity* ownerUIEntity);
-
-            std::function<void(sge::ClickableShape* thisClickableShape, sf::Event event)> action;
-            
-            sf::Vector2f offset = sf::Vector2f(0, 0);
-
-            
-            sge::UIEntity* getOwnerUIEntity();
-            void align();
-
-        private:
-            sge::UIEntity* m_ownerUIEntityPtr;
-    };
-}
-
-#endif
-#ifndef CLICKABLE_SHAPE_MANAGER_H
-#define CLICKABLE_SHAPE_MANAGER_H
-
-#include <vector>
-
-namespace sge{
-    struct ClickableShape;
-
-    class ClickableShapeManager{
-        public:
-            void registerClickableShape(sge::ClickableShape* clickableShape);
-            void deregsiterClickableShape(sge::ClickableShape* clickableShape);
-            std::vector<sge::ClickableShape*> getAllActiveClickableShapes();
-
-            void activateClickableShape(sge::ClickableShape* clickableShape);
-            void deactivateClickableShape(sge::ClickableShape* clickableShape);
-
-            void alignClickableShapes();
-            void updateClickableShapes(sf::Event event);
-
-        private:
-            std::vector<sge::ClickableShape*> m_activeClickableShapes;
-            std::vector<sge::ClickableShape*> m_inactiveClickableShapes;
-    };
-}
-
-#endif
-#ifndef CLICKABLE_SHAPE_HELPERS_H
-#define CLICKABLE_SHAPE_HELPERS_H
-
-#include <SFML/Graphics.hpp>
-
-namespace sge{
-    class ClickableShape;
-
-    bool isMouseOverClickableShape(ClickableShape* clickableShape, sf::RenderWindow* window);
-}
-
-#endif
 //
 
 // Debug
@@ -380,7 +242,7 @@ namespace sge{
 
 //
 
-// Logic
+// Controller
 #ifndef CONTROLLER_MANAGER_H
 #define CONTROLLER_MANAGER_H
 
@@ -403,7 +265,9 @@ namespace sge{
 }
 
 #endif
+//
 
+// View
 #ifndef SCRIPTED_VIEW_H
 #define SCRIPTED_VIEW_H
 
@@ -439,6 +303,9 @@ namespace sge{
 }
 
 #endif
+//
+
+// Logic
 #ifndef SPRITE_MANAGER_H
 #define SPRITE_MANAGER_H
 
@@ -654,7 +521,31 @@ namespace sge{
 }
 
 #endif
+#ifndef COLLISION_SHAPE_H
+#define COLLISION_SHAPE_H
 
+#include <SFML/Graphics.hpp>
+
+namespace sge{
+    class Entity;
+    struct Measurements;
+
+    class CollisionShape : public sf::RectangleShape{
+        public:
+            CollisionShape(sge::Entity* ownerEntity);
+
+            sf::Vector2f offset = sf::Vector2f(0, 0);
+
+            sge::Entity* getOwnerEntity();
+            sge::Measurements getMeasurements();
+            void align();
+
+        private:
+            sge::Entity* m_ownerEntityPtr;
+    };
+}
+
+#endif
 #ifndef COLLISION_SHAPE_MANAGER_H
 #define COLLISION_SHAPE_MANAGER_H
 
@@ -710,6 +601,122 @@ namespace sge{
 
 #endif
 
+#ifndef CLICKABLE_SHAPE_H
+#define CLICKABLE_SHAPE_H
+
+#include <functional>
+#include <SFML/Graphics.hpp>
+
+namespace sge{
+    class UIEntity;
+
+    class ClickableShape : public sf::RectangleShape{
+        public:
+            ClickableShape(sge::UIEntity* ownerUIEntity);
+
+            std::function<void(sge::ClickableShape* thisClickableShape, sf::Event event)> action;
+            
+            sf::Vector2f offset = sf::Vector2f(0, 0);
+
+            
+            sge::UIEntity* getOwnerUIEntity();
+            void align();
+
+        private:
+            sge::UIEntity* m_ownerUIEntityPtr;
+    };
+}
+
+#endif
+#ifndef CLICKABLE_SHAPE_MANAGER_H
+#define CLICKABLE_SHAPE_MANAGER_H
+
+#include <vector>
+
+namespace sge{
+    struct ClickableShape;
+
+    class ClickableShapeManager{
+        public:
+            void registerClickableShape(sge::ClickableShape* clickableShape);
+            void deregsiterClickableShape(sge::ClickableShape* clickableShape);
+            std::vector<sge::ClickableShape*> getAllActiveClickableShapes();
+
+            void activateClickableShape(sge::ClickableShape* clickableShape);
+            void deactivateClickableShape(sge::ClickableShape* clickableShape);
+
+            void alignClickableShapes();
+            void updateClickableShapes(sf::Event event);
+
+        private:
+            std::vector<sge::ClickableShape*> m_activeClickableShapes;
+            std::vector<sge::ClickableShape*> m_inactiveClickableShapes;
+    };
+}
+
+#endif
+#ifndef CLICKABLE_SHAPE_HELPERS_H
+#define CLICKABLE_SHAPE_HELPERS_H
+
+#include <SFML/Graphics.hpp>
+
+namespace sge{
+    class ClickableShape;
+
+    bool isMouseOverClickableShape(ClickableShape* clickableShape, sf::RenderWindow* window);
+}
+
+#endif
+
+#ifndef SPRITE_TEXT_H
+#define SPRITE_TEXT_H
+
+#include <SFML/Graphics.hpp>
+
+namespace sge{
+    class SpriteText : public sf::Text{
+        public:
+            SpriteText(sf::Sprite* ownerSprite);
+
+            sf::Vector2f offset = sf::Vector2f(0, 0);
+
+            void align();
+        
+        private:
+            sf::Sprite* m_ownerSpritePtr;
+    };
+}
+
+#endif
+#ifndef SPRITE_TEXT_MANAGER_H
+#define SPRITE_TEXT_MANAGER_H
+
+#include <vector>
+#include <SFML/Graphics.hpp>
+
+namespace sge{
+    class SpriteText;
+
+    class SpriteTextManager{
+        public:
+            void registerSpriteText(sge::SpriteText* spriteText);
+            void deregisterSpriteText(sge::SpriteText* spriteText);
+            std::vector<sge::SpriteText*> getAllVisibleSpriteTextObjects();
+
+            void showSpriteText(sge::SpriteText* spriteText);
+            void hideSpriteText(sge::SpriteText* spriteText);
+
+            void alignSpriteTextObjects();
+            void drawSpriteTextObjects(sf::RenderWindow* windowPtr);
+
+        private:
+            std::vector<sge::SpriteText*> m_visibleSpriteTextObjects;
+            std::vector<sge::SpriteText*> m_hiddenSpriteTextObjects;
+    };  
+}
+
+#endif
+
 #include <vector>
 
 namespace sge{
@@ -727,6 +734,45 @@ namespace sge{
             std::vector<sge::Animation*> m_animations;
     };
 }
+#ifndef ANIMATION_H
+#define ANIMATION_H
+
+#include <SFML/Graphics.hpp>
+#include <string>
+#include <unordered_map>
+#include <vector>
+
+namespace sge{
+    class TextureSheet;
+
+    // TODO Animations should switch immediately
+    class Animation{
+        public:
+            Animation(sge::TextureSheet* textureSheet, sf::Sprite* ownerSprite, int initialTextureN);
+        
+            int animationDelayMilliseconds = 100;
+            
+            void addTextureSequence(std::string name, std::vector<int> textureSequence);
+            void setCurrentTextureSequence(std::string name);
+        
+            void runForward();
+            // TODO
+            // animationType : forward or cycle, run function in manager based on animation type
+            // runCycle()  1 2 3 2 1
+
+        private:
+            sf::Sprite* m_ownerSpritePtr;
+            sge::TextureSheet* m_textureSheet;
+            
+            sf::Clock m_clock;
+            std::unordered_map<std::string, std::vector<int>> m_textureSequences; // e.g. "idle": [5, 6, 7, 8]
+            std::string m_currentTextureSequence;
+            int m_currentTextureN = 0;
+
+    };
+}
+
+#endif
 
 #ifndef ENTITY_H
 #define ENTITY_H
@@ -988,55 +1034,6 @@ namespace sge{
 
 #endif
 
-#ifndef SPRITE_TEXT_H
-#define SPRITE_TEXT_H
-
-#include <SFML/Graphics.hpp>
-
-namespace sge{
-    class SpriteText : public sf::Text{
-        public:
-            SpriteText(sf::Sprite* ownerSprite);
-
-            sf::Vector2f offset = sf::Vector2f(0, 0);
-
-            void align();
-        
-        private:
-            sf::Sprite* m_ownerSpritePtr;
-    };
-}
-
-#endif
-#ifndef SPRITE_TEXT_MANAGER_H
-#define SPRITE_TEXT_MANAGER_H
-
-#include <vector>
-#include <SFML/Graphics.hpp>
-
-namespace sge{
-    class SpriteText;
-
-    class SpriteTextManager{
-        public:
-            void registerSpriteText(sge::SpriteText* spriteText);
-            void deregisterSpriteText(sge::SpriteText* spriteText);
-            std::vector<sge::SpriteText*> getAllVisibleSpriteTextObjects();
-
-            void showSpriteText(sge::SpriteText* spriteText);
-            void hideSpriteText(sge::SpriteText* spriteText);
-
-            void alignSpriteTextObjects();
-            void drawSpriteTextObjects(sf::RenderWindow* windowPtr);
-
-        private:
-            std::vector<sge::SpriteText*> m_visibleSpriteTextObjects;
-            std::vector<sge::SpriteText*> m_hiddenSpriteTextObjects;
-    };  
-}
-
-#endif
-
 #ifndef UI_ENTITY_H
 #define UI_ENTITY_H
 
@@ -1163,6 +1160,8 @@ sge::Universe::Universe(){
     sge::SpriteManager* SpM = new sge::SpriteManager();
     sge::PhysicsManager* PM = new sge::PhysicsManager();
     sge::CollisionShapeManager* CSM = new sge::CollisionShapeManager();
+    sge::ClickableShapeManager* ClSM = new sge::ClickableShapeManager();
+    sge::SpriteTextManager* STM = new SpriteTextManager();
     sge::AnimationManager* AnM = new sge::AnimationManager();
     sge::CollisionManager* CM = new sge::CollisionManager();
     sge::EntityManager* EM = new sge::EntityManager(SpM, PM, CSM, AnM, CM);
@@ -1170,29 +1169,17 @@ sge::Universe::Universe(){
 
     assetsManager = AsM;
     controllerManager = CoM;
-
     scriptedViewManager = VM;
-    spriteManager = SpM;
-    physicsManager = PM;
-    collisionShapeManager = CSM;
-    animationManager = AnM;
+
+    m_spriteManager = SpM;
+    m_physicsManager = PM;
+    m_collisionShapeManager = CSM;
+    m_clickableShapeManager = ClSM;
+    m_spriteTextManager = STM;
+    m_animationManager = AnM;
     collisionManager = CM;
     entityManager = EM;
     sceneManager = ScM;
-    
-    sge::UISpriteManager* UISM = new sge::UISpriteManager();
-    sge::ClickableShapeManager* UICSM = new sge::ClickableShapeManager();
-    sge::SpriteTextManager* UISTM = new SpriteTextManager();
-    sge::UIAnimationManager* UIAM = new UIAnimationManager();
-    sge::UIEntityManager* UIEM = new UIEntityManager(UISM, UICSM, UISTM, UIAM);
-    sge::UIScreenManager* UIScM = new sge::UIScreenManager(UIEM);
-
-    uiSpriteManager = UISM;
-    clickableShapeManager = UICSM;
-    spriteTextManager = UISTM;
-    uiAnimationManager = UIAM;
-    uiEntityManager = UIEM;
-    uiScreenManager = UIScM;
 }
 
 void sge::Universe::setupWindow(sf::RenderWindow *window){
@@ -1230,30 +1217,27 @@ void sge::Universe::loop(){
             }
 
             controllerManager->updateControllers(event);
-            clickableShapeManager->updateClickableShapes(event);
+            m_clickableShapeManager->updateClickableShapes(event);
         }
 
         if(!isPaused){
-            physicsManager->updatePhysics(dt);
-            collisionShapeManager->alignCollisionShapes();
+            m_physicsManager->updatePhysics(dt);
+            m_collisionShapeManager->alignCollisionShapes();
             collisionManager->updateCollisions();
-            animationManager->updateAnimations();
+            m_animationManager->updateAnimations();
             scriptedViewManager->runViewScripts();
             sceneManager->alignScene(); // Scene can be reset only after all managers finished their updates to prevent segfaults
         }
-        clickableShapeManager->alignClickableShapes();
-        spriteTextManager->alignSpriteTextObjects();
-        uiAnimationManager->updateActiveAnimations();
-
+        m_clickableShapeManager->alignClickableShapes();
+        m_spriteTextManager->alignSpriteTextObjects();
         
         m_windowPtr->clear();
         
-        spriteManager->drawSprites(m_windowPtr);
+        m_spriteManager->drawSprites(m_windowPtr);
         debugManager->showDebugInfo(m_windowPtr); // ? show in ui view
        
         m_windowPtr->setView(m_uiView);
-        uiSpriteManager->drawUISprites(m_windowPtr);
-        spriteTextManager->drawSpriteTextObjects(m_windowPtr);
+        m_spriteTextManager->drawSpriteTextObjects(m_windowPtr);
 
         m_windowPtr->display();
     }
@@ -1298,103 +1282,6 @@ sge::TextureSheet::TextureSheet(sge::TextureSheetSizes textureSheetSizes, std::s
 std::string sge::TextureSheet::getLocation(){ return m_location; }
 sf::Texture* sge::TextureSheet::getTexture(){ return &m_textureSheet; }
 sf::IntRect sge::TextureSheet::getTextureRect(int textureN){ return m_textureRects[textureN]; }
-
-
-sge::Animation::Animation(sge::TextureSheet* textureSheet, sf::Sprite* ownerSprite, int initialTextureN){
-    m_textureSheet = textureSheet;
-    m_ownerSpritePtr = ownerSprite;
-    
-    m_ownerSpritePtr->setTexture(*textureSheet->getTexture());
-    m_ownerSpritePtr->setTextureRect(textureSheet->getTextureRect(initialTextureN));
-}
-
-void sge::Animation::addTextureSequence(std::string name, std::vector<int> textureSequence){ m_textureSequences[name] = textureSequence; }
-void sge::Animation::setCurrentTextureSequence(std::string name){
-    m_clock.restart();
-    m_currentTextureSequence = name;
-    m_currentTextureN = 0;
-
-    m_ownerSpritePtr->setTextureRect(m_textureSheet->getTextureRect(m_textureSequences[m_currentTextureSequence].at(m_currentTextureN)));
-}
-
-void sge::Animation::runForward(){
-    if(!m_textureSequences.size()){
-        printf("No texture sequences initialized.\n");
-        exit(1);
-    }
-    if(!m_currentTextureSequence.length()){
-        printf("Can not run animation if no current texture sequence is set.\n"); // ? Default to first added ?
-        exit(1);
-    }
-
-    if(m_clock.getElapsedTime().asMilliseconds() > animationDelayMilliseconds){
-        m_ownerSpritePtr->setTextureRect(m_textureSheet->getTextureRect(m_textureSequences[m_currentTextureSequence].at(m_currentTextureN)));
-        
-        if(m_currentTextureN+1 == m_textureSequences[m_currentTextureSequence].size()){
-            m_currentTextureN = 0;
-        }
-        else m_currentTextureN++;
-
-        m_clock.restart();
-    }
-}
-
-
-sge::CollisionShape::CollisionShape(sge::Entity* ownerEntity){
-    m_ownerEntityPtr = ownerEntity;
-
-    this->setFillColor(sf::Color(0,0,0,0));
-    this->setSize(sf::Vector2f(ownerEntity->sprite->getGlobalBounds().width, ownerEntity->sprite->getGlobalBounds().height));
-}
-
-sge::Entity* sge::CollisionShape::getOwnerEntity(){ return m_ownerEntityPtr; }
-sge::Measurements sge::CollisionShape::getMeasurements(){
-    return { this->getPosition().x, this->getPosition().y, this->getGlobalBounds().height, this->getGlobalBounds().width };
-}
-void sge::CollisionShape::align(){
-    this->setPosition(m_ownerEntityPtr->sprite->getPosition() + offset);
-}
-
-
-sge::ClickableShape::ClickableShape(sge::UIEntity* ownerUIEntity){ m_ownerUIEntityPtr = ownerUIEntity; }
-
-sge::UIEntity* sge::ClickableShape::getOwnerUIEntity(){ return m_ownerUIEntityPtr; }
-void sge::ClickableShape::align(){ this->setPosition(m_ownerUIEntityPtr->sprite->getPosition() + offset); }
-#include <algorithm>
-#include <SFML/Graphics.hpp>
-
-void sge::ClickableShapeManager::registerClickableShape(sge::ClickableShape* clickableShape){ m_activeClickableShapes.push_back(clickableShape); }
-void sge::ClickableShapeManager::deregsiterClickableShape(sge::ClickableShape* clickableShape){
-    m_activeClickableShapes.erase(std::remove(m_activeClickableShapes.begin(), m_activeClickableShapes.end(), clickableShape), m_activeClickableShapes.end());
-    m_inactiveClickableShapes.erase(std::remove(m_inactiveClickableShapes.begin(), m_inactiveClickableShapes.end(), clickableShape), m_inactiveClickableShapes.end());
-}
-std::vector<sge::ClickableShape*> sge::ClickableShapeManager::getAllActiveClickableShapes(){ return m_activeClickableShapes; }
-
-void sge::ClickableShapeManager::activateClickableShape(sge::ClickableShape* clickableShape){
-    deregsiterClickableShape(clickableShape);
-    m_activeClickableShapes.push_back(clickableShape);
-}
-void sge::ClickableShapeManager::deactivateClickableShape(sge::ClickableShape* clickableShape){
-    deregsiterClickableShape(clickableShape);
-    m_inactiveClickableShapes.push_back(clickableShape);
-}
-
-void sge::ClickableShapeManager::alignClickableShapes(){
-    for(sge::ClickableShape* clickableShape : m_activeClickableShapes){
-        clickableShape->align();
-    }
-}
-
-void sge::ClickableShapeManager::updateClickableShapes(sf::Event event){
-    for(ClickableShape* thisClickableShape : m_activeClickableShapes){
-        thisClickableShape->action(thisClickableShape, event);
-    }
-}
-
-
-bool sge::isMouseOverClickableShape(ClickableShape* clickableShape, sf::RenderWindow* window){
-    return clickableShape->getOwnerUIEntity()->sprite->getGlobalBounds().contains(window->mapPixelToCoords(sf::Mouse::getPosition(*window)));
-}
 
 
 sge::DebugEntity::DebugEntity(sge::Entity* relatedEntity){ m_relatedEntity = relatedEntity; }
@@ -1705,6 +1592,22 @@ sge::CollisionSide sge::flipInitiatorImpactSide(sge::CollisionSide initiatorImpa
 
     return sge::CollisionSide::bottom;
 }
+
+
+sge::CollisionShape::CollisionShape(sge::Entity* ownerEntity){
+    m_ownerEntityPtr = ownerEntity;
+
+    this->setFillColor(sf::Color(0,0,0,0));
+    this->setSize(sf::Vector2f(ownerEntity->sprite->getGlobalBounds().width, ownerEntity->sprite->getGlobalBounds().height));
+}
+
+sge::Entity* sge::CollisionShape::getOwnerEntity(){ return m_ownerEntityPtr; }
+sge::Measurements sge::CollisionShape::getMeasurements(){
+    return { this->getPosition().x, this->getPosition().y, this->getGlobalBounds().height, this->getGlobalBounds().width };
+}
+void sge::CollisionShape::align(){
+    this->setPosition(m_ownerEntityPtr->sprite->getPosition() + offset);
+}
 #include <algorithm>
 
 void sge::CollisionShapeManager::registerCollisionShape(sge::CollisionShape* collisionShape){ m_collisionShapes.push_back(collisionShape); }
@@ -1771,6 +1674,83 @@ bool sge::boundingBox(sge::CollisionShape* initiator, sge::CollisionShape* recip
 }
 
 
+sge::ClickableShape::ClickableShape(sge::UIEntity* ownerUIEntity){ m_ownerUIEntityPtr = ownerUIEntity; }
+
+sge::UIEntity* sge::ClickableShape::getOwnerUIEntity(){ return m_ownerUIEntityPtr; }
+void sge::ClickableShape::align(){ this->setPosition(m_ownerUIEntityPtr->sprite->getPosition() + offset); }
+#include <algorithm>
+#include <SFML/Graphics.hpp>
+
+void sge::ClickableShapeManager::registerClickableShape(sge::ClickableShape* clickableShape){ m_activeClickableShapes.push_back(clickableShape); }
+void sge::ClickableShapeManager::deregsiterClickableShape(sge::ClickableShape* clickableShape){
+    m_activeClickableShapes.erase(std::remove(m_activeClickableShapes.begin(), m_activeClickableShapes.end(), clickableShape), m_activeClickableShapes.end());
+    m_inactiveClickableShapes.erase(std::remove(m_inactiveClickableShapes.begin(), m_inactiveClickableShapes.end(), clickableShape), m_inactiveClickableShapes.end());
+}
+std::vector<sge::ClickableShape*> sge::ClickableShapeManager::getAllActiveClickableShapes(){ return m_activeClickableShapes; }
+
+void sge::ClickableShapeManager::activateClickableShape(sge::ClickableShape* clickableShape){
+    deregsiterClickableShape(clickableShape);
+    m_activeClickableShapes.push_back(clickableShape);
+}
+void sge::ClickableShapeManager::deactivateClickableShape(sge::ClickableShape* clickableShape){
+    deregsiterClickableShape(clickableShape);
+    m_inactiveClickableShapes.push_back(clickableShape);
+}
+
+void sge::ClickableShapeManager::alignClickableShapes(){
+    for(sge::ClickableShape* clickableShape : m_activeClickableShapes){
+        clickableShape->align();
+    }
+}
+
+void sge::ClickableShapeManager::updateClickableShapes(sf::Event event){
+    for(ClickableShape* thisClickableShape : m_activeClickableShapes){
+        thisClickableShape->action(thisClickableShape, event);
+    }
+}
+
+
+bool sge::isMouseOverClickableShape(ClickableShape* clickableShape, sf::RenderWindow* window){
+    return clickableShape->getOwnerUIEntity()->sprite->getGlobalBounds().contains(window->mapPixelToCoords(sf::Mouse::getPosition(*window)));
+}
+
+
+sge::SpriteText::SpriteText(sf::Sprite* ownerSprite){ m_ownerSpritePtr = ownerSprite; }
+void sge::SpriteText::align(){
+    sf::Vector2f pos = m_ownerSpritePtr->getPosition() + offset; 
+    
+    this->setPosition((int)pos.x, (int)pos.y);
+}
+#include <algorithm>
+
+void sge::SpriteTextManager::registerSpriteText(sge::SpriteText* spriteText){ m_visibleSpriteTextObjects.push_back(spriteText); }
+void sge::SpriteTextManager::deregisterSpriteText(sge::SpriteText* spriteText){
+    m_visibleSpriteTextObjects.erase(std::remove(m_visibleSpriteTextObjects.begin(), m_visibleSpriteTextObjects.end(), spriteText), m_visibleSpriteTextObjects.end());
+    m_hiddenSpriteTextObjects.erase(std::remove(m_hiddenSpriteTextObjects.begin(), m_hiddenSpriteTextObjects.end(), spriteText), m_hiddenSpriteTextObjects.end());
+}
+std::vector<sge::SpriteText*> sge::SpriteTextManager::getAllVisibleSpriteTextObjects(){ return m_visibleSpriteTextObjects; }
+
+void sge::SpriteTextManager::showSpriteText(sge::SpriteText* spriteText){
+    deregisterSpriteText(spriteText);
+    m_visibleSpriteTextObjects.push_back(spriteText);
+}
+void sge::SpriteTextManager::hideSpriteText(sge::SpriteText* spriteText){
+    deregisterSpriteText(spriteText);
+    m_hiddenSpriteTextObjects.push_back(spriteText);
+}
+
+void sge::SpriteTextManager::alignSpriteTextObjects(){
+    for(sge::SpriteText* spriteText : m_visibleSpriteTextObjects){
+        spriteText->align();
+    }
+}
+void sge::SpriteTextManager::drawSpriteTextObjects(sf::RenderWindow* windowPtr){
+    for(SpriteText* spriteText : m_visibleSpriteTextObjects){
+        windowPtr->draw(*spriteText);
+    }
+}
+
+
 void sge::AnimationManager::registerAnimation(sge::Animation* animation){ m_animations.push_back(animation); }
 void sge::AnimationManager::deregisterAnimation(sge::Animation* animation){ m_animations.erase(std::remove(m_animations.begin(), m_animations.end(), animation), m_animations.end()); }
 void sge::AnimationManager::deregisterAllAnimations(){ m_animations.clear(); }
@@ -1778,6 +1758,46 @@ void sge::AnimationManager::deregisterAllAnimations(){ m_animations.clear(); }
 void sge::AnimationManager::updateAnimations(){
     for(sge::Animation* animation : m_animations){
         animation->runForward();
+    }
+}
+
+
+sge::Animation::Animation(sge::TextureSheet* textureSheet, sf::Sprite* ownerSprite, int initialTextureN){
+    m_textureSheet = textureSheet;
+    m_ownerSpritePtr = ownerSprite;
+    
+    m_ownerSpritePtr->setTexture(*textureSheet->getTexture());
+    m_ownerSpritePtr->setTextureRect(textureSheet->getTextureRect(initialTextureN));
+}
+
+void sge::Animation::addTextureSequence(std::string name, std::vector<int> textureSequence){ m_textureSequences[name] = textureSequence; }
+void sge::Animation::setCurrentTextureSequence(std::string name){
+    m_clock.restart();
+    m_currentTextureSequence = name;
+    m_currentTextureN = 0;
+
+    m_ownerSpritePtr->setTextureRect(m_textureSheet->getTextureRect(m_textureSequences[m_currentTextureSequence].at(m_currentTextureN)));
+}
+
+void sge::Animation::runForward(){
+    if(!m_textureSequences.size()){
+        printf("No texture sequences initialized.\n");
+        exit(1);
+    }
+    if(!m_currentTextureSequence.length()){
+        printf("Can not run animation if no current texture sequence is set.\n"); // ? Default to first added ?
+        exit(1);
+    }
+
+    if(m_clock.getElapsedTime().asMilliseconds() > animationDelayMilliseconds){
+        m_ownerSpritePtr->setTextureRect(m_textureSheet->getTextureRect(m_textureSequences[m_currentTextureSequence].at(m_currentTextureN)));
+        
+        if(m_currentTextureN+1 == m_textureSequences[m_currentTextureSequence].size()){
+            m_currentTextureN = 0;
+        }
+        else m_currentTextureN++;
+
+        m_clock.restart();
     }
 }
 
@@ -2045,42 +2065,6 @@ void sge::UISpriteManager::hideSprite(sf::Sprite* sprite){
 void sge::UISpriteManager::drawUISprites(sf::RenderWindow* windowPtr){
     for(sf::Sprite* sprite : m_visibleSprites){
         windowPtr->draw(*sprite);
-    }
-}
-
-
-sge::SpriteText::SpriteText(sf::Sprite* ownerSprite){ m_ownerSpritePtr = ownerSprite; }
-void sge::SpriteText::align(){
-    sf::Vector2f pos = m_ownerSpritePtr->getPosition() + offset; 
-    
-    this->setPosition((int)pos.x, (int)pos.y);
-}
-#include <algorithm>
-
-void sge::SpriteTextManager::registerSpriteText(sge::SpriteText* spriteText){ m_visibleSpriteTextObjects.push_back(spriteText); }
-void sge::SpriteTextManager::deregisterSpriteText(sge::SpriteText* spriteText){
-    m_visibleSpriteTextObjects.erase(std::remove(m_visibleSpriteTextObjects.begin(), m_visibleSpriteTextObjects.end(), spriteText), m_visibleSpriteTextObjects.end());
-    m_hiddenSpriteTextObjects.erase(std::remove(m_hiddenSpriteTextObjects.begin(), m_hiddenSpriteTextObjects.end(), spriteText), m_hiddenSpriteTextObjects.end());
-}
-std::vector<sge::SpriteText*> sge::SpriteTextManager::getAllVisibleSpriteTextObjects(){ return m_visibleSpriteTextObjects; }
-
-void sge::SpriteTextManager::showSpriteText(sge::SpriteText* spriteText){
-    deregisterSpriteText(spriteText);
-    m_visibleSpriteTextObjects.push_back(spriteText);
-}
-void sge::SpriteTextManager::hideSpriteText(sge::SpriteText* spriteText){
-    deregisterSpriteText(spriteText);
-    m_hiddenSpriteTextObjects.push_back(spriteText);
-}
-
-void sge::SpriteTextManager::alignSpriteTextObjects(){
-    for(sge::SpriteText* spriteText : m_visibleSpriteTextObjects){
-        spriteText->align();
-    }
-}
-void sge::SpriteTextManager::drawSpriteTextObjects(sf::RenderWindow* windowPtr){
-    for(SpriteText* spriteText : m_visibleSpriteTextObjects){
-        windowPtr->draw(*spriteText);
     }
 }
 

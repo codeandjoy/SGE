@@ -9,24 +9,19 @@
 namespace sge{
     class AssetsManager;
     class ControllerManager;
-
     class ScriptedViewManager;
+    class DebugManager;
+
     class SpriteManager;
     class PhysicsManager;
-    class PhysicalObject;
     class CollisionShapeManager;
+    class ClickableShapeManager;
+    class SpriteTextManager;
     class AnimationManager;
     class CollisionManager;
     class EntityManager;
-    class DebugManager;
     class SceneManager;
     
-    class UIScreenManager;
-    class UISpriteManager;
-    class ClickableShapeManager;
-    class SpriteTextManager;
-    class UIAnimationManager;
-    class UIEntityManager;
 
     class Universe{
         public:
@@ -41,30 +36,27 @@ namespace sge{
 
             sge::AssetsManager* assetsManager = nullptr;
             sge::ControllerManager* controllerManager = nullptr;
-
             sge::DebugManager* debugManager = nullptr;
-            
             sge::ScriptedViewManager* scriptedViewManager = nullptr;
-            sge::SpriteManager* spriteManager = nullptr;
-            sge::PhysicsManager* physicsManager = nullptr;
-            sge::CollisionShapeManager* collisionShapeManager = nullptr;
-            sge::AnimationManager* animationManager = nullptr;
+
             sge::CollisionManager* collisionManager = nullptr;
             sge::EntityManager* entityManager = nullptr;
             sge::SceneManager* sceneManager = nullptr;
 
-            sge::UISpriteManager* uiSpriteManager = nullptr;
-            sge::ClickableShapeManager* clickableShapeManager = nullptr;
-            sge::SpriteTextManager* spriteTextManager = nullptr;
-            sge::UIAnimationManager* uiAnimationManager = nullptr;
-            sge::UIEntityManager* uiEntityManager = nullptr;
-            sge::UIScreenManager* uiScreenManager = nullptr;
-
         private:
             sf::RenderWindow* m_windowPtr;
-            sf::View m_uiView;
+            sf::View m_uiView; // ! remove
 
             sf::Clock m_deltaClock;
+
+
+            sge::SpriteManager* m_spriteManager = nullptr;
+            sge::PhysicsManager* m_physicsManager = nullptr;
+            sge::CollisionShapeManager* m_collisionShapeManager = nullptr;
+            sge::AnimationManager* m_animationManager = nullptr;
+
+            sge::ClickableShapeManager* m_clickableShapeManager = nullptr;
+            sge::SpriteTextManager* m_spriteTextManager = nullptr;
     };
 }
 

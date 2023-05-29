@@ -1,9 +1,9 @@
 #include "EntityManager.h"
 #include "Entity.h"
-#include "../SpriteManager/SpriteManager.h"
+#include "../Sprite/SpriteManager.h"
 #include "../Physics/PhysicsManager.h"
 #include "../CollisionShape/CollisionShapeManager.h"
-#include "../AnimationManager/AnimationManager.h"
+#include "../Animation/AnimationManager.h"
 #include "../Collision/CollisionManager.h"
 
 

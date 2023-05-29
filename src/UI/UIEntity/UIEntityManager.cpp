@@ -1,7 +1,7 @@
 #include "UIEntityManager.h"
 #include "../UISpriteManager/UISpriteManager.h"
-#include "../../Common/ClickableShape/ClickableShapeManager.h"
-#include "../SpriteText/SpriteTextManager.h"
+#include "../../Logic/ClickableShape/ClickableShapeManager.h"
+#include "../../Logic/SpriteText/SpriteTextManager.h"
 #include "../UIAnimationManager/UIAnimationManager.h"
 #include "UIEntity.h"
 

@@ -1,6 +1,6 @@
 #include <algorithm>
 #include "UIAnimationManager.h"
-#include "../../Common/Animation/Animation.h"
+#include "../../Logic/Animation/Animation.h"
 
 
 void sge::UIAnimationManager::registerAnimation(sge::Animation* animation){ m_activeAnimations.push_back(animation); }
