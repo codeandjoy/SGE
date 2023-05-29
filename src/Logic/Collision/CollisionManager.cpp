@@ -51,7 +51,6 @@ void sge::CollisionManager::deregisterAllCollisionPairs(){
 }
 
 
-
 void sge::CollisionManager::updateCollisions(){
     std::vector<sge::Collision> presentCollisions;
 

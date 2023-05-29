@@ -27,8 +27,8 @@ sge::Universe::Universe(){
     sge::SpriteTextManager* STM = new SpriteTextManager();
     sge::AnimationManager* AnM = new sge::AnimationManager();
     sge::CollisionManager* CM = new sge::CollisionManager();
-    sge::EntityManager* EM = new sge::EntityManager(SpM, PM, CSM, AnM, CM);
-    sge::SceneManager* ScM = new sge::SceneManager(SpM, PM, CSM, AnM, CM, EM);
+    sge::EntityManager* EM = new sge::EntityManager(SpM, PM, CSM, ClSM, STM, AnM, CM);
+    sge::SceneManager* ScM = new sge::SceneManager(EM, CM);
 
     assetsManager = AsM;
     controllerManager = CoM;

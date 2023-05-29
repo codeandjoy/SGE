@@ -3,16 +3,20 @@
 #include "../Sprite/SpriteManager.h"
 #include "../Physics/PhysicsManager.h"
 #include "../CollisionShape/CollisionShapeManager.h"
+#include "../ClickableShape/ClickableShapeManager.h"
+#include "../SpriteText/SpriteTextManager.h"
 #include "../Animation/AnimationManager.h"
 #include "../Collision/CollisionManager.h"
 
 
-sge::EntityManager::EntityManager(sge::SpriteManager* spriteManager, sge::PhysicsManager* physicsManager, sge::CollisionShapeManager* collisionShapeManager, sge::AnimationManager* animationManager, sge::CollisionManager* collisionManager){
+sge::EntityManager::EntityManager(sge::SpriteManager* spriteManager, sge::PhysicsManager* physicsManager, sge::CollisionShapeManager* collisionShapeManager, sge::ClickableShapeManager* clickableShapeManager, sge::SpriteTextManager* spriteTextManager, sge::AnimationManager* animationManager, sge::CollisionManager* collisionManager){
     m_spriteManagerPtr = spriteManager;
     m_physicsManagerPtr = physicsManager;
-    m_collisionShapeManager = collisionShapeManager;
+    m_collisionShapeManagerPtr = collisionShapeManager;
+    m_clickableShapeManagerPtr = clickableShapeManager;
+    m_spriteTextManagerPtr = spriteTextManager;
     m_animationManagerPtr = animationManager;
-    m_collisionManager = collisionManager;
+    m_collisionManagerPtr = collisionManager;
 }
 
 
@@ -26,8 +30,16 @@ void sge::EntityManager::registerEntity(sf::View* view, sge::Entity* entity){
         
     if(entity->collisionShapes.size()){
         for(auto& [_, collisionShape] : entity->collisionShapes){
-            m_collisionShapeManager->registerCollisionShape(collisionShape);
+            m_collisionShapeManagerPtr->registerCollisionShape(collisionShape);
         }
+    }
+
+    if(entity->clickableShape){
+        m_clickableShapeManagerPtr->registerClickableShape(entity->clickableShape);
+    }
+
+    if(entity->spriteText){
+        m_spriteTextManagerPtr->registerSpriteText(entity->spriteText);
     }
     
     if(entity->animation){
@@ -47,6 +59,12 @@ void sge::EntityManager::deregisterEntity(sf::View* view, sge::Entity* entity){
     m_deregisterEntityFromCoreManagers(view, entity);
 
     m_entities[view].erase(std::remove(m_entities[view].begin(), m_entities[view].end(), entity), m_entities[view].end());    
+}
+
+void sge::EntityManager::deregisterEntities(sf::View* view, std::vector<sge::Entity*> entities){
+    for(sge::Entity* entity : entities){
+        deregisterEntity(view, entity);
+    }
 }
 
 void sge::EntityManager::deregisterAllEntities(){
@@ -72,9 +90,17 @@ void sge::EntityManager::m_deregisterEntityFromCoreManagers(sf::View* view, sge:
 
     if(entity->collisionShapes.size()){
         for(auto[_, collisionShape] : entity->collisionShapes){
-            m_collisionShapeManager->deregisterCollisionShape(collisionShape);
-            m_collisionManager->deregisterCollisionShapeFromCollisionGroups(collisionShape);
+            m_collisionShapeManagerPtr->deregisterCollisionShape(collisionShape);
+            m_collisionManagerPtr->deregisterCollisionShapeFromCollisionGroups(collisionShape);
         }
+    }
+
+    if(entity->clickableShape){
+        m_clickableShapeManagerPtr->deregsiterClickableShape(entity->clickableShape);
+    }
+
+    if(entity->spriteText){
+        m_spriteTextManagerPtr->deregisterSpriteText(entity->spriteText);
     }
 
     if(entity->animation){

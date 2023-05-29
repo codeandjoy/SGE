@@ -11,17 +11,29 @@ namespace sge{
     class SpriteManager;
     class PhysicsManager;
     class CollisionShapeManager;
+    class ClickableShapeManager;
+    class SpriteTextManager;
     class AnimationManager;
     class CollisionManager;
 
+
     class EntityManager{
         public:
-            EntityManager(sge::SpriteManager* spriteManager, sge::PhysicsManager* physicsManager, sge::CollisionShapeManager* collisionShapeManager, sge::AnimationManager* animationManager, sge::CollisionManager* collisionManager);
+            EntityManager(
+                sge::SpriteManager* spriteManager,
+                sge::PhysicsManager* physicsManager,
+                sge::CollisionShapeManager* collisionShapeManager,
+                sge::ClickableShapeManager* clickableShapeManager,
+                sge::SpriteTextManager* SpriteTextManager,
+                sge::AnimationManager* animationManager,
+                sge::CollisionManager* collisionManager
+            );
 
 
             void registerEntity(sf::View* view, sge::Entity* entity);
             void registerEntities(sf::View* view, std::vector<sge::Entity*> entities);
             void deregisterEntity(sf::View* view, sge::Entity* entity);
+            void deregisterEntities(sf::View* view, std::vector<sge::Entity*> entities);
             void deregisterAllEntities();
             std::vector<sge::Entity*> getViewEntities(sf::View* view);
 
@@ -30,9 +42,11 @@ namespace sge{
 
             sge::SpriteManager* m_spriteManagerPtr;
             sge::PhysicsManager* m_physicsManagerPtr;
-            sge::CollisionShapeManager* m_collisionShapeManager;
+            sge::CollisionShapeManager* m_collisionShapeManagerPtr;
+            sge::ClickableShapeManager* m_clickableShapeManagerPtr;
+            sge::SpriteTextManager* m_spriteTextManagerPtr;
             sge::AnimationManager* m_animationManagerPtr;
-            sge::CollisionManager* m_collisionManager;
+            sge::CollisionManager* m_collisionManagerPtr;
 
 
             void m_deregisterEntityFromCoreManagers(sf::View* view, sge::Entity* entity);
