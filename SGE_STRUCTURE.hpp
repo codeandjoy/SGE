@@ -14,11 +14,8 @@
 
 
 // Common
-#include "./src/Common/Animation/Animation.h"
 
-#include "./src/Common/ClickableShape/ClickableShape.h"
-#include "./src/Common/ClickableShape/ClickableShapeManager.h"
-#include "./src/Common/ClickableShape/helpers.h"
+
 //
 
 
@@ -30,12 +27,19 @@
 //
 
 
-// Logic
-#include "./src/Logic/Controller/ControllerManager.h"
+// Controller
+#include "./src/Controller/ControllerManager.h"
+//
 
-#include "./src/Logic/ScriptedView/ScriptedView.h"
-#include "./src/Logic/ScriptedView/ScriptedViewManager.h"
-#include "./src/Logic/SpriteManager/SpriteManager.h"
+
+// View
+#include "./src/View/ScriptedView.h"
+#include "./src/View/ScriptedViewManager.h"
+//
+
+
+// Logic
+#include "./src/Logic/Sprite/SpriteManager.h"
 
 #include "./src/Logic/Physics/PhysicsManager.h"
 #include "./src/Logic/Physics/PhysicalObject.h"
@@ -51,7 +55,15 @@
 #include "./src/Logic/Collision/CollisionResponses.h"
 #include "./src/Logic/Collision/CollisionDetectionAlgorithms.h"
 
-#include "./src/Logic/AnimationManager/AnimationManager.h"
+#include "./src/Logic/ClickableShape/ClickableShape.h"
+#include "./src/Logic/ClickableShape/ClickableShapeManager.h"
+#include "./src/Logic/ClickableShape/helpers.h"
+
+#include "./src/Logic/SpriteText/SpriteText.h"
+#include "./src/Logic/SpriteText/SpriteTextManager.h"
+
+#include "./src/Logic/Animation/AnimationManager.h"
+#include "./src/Logic/Animation/Animation.h"
 
 #include "./src/Logic/Entity/Entity.h"
 #include "./src/Logic/Entity/EntityManager.h"
@@ -67,8 +79,7 @@
 
 #include "./src/UI/UISpriteManager/UISpriteManager.h"
 
-#include "./src/UI/SpriteText/SpriteText.h"
-#include "./src/UI/SpriteText/SpriteTextManager.h"
+
 
 #include "./src/UI/UIEntity/UIEntity.h"
 #include "./src/UI/UIEntity/UIEntityManager.h"
