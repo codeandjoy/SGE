@@ -39,7 +39,7 @@ void sge::EntityManager::registerEntity(sf::View* view, sge::Entity* entity){
     }
 
     if(entity->spriteText){
-        m_spriteTextManagerPtr->registerSpriteText(entity->spriteText);
+        m_spriteTextManagerPtr->registerSpriteText(view, entity->spriteText);
     }
     
     if(entity->animation){
@@ -100,7 +100,7 @@ void sge::EntityManager::m_deregisterEntityFromCoreManagers(sf::View* view, sge:
     }
 
     if(entity->spriteText){
-        m_spriteTextManagerPtr->deregisterSpriteText(entity->spriteText);
+        m_spriteTextManagerPtr->deregisterSpriteText(view, entity->spriteText);
     }
 
     if(entity->animation){

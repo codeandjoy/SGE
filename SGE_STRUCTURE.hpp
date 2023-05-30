@@ -73,19 +73,6 @@
 #include "./src/Logic/Scene/SceneManager.h"
 //
 
-// UI
-#include "./src/UI/UIScreen/UIScreen.h"
-#include "./src/UI/UIScreen/UIScreenManager.h"
-
-#include "./src/UI/UISpriteManager/UISpriteManager.h"
-
-
-
-#include "./src/UI/UIEntity/UIEntity.h"
-#include "./src/UI/UIEntity/UIEntityManager.h"
-
-#include "./src/UI/UIAnimationManager/UIAnimationManager.h"
-//
 
 // utils
 #include "./src/utils/Approach.h"

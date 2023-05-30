@@ -7,22 +7,22 @@
 
 
 namespace sge{
-    class UIEntity;
+    class Entity;
 
     class ClickableShape : public sf::RectangleShape{
         public:
-            ClickableShape(sge::UIEntity* ownerUIEntity);
+            ClickableShape(sge::Entity* ownerEntity);
 
             std::function<void(sge::ClickableShape* thisClickableShape, sf::Event event)> action;
             
             sf::Vector2f offset = sf::Vector2f(0, 0);
 
             
-            sge::UIEntity* getOwnerUIEntity();
+            sge::Entity* getOwnerEntity();
             void align();
 
         private:
-            sge::UIEntity* m_ownerUIEntityPtr;
+            sge::Entity* m_ownerEntityPtr;
     };
 }
 

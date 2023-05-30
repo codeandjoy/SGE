@@ -1,8 +1,8 @@
 #include "ClickableShape.h"
-#include "../../UI/UIEntity/UIEntity.h"
+#include "../../Logic/Entity/Entity.h"
 
 
-sge::ClickableShape::ClickableShape(sge::UIEntity* ownerUIEntity){ m_ownerUIEntityPtr = ownerUIEntity; }
+sge::ClickableShape::ClickableShape(sge::Entity* ownerUIEntity){ m_ownerEntityPtr = ownerUIEntity; }
 
-sge::UIEntity* sge::ClickableShape::getOwnerUIEntity(){ return m_ownerUIEntityPtr; }
-void sge::ClickableShape::align(){ this->setPosition(m_ownerUIEntityPtr->sprite->getPosition() + offset); }
+sge::Entity* sge::ClickableShape::getOwnerEntity(){ return m_ownerEntityPtr; }
+void sge::ClickableShape::align(){ this->setPosition(m_ownerEntityPtr->sprite->getPosition() + offset); }
