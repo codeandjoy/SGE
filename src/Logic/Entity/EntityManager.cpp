@@ -35,7 +35,7 @@ void sge::EntityManager::registerEntity(sf::View* view, sge::Entity* entity){
     }
 
     if(entity->clickableShape){
-        m_clickableShapeManagerPtr->registerClickableShape(entity->clickableShape);
+        m_clickableShapeManagerPtr->registerClickableShape(view, entity->clickableShape);
     }
 
     if(entity->spriteText){
@@ -96,7 +96,7 @@ void sge::EntityManager::m_deregisterEntityFromCoreManagers(sf::View* view, sge:
     }
 
     if(entity->clickableShape){
-        m_clickableShapeManagerPtr->deregsiterClickableShape(entity->clickableShape);
+        m_clickableShapeManagerPtr->deregsiterClickableShape(view, entity->clickableShape);
     }
 
     if(entity->spriteText){

@@ -5,34 +5,26 @@
 #include "ClickableShape.h"
 
 
-void sge::ClickableShapeManager::registerClickableShape(sge::ClickableShape* clickableShape){ m_activeClickableShapes.push_back(clickableShape); }
-void sge::ClickableShapeManager::deregsiterClickableShape(sge::ClickableShape* clickableShape){
-    m_activeClickableShapes.erase(std::remove(m_activeClickableShapes.begin(), m_activeClickableShapes.end(), clickableShape), m_activeClickableShapes.end());
-    m_inactiveClickableShapes.erase(std::remove(m_inactiveClickableShapes.begin(), m_inactiveClickableShapes.end(), clickableShape), m_inactiveClickableShapes.end());
+void sge::ClickableShapeManager::registerClickableShape(sf::View* view, sge::ClickableShape* clickableShape){ m_clickableShapes[view].push_back(clickableShape); }
+void sge::ClickableShapeManager::deregsiterClickableShape(sf::View* view, sge::ClickableShape* clickableShape){
+    m_clickableShapes[view].erase(std::remove(m_clickableShapes[view].begin(), m_clickableShapes[view].end(), clickableShape), m_clickableShapes[view].end());
 }
-std::vector<sge::ClickableShape*> sge::ClickableShapeManager::getAllActiveClickableShapes(){ return m_activeClickableShapes; }
-
-
-
-void sge::ClickableShapeManager::activateClickableShape(sge::ClickableShape* clickableShape){
-    deregsiterClickableShape(clickableShape);
-    m_activeClickableShapes.push_back(clickableShape);
-}
-void sge::ClickableShapeManager::deactivateClickableShape(sge::ClickableShape* clickableShape){
-    deregsiterClickableShape(clickableShape);
-    m_inactiveClickableShapes.push_back(clickableShape);
-}
-
+std::vector<sge::ClickableShape*> sge::ClickableShapeManager::getClickableShapesByView(sf::View* view){ return m_clickableShapes[view]; }
+std::unordered_map<sf::View*, std::vector<sge::ClickableShape*>> sge::ClickableShapeManager::getClickableShapesMap(){ return m_clickableShapes; };
 
 
 void sge::ClickableShapeManager::alignClickableShapes(){
-    for(sge::ClickableShape* clickableShape : m_activeClickableShapes){
-        clickableShape->align();
+    for(auto& [_, clickableShapes] : m_clickableShapes){
+        for(sge::ClickableShape* clickableShape : clickableShapes){
+            clickableShape->align();
+        }
     }
 }
 
 void sge::ClickableShapeManager::updateClickableShapes(sf::Event event){
-    for(ClickableShape* thisClickableShape : m_activeClickableShapes){
-        thisClickableShape->action(thisClickableShape, event);
+    for(auto& [_, clickableShapes] : m_clickableShapes){
+        for(ClickableShape* thisClickableShape : clickableShapes){
+            thisClickableShape->action(thisClickableShape, event);
+        }
     }
 }
