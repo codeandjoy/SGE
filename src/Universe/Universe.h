@@ -25,11 +25,10 @@ namespace sge{
 
     class Universe{
         public:
-            Universe();
+            Universe(sf::RenderWindow* window);
 
             bool isPaused = false;
 
-            void setupWindow(sf::RenderWindow* window); // ! move window init to constructor
             void setupDebug();
             void loop();
 
@@ -45,7 +44,6 @@ namespace sge{
 
         private:
             sf::RenderWindow* m_windowPtr;
-            sf::View m_uiView; // ! remove
 
             sf::Clock m_deltaClock;
 

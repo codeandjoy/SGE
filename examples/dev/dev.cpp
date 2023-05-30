@@ -13,19 +13,17 @@ int main(){
 
 
 
-    sge::Universe* universe = new sge::Universe();
+    sf::RenderWindow *window = new sf::RenderWindow(sf::VideoMode(1000, 600), "Test");
+    window->setKeyRepeatEnabled(false); // For proper keyboard events handling (e.g. jumping)
+
+    sge::Universe* universe = new sge::Universe(window);
     universe->setupDebug();
 
-    sf::RenderWindow *window = new sf::RenderWindow(sf::VideoMode(1000, 600), "Test");
     sge::ScriptedView *cameraView = new sge::ScriptedView();
     cameraView->setCenter(sf::Vector2f(100, 100));
     cameraView->setSize(sf::Vector2f(250, 150));
     universe->scriptedViewManager->registerScriptedView(cameraView);
 
-
-    window->setKeyRepeatEnabled(false); // For proper keyboard events handling (e.g. jumping)
-    
-    universe->setupWindow(window);
 
 
     // Load all textures

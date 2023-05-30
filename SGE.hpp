@@ -30,11 +30,10 @@ namespace sge{
 
     class Universe{
         public:
-            Universe();
+            Universe(sf::RenderWindow* window);
 
             bool isPaused = false;
 
-            void setupWindow(sf::RenderWindow* window); // ! move window init to constructor
             void setupDebug();
             void loop();
 
@@ -49,7 +48,6 @@ namespace sge{
 
         private:
             sf::RenderWindow* m_windowPtr;
-            sf::View m_uiView; // ! remove
 
             sf::Clock m_deltaClock;
 
@@ -987,7 +985,9 @@ namespace sge{
 #ifndef SGE_MAIN
 #define SGE_MAIN
 
-sge::Universe::Universe(){
+sge::Universe::Universe(sf::RenderWindow* window){
+    m_windowPtr = window;
+    
     sge::AssetsManager* AsM = new sge::AssetsManager();
     sge::ControllerManager* CoM = new sge::ControllerManager();
 
@@ -1017,10 +1017,6 @@ sge::Universe::Universe(){
     sceneManager = ScM;
 }
 
-void sge::Universe::setupWindow(sf::RenderWindow *window){
-    m_windowPtr = window;
-    m_uiView = window->getDefaultView();
-}
 void sge::Universe::setupDebug(){
     sge::DebugManager* debugManagerPtr = new sge::DebugManager();
     debugManager = debugManagerPtr;
@@ -1044,12 +1040,6 @@ void sge::Universe::loop(){
         sf::Event event;
         while(m_windowPtr->pollEvent(event)){
             if(event.type == sf::Event::Closed) m_windowPtr->close();
-            if(event.type == sf::Event::Resized){
-                m_uiView.setSize({
-                    static_cast<float>(event.size.width),
-                    static_cast<float>(event.size.height)
-                });
-            }
 
             controllerManager->updateControllers(event);
             m_clickableShapeManager->updateClickableShapes(event);
@@ -1066,13 +1056,12 @@ void sge::Universe::loop(){
         m_clickableShapeManager->alignClickableShapes();
         m_spriteTextManager->alignSpriteTextObjects();
         
+        
         m_windowPtr->clear();
         
         m_spriteManager->drawSprites(m_windowPtr);
-        debugManager->showDebugInfo(m_windowPtr); // ? show in ui view
-       
-        m_windowPtr->setView(m_uiView);
         m_spriteTextManager->drawSpriteTextObjects(m_windowPtr);
+        debugManager->showDebugInfo(m_windowPtr);
 
         m_windowPtr->display();
     }
