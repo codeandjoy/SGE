@@ -100,7 +100,7 @@ void sge::Universe::loop(){
         
         m_spriteManager->drawSprites(m_windowPtr);
         m_spriteTextManager->drawSpriteTextObjects(m_windowPtr);
-        debugManager->showDebugInfo(m_windowPtr);
+        // debugManager->showDebugInfo(m_windowPtr); // ! Segfault !
 
         m_windowPtr->display();
     }

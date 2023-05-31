@@ -778,11 +778,18 @@ namespace sge{
 
 namespace sge{
     class StateCluster;
+    struct Entity;
 
-    struct State{
-        std::function<void()> enterScript = {};
-        std::function<void()> exitScript = {};
-        std::function<void(float, sge::StateCluster*)> updateScript = {};
+    class State{
+        public:
+            State(Entity* ownerEntity);
+
+            virtual void enterScript(){}
+            virtual void exitScript(){}
+            virtual void updateScript(float dt, sge::StateCluster* containerStateCluster){}
+
+        protected:
+            Entity* m_ownerEntityPtr;
     };
 }
 
@@ -1132,7 +1139,7 @@ void sge::Universe::loop(){
         
         m_spriteManager->drawSprites(m_windowPtr);
         m_spriteTextManager->drawSpriteTextObjects(m_windowPtr);
-        debugManager->showDebugInfo(m_windowPtr);
+        // debugManager->showDebugInfo(m_windowPtr); // ! Segfault !
 
         m_windowPtr->display();
     }
@@ -1687,6 +1694,9 @@ void sge::Animation::runForward(){
         m_clock.restart();
     }
 }
+
+
+sge::State::State(Entity* ownerEntity){ m_ownerEntityPtr = ownerEntity; }
 
 
 sge::State* sge::StateCluster::getCurrentState(){ return states[m_currentState]; }
