@@ -23,6 +23,7 @@ namespace sge{
     class ClickableShapeManager;
     class SpriteTextManager;
     class AnimationManager;
+    class StateManager;
     class CollisionManager;
     class EntityManager;
     class SceneManager;
@@ -55,6 +56,7 @@ namespace sge{
             sge::PhysicsManager* m_physicsManager = nullptr;
             sge::CollisionShapeManager* m_collisionShapeManager = nullptr;
             sge::AnimationManager* m_animationManager = nullptr;
+            sge::StateManager* m_stateManager = nullptr;
 
             sge::ClickableShapeManager* m_clickableShapeManager = nullptr;
             sge::SpriteTextManager* m_spriteTextManager = nullptr;
@@ -769,6 +771,68 @@ namespace sge{
 
 #endif
 
+#ifndef STATE_H
+#define STATE_H
+
+#include <functional>
+
+namespace sge{
+    class StateCluster;
+
+    struct State{
+        std::function<void()> enterScript = {};
+        std::function<void()> exitScript = {};
+        std::function<void(float, sge::StateCluster*)> updateScript = {};
+    };
+}
+
+#endif
+#ifndef STATE_CLUSTER_H
+#define STATE_CLUSTER_H
+
+#include <unordered_map>
+#include <functional>
+#include <string>
+
+namespace sge{
+    struct State;
+
+    class StateCluster{
+        public:
+            sge::State* getCurrentState();
+            std::string getCurrentStateName();
+            void setCurrentState(std::string name);
+
+            std::unordered_map<std::string, sge::State*> states;
+            
+        private:
+            std::string m_currentState = "";
+    };
+}
+
+#endif
+#ifndef STATE_MACHINE_H
+#define STATE_MACHINE_H
+
+#include <vector>
+
+namespace sge{
+    class StateCluster;
+
+    class StateManager{
+        public:
+            void registerStateCluster(sge::StateCluster* stateCluster);
+            void deregisterStateCluster(sge::StateCluster* stateCluster);
+
+            void runUpdateScripts(float dt);
+
+        private:
+            std::vector<StateCluster*> m_stateClusters;
+    }; 
+}
+
+#endif
+
 #ifndef ENTITY_H
 #define ENTITY_H
 
@@ -778,6 +842,7 @@ namespace sge{
     class ClickableShape;
     class SpriteText;
     class Animation;
+    class StateCluster;
 
     struct Entity{
         sf::Sprite* sprite;
@@ -786,6 +851,7 @@ namespace sge{
         sge::ClickableShape* clickableShape = nullptr;
         sge::SpriteText* spriteText = nullptr;
         sge::Animation* animation = nullptr;
+        sge::StateCluster* stateCluster = nullptr;
     };
 }
 
@@ -806,6 +872,7 @@ namespace sge{
     class SpriteTextManager;
     class AnimationManager;
     class CollisionManager;
+    class StateManager;
 
     class EntityManager{
         public:
@@ -816,6 +883,7 @@ namespace sge{
                 sge::ClickableShapeManager* clickableShapeManager,
                 sge::SpriteTextManager* SpriteTextManager,
                 sge::AnimationManager* animationManager,
+                sge::StateManager* stateManager,
                 sge::CollisionManager* collisionManager
             );
 
@@ -835,6 +903,7 @@ namespace sge{
             sge::ClickableShapeManager* m_clickableShapeManagerPtr;
             sge::SpriteTextManager* m_spriteTextManagerPtr;
             sge::AnimationManager* m_animationManagerPtr;
+            sge::StateManager* m_stateManagerPtr;
             sge::CollisionManager* m_collisionManagerPtr;
 
             void m_deregisterEntityFromCoreManagers(sf::View* view, sge::Entity* entity);
@@ -997,8 +1066,9 @@ sge::Universe::Universe(sf::RenderWindow* window){
     sge::ClickableShapeManager* ClSM = new sge::ClickableShapeManager();
     sge::SpriteTextManager* STM = new SpriteTextManager();
     sge::AnimationManager* AnM = new sge::AnimationManager();
+    sge::StateManager* StM = new sge::StateManager();
     sge::CollisionManager* CM = new sge::CollisionManager();
-    sge::EntityManager* EM = new sge::EntityManager(SpM, PM, CSM, ClSM, STM, AnM, CM);
+    sge::EntityManager* EM = new sge::EntityManager(SpM, PM, CSM, ClSM, STM, AnM, StM, CM);
     sge::SceneManager* ScM = new sge::SceneManager(EM, CM);
 
     assetsManager = AsM;
@@ -1011,6 +1081,7 @@ sge::Universe::Universe(sf::RenderWindow* window){
     m_clickableShapeManager = ClSM;
     m_spriteTextManager = STM;
     m_animationManager = AnM;
+    m_stateManager = StM;
     collisionManager = CM;
     entityManager = EM;
     sceneManager = ScM;
@@ -1050,6 +1121,7 @@ void sge::Universe::loop(){
             collisionManager->updateCollisions();
             m_animationManager->updateAnimations();
             scriptedViewManager->runViewScripts();
+            m_stateManager->runUpdateScripts(dt);
             sceneManager->alignScene(); // Scene can be reset only after all managers finished their updates to prevent segfaults
         }
         m_clickableShapeManager->alignClickableShapes();
@@ -1617,13 +1689,48 @@ void sge::Animation::runForward(){
 }
 
 
-sge::EntityManager::EntityManager(sge::SpriteManager* spriteManager, sge::PhysicsManager* physicsManager, sge::CollisionShapeManager* collisionShapeManager, sge::ClickableShapeManager* clickableShapeManager, sge::SpriteTextManager* spriteTextManager, sge::AnimationManager* animationManager, sge::CollisionManager* collisionManager){
+sge::State* sge::StateCluster::getCurrentState(){ return states[m_currentState]; }
+std::string sge::StateCluster::getCurrentStateName(){ return m_currentState; }
+void sge::StateCluster::setCurrentState(std::string name){
+    if(m_currentState != ""){
+        states[m_currentState]->exitScript();
+    }
+    states[name]->enterScript();
+
+    m_currentState = name;
+}
+#include <algorithm>
+
+void sge::StateManager::registerStateCluster(sge::StateCluster* stateCluster){ m_stateClusters.push_back(stateCluster); }
+void sge::StateManager::deregisterStateCluster(sge::StateCluster* stateCluster){
+    m_stateClusters.erase(std::remove(m_stateClusters.begin(), m_stateClusters.end(), stateCluster), m_stateClusters.end());
+}
+
+void sge::StateManager::runUpdateScripts(float dt){
+    for(StateCluster* stateCluster : m_stateClusters){
+        stateCluster->getCurrentState()->updateScript(dt, stateCluster);
+    }
+}
+
+
+sge::EntityManager::EntityManager(
+        sge::SpriteManager* spriteManager,
+        sge::PhysicsManager* physicsManager,
+        sge::CollisionShapeManager* collisionShapeManager,
+        sge::ClickableShapeManager* clickableShapeManager,
+        sge::SpriteTextManager* spriteTextManager,
+        sge::AnimationManager* animationManager,
+        sge::StateManager* stateManager,
+        sge::CollisionManager* collisionManager
+    ){
+
     m_spriteManagerPtr = spriteManager;
     m_physicsManagerPtr = physicsManager;
     m_collisionShapeManagerPtr = collisionShapeManager;
     m_clickableShapeManagerPtr = clickableShapeManager;
     m_spriteTextManagerPtr = spriteTextManager;
     m_animationManagerPtr = animationManager;
+    m_stateManagerPtr = stateManager;
     m_collisionManagerPtr = collisionManager;
 }
 
@@ -1650,6 +1757,10 @@ void sge::EntityManager::registerEntity(sf::View* view, sge::Entity* entity){
     
     if(entity->animation){
         m_animationManagerPtr->registerAnimation(entity->animation);
+    }
+
+    if(entity->stateCluster){
+        m_stateManagerPtr->registerStateCluster(entity->stateCluster);
     }
 
     m_entities[view].push_back(entity);
@@ -1709,6 +1820,10 @@ void sge::EntityManager::m_deregisterEntityFromCoreManagers(sf::View* view, sge:
 
     if(entity->animation){
         m_animationManagerPtr->deregisterAnimation(entity->animation);
+    }
+
+    if(entity->stateCluster){
+        m_stateManagerPtr->deregisterStateCluster(entity->stateCluster);
     }
 }
 

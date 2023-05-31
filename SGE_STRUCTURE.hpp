@@ -65,6 +65,10 @@
 #include "./src/Logic/Animation/AnimationManager.h"
 #include "./src/Logic/Animation/Animation.h"
 
+#include "./src/Logic/State/State.h"
+#include "./src/Logic/State/StateCluster.h"
+#include "./src/Logic/State/StateManager.h"
+
 #include "./src/Logic/Entity/Entity.h"
 #include "./src/Logic/Entity/EntityManager.h"
 #include "./src/Logic/Entity/EntityBuilders.h"
