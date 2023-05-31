@@ -13,6 +13,6 @@ void sge::StateManager::deregisterStateCluster(sge::StateCluster* stateCluster){
 
 void sge::StateManager::runUpdateScripts(float dt){
     for(StateCluster* stateCluster : m_stateClusters){
-        stateCluster->getCurrentState()->updateScript(dt);
+        stateCluster->getCurrentState()->updateScript(dt, stateCluster);
     }
 }

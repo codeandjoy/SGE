@@ -5,10 +5,12 @@
 
 
 namespace sge{
+    class StateCluster;
+
     struct State{
         std::function<void()> enterScript = {};
         std::function<void()> exitScript = {};
-        std::function<void(float dt)> updateScript = {};
+        std::function<void(float, sge::StateCluster*)> updateScript = {};
     };
 }
 
