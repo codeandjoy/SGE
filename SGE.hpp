@@ -783,8 +783,8 @@ namespace sge{
         sf::Sprite* sprite;
         sge::PhysicalObject* physicalObject = nullptr;
         std::unordered_map<std::string, sge::CollisionShape*> collisionShapes; 
-        sge::ClickableShape* clickableShape;
-        sge::SpriteText* spriteText;
+        sge::ClickableShape* clickableShape = nullptr;
+        sge::SpriteText* spriteText = nullptr;
         sge::Animation* animation = nullptr;
     };
 }
