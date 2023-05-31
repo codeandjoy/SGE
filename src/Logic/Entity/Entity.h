@@ -8,6 +8,7 @@ namespace sge{
     class ClickableShape;
     class SpriteText;
     class Animation;
+    class StateCluster;
 
     struct Entity{
         sf::Sprite* sprite;
@@ -16,6 +17,7 @@ namespace sge{
         sge::ClickableShape* clickableShape = nullptr;
         sge::SpriteText* spriteText = nullptr;
         sge::Animation* animation = nullptr;
+        sge::StateCluster* stateCluster = nullptr;
     };
 }
 

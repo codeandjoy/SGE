@@ -5,17 +5,29 @@
 #include "../CollisionShape/CollisionShapeManager.h"
 #include "../ClickableShape/ClickableShapeManager.h"
 #include "../SpriteText/SpriteTextManager.h"
+#include "../State/StateManager.h"
 #include "../Animation/AnimationManager.h"
 #include "../Collision/CollisionManager.h"
 
 
-sge::EntityManager::EntityManager(sge::SpriteManager* spriteManager, sge::PhysicsManager* physicsManager, sge::CollisionShapeManager* collisionShapeManager, sge::ClickableShapeManager* clickableShapeManager, sge::SpriteTextManager* spriteTextManager, sge::AnimationManager* animationManager, sge::CollisionManager* collisionManager){
+sge::EntityManager::EntityManager(
+        sge::SpriteManager* spriteManager,
+        sge::PhysicsManager* physicsManager,
+        sge::CollisionShapeManager* collisionShapeManager,
+        sge::ClickableShapeManager* clickableShapeManager,
+        sge::SpriteTextManager* spriteTextManager,
+        sge::AnimationManager* animationManager,
+        sge::StateManager* stateManager,
+        sge::CollisionManager* collisionManager
+    ){
+
     m_spriteManagerPtr = spriteManager;
     m_physicsManagerPtr = physicsManager;
     m_collisionShapeManagerPtr = collisionShapeManager;
     m_clickableShapeManagerPtr = clickableShapeManager;
     m_spriteTextManagerPtr = spriteTextManager;
     m_animationManagerPtr = animationManager;
+    m_stateManagerPtr = stateManager;
     m_collisionManagerPtr = collisionManager;
 }
 
@@ -44,6 +56,10 @@ void sge::EntityManager::registerEntity(sf::View* view, sge::Entity* entity){
     
     if(entity->animation){
         m_animationManagerPtr->registerAnimation(entity->animation);
+    }
+
+    if(entity->stateCluster){
+        m_stateManagerPtr->registerStateCluster(entity->stateCluster);
     }
 
     m_entities[view].push_back(entity);
@@ -105,5 +121,9 @@ void sge::EntityManager::m_deregisterEntityFromCoreManagers(sf::View* view, sge:
 
     if(entity->animation){
         m_animationManagerPtr->deregisterAnimation(entity->animation);
+    }
+
+    if(entity->stateCluster){
+        m_stateManagerPtr->deregisterStateCluster(entity->stateCluster);
     }
 }

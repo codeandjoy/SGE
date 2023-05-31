@@ -10,6 +10,7 @@
 #include "../Logic/ClickableShape/ClickableShapeManager.h"
 #include "../Logic/SpriteText/SpriteTextManager.h"
 #include "../Logic/Animation/AnimationManager.h"
+#include "../Logic/State/StateManager.h"
 #include "../Logic/Collision/CollisionManager.h"
 #include "../Logic/Entity/EntityManager.h"
 #include "../Logic/Scene/SceneManager.h"
@@ -28,8 +29,9 @@ sge::Universe::Universe(sf::RenderWindow* window){
     sge::ClickableShapeManager* ClSM = new sge::ClickableShapeManager();
     sge::SpriteTextManager* STM = new SpriteTextManager();
     sge::AnimationManager* AnM = new sge::AnimationManager();
+    sge::StateManager* StM = new sge::StateManager();
     sge::CollisionManager* CM = new sge::CollisionManager();
-    sge::EntityManager* EM = new sge::EntityManager(SpM, PM, CSM, ClSM, STM, AnM, CM);
+    sge::EntityManager* EM = new sge::EntityManager(SpM, PM, CSM, ClSM, STM, AnM, StM, CM);
     sge::SceneManager* ScM = new sge::SceneManager(EM, CM);
 
     assetsManager = AsM;
@@ -42,6 +44,7 @@ sge::Universe::Universe(sf::RenderWindow* window){
     m_clickableShapeManager = ClSM;
     m_spriteTextManager = STM;
     m_animationManager = AnM;
+    m_stateManager = StM;
     collisionManager = CM;
     entityManager = EM;
     sceneManager = ScM;
@@ -86,6 +89,7 @@ void sge::Universe::loop(){
             collisionManager->updateCollisions();
             m_animationManager->updateAnimations();
             scriptedViewManager->runViewScripts();
+            m_stateManager->runUpdateScripts(dt);
             sceneManager->alignScene(); // Scene can be reset only after all managers finished their updates to prevent segfaults
         }
         m_clickableShapeManager->alignClickableShapes();
