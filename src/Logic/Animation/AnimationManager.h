@@ -1,18 +1,17 @@
 #include <vector>
 
+#include "../../Manager/StorageManagers/VectorManager.h"
+#include "../../Manager/LoopSectionManagers/UpdateManager.h"
+
 
 namespace sge{
-    class Animation;    
+    class Animation;
 
-    class AnimationManager{
+    class AnimationManager :
+        public sge::VectorManager<sge::Animation*>,
+        public sge::UpdateManager{
+        
         public:
-            void registerAnimation(sge::Animation* animation);
-            void deregisterAnimation(sge::Animation* animation);
-            void deregisterAllAnimations();
-
-            void updateAnimations();
-
-        private:
-            std::vector<sge::Animation*> m_animations;
+            void update(float dt) override;
     };
 }

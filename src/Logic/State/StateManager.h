@@ -3,20 +3,19 @@
 
 #include <vector>
 
+#include "../../Manager/StorageManagers/VectorManager.h"
+#include "../../Manager/LoopSectionManagers/UpdateManager.h"
+
 
 namespace sge{
     class StateCluster;
 
-    class StateManager{
+    class StateManager :
+        public sge::VectorManager<sge::StateCluster*>,
+        public sge::UpdateManager{
+
         public:
-            void registerStateCluster(sge::StateCluster* stateCluster);
-            void deregisterStateCluster(sge::StateCluster* stateCluster);
-
-
-            void runUpdateScripts(float dt);
-
-        private:
-            std::vector<StateCluster*> m_stateClusters;
+            void update(float dt) override;
     }; 
 }
 

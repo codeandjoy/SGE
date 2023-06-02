@@ -5,18 +5,17 @@
 #include <vector>
 
 #include <SFML/Graphics.hpp>
+#include "../Manager/StorageManagers/VectorManager.h"
+#include "../Manager/LoopSectionManagers/EventManager.h"
 
 
 namespace sge{
-    class ControllerManager{
-        public:
-            void registerController(std::function<void(sf::Event)> controller);
-            std::vector<std::function<void(sf::Event)>> getAllControllers();       
+    class ControllerManager :
+        public sge::VectorManager<std::function<void(sf::Event)>>,
+        public sge::EventManager{
 
-            void updateControllers(sf::Event event);
-            
-        private:
-            std::vector<std::function<void(sf::Event)>> m_controllers;
+        public:
+            void processEvent(sf::Event event) override;
     };
 }
 

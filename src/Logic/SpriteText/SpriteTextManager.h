@@ -5,22 +5,22 @@
 #include <vector>
 #include <SFML/Graphics.hpp>
 
+#include "../../Manager/StorageManagers/ViewManager.h"
+#include "../../Manager/LoopSectionManagers/UpdateManager.h"
+#include "../../Manager/LoopSectionManagers/DrawManager.h"
+
+
 namespace sge{
     class SpriteText;
 
-    class SpriteTextManager{
+    class SpriteTextManager :
+        public sge::ViewManager<sge::SpriteText*>,
+        public sge::UpdateManager,
+        public sge::DrawManager{
+            
         public:
-            void registerSpriteText(sf::View* view, sge::SpriteText* spriteText);
-            void deregisterSpriteText(sf::View* view, sge::SpriteText* spriteText);
-            std::vector<sge::SpriteText*> getSpriteTextObjectsByView(sf::View* view);
-            std::unordered_map<sf::View*, std::vector<sge::SpriteText*>> getSpriteTextObjectsMap();
-
-
-            void alignSpriteTextObjects();
-            void drawSpriteTextObjects(sf::RenderWindow* windowPtr);
-
-        private:
-            std::unordered_map<sf::View*, std::vector<sge::SpriteText*>> m_spriteTextObjects;
+            void update(float dt) override;
+            void draw(sf::RenderWindow* window) override;
     };  
 }
 

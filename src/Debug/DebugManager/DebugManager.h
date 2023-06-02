@@ -5,20 +5,19 @@
 #include <unordered_map>
 #include <vector>
 
+#include "../../Manager/StorageManagers/ViewManager.h" 
+#include "../../Manager/LoopSectionManagers/DrawManager.h" 
+
+
 namespace sge{
     class DebugEntity;
 
-    class DebugManager{
+    class DebugManager :
+        public sge::ViewManager<sge::DebugEntity*>,
+        public sge::DrawManager{
+
         public:
-            void registerDebugEntity(sf::View* view, sge::DebugEntity* debugEntity);
-            void registerDebugEntities(sf::View* view, std::vector<sge::DebugEntity*> debugEntities);
-            void deregisterDebugEntity(sf::View* view, sge::DebugEntity* debugEntity);
-            void deregisterAllDebugEntities();
-
-            void showDebugInfo(sf::RenderWindow* windowPtr);
-
-        private:
-            std::unordered_map<sf::View*, std::vector<sge::DebugEntity*>> m_debugEntities;
+            void draw(sf::RenderWindow* window) override;
     };
 }
 

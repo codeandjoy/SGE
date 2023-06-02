@@ -5,22 +5,22 @@
 #include <vector>
 #include <SFML/Graphics.hpp>
 
+#include "../../Manager/StorageManagers/ViewManager.h"
+#include "../../Manager/LoopSectionManagers/UpdateManager.h"
+#include "../../Manager/LoopSectionManagers/EventManager.h"
+
 
 namespace sge{
     struct ClickableShape;
 
-    class ClickableShapeManager{
+    class ClickableShapeManager :
+        public sge::ViewManager<ClickableShape*>,
+        public sge::UpdateManager,
+        public sge::EventManager{
+
         public:
-            void registerClickableShape(sf::View* view, sge::ClickableShape* clickableShape);
-            void deregsiterClickableShape(sf::View* view, sge::ClickableShape* clickableShape);
-            std::vector<sge::ClickableShape*> getClickableShapesByView(sf::View* view);
-            std::unordered_map<sf::View*, std::vector<sge::ClickableShape*>> getClickableShapesMap();
-
-            void alignClickableShapes();
-            void updateClickableShapes(sf::Event event);
-
-        private:
-            std::unordered_map<sf::View*, std::vector<sge::ClickableShape*>> m_clickableShapes;
+            void update(float dt) override;
+            void processEvent(sf::Event event) override;
     };
 }
 

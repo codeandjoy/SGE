@@ -3,22 +3,19 @@
 
 #include <vector>
 
+#include "../../Manager/StorageManagers/VectorManager.h"
+#include "../../Manager/LoopSectionManagers/UpdateManager.h"
+
 
 namespace sge{
     class PhysicalObject;
 
-    class PhysicsManager{
+    class PhysicsManager :
+        public sge::VectorManager<sge::PhysicalObject*>,
+        public sge::UpdateManager{
+
         public:
-            void registerPhysicalObject(sge::PhysicalObject* physicalObject);
-            void deregisterPhysicalObject(sge::PhysicalObject* physicalObject);
-            void deregisterAllPhysicalObjects();
-            std::vector<sge::PhysicalObject*> getAllPhysicalObjects();
-
-
-            void updatePhysics(float dt);
-
-        private:
-            std::vector<sge::PhysicalObject*> m_physicalObjects;
+            void update(float dt) override;
     };
 }
 

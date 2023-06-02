@@ -78,29 +78,31 @@ void sge::Universe::loop(){
         while(m_windowPtr->pollEvent(event)){
             if(event.type == sf::Event::Closed) m_windowPtr->close();
 
-            controllerManager->updateControllers(event);
-            m_clickableShapeManager->updateClickableShapes(event);
+            controllerManager->processEvent(event);
+            m_clickableShapeManager->processEvent(event);
         }
 
 
         if(!isPaused){
-            m_physicsManager->updatePhysics(dt);
-            m_collisionShapeManager->alignCollisionShapes();
+            m_physicsManager->update(dt);
+            m_collisionShapeManager->update(dt);
+            m_clickableShapeManager->update(dt);
+            m_spriteTextManager->update(dt);
+            m_stateManager->update(dt);
             collisionManager->updateCollisions();
-            m_animationManager->updateAnimations();
-            scriptedViewManager->runViewScripts();
-            m_stateManager->runUpdateScripts(dt);
-            sceneManager->alignScene(); // Scene can be reset only after all managers finished their updates to prevent segfaults
+
+            m_animationManager->update(dt);
+            scriptedViewManager->update(dt);
+
+            sceneManager->alignScene(); // Scene can be reset only after all managers finished their updates to prevent segfaults in loops
         }
-        m_clickableShapeManager->alignClickableShapes();
-        m_spriteTextManager->alignSpriteTextObjects();
         
         
         m_windowPtr->clear();
         
-        m_spriteManager->drawSprites(m_windowPtr);
-        m_spriteTextManager->drawSpriteTextObjects(m_windowPtr);
-        // debugManager->showDebugInfo(m_windowPtr); // ! Segfault !
+        m_spriteManager->draw(m_windowPtr);
+        m_spriteTextManager->draw(m_windowPtr);
+        // debugManager->draw(m_windowPtr); // ! Segfault !
 
         m_windowPtr->display();
     }

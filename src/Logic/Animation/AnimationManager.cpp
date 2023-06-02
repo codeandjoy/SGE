@@ -2,13 +2,8 @@
 #include "Animation.h"
 
 
-void sge::AnimationManager::registerAnimation(sge::Animation* animation){ m_animations.push_back(animation); }
-void sge::AnimationManager::deregisterAnimation(sge::Animation* animation){ m_animations.erase(std::remove(m_animations.begin(), m_animations.end(), animation), m_animations.end()); }
-void sge::AnimationManager::deregisterAllAnimations(){ m_animations.clear(); }
-
-
-void sge::AnimationManager::updateAnimations(){
-    for(sge::Animation* animation : m_animations){
+void sge::AnimationManager::update(float dt){
+    for(sge::Animation* animation : m_components){
         animation->runForward();
     }
 }

@@ -3,25 +3,19 @@
 
 #include <vector>
 
+#include "../../Manager/StorageManagers/VectorManager.h"
+#include "../../Manager/LoopSectionManagers/UpdateManager.h"
+
 
 namespace sge{
     class CollisionShape;
 
-    class CollisionShapeManager{
+    class CollisionShapeManager :
+        public sge::VectorManager<sge::CollisionShape*>,
+        public sge::UpdateManager{
+
         public:
-            void registerCollisionShape(sge::CollisionShape* collisionShape);
-            void deregisterCollisionShape(sge::CollisionShape* collisionShape);
-            void registerCollisionShapes(std::vector<sge::CollisionShape*> collisionShapes);
-            void deregisterAllCollisionShapes();
-            
-
-            std::vector<sge::CollisionShape*> getCollisionShapes();
-            
-            
-            void alignCollisionShapes();
-
-        private:
-            std::vector<CollisionShape*> m_collisionShapes;
+            void update(float dt) override;
     };
 }
 

@@ -6,16 +6,16 @@
 
 #include "./src/Universe/Universe.h"
 
+// Manager
+#include "./src/Manager/StorageManagers/VectorManager.h"
+#include "./src/Manager/StorageManagers/ViewManager.h"
+#include "./src/Manager/StorageManagers/LabelManager.h"
+//
+
 // AssetsManager
 #include "./src/Assets/AssetsManager/AssetsManager.h"
 #include "./src/Assets/Texture/TextureSheetSizes.h"
 #include "./src/Assets/Texture/TextureSheet.h"
-//
-
-
-// Common
-
-
 //
 
 

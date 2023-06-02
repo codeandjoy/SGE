@@ -5,19 +5,17 @@
 #include <vector>
 #include <SFML/Graphics.hpp>
 
+#include "../../Manager/StorageManagers/ViewManager.h"
+#include "../../Manager/LoopSectionManagers/DrawManager.h"
+
 
 namespace sge{
-    class SpriteManager{
+    class SpriteManager :
+        public sge::ViewManager<sf::Sprite*>,
+        public sge::DrawManager{
+            
         public:
-            void registerSprite(sf::View*, sf::Sprite* sprite);
-            void deregisterSprite(sf::View*, sf::Sprite* sprite);
-            void deregisterAllSprites();
-            std::vector<sf::Sprite*> getViewSprites(sf::View* view);
-
-            void drawSprites(sf::RenderWindow* windowPtr);
-
-        private:
-            std::unordered_map<sf::View*, std::vector<sf::Sprite*>> m_sprites;
+            void draw(sf::RenderWindow* window) override;
     };
 }
 

@@ -34,96 +34,68 @@ sge::EntityManager::EntityManager(
 
 
 void sge::EntityManager::registerEntity(sf::View* view, sge::Entity* entity){
-    m_spriteManagerPtr->registerSprite(view, entity->sprite);
+    m_spriteManagerPtr->registerComponent(view, entity->sprite);
 
     if(entity->physicalObject){
-        m_physicsManagerPtr->registerPhysicalObject(entity->physicalObject);
+        m_physicsManagerPtr->registerComponent(entity->physicalObject);
     }
         
     if(entity->collisionShapes.size()){
         for(auto& [_, collisionShape] : entity->collisionShapes){
-            m_collisionShapeManagerPtr->registerCollisionShape(collisionShape);
+            m_collisionShapeManagerPtr->registerComponent(collisionShape);
         }
     }
 
     if(entity->clickableShape){
-        m_clickableShapeManagerPtr->registerClickableShape(view, entity->clickableShape);
+        m_clickableShapeManagerPtr->registerComponent(view, entity->clickableShape);
     }
 
     if(entity->spriteText){
-        m_spriteTextManagerPtr->registerSpriteText(view, entity->spriteText);
+        m_spriteTextManagerPtr->registerComponent(view, entity->spriteText);
     }
     
     if(entity->animation){
-        m_animationManagerPtr->registerAnimation(entity->animation);
+        m_animationManagerPtr->registerComponent(entity->animation);
     }
 
     if(entity->stateCluster){
-        m_stateManagerPtr->registerStateCluster(entity->stateCluster);
+        m_stateManagerPtr->registerComponent(entity->stateCluster);
     }
 
-    m_entities[view].push_back(entity);
-}
 
-void sge::EntityManager::registerEntities(sf::View* view, std::vector<sge::Entity*> entities){
-    for(sge::Entity* entity : entities){
-        registerEntity(view, entity);
-    }
+    sge::ViewManager<sge::Entity*>::registerComponent(view, entity);
 }
 
 void sge::EntityManager::deregisterEntity(sf::View* view, sge::Entity* entity){
-    m_deregisterEntityFromCoreManagers(view, entity);
-
-    m_entities[view].erase(std::remove(m_entities[view].begin(), m_entities[view].end(), entity), m_entities[view].end());    
-}
-
-void sge::EntityManager::deregisterEntities(sf::View* view, std::vector<sge::Entity*> entities){
-    for(sge::Entity* entity : entities){
-        deregisterEntity(view, entity);
-    }
-}
-
-void sge::EntityManager::deregisterAllEntities(){
-    for(auto& [view, entities] : m_entities){
-        for(Entity* entity : entities){
-            m_deregisterEntityFromCoreManagers(view, entity);
-        }
-    }
-
-    m_entities.clear();
-}
-
-std::vector<sge::Entity*> sge::EntityManager::getViewEntities(sf::View* view){ return m_entities[view]; }
-
-
-
-void sge::EntityManager::m_deregisterEntityFromCoreManagers(sf::View* view, sge::Entity* entity){
-    m_spriteManagerPtr->deregisterSprite(view, entity->sprite);
+    m_spriteManagerPtr->deregisterComponent(view, entity->sprite);
 
     if(entity->physicalObject){
-        m_physicsManagerPtr->deregisterPhysicalObject(entity->physicalObject);
+        m_physicsManagerPtr->deregisterComponent(entity->physicalObject);
     }
 
     if(entity->collisionShapes.size()){
         for(auto[_, collisionShape] : entity->collisionShapes){
-            m_collisionShapeManagerPtr->deregisterCollisionShape(collisionShape);
+            m_collisionShapeManagerPtr->deregisterComponent(collisionShape);
             m_collisionManagerPtr->deregisterCollisionShapeFromCollisionGroups(collisionShape);
         }
     }
 
     if(entity->clickableShape){
-        m_clickableShapeManagerPtr->deregsiterClickableShape(view, entity->clickableShape);
+        m_clickableShapeManagerPtr->deregisterComponent(view, entity->clickableShape);
     }
 
     if(entity->spriteText){
-        m_spriteTextManagerPtr->deregisterSpriteText(view, entity->spriteText);
+        m_spriteTextManagerPtr->deregisterComponent(view, entity->spriteText);
     }
 
     if(entity->animation){
-        m_animationManagerPtr->deregisterAnimation(entity->animation);
+        m_animationManagerPtr->deregisterComponent(entity->animation);
     }
 
     if(entity->stateCluster){
-        m_stateManagerPtr->deregisterStateCluster(entity->stateCluster);
+        m_stateManagerPtr->deregisterComponent(entity->stateCluster);
     }
+
+
+    sge::ViewManager<sge::Entity*>::deregisterComponent(view, entity);
 }

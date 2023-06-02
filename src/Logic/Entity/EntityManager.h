@@ -5,6 +5,8 @@
 #include <vector>
 #include <SFML/Graphics.hpp>
 
+#include "../../Manager/StorageManagers/ViewManager.h"
+
 
 namespace sge{
     struct Entity;
@@ -18,7 +20,7 @@ namespace sge{
     class StateManager;
 
 
-    class EntityManager{
+    class EntityManager : public sge::ViewManager<sge::Entity*>{
         public:
             EntityManager(
                 sge::SpriteManager* spriteManager,
@@ -31,16 +33,15 @@ namespace sge{
                 sge::CollisionManager* collisionManager
             );
 
+        void registerEntity(sf::View* view, sge::Entity* entity);
+        void deregisterEntity(sf::View* view, sge::Entity* entity);
 
-            void registerEntity(sf::View* view, sge::Entity* entity);
-            void registerEntities(sf::View* view, std::vector<sge::Entity*> entities);
-            void deregisterEntity(sf::View* view, sge::Entity* entity);
-            void deregisterEntities(sf::View* view, std::vector<sge::Entity*> entities);
-            void deregisterAllEntities();
-            std::vector<sge::Entity*> getViewEntities(sf::View* view);
 
         private:
-            std::unordered_map<sf::View*, std::vector<sge::Entity*>> m_entities;
+            // Hidden because extended using 'registerEntiy' and 'deregisterEntity'
+            using sge::ViewManager<sge::Entity*>::registerComponent;
+            using sge::ViewManager<sge::Entity*>::deregisterComponent;
+            //
 
             sge::SpriteManager* m_spriteManagerPtr;
             sge::PhysicsManager* m_physicsManagerPtr;
@@ -50,9 +51,6 @@ namespace sge{
             sge::AnimationManager* m_animationManagerPtr;
             sge::StateManager* m_stateManagerPtr;
             sge::CollisionManager* m_collisionManagerPtr;
-
-
-            void m_deregisterEntityFromCoreManagers(sf::View* view, sge::Entity* entity);
     };
 }
 

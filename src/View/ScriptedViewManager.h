@@ -5,18 +5,19 @@
 #include <vector>
 #include <string>
 
+#include "../Manager/StorageManagers/VectorManager.h"
+#include "../Manager/LoopSectionManagers/UpdateManager.h"
+
 
 namespace sge{
     struct ScriptedView;
 
-    class ScriptedViewManager{
+    class ScriptedViewManager :
+        public sge::VectorManager<sge::ScriptedView*>,
+        public sge::UpdateManager{
+
         public:
-            void registerScriptedView(sge::ScriptedView* scriptedView);
-
-            void runViewScripts();
-
-        private:
-            std::vector<sge::ScriptedView*> m_scriptedViews;
+            void update(float dt) override;
     };
 }
 

@@ -22,7 +22,7 @@ int main(){
     sge::ScriptedView *cameraView = new sge::ScriptedView();
     cameraView->setCenter(sf::Vector2f(100, 100));
     cameraView->setSize(sf::Vector2f(250, 150));
-    universe->scriptedViewManager->registerScriptedView(cameraView);
+    universe->scriptedViewManager->registerComponent(cameraView);
 
 
 
@@ -62,7 +62,9 @@ int main(){
         }
     }
 
-    universe->entityManager->registerEntities(cameraView, mapTileEntities);
+    for(sge::Entity* entity : mapTileEntities){
+        universe->entityManager->registerEntity(cameraView, entity);
+    }
     //
 
 
@@ -83,7 +85,7 @@ int main(){
 
     sge::DebugEntity* boxDE = new sge::DebugEntity(boxEntity);
     boxDE->customCollisionShapeBorderSettings["globalBounds"] = sge::CollisionShapeBorderSettings{sf::Color::Green};
-    universe->debugManager->registerDebugEntity(cameraView, boxDE); // ? make it registerDebugEntityGroup for consistency
+    universe->debugManager->registerComponent(cameraView, boxDE);
     //
 
 
@@ -119,7 +121,7 @@ int main(){
     //     printf("%f, %f\n", playerEntity->getPosition().x, playerEntity->getPosition().y);
     // });
 
-    universe->debugManager->registerDebugEntity(cameraView, playerDE);
+    universe->debugManager->registerComponent(cameraView, playerDE);
     //
 
 
@@ -241,7 +243,7 @@ int main(){
 
 
     // Controllers and events
-    universe->controllerManager->registerController([playerEntity, playerAnimation, universe](sf::Event event){
+    universe->controllerManager->registerComponent([playerEntity, playerAnimation, universe](sf::Event event){
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::A)){
             playerEntity->physicalObject->velocity.x = -70;
             playerAnimation->setCurrentTextureSequence("runLeft");
