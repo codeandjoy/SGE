@@ -8,20 +8,24 @@ void sge::DebugManager::draw(sf::RenderWindow* window){
         window->setView(*view);
         
         for(sge::DebugEntity* debugEntity : debugEntities){
-            // Run extraDebugFunctions
-            // ! rewrite into update or just remove
-            for(std::function<void(sf::RenderWindow* renderWindow)> extraDebugFunction : debugEntity->getExtraDebugFunctions()){
-                extraDebugFunction(window);
-            }
-            //
-
-            // Draw collision shape borders
-            if(debugEntity->drawCollisionShapeBorders){
-                for(sge::CollisionShapeBorder* collisionShapeBorder : debugEntity->generateCollisionShapeBorders()){
-                    window->draw(*collisionShapeBorder);
+            if(debugEntity->isActive || debugEntity->isPaused){
+                // Run extraDebugFunctions
+                // !
+                // ! rewrite into update or just remove
+                // !
+                for(std::function<void(sf::RenderWindow* renderWindow)> extraDebugFunction : debugEntity->getExtraDebugFunctions()){
+                    extraDebugFunction(window);
                 }
+                //
+
+                // Draw collision shape borders
+                if(debugEntity->drawCollisionShapeBorders){
+                    for(sge::CollisionShapeBorder* collisionShapeBorder : debugEntity->generateCollisionShapeBorders()){
+                        window->draw(*collisionShapeBorder);
+                    }
+                }
+                //
             }
-            //
         }
     }
 }

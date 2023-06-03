@@ -57,8 +57,12 @@ void sge::CollisionManager::updateCollisions(){
     for(std::string pair : m_collisionPairsOrder){
 
         for(sge::CollisionShape* initiator : m_collisionGroups[m_collisionPairs[pair]->initiatorGroupName]){
-            // Register all present collisions
+            if(!initiator->isActive) continue;
+
+            // Collect all present collisions
             for(sge::CollisionShape* recipient : m_collisionGroups[m_collisionPairs[pair]->recipientGroupName]){
+                if(!recipient->isActive) continue;
+
                 if(m_collisionPairs[pair]->algorithm(initiator, recipient)){
                     CollisionSide initiatorImpactSide = determineInitiatorImpactSide(initiator, recipient);
 

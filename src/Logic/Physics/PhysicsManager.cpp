@@ -4,6 +4,6 @@
 
 void sge::PhysicsManager::update(float dt){
     for(sge::PhysicalObject* physicalObject : m_components){
-        physicalObject->update(dt);
+        if(physicalObject->isActive) physicalObject->update(dt);
     }
 }

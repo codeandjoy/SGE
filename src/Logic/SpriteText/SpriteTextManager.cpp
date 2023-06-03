@@ -7,7 +7,7 @@
 void sge::SpriteTextManager::update(float dt){
     for(auto& [_, spriteTextObjects] : m_components){
         for(sge::SpriteText* spriteText : spriteTextObjects){
-            spriteText->align();
+            if(spriteText->isActive) spriteText->align();
         }
     }
 }
@@ -16,7 +16,7 @@ void sge::SpriteTextManager::draw(sf::RenderWindow* window){
         window->setView(*view);
 
         for(SpriteText* spriteText : spriteTextObjects){
-            window->draw(*spriteText);
+            if(spriteText->isActive || spriteText->isPaused) window->draw(*spriteText);
         }
     }
 }

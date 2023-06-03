@@ -7,7 +7,7 @@ void sge::SpriteManager::draw(sf::RenderWindow* window){
         window->setView(*view);
 
         for(sge::Sprite* sprite : sprites){
-            window->draw(*sprite);
+            if(sprite->isActive || sprite->isPaused) window->draw(*sprite);
         }
     }
 }

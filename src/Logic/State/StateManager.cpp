@@ -7,6 +7,6 @@
 
 void sge::StateManager::update(float dt){
     for(StateCluster* stateCluster : m_components){
-        stateCluster->getCurrentState()->updateScript(dt, stateCluster);
+        if(stateCluster->isActive) stateCluster->getCurrentState()->updateScript(dt, stateCluster);
     }
 }

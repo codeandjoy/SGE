@@ -477,7 +477,7 @@ namespace sge{
 #include <functional>
 
 namespace sge{
-    class PhysicalObject : sge::StatefulComponent{
+    class PhysicalObject : public sge::StatefulComponent{
         public:
             PhysicalObject(sf::Sprite* ownerSprite);
 
@@ -1294,20 +1294,24 @@ void sge::DebugManager::draw(sf::RenderWindow* window){
         window->setView(*view);
         
         for(sge::DebugEntity* debugEntity : debugEntities){
-            // Run extraDebugFunctions
-            // ! rewrite into update or just remove
-            for(std::function<void(sf::RenderWindow* renderWindow)> extraDebugFunction : debugEntity->getExtraDebugFunctions()){
-                extraDebugFunction(window);
-            }
-            //
-
-            // Draw collision shape borders
-            if(debugEntity->drawCollisionShapeBorders){
-                for(sge::CollisionShapeBorder* collisionShapeBorder : debugEntity->generateCollisionShapeBorders()){
-                    window->draw(*collisionShapeBorder);
+            if(debugEntity->isActive || debugEntity->isPaused){
+                // Run extraDebugFunctions
+                // !
+                // ! rewrite into update or just remove
+                // !
+                for(std::function<void(sf::RenderWindow* renderWindow)> extraDebugFunction : debugEntity->getExtraDebugFunctions()){
+                    extraDebugFunction(window);
                 }
+                //
+
+                // Draw collision shape borders
+                if(debugEntity->drawCollisionShapeBorders){
+                    for(sge::CollisionShapeBorder* collisionShapeBorder : debugEntity->generateCollisionShapeBorders()){
+                        window->draw(*collisionShapeBorder);
+                    }
+                }
+                //
             }
-            //
         }
     }
 }
@@ -1360,7 +1364,7 @@ void sge::SpriteManager::draw(sf::RenderWindow* window){
         window->setView(*view);
 
         for(sge::Sprite* sprite : sprites){
-            window->draw(*sprite);
+            if(sprite->isActive || sprite->isPaused) window->draw(*sprite);
         }
     }
 }
@@ -1368,7 +1372,7 @@ void sge::SpriteManager::draw(sf::RenderWindow* window){
 
 void sge::PhysicsManager::update(float dt){
     for(sge::PhysicalObject* physicalObject : m_components){
-        physicalObject->update(dt);
+        if(physicalObject->isActive) physicalObject->update(dt);
     }
 }
 
@@ -1471,8 +1475,12 @@ void sge::CollisionManager::updateCollisions(){
     for(std::string pair : m_collisionPairsOrder){
 
         for(sge::CollisionShape* initiator : m_collisionGroups[m_collisionPairs[pair]->initiatorGroupName]){
-            // Register all present collisions
+            if(!initiator->isActive) continue;
+
+            // Collect all present collisions
             for(sge::CollisionShape* recipient : m_collisionGroups[m_collisionPairs[pair]->recipientGroupName]){
+                if(!recipient->isActive) continue;
+
                 if(m_collisionPairs[pair]->algorithm(initiator, recipient)){
                     CollisionSide initiatorImpactSide = determineInitiatorImpactSide(initiator, recipient);
 
@@ -1587,7 +1595,7 @@ void sge::CollisionShape::align(){
 
 void sge::CollisionShapeManager::update(float dt){
     for(sge::CollisionShape* collisionShape : m_components){
-        collisionShape->align();
+        if(collisionShape->isActive) collisionShape->align();
     }
 }
 
@@ -1652,15 +1660,15 @@ void sge::ClickableShape::align(){ this->setPosition(m_ownerEntityPtr->sprite->g
 void sge::ClickableShapeManager::update(float dt){
     for(auto& [_, clickableShapes] : m_components){
         for(sge::ClickableShape* clickableShape : clickableShapes){
-            clickableShape->align();
+            if(clickableShape->isActive) clickableShape->align();
         }
     }
 }
 
 void sge::ClickableShapeManager::processEvent(sf::Event event){
     for(auto& [_, clickableShapes] : m_components){
-        for(ClickableShape* thisClickableShape : clickableShapes){
-            thisClickableShape->action(thisClickableShape, event);
+        for(ClickableShape* clickableShape : clickableShapes){
+            if(clickableShape->isActive) clickableShape->action(clickableShape, event);
         }
     }
 }
@@ -1682,7 +1690,7 @@ void sge::SpriteText::align(){
 void sge::SpriteTextManager::update(float dt){
     for(auto& [_, spriteTextObjects] : m_components){
         for(sge::SpriteText* spriteText : spriteTextObjects){
-            spriteText->align();
+            if(spriteText->isActive) spriteText->align();
         }
     }
 }
@@ -1691,7 +1699,7 @@ void sge::SpriteTextManager::draw(sf::RenderWindow* window){
         window->setView(*view);
 
         for(SpriteText* spriteText : spriteTextObjects){
-            window->draw(*spriteText);
+            if(spriteText->isActive || spriteText->isPaused) window->draw(*spriteText);
         }
     }
 }
@@ -1699,7 +1707,7 @@ void sge::SpriteTextManager::draw(sf::RenderWindow* window){
 
 void sge::AnimationManager::update(float dt){
     for(sge::Animation* animation : m_components){
-        animation->runForward();
+        if(animation->isActive) animation->runForward();
     }
 }
 
@@ -1761,7 +1769,7 @@ void sge::StateCluster::setCurrentState(std::string name){
 
 void sge::StateManager::update(float dt){
     for(StateCluster* stateCluster : m_components){
-        stateCluster->getCurrentState()->updateScript(dt, stateCluster);
+        if(stateCluster->isActive) stateCluster->getCurrentState()->updateScript(dt, stateCluster);
     }
 }
 
