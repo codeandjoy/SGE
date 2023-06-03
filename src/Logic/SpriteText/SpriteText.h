@@ -3,9 +3,11 @@
 
 #include <SFML/Graphics.hpp>
 
+#include "../../Component/StatefulComponent.h"
+
 
 namespace sge{
-    class SpriteText : public sf::Text{
+    class SpriteText : public sge::StatefulComponent, public sf::Text{
         public:
             SpriteText(sf::Sprite* ownerSprite);
 

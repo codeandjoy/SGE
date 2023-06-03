@@ -7,9 +7,11 @@
 #include <unordered_map>
 #include <functional>
 
+#include "../../Component/StatefulComponent.h"
+
 
 namespace sge{
-    class PhysicalObject{
+    class PhysicalObject : sge::StatefulComponent{
         public:
             PhysicalObject(sf::Sprite* ownerSprite);
 

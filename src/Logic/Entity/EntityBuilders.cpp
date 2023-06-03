@@ -1,13 +1,14 @@
 #include "EntityBuilders.h"
 
 #include "./Entity.h"
+#include "../Sprite/Sprite.h"
 #include "../Physics/Computations.h"
 #include "../Physics/PhysicalObject.h"
 #include "../CollisionShape/CollisionShape.h"
 
 
 sge::Entity* sge::buildPlainEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position){
-    sge::Entity* e = new sge::Entity{ new sf::Sprite() };
+    sge::Entity* e = new sge::Entity{ new sge::Sprite() };
     e->sprite->setTexture(*texture);
     e->sprite->setTextureRect(textureRect);
     e->sprite->setPosition(position);
@@ -16,7 +17,7 @@ sge::Entity* sge::buildPlainEntity(sf::Texture* texture, sf::IntRect textureRect
 }
 
 sge::Entity* sge::buildVoidEntity(sf::Vector2f size, sf::Vector2f position){
-    sge::Entity* e = new sge::Entity{ new sf::Sprite() };
+    sge::Entity* e = new sge::Entity{ new sge::Sprite() };
     e->sprite->setPosition(position);
 
     e->collisionShapes["globalBounds"] = new sge::CollisionShape(e);

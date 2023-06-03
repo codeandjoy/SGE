@@ -133,6 +133,37 @@ namespace sge{
 #endif
 //
 
+// Component
+#ifndef STATEFUL_COMPONENT_H
+#define STATEFUL_COMPONENT_H
+
+namespace sge{
+    struct StatefulComponent{
+        bool isActive = true;
+        bool isPaused = false;
+        bool isHidden = false;
+
+        void activate(){
+            isActive = true;
+            isPaused = false;
+            isHidden = false;
+        }
+        void pause(){
+            isActive = false;
+            isPaused = true;
+            isHidden = false;
+        }
+        void hide(){
+            isActive = false;
+            isPaused = false;
+            isHidden = true;
+        }
+    };
+}
+
+#endif
+//
+
 // AssetsManager
 #ifndef ASSETS_MANAGER_H
 #define ASSETS_MANAGER_H
@@ -241,7 +272,7 @@ namespace sge{
     class Entity;
     class CollisionShapeBorder;
 
-    class DebugEntity{
+    class DebugEntity : public sge::StatefulComponent{
         public:
             DebugEntity(sge::Entity* relatedEntity);
 
@@ -405,8 +436,10 @@ namespace sge{
 #include <SFML/Graphics.hpp>
 
 namespace sge{
+    class Sprite;
+
     class SpriteManager :
-        public sge::ViewManager<sf::Sprite*>,
+        public sge::ViewManager<sge::Sprite*>,
         public sge::DrawManager{
             
         public:
@@ -444,7 +477,7 @@ namespace sge{
 #include <functional>
 
 namespace sge{
-    class PhysicalObject{
+    class PhysicalObject : sge::StatefulComponent{
         public:
             PhysicalObject(sf::Sprite* ownerSprite);
 
@@ -611,7 +644,7 @@ namespace sge{
     class Entity;
     struct Measurements;
 
-    class CollisionShape : public sf::RectangleShape{
+    class CollisionShape : public sge::StatefulComponent, public sf::RectangleShape{
         public:
             CollisionShape(sge::Entity* ownerEntity);
 
@@ -682,7 +715,7 @@ namespace sge{
 namespace sge{
     class Entity;
 
-    class ClickableShape : public sf::RectangleShape{
+    class ClickableShape : public sge::StatefulComponent, public sf::RectangleShape{
         public:
             ClickableShape(sge::Entity* ownerEntity);
 
@@ -741,7 +774,7 @@ namespace sge{
 #include <SFML/Graphics.hpp>
 
 namespace sge{
-    class SpriteText : public sf::Text{
+    class SpriteText : public sge::StatefulComponent, public sf::Text{
         public:
             SpriteText(sf::Sprite* ownerSprite);
 
@@ -802,8 +835,7 @@ namespace sge{
 namespace sge{
     class TextureSheet;
 
-    // TODO Animations should switch immediately
-    class Animation{
+    class Animation : public sge::StatefulComponent{
         public:
             Animation(sge::TextureSheet* textureSheet, sf::Sprite* ownerSprite, int initialTextureN);
         
@@ -864,7 +896,7 @@ namespace sge{
 namespace sge{
     struct State;
 
-    class StateCluster{
+    class StateCluster : public sge::StatefulComponent{
         public:
             sge::State* getCurrentState();
             std::string getCurrentStateName();
@@ -901,6 +933,7 @@ namespace sge{
 #define ENTITY_H
 
 namespace sge{
+    class Sprite;
     class PhysicalObject;
     class CollisionShape;
     class ClickableShape;
@@ -909,7 +942,7 @@ namespace sge{
     class StateCluster;
 
     struct Entity{
-        sf::Sprite* sprite;
+        sge::Sprite* sprite;
         sge::PhysicalObject* physicalObject = nullptr;
         std::unordered_map<std::string, sge::CollisionShape*> collisionShapes; 
         sge::ClickableShape* clickableShape = nullptr;
@@ -1306,12 +1339,27 @@ void sge::ScriptedViewManager::update(float dt){
     }
 }
 
+#ifndef SPRITE_H
+#define SPRITE_H
+
+#include <SFML/Graphics.hpp>
+
+namespace sge{
+    class Sprite : public sge::StatefulComponent, public sf::Sprite{
+        public:
+            Sprite() : sf::Sprite(){};
+            Sprite(const sf::Texture& texture) : sf::Sprite(texture){};
+            Sprite(const sf::Texture& texture, const sf::IntRect& rectangle) : sf::Sprite(texture, rectangle){};
+    };
+}
+
+#endif
 
 void sge::SpriteManager::draw(sf::RenderWindow* window){
     for(auto [view, sprites] : m_components){
         window->setView(*view);
 
-        for(sf::Sprite* sprite : sprites){
+        for(sge::Sprite* sprite : sprites){
             window->draw(*sprite);
         }
     }
@@ -1806,7 +1854,7 @@ void sge::EntityManager::deregisterEntity(sf::View* view, sge::Entity* entity){
 
 
 sge::Entity* sge::buildPlainEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position){
-    sge::Entity* e = new sge::Entity{ new sf::Sprite() };
+    sge::Entity* e = new sge::Entity{ new sge::Sprite() };
     e->sprite->setTexture(*texture);
     e->sprite->setTextureRect(textureRect);
     e->sprite->setPosition(position);
@@ -1815,7 +1863,7 @@ sge::Entity* sge::buildPlainEntity(sf::Texture* texture, sf::IntRect textureRect
 }
 
 sge::Entity* sge::buildVoidEntity(sf::Vector2f size, sf::Vector2f position){
-    sge::Entity* e = new sge::Entity{ new sf::Sprite() };
+    sge::Entity* e = new sge::Entity{ new sge::Sprite() };
     e->sprite->setPosition(position);
 
     e->collisionShapes["globalBounds"] = new sge::CollisionShape(e);

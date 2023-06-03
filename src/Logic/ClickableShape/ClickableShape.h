@@ -4,12 +4,13 @@
 #include <functional>
 #include <SFML/Graphics.hpp>
 #include "../../Logic/CollisionShape/CollisionShape.h"
+#include "../../Component/StatefulComponent.h"
 
 
 namespace sge{
     class Entity;
 
-    class ClickableShape : public sf::RectangleShape{
+    class ClickableShape : public sge::StatefulComponent, public sf::RectangleShape{
         public:
             ClickableShape(sge::Entity* ownerEntity);
 

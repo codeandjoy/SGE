@@ -3,12 +3,14 @@
 
 #include <SFML/Graphics.hpp>
 
+#include "../../Component/StatefulComponent.h"
+
 
 namespace sge{
     class Entity;
     struct Measurements;
 
-    class CollisionShape : public sf::RectangleShape{
+    class CollisionShape : public sge::StatefulComponent, public sf::RectangleShape{
         public:
             CollisionShape(sge::Entity* ownerEntity);
 

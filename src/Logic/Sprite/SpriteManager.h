@@ -10,8 +10,10 @@
 
 
 namespace sge{
+    class Sprite;
+
     class SpriteManager :
-        public sge::ViewManager<sf::Sprite*>,
+        public sge::ViewManager<sge::Sprite*>,
         public sge::DrawManager{
             
         public:

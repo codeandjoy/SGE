@@ -12,6 +12,12 @@
 #include "./src/Manager/StorageManagers/LabelManager.h"
 //
 
+
+// Component
+#include "./src/Component/StatefulComponent.h"
+//
+
+
 // AssetsManager
 #include "./src/Assets/AssetsManager/AssetsManager.h"
 #include "./src/Assets/Texture/TextureSheetSizes.h"

@@ -6,12 +6,13 @@
 #include <unordered_map>
 #include <vector>
 
+#include "../../Component/StatefulComponent.h"
+
 
 namespace sge{
     class TextureSheet;
 
-    // TODO Animations should switch immediately
-    class Animation{
+    class Animation : public sge::StatefulComponent{
         public:
             Animation(sge::TextureSheet* textureSheet, sf::Sprite* ownerSprite, int initialTextureN);
         

@@ -8,13 +8,14 @@
 #include <functional>
 
 #include "../CollisionShapeBorder/CollisionShapeBorderSettings.h"
+#include "../../Component/StatefulComponent.h"
 
 
 namespace sge{
     class Entity;
     class CollisionShapeBorder;
 
-    class DebugEntity{
+    class DebugEntity : public sge::StatefulComponent{
         public:
             DebugEntity(sge::Entity* relatedEntity);
 

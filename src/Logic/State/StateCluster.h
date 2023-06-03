@@ -5,11 +5,13 @@
 #include <functional>
 #include <string>
 
+#include "../../Component/StatefulComponent.h"
+
 
 namespace sge{
     struct State;
 
-    class StateCluster{
+    class StateCluster : public sge::StatefulComponent{
         public:
             sge::State* getCurrentState();
             std::string getCurrentStateName();

@@ -3,6 +3,7 @@
 
 
 namespace sge{
+    class Sprite;
     class PhysicalObject;
     class CollisionShape;
     class ClickableShape;
@@ -11,7 +12,7 @@ namespace sge{
     class StateCluster;
 
     struct Entity{
-        sf::Sprite* sprite;
+        sge::Sprite* sprite;
         sge::PhysicalObject* physicalObject = nullptr;
         std::unordered_map<std::string, sge::CollisionShape*> collisionShapes; 
         sge::ClickableShape* clickableShape = nullptr;
