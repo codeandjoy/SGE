@@ -66,7 +66,7 @@ void sge::Universe::loop(){
     while(m_windowPtr->isOpen()){
         sf::Time deltaTime = m_deltaClock.restart();
         float dt = deltaTime.asSeconds();
-        if(dt > 0.15f) dt = 0.15f;
+        if(dt > dtCap) dt = dtCap;
 
 
         sf::Event event;

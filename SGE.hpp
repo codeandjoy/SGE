@@ -34,6 +34,7 @@ namespace sge{
             Universe(sf::RenderWindow* window);
 
             bool isPaused = false;
+            float dtCap = .15f;
 
             void setupDebug();
             void loop();
@@ -1157,7 +1158,7 @@ void sge::Universe::loop(){
     while(m_windowPtr->isOpen()){
         sf::Time deltaTime = m_deltaClock.restart();
         float dt = deltaTime.asSeconds();
-        if(dt > 0.15f) dt = 0.15f;
+        if(dt > dtCap) dt = dtCap;
 
         sf::Event event;
         while(m_windowPtr->pollEvent(event)){

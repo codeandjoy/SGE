@@ -29,6 +29,7 @@ namespace sge{
             Universe(sf::RenderWindow* window);
 
             bool isPaused = false;
+            float dtCap = .15f;
 
             void setupDebug();
             void loop();
