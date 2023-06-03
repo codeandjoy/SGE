@@ -9,7 +9,7 @@
 
 
 namespace sge{
-    struct Entity;
+    class Entity;
     class SpriteManager;
     class PhysicsManager;
     class CollisionShapeManager;

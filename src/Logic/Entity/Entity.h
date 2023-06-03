@@ -1,6 +1,8 @@
 #ifndef ENTITY_H
 #define ENTITY_H
 
+#include "../../Component/StatefulComponent.h"
+
 
 namespace sge{
     class Sprite;
@@ -11,14 +13,26 @@ namespace sge{
     class Animation;
     class StateCluster;
 
-    struct Entity{
-        sge::Sprite* sprite;
-        sge::PhysicalObject* physicalObject = nullptr;
-        std::unordered_map<std::string, sge::CollisionShape*> collisionShapes; 
-        sge::ClickableShape* clickableShape = nullptr;
-        sge::SpriteText* spriteText = nullptr;
-        sge::Animation* animation = nullptr;
-        sge::StateCluster* stateCluster = nullptr;
+    class Entity : public sge::StatefulComponent{
+        public:
+            sge::Sprite* sprite;
+            sge::PhysicalObject* physicalObject = nullptr;
+            std::unordered_map<std::string, sge::CollisionShape*> collisionShapes; 
+            sge::ClickableShape* clickableShape = nullptr;
+            sge::SpriteText* spriteText = nullptr;
+            sge::Animation* animation = nullptr;
+            sge::StateCluster* stateCluster = nullptr;
+
+            void activateEntity();
+            void pauseEntity();
+            void hideEntity();
+
+        private:
+            // Hidden because extended using 'activateEntity', 'pauseEntity' and 'hideEntity'
+            using sge::StatefulComponent::activate;
+            using sge::StatefulComponent::pause;
+            using sge::StatefulComponent::hide;
+            // 
     };
 }
 

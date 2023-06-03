@@ -6,7 +6,7 @@
 
 namespace sge{
     class StateCluster;
-    struct Entity;
+    class Entity;
 
     class State{
         public:
