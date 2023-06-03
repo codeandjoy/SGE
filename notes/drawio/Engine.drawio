@@ -1,6 +1,6 @@
-<mxfile host="Electron" modified="2023-06-02T17:26:14.925Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.2.8 Chrome/112.0.5615.165 Electron/24.2.0 Safari/537.36" etag="6MPzCTBxyCHr1be46kd8" version="21.2.8" type="device">
+<mxfile host="Electron" modified="2023-06-03T04:01:08.342Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.2.8 Chrome/112.0.5615.165 Electron/24.2.0 Safari/537.36" etag="eu_PfUOZ3KoHvjtCYp75" version="21.2.8" type="device">
   <diagram name="Page-1" id="3vT43Wd3uMkU654bus9_">
-    <mxGraphModel dx="2487" dy="1425" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="1995" dy="1126" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -12,7 +12,7 @@
         <mxCell id="lwttH7d4b95rTX6gbIl2-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=none;endFill=0;" parent="1" source="RYIpH5o0aymqOep2SFFL-1" target="RYIpH5o0aymqOep2SFFL-70" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="ijKg_ikHfJque0BtsIPP-11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="RYIpH5o0aymqOep2SFFL-1" target="lwttH7d4b95rTX6gbIl2-12" edge="1">
+        <mxCell id="ijKg_ikHfJque0BtsIPP-11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=none;endFill=0;" parent="1" source="RYIpH5o0aymqOep2SFFL-1" target="lwttH7d4b95rTX6gbIl2-12" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="RYIpH5o0aymqOep2SFFL-1" value="&lt;font color=&quot;#ffffff&quot;&gt;Universe&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fa6800;fontColor=#000000;strokeColor=#C73500;" parent="1" vertex="1">
@@ -313,7 +313,7 @@
         <mxCell id="RYIpH5o0aymqOep2SFFL-97" value="&lt;font color=&quot;#7d7d7d&quot;&gt;(organizes managers in game loop)&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="1020" y="405" width="200" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="RYIpH5o0aymqOep2SFFL-98" value="&lt;font color=&quot;#7d7d7d&quot;&gt;(manages core engine components)&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+        <mxCell id="RYIpH5o0aymqOep2SFFL-98" value="&lt;font color=&quot;#7d7d7d&quot;&gt;(manages engine components)&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="1020" y="485" width="200" height="30" as="geometry" />
         </mxCell>
         <mxCell id="RYIpH5o0aymqOep2SFFL-99" value="&lt;font color=&quot;#7d7d7d&quot;&gt;(describes core engine component)&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
@@ -325,7 +325,7 @@
         <mxCell id="RYIpH5o0aymqOep2SFFL-101" value="Higher order component" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="930" y="565" width="100" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="RYIpH5o0aymqOep2SFFL-102" value="&lt;font color=&quot;#7d7d7d&quot;&gt;(contains other engine components)&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+        <mxCell id="RYIpH5o0aymqOep2SFFL-102" value="&lt;font color=&quot;#7d7d7d&quot;&gt;(contains and manages other engine components)&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="1010" y="565" width="200" height="30" as="geometry" />
         </mxCell>
         <mxCell id="lwttH7d4b95rTX6gbIl2-12" value="View" style="swimlane;whiteSpace=wrap;html=1;" parent="1" vertex="1">
