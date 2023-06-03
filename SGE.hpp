@@ -1191,7 +1191,7 @@ void sge::Universe::loop(){
         
         m_spriteManager->draw(m_windowPtr);
         m_spriteTextManager->draw(m_windowPtr);
-        // debugManager->draw(m_windowPtr); // ! Segfault !
+        if(debugManager) debugManager->draw(m_windowPtr);
 
         m_windowPtr->display();
     }
