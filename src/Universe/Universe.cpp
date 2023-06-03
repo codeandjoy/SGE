@@ -61,11 +61,6 @@ void sge::Universe::setupDebug(){
 
 
 void sge::Universe::loop(){
-    if(!m_windowPtr){
-        printf("RenderWindow is not initialized. Use setupWindow method to initialize RenderWindow before(!) looping the Universe.\n");
-        exit(1);
-    }
-
     m_deltaClock.restart();
 
     while(m_windowPtr->isOpen()){
