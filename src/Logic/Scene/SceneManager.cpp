@@ -15,7 +15,7 @@ void sge::SceneManager::setupDebug(sge::DebugManager* debugManager){ m_debugMana
 void sge::SceneManager::m_registerSceneMembers(std::string label){
     for(auto& [view, entities] : m_components[label]->getEntitiesMap()){
         for(sge::Entity* entity : entities){
-            m_entityManagerPtr->registerEntity(view, entity);
+            m_entityManagerPtr->registerComponent(view, entity);
         }
     }
 
@@ -43,7 +43,7 @@ void sge::SceneManager::m_deregisterSceneMembers(std::string label){
 
     for(auto& [view, entities] : m_components[label]->getEntitiesMap()){
         for(sge::Entity* entity : entities){
-            m_entityManagerPtr->deregisterEntity(view, entity);
+            m_entityManagerPtr->deregisterComponent(view, entity);
         }
     }
 

@@ -7,7 +7,7 @@
 #include "../Animation/Animation.h"
 #include "../State/StateCluster.h"
 
-void sge::Entity::activateEntity(){
+void sge::Entity::activateEntityParts(){
     sprite->activate();
     if(physicalObject) physicalObject->activate();
     if(!collisionShapes.empty()){
@@ -21,7 +21,7 @@ void sge::Entity::activateEntity(){
     sge::StatefulComponent::activate();
 }
 
-void sge::Entity::pauseEntity(){
+void sge::Entity::pauseEntityParts(){
     sprite->pause();
     if(physicalObject) physicalObject->pause();
     if(!collisionShapes.empty()){
@@ -35,7 +35,7 @@ void sge::Entity::pauseEntity(){
     sge::StatefulComponent::pause();
 }
 
-void sge::Entity::hideEntity(){
+void sge::Entity::hideEntityParts(){
     sprite->hide();
     if(physicalObject) physicalObject->hide();
     if(!collisionShapes.empty()){

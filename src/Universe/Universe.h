@@ -21,7 +21,8 @@ namespace sge{
     class StateManager;
     class CollisionManager;
     class EntityManager;
-    class SceneManager;
+    class DrumSceneManager;
+    class LayerSceneManager;
     
 
     class Universe{
@@ -42,7 +43,8 @@ namespace sge{
 
             sge::CollisionManager* collisionManager = nullptr;
             sge::EntityManager* entityManager = nullptr;
-            sge::SceneManager* sceneManager = nullptr;
+            sge::DrumSceneManager* drumSceneManager = nullptr;
+            sge::LayerSceneManager* layerSceneManager = nullptr;
 
         private:
             sf::RenderWindow* m_windowPtr;

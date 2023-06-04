@@ -8,16 +8,16 @@
 
 
 sge::Entity* sge::buildPlainEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position){
-    sge::Entity* e = new sge::Entity{ new sge::Sprite() };
-    e->sprite->setTexture(*texture);
-    e->sprite->setTextureRect(textureRect);
+    sge::Entity* e = new sge::Entity();
+    e->sprite = new sge::Sprite(*texture, textureRect);
     e->sprite->setPosition(position);
 
     return e;
 }
 
 sge::Entity* sge::buildVoidEntity(sf::Vector2f size, sf::Vector2f position){
-    sge::Entity* e = new sge::Entity{ new sge::Sprite() };
+    sge::Entity* e = new sge::Entity();
+    e->sprite = new sge::Sprite();
     e->sprite->setPosition(position);
 
     e->collisionShapes["globalBounds"] = new sge::CollisionShape(e);

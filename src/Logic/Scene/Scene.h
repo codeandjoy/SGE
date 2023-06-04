@@ -24,9 +24,9 @@ namespace sge{
             void registerCollisionGroup(std::string name, std::vector<sge::CollisionShape*> collisionShapes);
             void registerCollisionPair(std::string name, sge::CollisionPair* collisionPair);
         
-            void activateScene();
-            void pauseScene();
-            void hideScene();
+            void activateSceneParts();
+            void pauseSceneParts();
+            void hideSceneParts();
 
         
             std::vector<sge::Entity*> getViewEntities(sf::View* view);

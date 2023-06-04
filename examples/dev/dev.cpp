@@ -63,7 +63,7 @@ int main(){
     }
 
     for(sge::Entity* entity : mapTileEntities){
-        universe->entityManager->registerEntity(cameraView, entity);
+        universe->entityManager->registerComponent(cameraView, entity);
     }
     //
 
@@ -80,7 +80,7 @@ int main(){
 
     boxEntity->physicalObject->acceleration.y = GRAVITY;
     
-    universe->entityManager->registerEntity(cameraView, boxEntity);
+    universe->entityManager->registerComponent(cameraView, boxEntity);
 
 
     sge::DebugEntity* boxDE = new sge::DebugEntity(boxEntity);
@@ -111,7 +111,7 @@ int main(){
     playerEntity->animation = playerAnimation;
     
 
-    universe->entityManager->registerEntity(cameraView, playerEntity);
+    universe->entityManager->registerComponent(cameraView, playerEntity);
 
 
     sge::DebugEntity* playerDE = new sge::DebugEntity(playerEntity);

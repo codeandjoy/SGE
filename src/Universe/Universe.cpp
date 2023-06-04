@@ -13,7 +13,8 @@
 #include "../Logic/State/StateManager.h"
 #include "../Logic/Collision/CollisionManager.h"
 #include "../Logic/Entity/EntityManager.h"
-#include "../Logic/Scene/SceneManager.h"
+#include "../Logic/Scene/DrumSceneManager.h"
+#include "../Logic/Scene/LayerSceneManager.h"
 
 
 sge::Universe::Universe(sf::RenderWindow* window){
@@ -32,7 +33,8 @@ sge::Universe::Universe(sf::RenderWindow* window){
     sge::StateManager* StM = new sge::StateManager();
     sge::CollisionManager* CM = new sge::CollisionManager();
     sge::EntityManager* EM = new sge::EntityManager(SpM, PM, CSM, ClSM, STM, AnM, StM, CM);
-    sge::SceneManager* ScM = new sge::SceneManager(EM, CM);
+    sge::DrumSceneManager* DrSM = new sge::DrumSceneManager(EM, CM);
+    sge::LayerSceneManager* LaSM = new sge::LayerSceneManager(EM, CM);
 
     assetsManager = AsM;
     controllerManager = CoM;
@@ -47,7 +49,8 @@ sge::Universe::Universe(sf::RenderWindow* window){
     m_stateManager = StM;
     collisionManager = CM;
     entityManager = EM;
-    sceneManager = ScM;
+    drumSceneManager = DrSM;
+    layerSceneManager = LaSM;
 }
 
 
@@ -56,7 +59,8 @@ void sge::Universe::setupDebug(){
     sge::DebugManager* debugManagerPtr = new sge::DebugManager();
     debugManager = debugManagerPtr;
 
-   sceneManager->setupDebug(debugManagerPtr);
+   drumSceneManager->setupDebug(debugManagerPtr);
+   layerSceneManager->setupDebug(debugManagerPtr);
 }
 
 
@@ -89,7 +93,7 @@ void sge::Universe::loop(){
             m_animationManager->update(dt);
             scriptedViewManager->update(dt);
 
-            sceneManager->alignScene(); // Scene can be reset only after all managers finished their updates to prevent segfaults in loops
+            drumSceneManager->alignScene(); // Scene can be reset only after all managers finished their updates to prevent segfaults in loops
         }
         
         

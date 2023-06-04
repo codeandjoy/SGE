@@ -22,10 +22,10 @@ void sge::Scene::registerCollisionPair(std::string name, sge::CollisionPair* col
 }
 
 
-void sge::Scene::activateScene(){
+void sge::Scene::activateSceneParts(){
     for(auto& [_, entities] : m_entities){
         for(sge::Entity* entity : entities){
-            entity->activateEntity();
+            entity->activateEntityParts();
         }
     }
     for(auto& [_, debugEntities] : m_debugEntities){
@@ -34,10 +34,10 @@ void sge::Scene::activateScene(){
         }
     }
 }
-void sge::Scene::pauseScene(){
+void sge::Scene::pauseSceneParts(){
     for(auto& [_, entities] : m_entities){
         for(sge::Entity* entity : entities){
-            entity->pauseEntity();
+            entity->pauseEntityParts();
         }
     }
     for(auto& [_, debugEntities] : m_debugEntities){
@@ -46,10 +46,10 @@ void sge::Scene::pauseScene(){
         }
     }
 }
-void sge::Scene::hideScene(){
+void sge::Scene::hideSceneParts(){
     for(auto& [_, entities] : m_entities){
         for(sge::Entity* entity : entities){
-            entity->hideEntity();
+            entity->hideEntityParts();
         }
     }
     for(auto& [_, debugEntities] : m_debugEntities){

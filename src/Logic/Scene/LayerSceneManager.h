@@ -9,8 +9,11 @@
 namespace sge{
     class Scene;
 
-    class LayerSceneManager : sge::SceneManager{
+    class LayerSceneManager : public sge::SceneManager{
         public:
+            LayerSceneManager(sge::EntityManager* entityManager, sge::CollisionManager* collisionManager)
+                : sge::SceneManager(entityManager, collisionManager){};
+
             void registerComponent(std::string label, sge::Scene* scene);
             void deregisterComponent(std::string label);
         
