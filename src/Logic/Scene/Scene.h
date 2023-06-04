@@ -18,12 +18,12 @@ namespace sge{
     class Scene : public sge::StatefulComponent{
         public:
             // rename to 'add' (parts are added)
-            void registerEntity(sf::View* view, sge::Entity* entity);
-            void registerEntities(sf::View* view, std::vector<sge::Entity*> entities);
-            void registerDebugEntity(sf::View* view, sge::DebugEntity* debugEntity);
-            void registerDebugEntities(sf::View* view, std::vector<sge::DebugEntity*> debugEntities);
-            void registerCollisionGroup(std::string name, std::vector<sge::CollisionShape*> collisionShapes);
-            void registerCollisionPair(std::string name, sge::CollisionPair* collisionPair);
+            void addEntity(sf::View* view, sge::Entity* entity);
+            void addEntities(sf::View* view, std::vector<sge::Entity*> entities);
+            void addDebugEntity(sf::View* view, sge::DebugEntity* debugEntity);
+            void addDebugEntities(sf::View* view, std::vector<sge::DebugEntity*> debugEntities);
+            void addCollisionGroup(std::string name, std::vector<sge::CollisionShape*> collisionShapes);
+            void addCollisionPair(std::string name, sge::CollisionPair* collisionPair);
         
             void activateSceneParts();
             void pauseSceneParts();

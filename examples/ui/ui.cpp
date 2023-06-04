@@ -36,7 +36,7 @@ int main(){
 
     uiEntityText->spriteText = uiAnotherSpriteText;
 
-    uiSceneText->registerEntity(view, uiEntityText);
+    uiSceneText->addEntity(view, uiEntityText);
 
     universe->layerSceneManager->registerComponent("text", uiSceneText);
     uiSceneText->hideSceneParts();
@@ -57,7 +57,7 @@ int main(){
 
     uiEntityButtonText->spriteText = spriteText;
 
-    uiSceneButton->registerEntity(view, uiEntityButtonText);
+    uiSceneButton->addEntity(view, uiEntityButtonText);
 
 
 
@@ -102,7 +102,7 @@ int main(){
 
     uiEntityButton->clickableShape = clicakbleShape;
 
-    uiSceneButton->registerEntity(view, uiEntityButton);
+    uiSceneButton->addEntity(view, uiEntityButton);
 
     universe->layerSceneManager->registerComponent("button", uiSceneButton);
 

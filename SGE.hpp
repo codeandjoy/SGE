@@ -1068,12 +1068,12 @@ namespace sge{
     class Scene : public sge::StatefulComponent{
         public:
             // rename to 'add' (parts are added)
-            void registerEntity(sf::View* view, sge::Entity* entity);
-            void registerEntities(sf::View* view, std::vector<sge::Entity*> entities);
-            void registerDebugEntity(sf::View* view, sge::DebugEntity* debugEntity);
-            void registerDebugEntities(sf::View* view, std::vector<sge::DebugEntity*> debugEntities);
-            void registerCollisionGroup(std::string name, std::vector<sge::CollisionShape*> collisionShapes);
-            void registerCollisionPair(std::string name, sge::CollisionPair* collisionPair);
+            void addEntity(sf::View* view, sge::Entity* entity);
+            void addEntities(sf::View* view, std::vector<sge::Entity*> entities);
+            void addDebugEntity(sf::View* view, sge::DebugEntity* debugEntity);
+            void addDebugEntities(sf::View* view, std::vector<sge::DebugEntity*> debugEntities);
+            void addCollisionGroup(std::string name, std::vector<sge::CollisionShape*> collisionShapes);
+            void addCollisionPair(std::string name, sge::CollisionPair* collisionPair);
         
             void activateSceneParts();
             void pauseSceneParts();
@@ -2025,20 +2025,20 @@ sge::Entity* sge::buildMobileEntity(sf::Texture* texture, sf::IntRect textureRec
 }
 
 
-void sge::Scene::registerEntity(sf::View* view, sge::Entity* entity){ m_entities[view].push_back(entity); }
-void sge::Scene::registerEntities(sf::View* view, std::vector<sge::Entity*> entities){
+void sge::Scene::addEntity(sf::View* view, sge::Entity* entity){ m_entities[view].push_back(entity); }
+void sge::Scene::addEntities(sf::View* view, std::vector<sge::Entity*> entities){
     for(Entity* entity : entities){
-        registerEntity(view, entity);
+        addEntity(view, entity);
     }
 }
-void sge::Scene::registerDebugEntity(sf::View* view, sge::DebugEntity* debugEntity){ m_debugEntities[view].push_back(debugEntity); }
-void sge::Scene::registerDebugEntities(sf::View* view,std::vector<DebugEntity*> debugEntities){
+void sge::Scene::addDebugEntity(sf::View* view, sge::DebugEntity* debugEntity){ m_debugEntities[view].push_back(debugEntity); }
+void sge::Scene::addDebugEntities(sf::View* view,std::vector<DebugEntity*> debugEntities){
     for(DebugEntity* debugEntity : debugEntities){
-        registerDebugEntity(view, debugEntity);
+        addDebugEntity(view, debugEntity);
     }
 }
-void sge::Scene::registerCollisionGroup(std::string name, std::vector<sge::CollisionShape*> collisionShapes){ m_collisionGroups[name] = collisionShapes; }
-void sge::Scene::registerCollisionPair(std::string name, sge::CollisionPair* collisionPair){
+void sge::Scene::addCollisionGroup(std::string name, std::vector<sge::CollisionShape*> collisionShapes){ m_collisionGroups[name] = collisionShapes; }
+void sge::Scene::addCollisionPair(std::string name, sge::CollisionPair* collisionPair){
     m_collisionPairs[name] = collisionPair;
     m_collisionPairsOrder.push_back(name);
 }
