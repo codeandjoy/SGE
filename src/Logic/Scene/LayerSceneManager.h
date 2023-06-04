@@ -15,7 +15,7 @@ namespace sge{
             void deregisterComponent(std::string label);
         
         private:
-            // Hidden because implemented in a different way
+            // Hidden because extended
             using sge::SceneManager::registerComponent;
             using sge::SceneManager::deregisterComponent;
             //

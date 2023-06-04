@@ -33,7 +33,18 @@ sge::EntityManager::EntityManager(
 
 
 
-void sge::EntityManager::registerEntity(sf::View* view, sge::Entity* entity){
+void sge::EntityManager::registerComponent(sf::View* view, sge::Entity* entity){
+    m_registerEntityMembers(view, entity);
+    sge::ViewManager<sge::Entity*>::registerComponent(view, entity);
+}
+void sge::EntityManager::deregisterComponent(sf::View* view, sge::Entity* entity){
+    m_deregisterEntityMembers(view, entity);
+    sge::ViewManager<sge::Entity*>::deregisterComponent(view, entity);
+}
+
+
+
+void sge::EntityManager::m_registerEntityMembers(sf::View* view, sge::Entity* entity){
     m_spriteManagerPtr->registerComponent(view, entity->sprite);
 
     if(entity->physicalObject){
@@ -61,12 +72,9 @@ void sge::EntityManager::registerEntity(sf::View* view, sge::Entity* entity){
     if(entity->stateCluster){
         m_stateManagerPtr->registerComponent(entity->stateCluster);
     }
-
-
-    sge::ViewManager<sge::Entity*>::registerComponent(view, entity);
 }
 
-void sge::EntityManager::deregisterEntity(sf::View* view, sge::Entity* entity){
+void sge::EntityManager::m_deregisterEntityMembers(sf::View* view, sge::Entity* entity){
     m_spriteManagerPtr->deregisterComponent(view, entity->sprite);
 
     if(entity->physicalObject){
@@ -95,7 +103,4 @@ void sge::EntityManager::deregisterEntity(sf::View* view, sge::Entity* entity){
     if(entity->stateCluster){
         m_stateManagerPtr->deregisterComponent(entity->stateCluster);
     }
-
-
-    sge::ViewManager<sge::Entity*>::deregisterComponent(view, entity);
 }

@@ -33,15 +33,18 @@ namespace sge{
                 sge::CollisionManager* collisionManager
             );
 
-        void registerEntity(sf::View* view, sge::Entity* entity);
-        void deregisterEntity(sf::View* view, sge::Entity* entity);
+        void registerComponent(sf::View* view, sge::Entity* entity);
+        void deregisterComponent(sf::View* view, sge::Entity* entity);
 
 
         private:
-            // Hidden because extended using 'registerEntiy' and 'deregisterEntity'
+            // Hidden because extended
             using sge::ViewManager<sge::Entity*>::registerComponent;
             using sge::ViewManager<sge::Entity*>::deregisterComponent;
             //
+
+            void m_registerEntityMembers(sf::View* view, sge::Entity* entity);
+            void m_deregisterEntityMembers(sf::View* view, sge::Entity* entity);
 
             sge::SpriteManager* m_spriteManagerPtr;
             sge::PhysicsManager* m_physicsManagerPtr;
