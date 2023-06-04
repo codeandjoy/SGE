@@ -17,17 +17,14 @@ namespace sge{
         public:
             SceneManager(sge::EntityManager* entityManager, sge::CollisionManager* collisionManager);
             void setupDebug(sge::DebugManager* debugManager);
-
-            void setCurrentScene(std::string name);
-            void alignScene();
         
-        private:
+        protected:
+            void m_registerSceneMembers(std::string label);
+            void m_deregisterSceneMembers(std::string label);
+
             sge::EntityManager* m_entityManagerPtr = nullptr;
             sge::CollisionManager* m_collisionManagerPtr = nullptr;
             sge::DebugManager* m_debugManagerPtr = nullptr;
-
-            std::string m_currentScene = "";
-            std::string m_loadedScene = "";
     };
 }
 

@@ -6,6 +6,8 @@
 #include <string>
 #include <SFML/Graphics.hpp>
 
+#include "../../Component/StatefulComponent.h"
+
 
 namespace sge{
     class Entity;
@@ -13,7 +15,7 @@ namespace sge{
     class CollisionShape;
     struct CollisionPair;
 
-    class Scene{
+    class Scene : public sge::StatefulComponent{
         public:
             void registerEntity(sf::View* view, sge::Entity* entity);
             void registerEntities(sf::View* view, std::vector<sge::Entity*> entities);
@@ -22,6 +24,10 @@ namespace sge{
             void registerCollisionGroup(std::string name, std::vector<sge::CollisionShape*> collisionShapes);
             void registerCollisionPair(std::string name, sge::CollisionPair* collisionPair);
         
+            void activateScene();
+            void pauseScene();
+            void hideScene();
+
         
             std::vector<sge::Entity*> getViewEntities(sf::View* view);
             std::unordered_map<sf::View*, std::vector<sge::Entity*>> getEntitiesMap();
@@ -34,6 +40,12 @@ namespace sge{
             std::vector<std::string> getCollisionPairsOrder();
 
         private:
+            // Hidden because extended using 'activateScene', 'pauseScene' and 'hideScene'
+            using sge::StatefulComponent::activate;
+            using sge::StatefulComponent::pause;
+            using sge::StatefulComponent::hide;
+            // 
+
             std::unordered_map<sf::View*, std::vector<sge::Entity*>> m_entities;
             std::unordered_map<sf::View*, std::vector<sge::DebugEntity*>> m_debugEntities;
             std::unordered_map<std::string, std::vector<sge::CollisionShape*>> m_collisionGroups;

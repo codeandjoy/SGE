@@ -1,4 +1,6 @@
 #include "Scene.h"
+#include "../Entity/Entity.h"
+#include "../../Debug/DebugEntity/DebugEntity.h"
 
 
 void sge::Scene::registerEntity(sf::View* view, sge::Entity* entity){ m_entities[view].push_back(entity); }
@@ -18,6 +20,45 @@ void sge::Scene::registerCollisionPair(std::string name, sge::CollisionPair* col
     m_collisionPairs[name] = collisionPair;
     m_collisionPairsOrder.push_back(name);
 }
+
+
+void sge::Scene::activateScene(){
+    for(auto& [_, entities] : m_entities){
+        for(sge::Entity* entity : entities){
+            entity->activateEntity();
+        }
+    }
+    for(auto& [_, debugEntities] : m_debugEntities){
+        for(sge::DebugEntity* debugEntity : debugEntities){
+            debugEntity->activate();
+        }
+    }
+}
+void sge::Scene::pauseScene(){
+    for(auto& [_, entities] : m_entities){
+        for(sge::Entity* entity : entities){
+            entity->pauseEntity();
+        }
+    }
+    for(auto& [_, debugEntities] : m_debugEntities){
+        for(sge::DebugEntity* debugEntity : debugEntities){
+            debugEntity->pause();
+        }
+    }
+}
+void sge::Scene::hideScene(){
+    for(auto& [_, entities] : m_entities){
+        for(sge::Entity* entity : entities){
+            entity->hideEntity();
+        }
+    }
+    for(auto& [_, debugEntities] : m_debugEntities){
+        for(sge::DebugEntity* debugEntity : debugEntities){
+            debugEntity->hide();
+        }
+    }
+}
+
 
 std::vector<sge::Entity*> sge::Scene::getViewEntities(sf::View* view){ return m_entities[view]; }
 std::unordered_map<sf::View*, std::vector<sge::Entity*>> sge::Scene::getEntitiesMap(){ return m_entities; };

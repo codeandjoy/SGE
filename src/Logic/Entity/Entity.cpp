@@ -17,6 +17,8 @@ void sge::Entity::activateEntity(){
     if(spriteText) spriteText->activate();
     if(animation) animation->activate();
     if(stateCluster) stateCluster->activate();
+
+    sge::StatefulComponent::activate();
 }
 
 void sge::Entity::pauseEntity(){
@@ -29,6 +31,8 @@ void sge::Entity::pauseEntity(){
     if(spriteText) spriteText->pause();
     if(animation) animation->pause();
     if(stateCluster) stateCluster->pause();
+
+    sge::StatefulComponent::pause();
 }
 
 void sge::Entity::hideEntity(){
@@ -41,4 +45,6 @@ void sge::Entity::hideEntity(){
     if(spriteText) spriteText->hide();
     if(animation) animation->hide();
     if(stateCluster) stateCluster->hide();
+
+    sge::StatefulComponent::hide();
 }
