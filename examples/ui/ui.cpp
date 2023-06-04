@@ -1,13 +1,15 @@
 #include <filesystem>
+#include <SFML/Graphics.hpp>
+
 #include "../../SGE.hpp"
 
 
 int main(){
-    sge::Universe* universe = new sge::Universe();
-
     sf::RenderWindow *window = new sf::RenderWindow(sf::VideoMode(1000, 600), "Test");
-    
-    universe->setupWindow(window);
+    sge::Universe* universe = new sge::Universe(window);
+
+    sf::View v = window->getDefaultView();
+    sf::View* view = &v;
 
 
 
@@ -20,88 +22,89 @@ int main(){
 
 
 
-    sge::UIScreen* hiddenUIScreen = new sge::UIScreen();
+    sge::Scene* uiSceneText = new sge::Scene();
 
-    sge::UIEntity* uiAnotherTextEntity = new sge::UIEntity{ new sf::Sprite() };
-    uiAnotherTextEntity->sprite->setPosition(424, 300);
+    sge::Entity* uiEntityText = new sge::Entity();
+    uiEntityText->sprite = new sge::Sprite();
+    uiEntityText->sprite->setPosition(424, 300);
 
-    sge::SpriteText* uiAnotherSpriteText = new sge::SpriteText(uiAnotherTextEntity->sprite);
+    sge::SpriteText* uiAnotherSpriteText = new sge::SpriteText(uiEntityText->sprite);
     uiAnotherSpriteText->setFont(*universe->assetsManager->getFont("m5x7"));
     uiAnotherSpriteText->setString("Other UI screen");
     uiAnotherSpriteText->setFillColor(sf::Color::White);
     uiAnotherSpriteText->setCharacterSize(30);
 
-    uiAnotherTextEntity->spriteText = uiAnotherSpriteText;
+    uiEntityText->spriteText = uiAnotherSpriteText;
 
-    hiddenUIScreen->addUIEntity(uiAnotherTextEntity);
+    uiSceneText->registerEntity(view, uiEntityText);
 
-    universe->uiScreenManager->registerUIScreen("hidden", hiddenUIScreen);
-    universe->uiScreenManager->hideUIScreen("hidden");
+    universe->layerSceneManager->registerComponent("text", uiSceneText);
+    uiSceneText->hideSceneParts();
 
 
 
-    sge::UIScreen* buttonScreen = new sge::UIScreen();
+    sge::Scene* uiSceneButton = new sge::Scene();
 
-    sge::UIEntity* uiTextEntity = new sge::UIEntity{ new sf::Sprite() };
-    uiTextEntity->sprite->setPosition(484, 40);
+    sge::Entity* uiEntityButtonText = new sge::Entity();
+    uiEntityButtonText->sprite = new sge::Sprite();
+    uiEntityButtonText->sprite->setPosition(484, 40);
 
-    sge::SpriteText* spriteText = new sge::SpriteText(uiTextEntity->sprite);
+    sge::SpriteText* spriteText = new sge::SpriteText(uiEntityButtonText->sprite);
     spriteText->setFont(*universe->assetsManager->getFont("m5x7"));
     spriteText->setString(std::to_string(clickCount));
     spriteText->setFillColor(sf::Color::White);
     spriteText->setCharacterSize(100);
 
-    uiTextEntity->spriteText = spriteText;
+    uiEntityButtonText->spriteText = spriteText;
 
-    buttonScreen->addUIEntity(uiTextEntity);
+    uiSceneButton->registerEntity(view, uiEntityButtonText);
 
 
 
-    sge::UIEntity* uiButtonEntity = new sge::UIEntity{ new sf::Sprite() };
-    uiButtonEntity->sprite->setScale(2,2);
-    uiButtonEntity->sprite->setTexture(*universe->assetsManager->getTextureSheet("button")->getTexture());
-    uiButtonEntity->sprite->setTextureRect(universe->assetsManager->getTextureSheet("button")->getTextureRect(0));
-    uiButtonEntity->sprite->setPosition(468, 200);
+    sge::Entity* uiEntityButton = new sge::Entity();
+    uiEntityButton->sprite = new sge::Sprite(); 
+    uiEntityButton->sprite->setScale(2,2);
+    uiEntityButton->sprite->setTexture(*universe->assetsManager->getTextureSheet("button")->getTexture());
+    uiEntityButton->sprite->setTextureRect(universe->assetsManager->getTextureSheet("button")->getTextureRect(0));
+    uiEntityButton->sprite->setPosition(468, 200);
 
-    sge::ClickableShape* clicakbleShape = new sge::ClickableShape(uiButtonEntity);
-    clicakbleShape->action = [window, universe, &clickCount, uiTextEntity, hiddenUIScreen](sge::ClickableShape* thisClickableShape, sf::Event event){
-        
-        
+    sge::ClickableShape* clicakbleShape = new sge::ClickableShape(uiEntityButton);
+    clicakbleShape->action = [window, universe, &clickCount, uiEntityButtonText, uiSceneText](sge::ClickableShape* thisClickableShape, sf::Event event){
         if(sge::isMouseOverClickableShape(thisClickableShape, window)){
             printf("Mouse over Button\n");
         }
 
         if(event.type == sf::Event::MouseButtonPressed){
             if(sge::isMouseOverClickableShape(thisClickableShape, window)){
-                thisClickableShape->getOwnerUIEntity()->sprite->setTextureRect(universe->assetsManager->getTextureSheet("button")->getTextureRect(1));
+                thisClickableShape->getOwnerEntity()->sprite->setTextureRect(universe->assetsManager->getTextureSheet("button")->getTextureRect(1));
             }
         }
         if(event.type == sf::Event::MouseButtonReleased){
-            thisClickableShape->getOwnerUIEntity()->sprite->setTextureRect(universe->assetsManager->getTextureSheet("button")->getTextureRect(0));
+            thisClickableShape->getOwnerEntity()->sprite->setTextureRect(universe->assetsManager->getTextureSheet("button")->getTextureRect(0));
             
             // Click count
             if(sge::isMouseOverClickableShape(thisClickableShape, window)){
                 clickCount++;
-                uiTextEntity->spriteText->setString(std::to_string(clickCount));
+                uiEntityButtonText->spriteText->setString(std::to_string(clickCount));
             }
             //
 
             // Toggle ui screen
-            if(!hiddenUIScreen->isVisible){
-                universe->uiScreenManager->showUIScreen("hidden");
+            if(uiSceneText->isActive){
+                uiSceneText->hideSceneParts();
             }
             else{
-                universe->uiScreenManager->hideUIScreen("hidden");
+                uiSceneText->activateSceneParts();
             }
             //
         }
     };
 
-    uiButtonEntity->clickableShape = clicakbleShape;
+    uiEntityButton->clickableShape = clicakbleShape;
 
-    buttonScreen->addUIEntity(uiButtonEntity);
+    uiSceneButton->registerEntity(view, uiEntityButton);
 
-    universe->uiScreenManager->registerUIScreen("buttonScreen", buttonScreen);
+    universe->layerSceneManager->registerComponent("button", uiSceneButton);
 
 
 

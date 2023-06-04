@@ -1067,6 +1067,7 @@ namespace sge{
 
     class Scene : public sge::StatefulComponent{
         public:
+            // rename to 'add' (parts are added)
             void registerEntity(sf::View* view, sge::Entity* entity);
             void registerEntities(sf::View* view, std::vector<sge::Entity*> entities);
             void registerDebugEntity(sf::View* view, sge::DebugEntity* debugEntity);
@@ -2053,6 +2054,8 @@ void sge::Scene::activateSceneParts(){
             debugEntity->activate();
         }
     }
+
+    sge::StatefulComponent::activate();
 }
 void sge::Scene::pauseSceneParts(){
     for(auto& [_, entities] : m_entities){
@@ -2065,6 +2068,8 @@ void sge::Scene::pauseSceneParts(){
             debugEntity->pause();
         }
     }
+
+    sge::StatefulComponent::pause();
 }
 void sge::Scene::hideSceneParts(){
     for(auto& [_, entities] : m_entities){
@@ -2077,6 +2082,8 @@ void sge::Scene::hideSceneParts(){
             debugEntity->hide();
         }
     }
+
+    sge::StatefulComponent::hide();
 }
 
 std::vector<sge::Entity*> sge::Scene::getViewEntities(sf::View* view){ return m_entities[view]; }

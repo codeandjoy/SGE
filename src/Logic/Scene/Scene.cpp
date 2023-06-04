@@ -33,6 +33,8 @@ void sge::Scene::activateSceneParts(){
             debugEntity->activate();
         }
     }
+
+    sge::StatefulComponent::activate();
 }
 void sge::Scene::pauseSceneParts(){
     for(auto& [_, entities] : m_entities){
@@ -45,6 +47,8 @@ void sge::Scene::pauseSceneParts(){
             debugEntity->pause();
         }
     }
+
+    sge::StatefulComponent::pause();
 }
 void sge::Scene::hideSceneParts(){
     for(auto& [_, entities] : m_entities){
@@ -57,6 +61,8 @@ void sge::Scene::hideSceneParts(){
             debugEntity->hide();
         }
     }
+
+    sge::StatefulComponent::hide();
 }
 
 

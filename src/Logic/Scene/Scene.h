@@ -17,6 +17,7 @@ namespace sge{
 
     class Scene : public sge::StatefulComponent{
         public:
+            // rename to 'add' (parts are added)
             void registerEntity(sf::View* view, sge::Entity* entity);
             void registerEntities(sf::View* view, std::vector<sge::Entity*> entities);
             void registerDebugEntity(sf::View* view, sge::DebugEntity* debugEntity);
