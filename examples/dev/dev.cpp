@@ -62,6 +62,13 @@ int main(){
         }
     }
 
+    // Setup collision groups
+    for(sge::Entity* entity : mapTileEntities){
+        entity->collisionShapes["globalBounds"]->collisionGroups.push_back("tiles");
+        entity->collisionShapes["globalBounds"]->collisionGroups.push_back("tiles+box");
+        entity->collisionShapes["globalBounds"]->collisionGroups.push_back("tiles+player");
+    }
+
     for(sge::Entity* entity : mapTileEntities){
         universe->entityManager->registerComponent(cameraView, entity);
     }
@@ -77,6 +84,9 @@ int main(){
         universe->assetsManager->getTextureSheet("picoTiles")->getTextureRect(box.getTileID()-1),
         sf::Vector2f(box.getPosition().x, box.getPosition().y)
     );
+
+    boxEntity->collisionShapes["globalBounds"]->collisionGroups.push_back("box");
+    boxEntity->collisionShapes["globalBounds"]->collisionGroups.push_back("tiles+box");
 
     boxEntity->physicalObject->acceleration.y = GRAVITY;
     
@@ -100,6 +110,9 @@ int main(){
     playerEntity->collisionShapes["globalBounds"]->setSize(sf::Vector2f(8, 4));
     playerEntity->collisionShapes["globalBounds"]->offset = sf::Vector2f(0, 4);
 
+    playerEntity->collisionShapes["globalBounds"]->collisionGroups.push_back("player");
+    playerEntity->collisionShapes["globalBounds"]->collisionGroups.push_back("tiles+player");
+
     playerEntity->physicalObject->acceleration.y = GRAVITY;
 
     sge::Animation* playerAnimation = new sge::Animation(universe->assetsManager->getTextureSheet("knight"), playerEntity->sprite, 9);
@@ -122,36 +135,6 @@ int main(){
     // });
 
     universe->debugManager->registerComponent(cameraView, playerDE);
-    //
-
-
-
-    // Collision groups
-    // Player
-    std::vector<sge::CollisionShape*> playerCollisionGroup =  {playerEntity->collisionShapes["globalBounds"]};
-    
-    // Map
-    std::vector<sge::CollisionShape*> mapCollisionGroup;
-    for(sge::Entity* mapTileEntity : mapTileEntities){
-        mapCollisionGroup.push_back(mapTileEntity->collisionShapes["globalBounds"]);
-    }
-
-    // Box
-    std::vector<sge::CollisionShape*> boxCollisionGroup = {boxEntity->collisionShapes["globalBounds"]};
-
-    // Map tiles + Box for player AABB
-    std::vector<sge::CollisionShape*> tilesAndBoxCollisionGroup = mapCollisionGroup;
-    tilesAndBoxCollisionGroup.insert(tilesAndBoxCollisionGroup.end(), boxCollisionGroup.begin(), boxCollisionGroup.end());
-
-    // Map tiles + Player for box AABB
-    std::vector<sge::CollisionShape*> tilesAndPlayerCollisionGroup = mapCollisionGroup;
-    tilesAndPlayerCollisionGroup.insert(tilesAndPlayerCollisionGroup.end(), playerCollisionGroup.begin(), playerCollisionGroup.end());
-
-    universe->collisionManager->registerCollisionGroup("player", playerCollisionGroup);
-    universe->collisionManager->registerCollisionGroup("tiles", mapCollisionGroup);
-    universe->collisionManager->registerCollisionGroup("box", boxCollisionGroup);
-    universe->collisionManager->registerCollisionGroup("tiles+box", tilesAndBoxCollisionGroup);
-    universe->collisionManager->registerCollisionGroup("tiles+player", tilesAndPlayerCollisionGroup);
     //
 
 

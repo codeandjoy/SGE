@@ -29,8 +29,7 @@ namespace sge{
                 sge::ClickableShapeManager* clickableShapeManager,
                 sge::SpriteTextManager* SpriteTextManager,
                 sge::AnimationManager* animationManager,
-                sge::StateManager* stateManager,
-                sge::CollisionManager* collisionManager
+                sge::StateManager* stateManager
             );
 
         void registerComponent(sf::View* view, sge::Entity* entity);
@@ -53,7 +52,6 @@ namespace sge{
             sge::SpriteTextManager* m_spriteTextManagerPtr;
             sge::AnimationManager* m_animationManagerPtr;
             sge::StateManager* m_stateManagerPtr;
-            sge::CollisionManager* m_collisionManagerPtr;
     };
 }
 

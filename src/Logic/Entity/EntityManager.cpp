@@ -17,8 +17,7 @@ sge::EntityManager::EntityManager(
         sge::ClickableShapeManager* clickableShapeManager,
         sge::SpriteTextManager* spriteTextManager,
         sge::AnimationManager* animationManager,
-        sge::StateManager* stateManager,
-        sge::CollisionManager* collisionManager
+        sge::StateManager* stateManager
     ){
 
     m_spriteManagerPtr = spriteManager;
@@ -28,7 +27,6 @@ sge::EntityManager::EntityManager(
     m_spriteTextManagerPtr = spriteTextManager;
     m_animationManagerPtr = animationManager;
     m_stateManagerPtr = stateManager;
-    m_collisionManagerPtr = collisionManager;
 }
 
 
@@ -84,7 +82,6 @@ void sge::EntityManager::m_deregisterEntityMembers(sf::View* view, sge::Entity* 
     if(entity->collisionShapes.size()){
         for(auto[_, collisionShape] : entity->collisionShapes){
             m_collisionShapeManagerPtr->deregisterComponent(collisionShape);
-            m_collisionManagerPtr->deregisterCollisionShapeFromCollisionGroups(collisionShape);
         }
     }
 

@@ -15,11 +15,6 @@ void sge::Scene::addDebugEntities(sf::View* view,std::vector<DebugEntity*> debug
         addDebugEntity(view, debugEntity);
     }
 }
-void sge::Scene::addCollisionGroup(std::string name, std::vector<sge::CollisionShape*> collisionShapes){ m_collisionGroups[name] = collisionShapes; }
-void sge::Scene::addCollisionPair(std::string name, sge::CollisionPair* collisionPair){
-    m_collisionPairs[name] = collisionPair;
-    m_collisionPairsOrder.push_back(name);
-}
 
 
 void sge::Scene::activateSceneParts(){
@@ -72,8 +67,3 @@ std::unordered_map<sf::View*, std::vector<sge::Entity*>> sge::Scene::getEntities
 
 std::vector<sge::DebugEntity*> sge::Scene::getViewDebugEntities(sf::View* view){ return m_debugEntities[view]; }
 std::unordered_map<sf::View*, std::vector<sge::DebugEntity*>> sge::Scene::getDebugEntitiesMap(){ return m_debugEntities; }
-
-
-std::unordered_map<std::string, std::vector<sge::CollisionShape*>> sge::Scene::getCollisionGroups(){ return m_collisionGroups; };
-std::unordered_map<std::string, sge::CollisionPair*> sge::Scene::getCollisionPairs(){ return m_collisionPairs; }
-std::vector<std::string> sge::Scene::getCollisionPairsOrder(){ return m_collisionPairsOrder; };

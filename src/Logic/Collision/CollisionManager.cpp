@@ -4,35 +4,7 @@
 #include "CollisionUtils.h"
 #include "CollisionPair.h"
 #include "../CollisionShape/CollisionShape.h"
-
-
-void sge::CollisionManager::registerCollisionGroup(std::string name, std::vector<sge::CollisionShape*> collisionGroup){ m_collisionGroups[name] = collisionGroup; } 
-void sge::CollisionManager::deregisterCollisionGroup(std::string name){
-    // Remove related collision pairs
-    std::vector<std::string> pairsToRemove;
-    for(auto& [pairName, collisionPair] : m_collisionPairs){
-        if(collisionPair->initiatorGroupName == name || collisionPair->recipientGroupName == name){
-            pairsToRemove.push_back(pairName);
-        }
-    }
-    for(std::string pairToRemove : pairsToRemove){
-        deregisterCollisionPair(pairToRemove);
-    }
-    //
-
-    m_collisionGroups.erase(name);
-}
-void sge::CollisionManager::registerCollisionGroups(std::unordered_map<std::string, std::vector<sge::CollisionShape*>> collisionGroups){ m_collisionGroups.insert(collisionGroups.begin(), collisionGroups.end()); }
-void sge::CollisionManager::deregisterAllCollisionGroups(){
-    m_collisionGroups.clear();
-    m_collisionPairs.clear();
-}
-std::unordered_map<std::string, std::vector<sge::CollisionShape*>> sge::CollisionManager::getCollisionGroups(){ return m_collisionGroups; }
-void sge::CollisionManager::deregisterCollisionShapeFromCollisionGroups(CollisionShape* collisionShape){
-    for(auto [_, collisionGroup] : m_collisionGroups){
-        collisionGroup.erase(std::remove(collisionGroup.begin(), collisionGroup.end(), collisionShape), collisionGroup.end());
-    }
-}
+#include "../CollisionShape/CollisionShapeManager.h"
 
 
 void sge::CollisionManager::registerCollisionPair(std::string name, sge::CollisionPair* collisionPair){
@@ -45,10 +17,6 @@ void sge::CollisionManager::deregisterCollisionPair(std::string name){
     m_collisionPairs.erase(name);
     m_collisionPairsOrder.erase(std::remove(m_collisionPairsOrder.begin(), m_collisionPairsOrder.end(), name), m_collisionPairsOrder.end());
 }
-void sge::CollisionManager::deregisterAllCollisionPairs(){
-    m_collisionPairs.clear();
-    m_collisionPairsOrder.clear();
-}
 
 
 void sge::CollisionManager::updateCollisions(){
@@ -56,11 +24,11 @@ void sge::CollisionManager::updateCollisions(){
 
     for(std::string pair : m_collisionPairsOrder){
 
-        for(sge::CollisionShape* initiator : m_collisionGroups[m_collisionPairs[pair]->initiatorGroupName]){
+        for(sge::CollisionShape* initiator : m_collisionShapeManagerPtr->getComponentsByCollisionGroup(m_collisionPairs[pair]->initiatorGroupName)){
             if(!initiator->isActive) continue;
 
             // Collect all present collisions
-            for(sge::CollisionShape* recipient : m_collisionGroups[m_collisionPairs[pair]->recipientGroupName]){
+            for(sge::CollisionShape* recipient : m_collisionShapeManagerPtr->getComponentsByCollisionGroup(m_collisionPairs[pair]->recipientGroupName)){
                 if(!recipient->isActive) continue;
 
                 if(m_collisionPairs[pair]->algorithm(initiator, recipient)){

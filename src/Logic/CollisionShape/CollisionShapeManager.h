@@ -15,6 +15,8 @@ namespace sge{
         public sge::UpdateManager{
 
         public:
+            std::vector<sge::CollisionShape*> getComponentsByCollisionGroup(std::string groupName);
+
             void update(float dt) override;
     };
 }

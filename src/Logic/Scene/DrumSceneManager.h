@@ -9,8 +9,8 @@ namespace sge{
 
     class DrumSceneManager : public sge::SceneManager{
         public:
-            DrumSceneManager(sge::EntityManager* entityManager, sge::CollisionManager* collisionManager)
-                : sge::SceneManager(entityManager, collisionManager){};
+            DrumSceneManager(sge::EntityManager* entityManager)
+                : sge::SceneManager(entityManager){};
 
 
             void setCurrentScene(std::string name);

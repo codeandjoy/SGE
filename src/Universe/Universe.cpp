@@ -31,10 +31,10 @@ sge::Universe::Universe(sf::RenderWindow* window){
     sge::SpriteTextManager* STM = new SpriteTextManager();
     sge::AnimationManager* AnM = new sge::AnimationManager();
     sge::StateManager* StM = new sge::StateManager();
-    sge::CollisionManager* CM = new sge::CollisionManager();
-    sge::EntityManager* EM = new sge::EntityManager(SpM, PM, CSM, ClSM, STM, AnM, StM, CM);
-    sge::DrumSceneManager* DrSM = new sge::DrumSceneManager(EM, CM);
-    sge::LayerSceneManager* LaSM = new sge::LayerSceneManager(EM, CM);
+    sge::CollisionManager* CM = new sge::CollisionManager(CSM);
+    sge::EntityManager* EM = new sge::EntityManager(SpM, PM, CSM, ClSM, STM, AnM, StM);
+    sge::DrumSceneManager* DrSM = new sge::DrumSceneManager(EM);
+    sge::LayerSceneManager* LaSM = new sge::LayerSceneManager(EM);
 
     assetsManager = AsM;
     controllerManager = CoM;
