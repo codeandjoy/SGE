@@ -4,19 +4,28 @@
 #include <tmxlite/ObjectGroup.hpp>
 #include "../../SGE.hpp"
 
-namespace constants{
-    const float GRAVITY = .3;
-}
 
 int main(){
-    sge::Universe* universe = new sge::Universe();
+    sf::RenderWindow* window = new sf::RenderWindow(sf::VideoMode(1000, 600), "CollisionPhase");
+    window->setKeyRepeatEnabled(false);
+    sf::View* view = new sf::View(sf::Vector2f(100, 70), sf::Vector2f(250, 150));
 
-    universe->assetsManager->loadTextureSheet(
+    sge::Universe* universe = new sge::Universe(window);
+    universe->setupDebug();
+    sge::AssetsManager* assetsManager = universe->assetsManager;
+    sge::EntityManager* entityManager = universe->entityManager;
+    sge::DebugManager* debugManager = universe->debugManager;
+    sge::CollisionManager* collisionManager = universe->collisionManager;
+    sge::ControllerManager* controllerManager = universe->controllerManager;
+
+
+
+    assetsManager->loadTextureSheet(
         std::filesystem::current_path().string() + "/examples/collision_phase/assets/pico_8_tiles.png",
         "picoTiles",
         sge::TextureSheetSizes{8, 8, 12, 12}
     );
-    universe->assetsManager->loadTextureSheet(
+    assetsManager->loadTextureSheet(
         std::filesystem::current_path().string() + "/examples/collision_phase/assets/pico_8_knight_sprite.png",
         "knight",
         sge::TextureSheetSizes{8, 8, 12, 12}
@@ -35,35 +44,35 @@ int main(){
         for(int j = 0; j < map.getTileCount().x; j++){
             if(surface[map.getTileCount().x*i+j].ID != 0){
                 surfaceEntities.push_back(sge::buildStaticEntity(
-                    universe->assetsManager->getTextureSheet("picoTiles")->getTexture(),
-                    universe->assetsManager->getTextureSheet("picoTiles")->getTextureRect(surface[map.getTileCount().x*i+j].ID-1),
+                    assetsManager->getTextureSheet("picoTiles")->getTexture(),
+                    assetsManager->getTextureSheet("picoTiles")->getTextureRect(surface[map.getTileCount().x*i+j].ID-1),
                     sf::Vector2f(j*map.getTileSize().x, i*map.getTileSize().y)
                 ));
             }
         }
     }
 
-    universe->entityManager->registerEntities(surfaceEntities);
+    for(sge::Entity* entity : surfaceEntities) entityManager->registerComponent(view, entity);
     
     std::vector<sge::DebugEntity*> surfaceDebugEntities;
     for(sge::Entity* surfaceEntity : surfaceEntities){
         sge::DebugEntity* surfaceDebugEntity = new sge::DebugEntity(surfaceEntity);
 
         surfaceDebugEntities.push_back(surfaceDebugEntity);
-        universe->debugManager->registerDebugEntity(surfaceDebugEntity);
+        debugManager->registerComponent(view, surfaceDebugEntity);
     }
 
 
 
     sge::Entity* playerEntity = sge::buildMobileEntity(
-        universe->assetsManager->getTextureSheet("knight")->getTexture(),
-        universe->assetsManager->getTextureSheet("knight")->getTextureRect(9),
+        assetsManager->getTextureSheet("knight")->getTexture(),
+        assetsManager->getTextureSheet("knight")->getTextureRect(9),
         sf::Vector2f(100,50)
     );
 
-    playerEntity->physicalObject->acceleration.y = constants::GRAVITY;
+    playerEntity->physicalObject->acceleration.y = .3;
 
-    sge::Animation* playerAnimation = new sge::Animation(universe->assetsManager->getTextureSheet("knight"), playerEntity->sprite, 9);
+    sge::Animation* playerAnimation = new sge::Animation(assetsManager->getTextureSheet("knight"), playerEntity->sprite, 9);
     playerAnimation->addTextureSequence("idle", std::vector<int>{9});
     playerAnimation->addTextureSequence("runRight", std::vector<int>{33, 34, 35});
     playerAnimation->addTextureSequence("runLeft", std::vector<int>{45, 46, 47});
@@ -71,12 +80,12 @@ int main(){
 
     playerEntity->animation = playerAnimation;
 
-    universe->entityManager->registerEntity(playerEntity);
+    entityManager->registerComponent(view, playerEntity);
 
     sge::DebugEntity* playerDebugEntity = new sge::DebugEntity(playerEntity);
     playerDebugEntity->customCollisionShapeBorderSettings["globalBounds"] = sge::CollisionShapeBorderSettings{sf::Color::Red};
 
-    universe->debugManager->registerDebugEntity(playerDebugEntity);
+    debugManager->registerComponent(view, playerDebugEntity);
 
 
 
@@ -86,8 +95,8 @@ int main(){
         surfaceCollisionGroup.push_back(surfaceEntity->collisionShapes["globalBounds"]);
     }
 
-    universe->collisionManager->registerCollisionGroup("player", playerCollisionGroup);
-    universe->collisionManager->registerCollisionGroup("surface", surfaceCollisionGroup);
+    collisionManager->registerCollisionGroup("player", playerCollisionGroup);
+    collisionManager->registerCollisionGroup("surface", surfaceCollisionGroup);
 
     sge::CollisionPair* player_surface = new sge::CollisionPair{ "player", "surface" };
     player_surface->algorithm = sge::boundingBox;
@@ -114,20 +123,22 @@ int main(){
         }
     };
 
-    universe->collisionManager->registerCollisionPair("player_surface", player_surface);
+    collisionManager->registerCollisionPair("player_surface", player_surface);
 
-    universe->controllerManager->registerController([playerEntity, playerAnimation](sf::Event event){
+
+
+    controllerManager->registerComponent([playerEntity](sf::Event event){
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::A)){
             playerEntity->physicalObject->velocity.x = -70;
-            playerAnimation->setCurrentTextureSequence("runLeft");
+            playerEntity->animation->setCurrentTextureSequence("runLeft");
         }
         else if(sf::Keyboard::isKeyPressed(sf::Keyboard::D)){
             playerEntity->physicalObject->velocity.x = 70;
-            playerAnimation->setCurrentTextureSequence("runRight");
+            playerEntity->animation->setCurrentTextureSequence("runRight");
         }
         else{
             playerEntity->physicalObject->velocity.x = 0;
-            playerAnimation->setCurrentTextureSequence("idle");
+            playerEntity->animation->setCurrentTextureSequence("idle");
         }
 
         if(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space){
@@ -135,14 +146,8 @@ int main(){
         }
     }); 
 
-
-
-    sf::RenderWindow* window = new sf::RenderWindow(sf::VideoMode(1000, 600), "CollisionPhase");
-    sf::View* view = new sf::View(sf::Vector2f(100, 70), sf::Vector2f(250, 150));
-    window->setView(*view);
-    window->setKeyRepeatEnabled(false);
     
-    universe->setupWindow(window);
+    
     universe->loop();
     return 0;
 }
