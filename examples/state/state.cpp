@@ -50,7 +50,6 @@ class WalkingRight : public sge::State{
 
 int main(){
     sf::RenderWindow* window = new sf::RenderWindow(sf::VideoMode(1000, 600), "State");
-    window->setKeyRepeatEnabled(false); // For proper keyboard events handling (e.g. jumping)
 
     sf::View* dummyView = new sf::View(sf::Vector2f(100, 100), sf::Vector2f(250, 150)); 
 
@@ -64,7 +63,8 @@ int main(){
 
 
 
-    sge::Entity* entity = new sge::Entity{ new sf::Sprite() };
+    sge::Entity* entity = new sge::Entity();
+    entity->sprite = new sge::Sprite();
     entity->sprite->setPosition(sf::Vector2f(100, 100));
     entity->sprite->setTexture(*assetsManager->getTextureSheet("knight")->getTexture());
     entity->sprite->setTextureRect(assetsManager->getTextureSheet("knight")->getTextureRect(9));
@@ -78,7 +78,7 @@ int main(){
 
     entity->stateCluster = entityStateCluster;
 
-    entityManager->registerEntity(dummyView, entity);
+    entityManager->registerComponent(dummyView, entity);
 
 
 
