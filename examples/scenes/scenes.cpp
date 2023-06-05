@@ -6,7 +6,11 @@
 
 
 int main(){
-    sge::Universe* universe = new sge::Universe();
+    sf::RenderWindow* window = new sf::RenderWindow(sf::VideoMode(1000, 600), "CollisionPhase");
+    window->setKeyRepeatEnabled(false);
+    sf::View* view = new sf::View(sf::Vector2f(100, 70), sf::Vector2f(250, 150));
+
+    sge::Universe* universe = new sge::Universe(window);
 
     universe->assetsManager->loadTextureSheet(
         std::filesystem::current_path().string() + "/examples/scenes/assets/pico_8_tiles.png",
@@ -22,17 +26,17 @@ int main(){
     // Player is universal for all scenes
     sge::Entity* playerEntity = setupPlayerEntity(universe);
 
-    sge::Scene* scene_1 = setupScene1(universe, playerEntity);
-    sge::Scene* scene_2 = setupScene2(universe, playerEntity);
+    sge::Scene* scene_1 = setupScene1(universe, playerEntity, view);
+    sge::Scene* scene_2 = setupScene2(universe, playerEntity, view);
 
-    universe->sceneManager->registerScene("level_1", scene_1);
-    universe->sceneManager->registerScene("level_2", scene_2);
+    universe->drumSceneManager->registerComponent("level_1", scene_1);
+    universe->drumSceneManager->registerComponent("level_2", scene_2);
     
-    universe->sceneManager->setCurrentScene("level_1");
+    universe->drumSceneManager->setCurrentScene("level_1");
 
 
 
-    universe->controllerManager->registerController([playerEntity](sf::Event event){
+    universe->controllerManager->registerComponent([playerEntity](sf::Event event){
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::A)){
             playerEntity->physicalObject->velocity.x = -70;
             playerEntity->animation->setCurrentTextureSequence("runLeft");
@@ -53,12 +57,8 @@ int main(){
 
 
 
-    sf::RenderWindow* window = new sf::RenderWindow(sf::VideoMode(1000, 600), "CollisionPhase");
-    sf::View* view = new sf::View(sf::Vector2f(100, 70), sf::Vector2f(250, 150));
-    window->setView(*view);
-    window->setKeyRepeatEnabled(false);
     
-    universe->setupWindow(window);
+    
     universe->loop();
     return 0;
 }

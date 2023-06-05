@@ -11,11 +11,11 @@
 #include "../../../SGE.hpp"
 
 
-sge::Scene* setupScene1(sge::Universe* universe, sge::Entity* playerEntity){
+sge::Scene* setupScene1(sge::Universe* universe, sge::Entity* playerEntity, sf::View* view){
     sge::Scene* level1Scene = new sge::Scene();
 
 
-    level1Scene->registerEntity(playerEntity);
+    level1Scene->addEntity(view, playerEntity);
 
 
 
@@ -28,12 +28,12 @@ sge::Scene* setupScene1(sge::Universe* universe, sge::Entity* playerEntity){
 
 
     std::vector<sge::Entity*> surfaceEntities = setupMapEntities(universe, map, surface);
-    level1Scene->registerEntities(surfaceEntities);
+    level1Scene->addEntities(view, surfaceEntities);
 
 
 
     sge::Entity* coinEntity = setupCoinEntity(universe, coin);
-    level1Scene->registerEntity(coinEntity);
+    level1Scene->addEntity(view, coinEntity);
 
 
 
@@ -44,9 +44,9 @@ sge::Scene* setupScene1(sge::Universe* universe, sge::Entity* playerEntity){
     std::vector<sge::CollisionShape*> playerCollisionGroup = {playerEntity->collisionShapes["globalBounds"]};
     std::vector<sge::CollisionShape*> coinCollisionGroup = {coinEntity->collisionShapes["globalBounds"]};
 
-    level1Scene->registerCollisionGroup("surface", surfaceCollisionGroup);
-    level1Scene->registerCollisionGroup("player", playerCollisionGroup);
-    level1Scene->registerCollisionGroup("coin", coinCollisionGroup);
+    level1Scene->addCollisionGroup("surface", surfaceCollisionGroup);
+    level1Scene->addCollisionGroup("player", playerCollisionGroup);
+    level1Scene->addCollisionGroup("coin", coinCollisionGroup);
 
 
 
@@ -57,16 +57,16 @@ sge::Scene* setupScene1(sge::Universe* universe, sge::Entity* playerEntity){
         sge::initiatorStandOnTopOfRecipient(collisions);
     };
 
-    level1Scene->registerCollisionPair("player_surface", player_surface);
+    level1Scene->addCollisionPair("player_surface", player_surface);
 
     sge::CollisionPair* player_coin = new sge::CollisionPair{ "player", "coin" };
     player_coin->algorithm = sge::boundingBox;
     player_coin->startPhaseCollisionResponse = [universe, playerEntity](auto _){
         playerEntity->sprite->setPosition(sf::Vector2f(100, 50));
-        universe->sceneManager->setCurrentScene("level_2");
+        universe->drumSceneManager->setCurrentScene("level_2");
     };
 
-    level1Scene->registerCollisionPair("player_coin", player_coin);
+    level1Scene->addCollisionPair("player_coin", player_coin);
 
 
 

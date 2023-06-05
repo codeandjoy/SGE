@@ -11,11 +11,11 @@
 #include "../../../SGE.hpp"
 
 
-sge::Scene* setupScene2(sge::Universe* universe, sge::Entity* playerEntity){
+sge::Scene* setupScene2(sge::Universe* universe, sge::Entity* playerEntity, sf::View* view){
     sge::Scene* level2Scene = new sge::Scene();
 
 
-    level2Scene->registerEntity(playerEntity);
+    level2Scene->addEntity(view, playerEntity);
 
 
 
@@ -28,12 +28,12 @@ sge::Scene* setupScene2(sge::Universe* universe, sge::Entity* playerEntity){
 
 
     std::vector<sge::Entity*> surfaceEntities = setupMapEntities(universe, map, surface);
-    level2Scene->registerEntities(surfaceEntities);
+    level2Scene->addEntities(view, surfaceEntities);
 
 
 
     sge::Entity* heartEntity = setupHeartEntity(universe, heart);
-    level2Scene->registerEntity(heartEntity);
+    level2Scene->addEntity(view, heartEntity);
 
 
 
@@ -44,9 +44,9 @@ sge::Scene* setupScene2(sge::Universe* universe, sge::Entity* playerEntity){
     std::vector<sge::CollisionShape*> playerCollisionGroup = {playerEntity->collisionShapes["globalBounds"]};
     std::vector<sge::CollisionShape*> heartCollisionGroup = {heartEntity->collisionShapes["globalBounds"]};
 
-    level2Scene->registerCollisionGroup("surface", surfaceCollisionGroup);
-    level2Scene->registerCollisionGroup("player", playerCollisionGroup);
-    level2Scene->registerCollisionGroup("heart", heartCollisionGroup);
+    level2Scene->addCollisionGroup("surface", surfaceCollisionGroup);
+    level2Scene->addCollisionGroup("player", playerCollisionGroup);
+    level2Scene->addCollisionGroup("heart", heartCollisionGroup);
 
 
 
@@ -57,16 +57,16 @@ sge::Scene* setupScene2(sge::Universe* universe, sge::Entity* playerEntity){
         sge::initiatorStandOnTopOfRecipient(collisions);
     };
 
-    level2Scene->registerCollisionPair("player_surface", player_surface);
+    level2Scene->addCollisionPair("player_surface", player_surface);
 
     sge::CollisionPair* player_heart = new sge::CollisionPair{ "player", "heart" };
     player_heart->algorithm = sge::boundingBox;
     player_heart->startPhaseCollisionResponse = [universe, playerEntity](auto _){
         playerEntity->sprite->setPosition(sf::Vector2f(100, 50));
-        universe->sceneManager->setCurrentScene("level_1");
+        universe->drumSceneManager->setCurrentScene("level_1");
     };
 
-    level2Scene->registerCollisionPair("player_heart", player_heart);
+    level2Scene->addCollisionPair("player_heart", player_heart);
 
 
 

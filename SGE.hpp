@@ -2150,7 +2150,7 @@ void sge::DrumSceneManager::setCurrentScene(std::string name){ m_currentScene = 
 void sge::DrumSceneManager::alignScene(){
     if(m_currentScene.length()){
         if(m_loadedScene != m_currentScene){
-            m_deregisterSceneMembers(m_loadedScene);
+            if(m_loadedScene.length()) m_deregisterSceneMembers(m_loadedScene);
 
             m_registerSceneMembers(m_currentScene);
 
