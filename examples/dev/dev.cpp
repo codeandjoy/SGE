@@ -56,17 +56,11 @@ int main(){
                 mapTileEntities.push_back(sge::buildStaticEntity(
                     universe->assetsManager->getTextureSheet("picoTiles")->getTexture(),
                     universe->assetsManager->getTextureSheet("picoTiles")->getTextureRect(tiles[map.getTileCount().x*i+j].ID-1),
-                    sf::Vector2f(j*map.getTileSize().x, i*map.getTileSize().y)
+                    sf::Vector2f(j*map.getTileSize().x, i*map.getTileSize().y),
+                    {"tiles", "tiles+box", "tiles+player"}
                 ));
             }
         }
-    }
-
-    // Setup collision groups
-    for(sge::Entity* entity : mapTileEntities){
-        entity->collisionShapes["globalBounds"]->collisionGroups.push_back("tiles");
-        entity->collisionShapes["globalBounds"]->collisionGroups.push_back("tiles+box");
-        entity->collisionShapes["globalBounds"]->collisionGroups.push_back("tiles+player");
     }
 
     for(sge::Entity* entity : mapTileEntities){
@@ -82,11 +76,9 @@ int main(){
     sge::Entity* boxEntity = sge::buildMobileEntity(
         universe->assetsManager->getTextureSheet("picoTiles")->getTexture(),
         universe->assetsManager->getTextureSheet("picoTiles")->getTextureRect(box.getTileID()-1),
-        sf::Vector2f(box.getPosition().x, box.getPosition().y)
+        sf::Vector2f(box.getPosition().x, box.getPosition().y),
+        {"box", "tiles+box"}
     );
-
-    boxEntity->collisionShapes["globalBounds"]->collisionGroups.push_back("box");
-    boxEntity->collisionShapes["globalBounds"]->collisionGroups.push_back("tiles+box");
 
     boxEntity->physicalObject->acceleration.y = GRAVITY;
     
@@ -104,14 +96,12 @@ int main(){
     sge::Entity* playerEntity = sge::buildMobileEntity(
         universe->assetsManager->getTextureSheet("knight")->getTexture(),
         universe->assetsManager->getTextureSheet("knight")->getTextureRect(9),
-        sf::Vector2f(100, 50)
+        sf::Vector2f(100, 50),
+        {"player", "tiles+player"}
     );
 
     playerEntity->collisionShapes["globalBounds"]->setSize(sf::Vector2f(8, 4));
     playerEntity->collisionShapes["globalBounds"]->offset = sf::Vector2f(0, 4);
-
-    playerEntity->collisionShapes["globalBounds"]->collisionGroups.push_back("player");
-    playerEntity->collisionShapes["globalBounds"]->collisionGroups.push_back("tiles+player");
 
     playerEntity->physicalObject->acceleration.y = GRAVITY;
 

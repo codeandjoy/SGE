@@ -8,7 +8,8 @@ sge::Entity* setupPlayerEntity(sge::Universe* universe){
     sge::Entity* playerEntity = sge::buildMobileEntity(
         universe->assetsManager->getTextureSheet("knight")->getTexture(),
         universe->assetsManager->getTextureSheet("knight")->getTextureRect(9),
-        sf::Vector2f(100,50)
+        sf::Vector2f(100,50),
+        {"player"}
     );
 
     playerEntity->physicalObject->acceleration.y = .2;

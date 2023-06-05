@@ -68,7 +68,8 @@ int main(){
 
     sge::Entity* topBorderEntity = sge::buildVoidEntity(
         sf::Vector2f(1000, 10),
-        sf::Vector2f(0, 0)
+        sf::Vector2f(0, 0),
+        {"goal"}
     );
     sge::DebugEntity* topBorderDebug = new sge::DebugEntity(topBorderEntity);
     topBorderDebug->customCollisionShapeBorderSettings["globalBounds"] = worldBorderSettings;
@@ -77,7 +78,8 @@ int main(){
 
     sge::Entity* bottomBorderEntity = sge::buildVoidEntity(
         sf::Vector2f(1000, 10),
-        sf::Vector2f(0, 690)
+        sf::Vector2f(0, 690),
+        {"goal"}
     );
     sge::DebugEntity* bottomBorderDebug = new sge::DebugEntity(bottomBorderEntity);
     bottomBorderDebug->customCollisionShapeBorderSettings["globalBounds"] = worldBorderSettings;
@@ -86,7 +88,8 @@ int main(){
 
     sge::Entity* leftBorderEntity = sge::buildVoidEntity(
         sf::Vector2f(10, 700),
-        sf::Vector2f(0, 0)
+        sf::Vector2f(0, 0),
+        {"racket_borders", "bouncy"}
     );
     sge::DebugEntity* leftBorderDebug = new sge::DebugEntity(leftBorderEntity);
     leftBorderDebug->customCollisionShapeBorderSettings["globalBounds"] = worldBorderSettings;
@@ -95,7 +98,8 @@ int main(){
     
     sge::Entity* rightBorderEntity = sge::buildVoidEntity(
         sf::Vector2f(10, 700),
-        sf::Vector2f(990, 0)
+        sf::Vector2f(990, 0),
+        {"racket_borders", "bouncy"}
     );
     sge::DebugEntity* rightBorderDebug = new sge::DebugEntity(rightBorderEntity);
     rightBorderDebug->customCollisionShapeBorderSettings["globalBounds"] = worldBorderSettings;
@@ -109,21 +113,24 @@ int main(){
     sge::Entity* racket1Entity = sge::buildMobileEntity(
         assetsManager->getTextureSheet("racket")->getTexture(),
         assetsManager->getTextureSheet("racket")->getTextureRect(0),
-        sf::Vector2f(450, 30)
+        sf::Vector2f(450, 30),
+        {"racket", "bouncy"}
     );
     entityManager->registerComponent(view, racket1Entity);
 
     sge::Entity* racket2Entity = sge::buildMobileEntity(
         assetsManager->getTextureSheet("racket")->getTexture(),
         assetsManager->getTextureSheet("racket")->getTextureRect(0),
-        sf::Vector2f(450, 660)
+        sf::Vector2f(450, 660),
+        {"racket", "bouncy"}
     );
     entityManager->registerComponent(view, racket2Entity);
 
     sge::Entity* ballEntity = sge::buildMobileEntity(
         assetsManager->getTextureSheet("ball")->getTexture(),
         assetsManager->getTextureSheet("ball")->getTextureRect(0),
-        sf::Vector2f(495, 345)
+        sf::Vector2f(495, 345),
+        {"ball"}
     );
     entityManager->registerComponent(view, ballEntity);
     //
@@ -137,31 +144,6 @@ int main(){
 
 
     // Game object interactions
-    std::vector<sge::CollisionShape*> racketsCollisionGroup{
-        racket1Entity->collisionShapes["globalBounds"],
-        racket2Entity->collisionShapes["globalBounds"]
-    };
-    std::vector<sge::CollisionShape*> racketBordersCollisionGroup{
-        leftBorderEntity->collisionShapes["globalBounds"],
-        rightBorderEntity->collisionShapes["globalBounds"]
-    };
-    std::vector<sge::CollisionShape*> ballCollisionGroup{ ballEntity->collisionShapes["globalBounds"] };
-    std::vector<sge::CollisionShape*> bouncyCollisionGroup{
-        racket1Entity->collisionShapes["globalBounds"],
-        racket2Entity->collisionShapes["globalBounds"],
-        leftBorderEntity->collisionShapes["globalBounds"],
-        rightBorderEntity->collisionShapes["globalBounds"]
-    };
-    std::vector<sge::CollisionShape*> goalCollisionGroup{
-        topBorderEntity->collisionShapes["globalBounds"],
-        bottomBorderEntity->collisionShapes["globalBounds"]
-    };
-    collisionManager->registerCollisionGroup("racket", racketsCollisionGroup);
-    collisionManager->registerCollisionGroup("racket_borders", racketBordersCollisionGroup);
-    collisionManager->registerCollisionGroup("ball", ballCollisionGroup);
-    collisionManager->registerCollisionGroup("bouncy", bouncyCollisionGroup);
-    collisionManager->registerCollisionGroup("goal", goalCollisionGroup);
-
     sge::CollisionPair* racket_racket_borders = new sge::CollisionPair{ "racket", "racket_borders" };
     racket_racket_borders->algorithm = sge::boundingBox;
     racket_racket_borders->continuousPhaseCollisionResponse = sge::resolveAABB;

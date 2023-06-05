@@ -8,7 +8,8 @@ sge::Entity* setupCoinEntity(sge::Universe* universe, auto coinLayer){
     sge::Entity* coinEntity = sge::buildStaticEntity(
         universe->assetsManager->getTextureSheet("picoTiles")->getTexture(),
         universe->assetsManager->getTextureSheet("picoTiles")->getTextureRect(18),
-        sf::Vector2f(coinLayer[0].getPosition().x, coinLayer[0].getPosition().y-10)
+        sf::Vector2f(coinLayer[0].getPosition().x, coinLayer[0].getPosition().y-10),
+        {"coin"}
     );
 
     sge::Animation* coinAnimation = new sge::Animation(universe->assetsManager->getTextureSheet("picoTiles"), coinEntity->sprite, 18);

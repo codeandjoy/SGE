@@ -15,27 +15,29 @@ sge::Entity* sge::buildPlainEntity(sf::Texture* texture, sf::IntRect textureRect
     return e;
 }
 
-sge::Entity* sge::buildVoidEntity(sf::Vector2f size, sf::Vector2f position){
+sge::Entity* sge::buildVoidEntity(sf::Vector2f size, sf::Vector2f position, std::vector<std::string> collisionGroups){
     sge::Entity* e = new sge::Entity();
     e->sprite = new sge::Sprite();
     e->sprite->setPosition(position);
 
     e->collisionShapes["globalBounds"] = new sge::CollisionShape(e);
     e->collisionShapes["globalBounds"]->setSize(size);
+    if(collisionGroups.size()) e->collisionShapes["globalBounds"]->collisionGroups = collisionGroups;
 
     return e;
 }
 
-sge::Entity* sge::buildStaticEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position){
+sge::Entity* sge::buildStaticEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position, std::vector<std::string> collisionGroups){
     sge::Entity* e = sge::buildPlainEntity(texture, textureRect, position);
 
     e->collisionShapes["globalBounds"] = new sge::CollisionShape(e);
+    if(collisionGroups.size()) e->collisionShapes["globalBounds"]->collisionGroups = collisionGroups;
 
     return e;
 }
 
-sge::Entity* sge::buildMobileEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position){
-    sge::Entity* e = sge::buildStaticEntity(texture, textureRect, position);
+sge::Entity* sge::buildMobileEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position, std::vector<std::string> collisionGroups){
+    sge::Entity* e = sge::buildStaticEntity(texture, textureRect, position, collisionGroups);
 
     e->physicalObject = new PhysicalObject(e->sprite);
 

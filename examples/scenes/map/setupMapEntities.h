@@ -14,7 +14,8 @@ std::vector<sge::Entity*> setupMapEntities(sge::Universe* universe, auto map, au
                 surfaceEntities.push_back(sge::buildStaticEntity(
                     universe->assetsManager->getTextureSheet("picoTiles")->getTexture(),
                     universe->assetsManager->getTextureSheet("picoTiles")->getTextureRect(surface[map->getTileCount().x*i+j].ID-1),
-                    sf::Vector2f(j*map->getTileSize().x, i*map->getTileSize().y)
+                    sf::Vector2f(j*map->getTileSize().x, i*map->getTileSize().y),
+                    {"surface"}
                 ));
             }
         }

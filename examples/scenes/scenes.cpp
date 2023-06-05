@@ -36,6 +36,31 @@ int main(){
 
 
 
+    sge::CollisionPair* player_surface = new sge::CollisionPair{ "player", "surface" };
+    player_surface->algorithm = sge::boundingBox;
+    player_surface->continuousPhaseCollisionResponse = [](std::vector<sge::Collision> collisions){
+        sge::resolveAABB(collisions);
+        sge::initiatorStandOnTopOfRecipient(collisions);
+    };
+    sge::CollisionPair* player_heart = new sge::CollisionPair{ "player", "heart" };
+    player_heart->algorithm = sge::boundingBox;
+    player_heart->startPhaseCollisionResponse = [universe, playerEntity](auto _){
+        playerEntity->sprite->setPosition(sf::Vector2f(100, 50));
+        universe->drumSceneManager->setCurrentScene("level_1");
+    };
+    sge::CollisionPair* player_coin = new sge::CollisionPair{ "player", "coin" };
+    player_coin->algorithm = sge::boundingBox;
+    player_coin->startPhaseCollisionResponse = [universe, playerEntity](auto _){
+        playerEntity->sprite->setPosition(sf::Vector2f(100, 50));
+        universe->drumSceneManager->setCurrentScene("level_2");
+    };
+
+    universe->collisionManager->registerCollisionPair("player_surface", player_surface);
+    universe->collisionManager->registerCollisionPair("player_heart", player_heart);
+    universe->collisionManager->registerCollisionPair("player_coin", player_coin);
+
+
+
     universe->controllerManager->registerComponent([playerEntity](sf::Event event){
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::A)){
             playerEntity->physicalObject->velocity.x = -70;

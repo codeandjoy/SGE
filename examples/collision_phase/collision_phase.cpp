@@ -46,7 +46,8 @@ int main(){
                 surfaceEntities.push_back(sge::buildStaticEntity(
                     assetsManager->getTextureSheet("picoTiles")->getTexture(),
                     assetsManager->getTextureSheet("picoTiles")->getTextureRect(surface[map.getTileCount().x*i+j].ID-1),
-                    sf::Vector2f(j*map.getTileSize().x, i*map.getTileSize().y)
+                    sf::Vector2f(j*map.getTileSize().x, i*map.getTileSize().y),
+                    {"surface"}
                 ));
             }
         }
@@ -67,7 +68,8 @@ int main(){
     sge::Entity* playerEntity = sge::buildMobileEntity(
         assetsManager->getTextureSheet("knight")->getTexture(),
         assetsManager->getTextureSheet("knight")->getTextureRect(9),
-        sf::Vector2f(100,50)
+        sf::Vector2f(100,50),
+        {"player"}
     );
 
     playerEntity->physicalObject->acceleration.y = .3;
@@ -88,15 +90,6 @@ int main(){
     debugManager->registerComponent(view, playerDebugEntity);
 
 
-
-    std::vector<sge::CollisionShape*> playerCollisionGroup = {playerEntity->collisionShapes["globalBounds"]};
-    std::vector<sge::CollisionShape*> surfaceCollisionGroup;
-    for(sge::Entity* surfaceEntity : surfaceEntities){
-        surfaceCollisionGroup.push_back(surfaceEntity->collisionShapes["globalBounds"]);
-    }
-
-    collisionManager->registerCollisionGroup("player", playerCollisionGroup);
-    collisionManager->registerCollisionGroup("surface", surfaceCollisionGroup);
 
     sge::CollisionPair* player_surface = new sge::CollisionPair{ "player", "surface" };
     player_surface->algorithm = sge::boundingBox;
