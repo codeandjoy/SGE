@@ -52,7 +52,7 @@
 #include "./src/Logic/Physics/Computations.h"
 
 #include "./src/Logic/Collision/CollisionManager.h"
-#include "./src/Logic/Collision/CollisionPair.h"
+#include "./src/Logic/Collision/CollisionInteraction.h"
 #include "./src/Logic/Collision/CollisionSide.h"
 #include "./src/Logic/Collision/Collision.h"
 #include "./src/Logic/Collision/CollisionUtils.h"

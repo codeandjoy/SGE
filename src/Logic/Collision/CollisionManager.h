@@ -6,28 +6,22 @@
 #include <unordered_map>
 #include <functional>
 
+#include "../../Manager/StorageManagers/VectorManager.h"
+
 
 namespace sge{
     struct Collision;
-    struct CollisionPair;
     class CollisionShape;
+    class CollisionInteraction;
     class CollisionShapeManager;
 
-    class CollisionManager{
+    class CollisionManager : public sge::VectorManager<CollisionInteraction*>{
         public:
             CollisionManager(CollisionShapeManager* collisionShapeManager): m_collisionShapeManagerPtr(collisionShapeManager){};
-
-            void registerCollisionPair(std::string name, sge::CollisionPair* collisionPair);
-            void deregisterCollisionPair(std::string name);
-            void registerCollisionPairs(std::unordered_map<std::string, CollisionPair*> collisionPairs);
-            void setCollisionPairsOrder(std::vector<std::string> order);
 
             void updateCollisions();
 
         private:
-            std::unordered_map<std::string, sge::CollisionPair*> m_collisionPairs;
-            std::vector<std::string> m_collisionPairsOrder;
-
             CollisionShapeManager* m_collisionShapeManagerPtr;
     };
 }

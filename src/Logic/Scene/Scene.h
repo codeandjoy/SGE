@@ -13,7 +13,6 @@ namespace sge{
     class Entity;
     class DebugEntity;
     class CollisionShape;
-    struct CollisionPair;
 
     class Scene : public sge::StatefulComponent{
         public:

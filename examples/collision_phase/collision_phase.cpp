@@ -5,6 +5,46 @@
 #include "../../SGE.hpp"
 
 
+class PlayerSurfaceInteraction : public sge::CollisionInteraction{
+    public:
+        PlayerSurfaceInteraction(std::vector<sge::DebugEntity*> surfaceDebugEntities) : m_surfaceDebugEntities(surfaceDebugEntities){
+            initiatorGroups = {"player"};
+            recipientGroups = {"surface"};
+        };
+
+
+        bool collisionDetectionAlgorithm(sge::CollisionShape* initiator, sge::CollisionShape* recipient) override{ return sge::boundingBox(initiator, recipient); }
+
+
+        void startPhaseCollisionResponse(std::vector<sge::Collision> collisions) override{
+            for(sge::Collision collision : collisions){
+                for(sge::DebugEntity* surfaceDebugEntitity : m_surfaceDebugEntities){
+                    if(surfaceDebugEntitity->getRelatedEntity() == collision.recipient->getOwnerEntity()){
+                        surfaceDebugEntitity->customCollisionShapeBorderSettings["globalBounds"] = sge::CollisionShapeBorderSettings{sf::Color::Red};
+                    }
+                }
+            }
+        }
+        void continuousPhaseCollisionResponse(std::vector<sge::Collision> collisions) override{
+            sge::resolveAABB(collisions);
+            sge::initiatorStandOnTopOfRecipient(collisions);
+        }
+        void endPhaseCollisionResponse(std::vector<sge::Collision> collisions) override{
+            for(sge::Collision collision : collisions){
+                for(sge::DebugEntity* surfaceDebugEntitity : m_surfaceDebugEntities){
+                    if(surfaceDebugEntitity->getRelatedEntity() == collision.recipient->getOwnerEntity()){
+                        surfaceDebugEntitity->customCollisionShapeBorderSettings["globalBounds"] = sge::CollisionShapeBorderSettings();
+                    }
+                }
+            }
+        }
+
+    private:
+        std::vector<sge::DebugEntity*> m_surfaceDebugEntities;
+};
+
+
+
 int main(){
     sf::RenderWindow* window = new sf::RenderWindow(sf::VideoMode(1000, 600), "CollisionPhase");
     window->setKeyRepeatEnabled(false);
@@ -91,32 +131,7 @@ int main(){
 
 
 
-    sge::CollisionPair* player_surface = new sge::CollisionPair{ "player", "surface" };
-    player_surface->algorithm = sge::boundingBox;
-    player_surface->startPhaseCollisionResponse = [surfaceDebugEntities](std::vector<sge::Collision> collisions){
-        for(sge::Collision collision : collisions){
-            for(sge::DebugEntity* surfaceDebugEntitity : surfaceDebugEntities){
-                if(surfaceDebugEntitity->getRelatedEntity() == collision.recipient->getOwnerEntity()){
-                    surfaceDebugEntitity->customCollisionShapeBorderSettings["globalBounds"] = sge::CollisionShapeBorderSettings{sf::Color::Red};
-                }
-            }
-        }
-    };
-    player_surface->continuousPhaseCollisionResponse = [](std::vector<sge::Collision> collisions){
-        sge::resolveAABB(collisions);
-        sge::initiatorStandOnTopOfRecipient(collisions);
-    };
-    player_surface->endPhaseCollisionResponse = [surfaceDebugEntities](std::vector<sge::Collision> collisions){
-        for(sge::Collision collision : collisions){
-            for(sge::DebugEntity* surfaceDebugEntitity : surfaceDebugEntities){
-                if(surfaceDebugEntitity->getRelatedEntity() == collision.recipient->getOwnerEntity()){
-                    surfaceDebugEntitity->customCollisionShapeBorderSettings["globalBounds"] = sge::CollisionShapeBorderSettings();
-                }
-            }
-        }
-    };
-
-    collisionManager->registerCollisionPair("player_surface", player_surface);
+    collisionManager->registerComponent(new PlayerSurfaceInteraction(surfaceDebugEntities));
 
 
 
