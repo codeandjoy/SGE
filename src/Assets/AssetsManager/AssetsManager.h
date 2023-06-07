@@ -13,6 +13,7 @@
 namespace sge{
     class TextureSheet;
 
+    // TODO return nulls when asset does not exist
     class AssetsManager{
         public:
             void loadTextureSheet(std::string location, std::string name, sge::TextureSheetSizes textureSheetSizes);

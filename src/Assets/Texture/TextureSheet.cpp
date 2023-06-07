@@ -19,8 +19,11 @@ sf::Texture* sge::TextureSheet::getTexture(){ return &m_textureSheet; }
 sf::IntRect sge::TextureSheet::getTextureRect(int textureN, bool isFlippedHorizontally = false, bool isFlippedVertically = false){
     sf::IntRect rect = m_textureRects[textureN];
 
-    if(isFlippedHorizontally) rect.width * -1;
-    if(isFlippedVertically) rect.height * -1;
+    if(isFlippedHorizontally){
+        rect.left += rect.width;
+        rect.width *= -1;
+    }
+    if(isFlippedVertically) rect.height *= -1;
 
     return rect;
 }

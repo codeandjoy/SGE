@@ -64,7 +64,7 @@ class CameraView : public sge::ScriptedView{
     public:
         CameraView(sge::Entity* playerEntity) : m_playerEntityPtr(playerEntity){
             this->setCenter(sf::Vector2f(100, 100));
-            this->setSize(sf::Vector2f(250, 150));
+            this->setSize(sf::Vector2f(500, 300));
         };
 
         void script(){
@@ -88,7 +88,7 @@ class GravityEntity : public sge::MobileEntity{
     public :
         GravityEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position, std::vector<std::string> collisionGroups)
             : sge::MobileEntity(texture, textureRect, position, collisionGroups){
-                physicalObject->acceleration.y = .3; // Gravity
+                physicalObject->acceleration.y = .4; // Gravity
         }
 };
 
@@ -97,13 +97,14 @@ class PlayerEntity : public GravityEntity{
         PlayerEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position, std::vector<std::string> collisionGroups, sge::TextureSheet* animationTextureSheet)
             : GravityEntity(texture, textureRect, position, collisionGroups){
                 animationCluster = new sge::AnimationCluster(sprite);
-                animationCluster->addTextureSequence("idle", new sge::TextureSequence(std::vector<int>{9}, animationTextureSheet));
-                animationCluster->addTextureSequence("runRight", new sge::TextureSequence(std::vector<int>{33, 34, 35}, animationTextureSheet));
-                animationCluster->addTextureSequence("runLeft", new sge::TextureSequence(std::vector<int>{45, 46, 47}, animationTextureSheet));
+                animationCluster->animationDelayMilliseconds = 80;
+                animationCluster->addTextureSequence("idle", new sge::TextureSequence(std::vector<int>{260}, animationTextureSheet));
+                animationCluster->addTextureSequence("runRight", new sge::TextureSequence(std::vector<int>{262, 263, 264}, animationTextureSheet));
+                animationCluster->addTextureSequence("runLeft", new sge::TextureSequence(std::vector<int>{262, 263, 264}, animationTextureSheet, true));
                 animationCluster->setCurrentTextureSequence("idle");
 
-                collisionShapes["global_bounds"]->setSize(sf::Vector2f(8, 4));
-                collisionShapes["global_bounds"]->offset = sf::Vector2f(0, 4);
+                collisionShapes["global_bounds"]->setSize(sf::Vector2f(16, 8));
+                collisionShapes["global_bounds"]->offset = sf::Vector2f(0, 8);
             }
 };
 
@@ -115,11 +116,11 @@ class KeyboardController : public sge::Controller{
 
         void script(sf::Event event) override{
             if(sf::Keyboard::isKeyPressed(sf::Keyboard::A)){
-                m_playerEntityPtr->physicalObject->velocity.x = -70;
+                m_playerEntityPtr->physicalObject->velocity.x = -100;
                 m_playerEntityPtr->animationCluster->setCurrentTextureSequence("runLeft");
             }
             else if(sf::Keyboard::isKeyPressed(sf::Keyboard::D)){
-                m_playerEntityPtr->physicalObject->velocity.x = 70;
+                m_playerEntityPtr->physicalObject->velocity.x = 100;
                 m_playerEntityPtr->animationCluster->setCurrentTextureSequence("runRight");
             }
             else{
@@ -128,7 +129,7 @@ class KeyboardController : public sge::Controller{
             }
 
             if(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space){
-                m_playerEntityPtr->physicalObject->velocity.y = -120;
+                m_playerEntityPtr->physicalObject->velocity.y = -200;
             }
         }
 
@@ -151,19 +152,18 @@ int main(){
 
 
     // Load all textures
-    universe->assetsManager->loadTextureSheet(std::filesystem::current_path().string() + "/examples/dev/assets/pico_8_knight_sprite.png", "knight", sge::TextureSheetSizes{8, 8, 12, 12});
-    universe->assetsManager->loadTextureSheet(std::filesystem::current_path().string() + "/examples/dev/assets/pico_8_tiles.png", "picoTiles", sge::TextureSheetSizes{8, 8, 12, 12});
+    universe->assetsManager->loadTextureSheet(std::filesystem::current_path().string() + "/examples/dev/assets/tilemap.png", "tileset", sge::TextureSheetSizes{16, 16, 20, 20});
     //
 
 
 
     // Player
     PlayerEntity* playerEntity = new PlayerEntity(
-        universe->assetsManager->getTextureSheet("knight")->getTexture(),
-        universe->assetsManager->getTextureSheet("knight")->getTextureRect(9),
-        sf::Vector2f(100, 50),
+        universe->assetsManager->getTextureSheet("tileset")->getTexture(),
+        universe->assetsManager->getTextureSheet("tileset")->getTextureRect(260),
+        sf::Vector2f(200, 100),
         {"player"},
-        universe->assetsManager->getTextureSheet("knight")
+        universe->assetsManager->getTextureSheet("tileset")
     );
 
     sge::DebugEntity* playerDE = new sge::DebugEntity(playerEntity);
@@ -178,7 +178,7 @@ int main(){
 
     // Read map
     tmx::Map map;
-    if(!map.load(std::filesystem::current_path().string() + "/examples/dev/assets/map.tmx")){
+    if(!map.load(std::filesystem::current_path().string() + "/examples/dev/assets/test_map.tmx")){
         printf("Can't load map");
         exit(1);
     }
@@ -195,8 +195,8 @@ int main(){
         for(int j = 0; j < map.getTileCount().x; j++){
             if(tiles[map.getTileCount().x*i+j].ID != 0){
                 mapTileEntities.push_back(new sge::StaticEntity(
-                    universe->assetsManager->getTextureSheet("picoTiles")->getTexture(),
-                    universe->assetsManager->getTextureSheet("picoTiles")->getTextureRect(tiles[map.getTileCount().x*i+j].ID-1),
+                    universe->assetsManager->getTextureSheet("tileset")->getTexture(),
+                    universe->assetsManager->getTextureSheet("tileset")->getTextureRect(tiles[map.getTileCount().x*i+j].ID-1),
                     sf::Vector2f(j*map.getTileSize().x, i*map.getTileSize().y),
                     {"tiles"}
                 ));
@@ -209,8 +209,8 @@ int main(){
     auto& box = boxes[0];
 
     GravityEntity* boxEntity = new GravityEntity(
-        universe->assetsManager->getTextureSheet("picoTiles")->getTexture(),
-        universe->assetsManager->getTextureSheet("picoTiles")->getTextureRect(box.getTileID()-1),
+        universe->assetsManager->getTextureSheet("tileset")->getTexture(),
+        universe->assetsManager->getTextureSheet("tileset")->getTextureRect(box.getTileID()-1),
         sf::Vector2f(box.getPosition().x, box.getPosition().y),
         {"box"}
     );

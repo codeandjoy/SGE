@@ -194,6 +194,7 @@ namespace sge{
 namespace sge{
     class TextureSheet;
 
+    // TODO return nulls when asset does not exist
     class AssetsManager{
         public:
             void loadTextureSheet(std::string location, std::string name, sge::TextureSheetSizes textureSheetSizes);
@@ -1421,8 +1422,11 @@ sf::Texture* sge::TextureSheet::getTexture(){ return &m_textureSheet; }
 sf::IntRect sge::TextureSheet::getTextureRect(int textureN, bool isFlippedHorizontally = false, bool isFlippedVertically = false){
     sf::IntRect rect = m_textureRects[textureN];
 
-    if(isFlippedHorizontally) rect.width * -1;
-    if(isFlippedVertically) rect.height * -1;
+    if(isFlippedHorizontally){
+        rect.left += rect.width;
+        rect.width *= -1;
+    }
+    if(isFlippedVertically) rect.height *= -1;
 
     return rect;
 }
