@@ -70,7 +70,8 @@
 #include "./src/Logic/SpriteText/SpriteTextManager.h"
 
 #include "./src/Logic/Animation/AnimationManager.h"
-#include "./src/Logic/Animation/Animation.h"
+#include "./src/Logic/Animation/AnimationCluster.h"
+#include "./src/Logic/Animation/TextureSequence.h"
 
 #include "./src/Logic/State/State.h"
 #include "./src/Logic/State/StateCluster.h"

@@ -1,3 +1,6 @@
+#ifndef ANIMATION_MANAGER_H
+#define ANIMATION_MANAGER_H
+
 #include <vector>
 
 #include "../../Manager/StorageManagers/VectorManager.h"
@@ -5,13 +8,16 @@
 
 
 namespace sge{
-    class Animation;
+    class AnimationCluster;
 
     class AnimationManager :
-        public sge::VectorManager<sge::Animation*>,
+        public sge::VectorManager<sge::AnimationCluster*>,
         public sge::UpdateManager{
         
         public:
             void update(float dt) override;
     };
 }
+
+
+#endif

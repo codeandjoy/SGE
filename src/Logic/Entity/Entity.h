@@ -11,7 +11,7 @@ namespace sge{
     class CollisionShape;
     class ClickableShape;
     class SpriteText;
-    class Animation;
+    class AnimationCluster;
     class StateCluster;
 
     class Entity : public sge::StatefulComponent{
@@ -21,7 +21,7 @@ namespace sge{
             std::unordered_map<std::string, sge::CollisionShape*> collisionShapes; 
             sge::ClickableShape* clickableShape = nullptr;
             sge::SpriteText* spriteText = nullptr;
-            sge::Animation* animation = nullptr;
+            sge::AnimationCluster* animationCluster = nullptr;
             sge::StateCluster* stateCluster = nullptr;
 
             void activateEntityParts();

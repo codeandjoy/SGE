@@ -63,8 +63,8 @@ void sge::EntityManager::m_registerEntityMembers(sf::View* view, sge::Entity* en
         m_spriteTextManagerPtr->registerComponent(view, entity->spriteText);
     }
     
-    if(entity->animation){
-        m_animationManagerPtr->registerComponent(entity->animation);
+    if(entity->animationCluster){
+        m_animationManagerPtr->registerComponent(entity->animationCluster);
     }
 
     if(entity->stateCluster){
@@ -93,8 +93,8 @@ void sge::EntityManager::m_deregisterEntityMembers(sf::View* view, sge::Entity* 
         m_spriteTextManagerPtr->deregisterComponent(view, entity->spriteText);
     }
 
-    if(entity->animation){
-        m_animationManagerPtr->deregisterComponent(entity->animation);
+    if(entity->animationCluster){
+        m_animationManagerPtr->deregisterComponent(entity->animationCluster);
     }
 
     if(entity->stateCluster){

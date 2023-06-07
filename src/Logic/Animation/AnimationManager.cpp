@@ -1,9 +1,9 @@
 #include "AnimationManager.h"
-#include "Animation.h"
+#include "AnimationCluster.h"
 
 
 void sge::AnimationManager::update(float dt){
-    for(sge::Animation* animation : m_components){
-        if(animation->isActive) animation->runForward();
+    for(sge::AnimationCluster* animation : m_components){
+        if(animation->isActive) animation->run();
     }
 }

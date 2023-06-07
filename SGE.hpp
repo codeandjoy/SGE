@@ -233,7 +233,7 @@ namespace sge{
 
             std::string getLocation();
             sf::Texture* getTexture();
-            sf::IntRect getTextureRect(int textureN);
+            sf::IntRect getTextureRect(int textureN, bool isFlippedHorizontally, bool isFlippedVertically);
 
         private:
             std::string m_location;
@@ -816,21 +816,26 @@ namespace sge{
 
 #endif
 
+#ifndef ANIMATION_MANAGER_H
+#define ANIMATION_MANAGER_H
+
 #include <vector>
 
 namespace sge{
-    class Animation;
+    class AnimationCluster;
 
     class AnimationManager :
-        public sge::VectorManager<sge::Animation*>,
+        public sge::VectorManager<sge::AnimationCluster*>,
         public sge::UpdateManager{
         
         public:
             void update(float dt) override;
     };
 }
-#ifndef ANIMATION_H
-#define ANIMATION_H
+
+#endif
+#ifndef ANIMATION_CLUSTER_H
+#define ANIMATION_CLUSTER_H
 
 #include <SFML/Graphics.hpp>
 #include <string>
@@ -838,31 +843,48 @@ namespace sge{
 #include <vector>
 
 namespace sge{
-    class TextureSheet;
+    class TextureSequence;
 
-    class Animation : public sge::StatefulComponent{
+    class AnimationCluster : public sge::StatefulComponent{
         public:
-            Animation(sge::TextureSheet* textureSheet, sf::Sprite* ownerSprite, int initialTextureN);
+            AnimationCluster(sf::Sprite* ownerSprite) : m_ownerSpritePtr(ownerSprite){};
         
             int animationDelayMilliseconds = 100;
             
-            void addTextureSequence(std::string name, std::vector<int> textureSequence);
+            void addTextureSequence(std::string name, TextureSequence* animationSequence);
             void setCurrentTextureSequence(std::string name);
         
-            void runForward();
-            // TODO
-            // animationType : forward or cycle, run function in manager based on animation type
-            // runCycle()  1 2 3 2 1
+            void run();
 
         private:
             sf::Sprite* m_ownerSpritePtr;
-            sge::TextureSheet* m_textureSheet;
             
+            std::unordered_map<std::string, TextureSequence*> m_textureSequences;
+            void m_updateTexture();
+
             sf::Clock m_clock;
-            std::unordered_map<std::string, std::vector<int>> m_textureSequences; // e.g. "idle": [5, 6, 7, 8]
             std::string m_currentTextureSequence;
             int m_currentTextureN = 0;
+    };
+}
 
+#endif
+#ifndef TEXTURE_SEQUENCE_H
+#define TEXTURE_SEQUENCE_H
+
+#include <SFML/Graphics.hpp>
+#include <vector>
+
+namespace sge{
+    class TextureSheet;    
+
+    class TextureSequence{
+        public:
+            TextureSequence(std::vector<int> textureSequence, sge::TextureSheet* textureSheetPtr, bool isFlippedHorizontally, bool isFlippedVertically);
+
+            std::vector<sf::IntRect> sequenceRects;
+            TextureSheet* textureSheet;
+            // TODO create runForward / cycle flags and use them in 'Animation'
     };
 }
 
@@ -945,7 +967,7 @@ namespace sge{
     class CollisionShape;
     class ClickableShape;
     class SpriteText;
-    class Animation;
+    class AnimationCluster;
     class StateCluster;
 
     class Entity : public sge::StatefulComponent{
@@ -955,7 +977,7 @@ namespace sge{
             std::unordered_map<std::string, sge::CollisionShape*> collisionShapes; 
             sge::ClickableShape* clickableShape = nullptr;
             sge::SpriteText* spriteText = nullptr;
-            sge::Animation* animation = nullptr;
+            sge::AnimationCluster* animationCluster = nullptr;
             sge::StateCluster* stateCluster = nullptr;
 
             void activateEntityParts();
@@ -1396,7 +1418,14 @@ sge::TextureSheet::TextureSheet(sge::TextureSheetSizes textureSheetSizes, std::s
 
 std::string sge::TextureSheet::getLocation(){ return m_location; }
 sf::Texture* sge::TextureSheet::getTexture(){ return &m_textureSheet; }
-sf::IntRect sge::TextureSheet::getTextureRect(int textureN){ return m_textureRects[textureN]; }
+sf::IntRect sge::TextureSheet::getTextureRect(int textureN, bool isFlippedHorizontally = false, bool isFlippedVertically = false){
+    sf::IntRect rect = m_textureRects[textureN];
+
+    if(isFlippedHorizontally) rect.width * -1;
+    if(isFlippedVertically) rect.height * -1;
+
+    return rect;
+}
 
 
 sge::DebugEntity::DebugEntity(sge::Entity* relatedEntity){ m_relatedEntity = relatedEntity; }
@@ -1782,48 +1811,55 @@ void sge::SpriteTextManager::draw(sf::RenderWindow* window){
 
 
 void sge::AnimationManager::update(float dt){
-    for(sge::Animation* animation : m_components){
-        if(animation->isActive) animation->runForward();
+    for(sge::AnimationCluster* animation : m_components){
+        if(animation->isActive) animation->run();
     }
 }
 
 
-sge::Animation::Animation(sge::TextureSheet* textureSheet, sf::Sprite* ownerSprite, int initialTextureN){
-    m_textureSheet = textureSheet;
-    m_ownerSpritePtr = ownerSprite;
-    
-    m_ownerSpritePtr->setTexture(*textureSheet->getTexture());
-    m_ownerSpritePtr->setTextureRect(textureSheet->getTextureRect(initialTextureN));
-}
-
-void sge::Animation::addTextureSequence(std::string name, std::vector<int> textureSequence){ m_textureSequences[name] = textureSequence; }
-void sge::Animation::setCurrentTextureSequence(std::string name){
+void sge::AnimationCluster::addTextureSequence(std::string name, TextureSequence* textureSequence){ m_textureSequences[name] = textureSequence; }
+void sge::AnimationCluster::setCurrentTextureSequence(std::string name){
     m_clock.restart();
     m_currentTextureSequence = name;
     m_currentTextureN = 0;
 
-    m_ownerSpritePtr->setTextureRect(m_textureSheet->getTextureRect(m_textureSequences[m_currentTextureSequence].at(m_currentTextureN)));
+    m_updateTexture();
 }
 
-void sge::Animation::runForward(){
+void sge::AnimationCluster::run(){
     if(!m_textureSequences.size()){
         printf("No texture sequences initialized.\n");
         exit(1);
     }
     if(!m_currentTextureSequence.length()){
-        printf("Can not run animation if no current texture sequence is set.\n"); // ? Default to first added ?
+        printf("Can not run AnimationCluster if no current texture sequence is set.\n"); // ? Default to first added ?
         exit(1);
     }
 
     if(m_clock.getElapsedTime().asMilliseconds() > animationDelayMilliseconds){
-        m_ownerSpritePtr->setTextureRect(m_textureSheet->getTextureRect(m_textureSequences[m_currentTextureSequence].at(m_currentTextureN)));
-        
-        if(m_currentTextureN+1 == m_textureSequences[m_currentTextureSequence].size()){
+        m_updateTexture();
+
+        if(m_currentTextureN+1 == m_textureSequences[m_currentTextureSequence]->sequenceRects.size()){
             m_currentTextureN = 0;
         }
         else m_currentTextureN++;
 
         m_clock.restart();
+    }
+}
+
+void sge::AnimationCluster::m_updateTexture(){
+    m_ownerSpritePtr->setTexture(*m_textureSequences[m_currentTextureSequence]->textureSheet->getTexture());
+    m_ownerSpritePtr->setTextureRect(m_textureSequences[m_currentTextureSequence]->sequenceRects[m_currentTextureN]);
+}
+
+
+sge::TextureSequence::TextureSequence(std::vector<int> textureSequence, sge::TextureSheet* textureSheetPtr, bool isFlippedHorizontally = false, bool isFlippedVertically = false){
+    textureSheet = textureSheetPtr;
+
+    for(int n : textureSequence){
+        sf::IntRect rect = textureSheet->getTextureRect(n, isFlippedHorizontally, isFlippedVertically);
+        sequenceRects.push_back(rect);
     }
 }
 
@@ -1858,7 +1894,7 @@ void sge::Entity::activateEntityParts(){
     }
     if(clickableShape) clickableShape->activate();
     if(spriteText) spriteText->activate();
-    if(animation) animation->activate();
+    if(animationCluster) animationCluster->activate();
     if(stateCluster) stateCluster->activate();
 
     sge::StatefulComponent::activate();
@@ -1872,7 +1908,7 @@ void sge::Entity::pauseEntityParts(){
     }
     if(clickableShape) clickableShape->pause();
     if(spriteText) spriteText->pause();
-    if(animation) animation->pause();
+    if(animationCluster) animationCluster->pause();
     if(stateCluster) stateCluster->pause();
 
     sge::StatefulComponent::pause();
@@ -1886,7 +1922,7 @@ void sge::Entity::hideEntityParts(){
     }
     if(clickableShape) clickableShape->hide();
     if(spriteText) spriteText->hide();
-    if(animation) animation->hide();
+    if(animationCluster) animationCluster->hide();
     if(stateCluster) stateCluster->hide();
 
     sge::StatefulComponent::hide();
@@ -1942,8 +1978,8 @@ void sge::EntityManager::m_registerEntityMembers(sf::View* view, sge::Entity* en
         m_spriteTextManagerPtr->registerComponent(view, entity->spriteText);
     }
     
-    if(entity->animation){
-        m_animationManagerPtr->registerComponent(entity->animation);
+    if(entity->animationCluster){
+        m_animationManagerPtr->registerComponent(entity->animationCluster);
     }
 
     if(entity->stateCluster){
@@ -1972,8 +2008,8 @@ void sge::EntityManager::m_deregisterEntityMembers(sf::View* view, sge::Entity* 
         m_spriteTextManagerPtr->deregisterComponent(view, entity->spriteText);
     }
 
-    if(entity->animation){
-        m_animationManagerPtr->deregisterComponent(entity->animation);
+    if(entity->animationCluster){
+        m_animationManagerPtr->deregisterComponent(entity->animationCluster);
     }
 
     if(entity->stateCluster){

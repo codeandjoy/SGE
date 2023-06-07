@@ -15,7 +15,7 @@ namespace sge{
 
             std::string getLocation();
             sf::Texture* getTexture();
-            sf::IntRect getTextureRect(int textureN);
+            sf::IntRect getTextureRect(int textureN, bool isFlippedHorizontally, bool isFlippedVertically);
 
         private:
             std::string m_location;

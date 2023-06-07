@@ -16,4 +16,11 @@ sge::TextureSheet::TextureSheet(sge::TextureSheetSizes textureSheetSizes, std::s
 
 std::string sge::TextureSheet::getLocation(){ return m_location; }
 sf::Texture* sge::TextureSheet::getTexture(){ return &m_textureSheet; }
-sf::IntRect sge::TextureSheet::getTextureRect(int textureN){ return m_textureRects[textureN]; }
+sf::IntRect sge::TextureSheet::getTextureRect(int textureN, bool isFlippedHorizontally = false, bool isFlippedVertically = false){
+    sf::IntRect rect = m_textureRects[textureN];
+
+    if(isFlippedHorizontally) rect.width * -1;
+    if(isFlippedVertically) rect.height * -1;
+
+    return rect;
+}

@@ -4,7 +4,7 @@
 #include "../CollisionShape/CollisionShape.h"
 #include "../ClickableShape/ClickableShape.h"
 #include "../SpriteText/SpriteText.h"
-#include "../Animation/Animation.h"
+#include "../Animation/AnimationCluster.h"
 #include "../State/StateCluster.h"
 
 void sge::Entity::activateEntityParts(){
@@ -15,7 +15,7 @@ void sge::Entity::activateEntityParts(){
     }
     if(clickableShape) clickableShape->activate();
     if(spriteText) spriteText->activate();
-    if(animation) animation->activate();
+    if(animationCluster) animationCluster->activate();
     if(stateCluster) stateCluster->activate();
 
     sge::StatefulComponent::activate();
@@ -29,7 +29,7 @@ void sge::Entity::pauseEntityParts(){
     }
     if(clickableShape) clickableShape->pause();
     if(spriteText) spriteText->pause();
-    if(animation) animation->pause();
+    if(animationCluster) animationCluster->pause();
     if(stateCluster) stateCluster->pause();
 
     sge::StatefulComponent::pause();
@@ -43,7 +43,7 @@ void sge::Entity::hideEntityParts(){
     }
     if(clickableShape) clickableShape->hide();
     if(spriteText) spriteText->hide();
-    if(animation) animation->hide();
+    if(animationCluster) animationCluster->hide();
     if(stateCluster) stateCluster->hide();
 
     sge::StatefulComponent::hide();

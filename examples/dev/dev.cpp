@@ -96,11 +96,11 @@ class PlayerEntity : public GravityEntity{
     public:
         PlayerEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position, std::vector<std::string> collisionGroups, sge::TextureSheet* animationTextureSheet)
             : GravityEntity(texture, textureRect, position, collisionGroups){
-                animation = new sge::Animation(animationTextureSheet, sprite, 9);
-                animation->addTextureSequence("idle", std::vector<int>{9});
-                animation->addTextureSequence("runRight", std::vector<int>{33, 34, 35});
-                animation->addTextureSequence("runLeft", std::vector<int>{45, 46, 47});
-                animation->setCurrentTextureSequence("idle");
+                animationCluster = new sge::AnimationCluster(sprite);
+                animationCluster->addTextureSequence("idle", new sge::TextureSequence(std::vector<int>{9}, animationTextureSheet));
+                animationCluster->addTextureSequence("runRight", new sge::TextureSequence(std::vector<int>{33, 34, 35}, animationTextureSheet));
+                animationCluster->addTextureSequence("runLeft", new sge::TextureSequence(std::vector<int>{45, 46, 47}, animationTextureSheet));
+                animationCluster->setCurrentTextureSequence("idle");
 
                 collisionShapes["global_bounds"]->setSize(sf::Vector2f(8, 4));
                 collisionShapes["global_bounds"]->offset = sf::Vector2f(0, 4);
@@ -116,15 +116,15 @@ class KeyboardController : public sge::Controller{
         void script(sf::Event event) override{
             if(sf::Keyboard::isKeyPressed(sf::Keyboard::A)){
                 m_playerEntityPtr->physicalObject->velocity.x = -70;
-                m_playerEntityPtr->animation->setCurrentTextureSequence("runLeft");
+                m_playerEntityPtr->animationCluster->setCurrentTextureSequence("runLeft");
             }
             else if(sf::Keyboard::isKeyPressed(sf::Keyboard::D)){
                 m_playerEntityPtr->physicalObject->velocity.x = 70;
-                m_playerEntityPtr->animation->setCurrentTextureSequence("runRight");
+                m_playerEntityPtr->animationCluster->setCurrentTextureSequence("runRight");
             }
             else{
                 m_playerEntityPtr->physicalObject->velocity.x = 0;
-                m_playerEntityPtr->animation->setCurrentTextureSequence("idle");
+                m_playerEntityPtr->animationCluster->setCurrentTextureSequence("idle");
             }
 
             if(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space){
