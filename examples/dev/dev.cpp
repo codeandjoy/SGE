@@ -34,7 +34,7 @@ class PushInteraction : public sge::CollisionInteraction{
         bool collisionDetectionAlgorithm(sge::CollisionShape* initiator, sge::CollisionShape* recipient) override{ return sge::boundingBox(initiator, recipient); }
     
         void startPhaseCollisionResponse(std::vector<sge::Collision> collisions) override{
-            boxDE->customCollisionShapeBorderSettings["globalBounds"] = sge::CollisionShapeBorderSettings{sf::Color::Red};
+            boxDE->customCollisionShapeBorderSettings["global_bounds"] = sge::CollisionShapeBorderSettings{sf::Color::Red};
 
             for(sge::Collision collision : collisions){
                 if(collision.recipientImpactSide == sge::CollisionSide::right){
@@ -47,7 +47,7 @@ class PushInteraction : public sge::CollisionInteraction{
         }
 
         void endPhaseCollisionResponse(std::vector<sge::Collision> collisions) override{
-            boxDE->customCollisionShapeBorderSettings["globalBounds"] = sge::CollisionShapeBorderSettings{sf::Color::Green};
+            boxDE->customCollisionShapeBorderSettings["global_bounds"] = sge::CollisionShapeBorderSettings{sf::Color::Green};
         
             for(sge::Collision collision : collisions){
                 collision.recipient->getOwnerEntity()->physicalObject->velocity.x = 0;
@@ -101,7 +101,39 @@ class PlayerEntity : public GravityEntity{
                 animation->addTextureSequence("runRight", std::vector<int>{33, 34, 35});
                 animation->addTextureSequence("runLeft", std::vector<int>{45, 46, 47});
                 animation->setCurrentTextureSequence("idle");
+
+                collisionShapes["global_bounds"]->setSize(sf::Vector2f(8, 4));
+                collisionShapes["global_bounds"]->offset = sf::Vector2f(0, 4);
             }
+};
+
+
+
+class KeyboardController : public sge::Controller{
+    public:
+        KeyboardController(sge::Entity* playerEntity) : m_playerEntityPtr(playerEntity){}; 
+
+        void script(sf::Event event) override{
+            if(sf::Keyboard::isKeyPressed(sf::Keyboard::A)){
+                m_playerEntityPtr->physicalObject->velocity.x = -70;
+                m_playerEntityPtr->animation->setCurrentTextureSequence("runLeft");
+            }
+            else if(sf::Keyboard::isKeyPressed(sf::Keyboard::D)){
+                m_playerEntityPtr->physicalObject->velocity.x = 70;
+                m_playerEntityPtr->animation->setCurrentTextureSequence("runRight");
+            }
+            else{
+                m_playerEntityPtr->physicalObject->velocity.x = 0;
+                m_playerEntityPtr->animation->setCurrentTextureSequence("idle");
+            }
+
+            if(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space){
+                m_playerEntityPtr->physicalObject->velocity.y = -120;
+            }
+        }
+
+    private:
+        sge::Entity* m_playerEntityPtr;
 };
 
 
@@ -137,7 +169,7 @@ int main(){
     );
 
     sge::DebugEntity* playerDE = new sge::DebugEntity(playerEntity);
-    playerDE->customCollisionShapeBorderSettings["globalBounds"] = sge::CollisionShapeBorderSettings{sf::Color::Red};
+    playerDE->customCollisionShapeBorderSettings["global_bounds"] = sge::CollisionShapeBorderSettings{sf::Color::Red};
     // Extra debug function example
     // playerDE->addExtraDebugFunction([playerEntity](auto _){
     //     printf("%f, %f\n", playerEntity->getPosition().x, playerEntity->getPosition().y);
@@ -186,7 +218,7 @@ int main(){
     );
 
     sge::DebugEntity* boxDE = new sge::DebugEntity(boxEntity);
-    boxDE->customCollisionShapeBorderSettings["globalBounds"] = sge::CollisionShapeBorderSettings{sf::Color::Green};
+    boxDE->customCollisionShapeBorderSettings["global_bounds"] = sge::CollisionShapeBorderSettings{sf::Color::Green};
     //
     
 
@@ -209,37 +241,16 @@ int main(){
 
 
 
-    // Collision management
     // * Notes:
     // ! The collision shape CAN NOT be the initiator AND the recepient of the AABB response
     // ! To work properly, all AABB recipients with common initiator should be put together
-
     universe->collisionManager->registerComponent(new AABBInteraction({"player"}, {"tiles", "box"}));
     universe->collisionManager->registerComponent(new AABBInteraction({"box"}, {"tiles"}));
     universe->collisionManager->registerComponent(new PushInteraction({"player"}, {"box"}, boxDE));
 
 
 
-    // Controllers and events
-    universe->controllerManager->registerComponent([playerEntity](sf::Event event){
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::A)){
-            playerEntity->physicalObject->velocity.x = -70;
-            playerEntity->animation->setCurrentTextureSequence("runLeft");
-        }
-        else if(sf::Keyboard::isKeyPressed(sf::Keyboard::D)){
-            playerEntity->physicalObject->velocity.x = 70;
-            playerEntity->animation->setCurrentTextureSequence("runRight");
-        }
-        else{
-            playerEntity->physicalObject->velocity.x = 0;
-            playerEntity->animation->setCurrentTextureSequence("idle");
-        }
-
-        if(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space){
-            playerEntity->physicalObject->velocity.y = -120;
-        }
-    });
-    //
+    universe->controllerManager->registerComponent(new KeyboardController(playerEntity));
 
 
 

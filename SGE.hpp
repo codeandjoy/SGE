@@ -34,7 +34,6 @@ namespace sge{
         public:
             Universe(sf::RenderWindow* window);
 
-            bool isPaused = false;
             float dtCap = .15f;
 
             void setupDebug();
@@ -370,8 +369,10 @@ namespace sge{
 #endif
 
 namespace sge{
+    class Controller;
+
     class ControllerManager :
-        public sge::VectorManager<std::function<void(sf::Event)>>,
+        public sge::VectorManager<sge::Controller*>,
         public sge::EventManager{
 
         public:
@@ -1329,10 +1330,13 @@ void sge::Universe::loop(){
     m_deltaClock.restart();
 
     while(m_windowPtr->isOpen()){
+        // dt
         sf::Time deltaTime = m_deltaClock.restart();
         float dt = deltaTime.asSeconds();
         if(dt > dtCap) dt = dtCap;
+        //
 
+        // Event
         sf::Event event;
         while(m_windowPtr->pollEvent(event)){
             if(event.type == sf::Event::Closed) m_windowPtr->close();
@@ -1340,22 +1344,24 @@ void sge::Universe::loop(){
             controllerManager->processEvent(event);
             m_clickableShapeManager->processEvent(event);
         }
+        //
 
-        if(!isPaused){
-            m_physicsManager->update(dt);
-            m_collisionShapeManager->update(dt);
-            m_clickableShapeManager->update(dt);
-            m_spriteTextManager->update(dt);
-            m_stateManager->update(dt);
-            collisionManager->updateCollisions();
+        // Update
+        m_physicsManager->update(dt);
+        m_collisionShapeManager->update(dt);
+        m_clickableShapeManager->update(dt);
+        m_spriteTextManager->update(dt);
+        m_stateManager->update(dt);
+        collisionManager->updateCollisions();
 
-            m_animationManager->update(dt);
-            scriptedViewManager->update(dt);
+        m_animationManager->update(dt);
+        scriptedViewManager->update(dt);
 
-            drumSceneManager->alignScene(); // Scene can be reset only after all managers finished their updates to prevent segfaults in loops
-        }
+        drumSceneManager->alignScene(); // Scene can be reset only after all managers finished their updates to prevent segfaults in loops
+        //
+
         
-        
+        // Draw
         m_windowPtr->clear();
         
         m_spriteManager->draw(m_windowPtr);
@@ -1363,6 +1369,7 @@ void sge::Universe::loop(){
         if(debugManager) debugManager->draw(m_windowPtr);
 
         m_windowPtr->display();
+        //
     }
 }
 
@@ -1467,10 +1474,23 @@ sge::CollisionShapeBorder::CollisionShapeBorder(sge::CollisionShape* owner, sge:
     this->setSize(sf::Vector2f(owner->getSize().x - settings.thickness*2, owner->getSize().y - settings.thickness*2));
 }
 
+#ifndef CONTROLLER_H
+#define CONTROLLER_H
+
+#include <SFML/Graphics.hpp>
+
+namespace sge{
+    class Controller{
+        public: 
+            virtual void script(sf::Event event){};
+    };
+}
+
+#endif
 
 void sge::ControllerManager::processEvent(sf::Event event){
-    for(std::function<void(sf::Event)> controller : m_components){
-        controller(event);
+    for(sge::Controller* controller : m_components){
+        controller->script(event);
     }
 }
 

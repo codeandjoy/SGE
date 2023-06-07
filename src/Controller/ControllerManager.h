@@ -10,8 +10,10 @@
 
 
 namespace sge{
+    class Controller;
+
     class ControllerManager :
-        public sge::VectorManager<std::function<void(sf::Event)>>,
+        public sge::VectorManager<sge::Controller*>,
         public sge::EventManager{
 
         public:

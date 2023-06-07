@@ -1,8 +1,9 @@
 #include "ControllerManager.h"
+#include "Controller.h"
 
 
 void sge::ControllerManager::processEvent(sf::Event event){
-    for(std::function<void(sf::Event)> controller : m_components){
-        controller(event);
+    for(sge::Controller* controller : m_components){
+        controller->script(event);
     }
 }
