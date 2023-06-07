@@ -110,7 +110,7 @@ int main(){
                     universe->assetsManager->getTextureSheet("picoTiles")->getTexture(),
                     universe->assetsManager->getTextureSheet("picoTiles")->getTextureRect(tiles[map.getTileCount().x*i+j].ID-1),
                     sf::Vector2f(j*map.getTileSize().x, i*map.getTileSize().y),
-                    {"tiles", "tiles+box", "tiles+player"}
+                    {"tiles"}
                 ));
             }
         }
@@ -130,7 +130,7 @@ int main(){
         universe->assetsManager->getTextureSheet("picoTiles")->getTexture(),
         universe->assetsManager->getTextureSheet("picoTiles")->getTextureRect(box.getTileID()-1),
         sf::Vector2f(box.getPosition().x, box.getPosition().y),
-        {"box", "tiles+box"}
+        {"box"}
     );
 
     boxEntity->physicalObject->acceleration.y = GRAVITY;
@@ -150,7 +150,7 @@ int main(){
         universe->assetsManager->getTextureSheet("knight")->getTexture(),
         universe->assetsManager->getTextureSheet("knight")->getTextureRect(9),
         sf::Vector2f(100, 50),
-        {"player", "tiles+player"}
+        {"player"}
     );
 
     playerEntity->collisionShapes["globalBounds"]->setSize(sf::Vector2f(8, 4));
