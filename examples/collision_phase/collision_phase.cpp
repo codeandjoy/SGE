@@ -7,10 +7,12 @@
 
 class PlayerSurfaceInteraction : public sge::CollisionInteraction{
     public:
-        PlayerSurfaceInteraction(std::vector<sge::DebugEntity*> surfaceDebugEntities) : m_surfaceDebugEntities(surfaceDebugEntities){
-            initiatorGroups = {"player"};
-            recipientGroups = {"surface"};
-        };
+        PlayerSurfaceInteraction(
+            std::vector<std::string> initiatorGroups,
+            std::vector<std::string> recipientGroups,
+            std::vector<sge::DebugEntity*> surfaceDebugEntities)
+                : sge::CollisionInteraction(initiatorGroups, recipientGroups),
+                  m_surfaceDebugEntities(surfaceDebugEntities){};
 
 
         bool collisionDetectionAlgorithm(sge::CollisionShape* initiator, sge::CollisionShape* recipient) override{ return sge::boundingBox(initiator, recipient); }
@@ -131,7 +133,7 @@ int main(){
 
 
 
-    collisionManager->registerComponent(new PlayerSurfaceInteraction(surfaceDebugEntities));
+    collisionManager->registerComponent(new PlayerSurfaceInteraction({"player"}, {"surface"}, surfaceDebugEntities));
 
 
 

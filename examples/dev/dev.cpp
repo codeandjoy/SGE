@@ -6,6 +6,59 @@
 
 #include "../../SGE.hpp"
 
+
+class AABBInteraction : public sge::CollisionInteraction{
+    public:
+        AABBInteraction(std::vector<std::string> initiatorGroups, std::vector<std::string> recipientGroups) : sge::CollisionInteraction(initiatorGroups, recipientGroups){};
+
+        bool collisionDetectionAlgorithm(sge::CollisionShape* initiator, sge::CollisionShape* recipient) override{ return sge::boundingBox(initiator, recipient); }
+    
+        void startPhaseCollisionResponse(std::vector<sge::Collision> collisions) override{
+            printf("star_phase\n");            
+        }
+
+        void continuousPhaseCollisionResponse(std::vector<sge::Collision> collisions) override{
+            sge::resolveAABB(collisions);
+            sge::initiatorStandOnTopOfRecipient(collisions);
+        }
+
+        void endPhaseCollisionResponse(std::vector<sge::Collision> collisions) override{
+            printf("end_phase\n");            
+        }
+};
+
+class PushInteraction : public sge::CollisionInteraction{
+    public:
+        PushInteraction(std::vector<std::string> initiatorGroups, std::vector<std::string> recipientGroups, sge::DebugEntity* boxDE) : sge::CollisionInteraction(initiatorGroups, recipientGroups), boxDE(boxDE){};
+
+        bool collisionDetectionAlgorithm(sge::CollisionShape* initiator, sge::CollisionShape* recipient) override{ return sge::boundingBox(initiator, recipient); }
+    
+        void startPhaseCollisionResponse(std::vector<sge::Collision> collisions) override{
+            boxDE->customCollisionShapeBorderSettings["globalBounds"] = sge::CollisionShapeBorderSettings{sf::Color::Red};
+
+            for(sge::Collision collision : collisions){
+                if(collision.recipientImpactSide == sge::CollisionSide::right){
+                    collision.recipient->getOwnerEntity()->physicalObject->velocity.x = -10;
+                }
+                else if(collision.recipientImpactSide == sge::CollisionSide::left){
+                    collision.recipient->getOwnerEntity()->physicalObject->velocity.x = 10;
+                }
+            }            
+        }
+
+        void endPhaseCollisionResponse(std::vector<sge::Collision> collisions) override{
+            boxDE->customCollisionShapeBorderSettings["globalBounds"] = sge::CollisionShapeBorderSettings{sf::Color::Green};
+        
+            for(sge::Collision collision : collisions){
+                collision.recipient->getOwnerEntity()->physicalObject->velocity.x = 0;
+            }          
+        }
+    
+    private:
+        sge::DebugEntity* boxDE;
+};
+
+
 int main(){
     const float GRAVITY = .3;
 
@@ -142,60 +195,9 @@ int main(){
     // ? to remove the need of creating extra collision groups like "tiles+box"
 
     // To work properly, all AABB shapes should be checked together
-    sge::CollisionPair* playerAABB = new sge::CollisionPair{"player", "tiles+box"};
-    playerAABB->algorithm = sge::boundingBox;
-    playerAABB->startPhaseCollisionResponse = [](std::vector<sge::Collision> collisions){
-        printf("start_phase\n");
-    };
-    playerAABB->continuousPhaseCollisionResponse = [](std::vector<sge::Collision> collisions){
-        // printf("continuous_phase\n");
-        sge::resolveAABB(collisions);
-        sge::initiatorStandOnTopOfRecipient(collisions);
-    };
-    playerAABB->endPhaseCollisionResponse = [](std::vector<sge::Collision> collisions){
-        printf("end_phase\n");
-    };
-
-    universe->collisionManager->registerCollisionPair("playerAABB", playerAABB);
-
-
-    // To work properly, all AABB shapes should be checked together
-    sge::CollisionPair* boxAABB = new sge::CollisionPair{"box", "tiles"};
-    boxAABB->algorithm = sge::boundingBox;
-    boxAABB->continuousPhaseCollisionResponse = [](std::vector<sge::Collision> collisions){
-        sge::resolveAABB(collisions);
-        sge::initiatorStandOnTopOfRecipient(collisions);
-    };
-
-    universe->collisionManager->registerCollisionPair("boxAABB", boxAABB);
-    
-
-    sge::CollisionPair* player_box = new sge::CollisionPair{"player", "box"};
-    player_box->algorithm = sge::boundingBox;
-    player_box->startPhaseCollisionResponse = [boxDE](std::vector<sge::Collision> collisions){
-        boxDE->customCollisionShapeBorderSettings["globalBounds"] = sge::CollisionShapeBorderSettings{sf::Color::Red};
-
-        // Refactor as pushRecipient(float velocity);
-        for(sge::Collision collision : collisions){
-            if(collision.recipientImpactSide == sge::CollisionSide::right){
-                collision.recipient->getOwnerEntity()->physicalObject->velocity.x = -10;
-            }
-            else if(collision.recipientImpactSide == sge::CollisionSide::left){
-                collision.recipient->getOwnerEntity()->physicalObject->velocity.x = 10;
-            }
-        }
-    };
-    player_box->endPhaseCollisionResponse = [boxDE](std::vector<sge::Collision> collisions){
-        boxDE->customCollisionShapeBorderSettings["globalBounds"] = sge::CollisionShapeBorderSettings{sf::Color::Green};
-        
-        for(sge::Collision collision : collisions){
-            // TODO remove (minus) push force in the future
-            collision.recipient->getOwnerEntity()->physicalObject->velocity.x = 0;
-        }
-    };
-
-    universe->collisionManager->registerCollisionPair("player_box", player_box);
-    //
+    universe->collisionManager->registerComponent(new AABBInteraction({"player"}, {"tiles", "box"}));
+    universe->collisionManager->registerComponent(new AABBInteraction({"box"}, {"tiles"}));
+    universe->collisionManager->registerComponent(new PushInteraction({"player"}, {"box"}, boxDE));
 
 
 

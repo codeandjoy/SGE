@@ -15,6 +15,9 @@ namespace sge{
         friend class CollisionManager;
         
         public:
+            CollisionInteraction(std::vector<std::string> initiatorGroups, std::vector<std::string> recipientGroups)
+                : initiatorGroups(initiatorGroups), recipientGroups(recipientGroups){};
+
             std::vector<std::string> initiatorGroups = {};
             std::vector<std::string> recipientGroups = {};
 
