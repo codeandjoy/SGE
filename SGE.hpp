@@ -1025,34 +1025,6 @@ namespace sge{
 }
 
 #endif
-#ifndef ENTITY_BUILDERS_H
-#define ENTITY_BUILDERS_H
-
-#include <SFML/Graphics.hpp>
-#include <vector>
-#include <string>
-
-namespace sge{
-    class Entity;
-    
-    // Builds sge::Entity that consists only of sf::Sprite*
-    Entity* buildPlainEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position);
-
-    // Builds sge::Entity that consists of sf::Sprite* with empty textture and "globalBounds" -> sge::CollisionShape*
-    Entity* buildVoidEntity(sf::Vector2f size, sf::Vector2f position, std::vector<std::string> collisionGroups = {});
-
-    // Builds sge::Entity that consists of sf::Sprite* and "globalBounds" -> sge::CollisionShape*
-    Entity* buildStaticEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position, std::vector<std::string> collisionGroups = {});
-
-    // Builds sge::Entity that consists of sf::Sprite*, sge::PhysicalObject* and "globalBounds" -> sge::CollisionShape*
-    //
-    // PhysicalObject added continuous computations:
-    // "updateVelocity" -> updateVelocityBasedOnAcceleration()
-    // "updatePosition" -> updatePositionBasedOnVelocity()
-    Entity* buildMobileEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position, std::vector<std::string> collisionGroups = {});
-}
-
-#endif
 #ifndef PLAIN_ENTITY_H
 #define PLAIN_ENTITY_H
 
@@ -2007,47 +1979,6 @@ void sge::EntityManager::m_deregisterEntityMembers(sf::View* view, sge::Entity* 
     if(entity->stateCluster){
         m_stateManagerPtr->deregisterComponent(entity->stateCluster);
     }
-}
-
-
-sge::Entity* sge::buildPlainEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position){
-    sge::Entity* e = new sge::Entity();
-    e->sprite = new sge::Sprite(*texture, textureRect);
-    e->sprite->setPosition(position);
-
-    return e;
-}
-
-sge::Entity* sge::buildVoidEntity(sf::Vector2f size, sf::Vector2f position, std::vector<std::string> collisionGroups){
-    sge::Entity* e = new sge::Entity();
-    e->sprite = new sge::Sprite();
-    e->sprite->setPosition(position);
-
-    e->collisionShapes["globalBounds"] = new sge::CollisionShape(e);
-    e->collisionShapes["globalBounds"]->setSize(size);
-    if(collisionGroups.size()) e->collisionShapes["globalBounds"]->collisionGroups = collisionGroups;
-
-    return e;
-}
-
-sge::Entity* sge::buildStaticEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position, std::vector<std::string> collisionGroups){
-    sge::Entity* e = sge::buildPlainEntity(texture, textureRect, position);
-
-    e->collisionShapes["globalBounds"] = new sge::CollisionShape(e);
-    if(collisionGroups.size()) e->collisionShapes["globalBounds"]->collisionGroups = collisionGroups;
-
-    return e;
-}
-
-sge::Entity* sge::buildMobileEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position, std::vector<std::string> collisionGroups){
-    sge::Entity* e = sge::buildStaticEntity(texture, textureRect, position, collisionGroups);
-
-    e->physicalObject = new PhysicalObject(e->sprite);
-
-    e->physicalObject->createContinuousComputation("updateVelocity", sge::updateVelocityBasedOnAcceleration());
-    e->physicalObject->createContinuousComputation("updatePosition", sge::updatePositionBasedOnVelocity());
-
-    return e;
 }
 
 
