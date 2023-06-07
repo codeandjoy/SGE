@@ -483,30 +483,20 @@ namespace sge{
         public:
             PhysicalObject(sf::Sprite* ownerSprite);
 
-            
             sf::Sprite* getOwnerSprite();
 
             sf::Vector2f velocity = sf::Vector2f(0, 0);
             sf::Vector2f acceleration = sf::Vector2f(0, 0);
 
-            void createAction(std::string name, std::function<void()> action);
-            void doAction(std::string name);
-
             void createContinuousComputation(std::string name, std::function<void(sge::PhysicalObject*, float)> computation);
-
-            void createFlag(std::string name);
-            bool getFlag(std::string flagName);
-            void setFlag(std::string flagName, bool value);        
 
             void update(float dt);
 
         private:
             sf::Sprite* m_ownerSpritePtr;
 
-            std::unordered_map<std::string, std::function<void()>> m_actions;
             std::unordered_map<std::string, std::function<void(sge::PhysicalObject*, float)>> m_continuousComputations;
             std::vector<std::string> m_continuousComputationOrder;
-            std::unordered_map<std::string, bool> m_flags;
     };
 }
 
@@ -1443,20 +1433,12 @@ sge::PhysicalObject::PhysicalObject(sf::Sprite* ownerSprite){ m_ownerSpritePtr =
 
 sf::Sprite* sge::PhysicalObject::getOwnerSprite(){ return m_ownerSpritePtr; }
 
-void sge::PhysicalObject::createAction(std::string name, std::function<void()> action){ m_actions[name] = action; }
-void sge::PhysicalObject::doAction(std::string name){ m_actions[name](); }
-
 void sge::PhysicalObject::createContinuousComputation(std::string name, std::function<void(sge::PhysicalObject*, float)> computation){
     m_continuousComputations[name] = computation;
     m_continuousComputationOrder.push_back(name);
 }
 
-void sge::PhysicalObject::createFlag(std::string name){ m_flags[name] = false; }
-bool sge::PhysicalObject::getFlag(std::string flagName){ return m_flags[flagName]; }
-void sge::PhysicalObject::setFlag(std::string flagName, bool value){ m_flags[flagName] = value; }
-
 void sge::PhysicalObject::update(float dt){
-    // Run continuous computations in order of insertion
     for(std::string computation : m_continuousComputationOrder){
         m_continuousComputations[computation](this, dt);
     }
