@@ -34,6 +34,7 @@
 
 
 // Controller
+#include "./src/Controller/Controller.h"
 #include "./src/Controller/ControllerManager.h"
 //
 

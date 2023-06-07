@@ -347,6 +347,19 @@ namespace sge{
 //
 
 // Controller
+#ifndef CONTROLLER_H
+#define CONTROLLER_H
+
+#include <SFML/Graphics.hpp>
+
+namespace sge{
+    class Controller{
+        public: 
+            virtual void script(sf::Event event){};
+    };
+}
+
+#endif
 #ifndef CONTROLLER_MANAGER_H
 #define CONTROLLER_MANAGER_H
 
@@ -1474,19 +1487,6 @@ sge::CollisionShapeBorder::CollisionShapeBorder(sge::CollisionShape* owner, sge:
     this->setSize(sf::Vector2f(owner->getSize().x - settings.thickness*2, owner->getSize().y - settings.thickness*2));
 }
 
-#ifndef CONTROLLER_H
-#define CONTROLLER_H
-
-#include <SFML/Graphics.hpp>
-
-namespace sge{
-    class Controller{
-        public: 
-            virtual void script(sf::Event event){};
-    };
-}
-
-#endif
 
 void sge::ControllerManager::processEvent(sf::Event event){
     for(sge::Controller* controller : m_components){
