@@ -391,7 +391,7 @@ namespace sge{
 
 namespace sge{
     struct ScriptedView : public sf::View{
-        std::function<void(sge::ScriptedView*)> script;
+        virtual void script(){};
     };
 }
 
@@ -1392,9 +1392,7 @@ void sge::ControllerManager::processEvent(sf::Event event){
 
 void sge::ScriptedViewManager::update(float dt){
     for(sge::ScriptedView* scriptedView : m_components){
-        if(scriptedView->script){
-            scriptedView->script(scriptedView);
-        }
+        scriptedView->script();
     }
 }
 

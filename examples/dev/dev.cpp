@@ -59,6 +59,30 @@ class PushInteraction : public sge::CollisionInteraction{
 };
 
 
+
+class CameraView : public sge::ScriptedView{
+    public:
+        CameraView(sge::Entity* playerEntity) : m_playerEntityPtr(playerEntity){
+            this->setCenter(sf::Vector2f(100, 100));
+            this->setSize(sf::Vector2f(250, 150));
+        };
+
+        void script(){
+            sf::Vector2f center = m_playerEntityPtr->sprite->getPosition();
+            center.x += 4;
+            center.y += 4;
+
+            m_scroll.x = center.x - this->getCenter().x - m_scroll.x / 100;
+            m_scroll.y = center.y - this->getCenter().y - m_scroll.y / 100;
+            
+            this->setCenter(center - m_scroll);
+        }
+    private:
+        sf::Vector2f m_scroll = sf::Vector2f(0, 0);
+        sge::Entity* m_playerEntityPtr;
+};
+
+
 int main(){
     const float GRAVITY = .3;
 
@@ -72,17 +96,54 @@ int main(){
     sge::Universe* universe = new sge::Universe(window);
     universe->setupDebug();
 
-    sge::ScriptedView *cameraView = new sge::ScriptedView();
-    cameraView->setCenter(sf::Vector2f(100, 100));
-    cameraView->setSize(sf::Vector2f(250, 150));
-    universe->scriptedViewManager->registerComponent(cameraView);
-
 
 
     // Load all textures
     universe->assetsManager->loadTextureSheet(std::filesystem::current_path().string() + "/examples/dev/assets/pico_8_knight_sprite.png", "knight", sge::TextureSheetSizes{8, 8, 12, 12});
     universe->assetsManager->loadTextureSheet(std::filesystem::current_path().string() + "/examples/dev/assets/pico_8_tiles.png", "picoTiles", sge::TextureSheetSizes{8, 8, 12, 12});
     //
+
+
+
+    // Player
+    sge::Entity* playerEntity = sge::buildMobileEntity(
+        universe->assetsManager->getTextureSheet("knight")->getTexture(),
+        universe->assetsManager->getTextureSheet("knight")->getTextureRect(9),
+        sf::Vector2f(100, 50),
+        {"player"}
+    );
+
+    playerEntity->collisionShapes["globalBounds"]->setSize(sf::Vector2f(8, 4));
+    playerEntity->collisionShapes["globalBounds"]->offset = sf::Vector2f(0, 4);
+
+    playerEntity->physicalObject->acceleration.y = GRAVITY;
+
+    sge::Animation* playerAnimation = new sge::Animation(universe->assetsManager->getTextureSheet("knight"), playerEntity->sprite, 9);
+    playerAnimation->addTextureSequence("idle", std::vector<int>{9});
+    playerAnimation->addTextureSequence("runRight", std::vector<int>{33, 34, 35});
+    playerAnimation->addTextureSequence("runLeft", std::vector<int>{45, 46, 47});
+    playerAnimation->setCurrentTextureSequence("idle");
+
+    playerEntity->animation = playerAnimation;
+    
+
+
+
+    sge::DebugEntity* playerDE = new sge::DebugEntity(playerEntity);
+    playerDE->customCollisionShapeBorderSettings["globalBounds"] = sge::CollisionShapeBorderSettings{sf::Color::Red};
+    // Extra debug function example
+    // playerDE->addExtraDebugFunction([playerEntity](auto _){
+    //     printf("%f, %f\n", playerEntity->getPosition().x, playerEntity->getPosition().y);
+    // });
+    //
+
+
+
+    CameraView* cameraView = new CameraView(playerEntity);
+
+    universe->entityManager->registerComponent(cameraView, playerEntity);
+    universe->debugManager->registerComponent(cameraView, playerDE);
+    universe->scriptedViewManager->registerComponent(cameraView);
 
 
 
@@ -145,40 +206,7 @@ int main(){
 
 
 
-    // Player
-    sge::Entity* playerEntity = sge::buildMobileEntity(
-        universe->assetsManager->getTextureSheet("knight")->getTexture(),
-        universe->assetsManager->getTextureSheet("knight")->getTextureRect(9),
-        sf::Vector2f(100, 50),
-        {"player"}
-    );
-
-    playerEntity->collisionShapes["globalBounds"]->setSize(sf::Vector2f(8, 4));
-    playerEntity->collisionShapes["globalBounds"]->offset = sf::Vector2f(0, 4);
-
-    playerEntity->physicalObject->acceleration.y = GRAVITY;
-
-    sge::Animation* playerAnimation = new sge::Animation(universe->assetsManager->getTextureSheet("knight"), playerEntity->sprite, 9);
-    playerAnimation->addTextureSequence("idle", std::vector<int>{9});
-    playerAnimation->addTextureSequence("runRight", std::vector<int>{33, 34, 35});
-    playerAnimation->addTextureSequence("runLeft", std::vector<int>{45, 46, 47});
-    playerAnimation->setCurrentTextureSequence("idle");
-
-    playerEntity->animation = playerAnimation;
     
-
-    universe->entityManager->registerComponent(cameraView, playerEntity);
-
-
-    sge::DebugEntity* playerDE = new sge::DebugEntity(playerEntity);
-    playerDE->customCollisionShapeBorderSettings["globalBounds"] = sge::CollisionShapeBorderSettings{sf::Color::Red};
-    // Extra debug function example
-    // playerDE->addExtraDebugFunction([playerEntity](auto _){
-    //     printf("%f, %f\n", playerEntity->getPosition().x, playerEntity->getPosition().y);
-    // });
-
-    universe->debugManager->registerComponent(cameraView, playerDE);
-    //
 
 
 
@@ -198,22 +226,6 @@ int main(){
     universe->collisionManager->registerComponent(new AABBInteraction({"player"}, {"tiles", "box"}));
     universe->collisionManager->registerComponent(new AABBInteraction({"box"}, {"tiles"}));
     universe->collisionManager->registerComponent(new PushInteraction({"player"}, {"box"}, boxDE));
-
-
-
-    // Camera script
-    sf::Vector2f scroll(0, 0);
-    cameraView->script = [playerEntity, &scroll](sge::ScriptedView* thisView){
-        sf::Vector2f center = playerEntity->sprite->getPosition();
-        center.x += 4;
-        center.y += 4;
-
-        scroll.x = center.x - thisView->getCenter().x - scroll.x / 100;
-        scroll.y = center.y - thisView->getCenter().y - scroll.y / 100;
-        
-        thisView->setCenter(center - scroll);
-    };
-    // 
 
 
 

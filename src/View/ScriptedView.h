@@ -7,7 +7,7 @@
 
 namespace sge{
     struct ScriptedView : public sf::View{
-        std::function<void(sge::ScriptedView*)> script;
+        virtual void script(){};
     };
 }
 
