@@ -1039,6 +1039,91 @@ namespace sge{
 }
 
 #endif
+#ifndef PLAIN_ENTITY_H
+#define PLAIN_ENTITY_H
+
+#include <SFML/Graphics.hpp>
+
+#ifndef SPRITE_H
+#define SPRITE_H
+
+#include <SFML/Graphics.hpp>
+
+namespace sge{
+    class Sprite : public sge::StatefulComponent, public sf::Sprite{
+        public:
+            Sprite() : sf::Sprite(){};
+            Sprite(const sf::Texture& texture) : sf::Sprite(texture){};
+            Sprite(const sf::Texture& texture, const sf::IntRect& rectangle) : sf::Sprite(texture, rectangle){};
+    };
+}
+
+#endif
+
+namespace sge{
+    class PlainEntity : public sge::Entity{
+        public:
+            PlainEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position){
+                sprite = new sge::Sprite(*texture, textureRect);
+                sprite->setPosition(position);
+            }
+    };
+}
+
+#endif
+#ifndef VOID_ENTITY_H
+#define VOID_ENTITY_H
+
+#include <SFML/Graphics.hpp>
+
+namespace sge{
+    class VoidEntity : public sge::Entity{
+        public:
+            VoidEntity(sf::Vector2f size, sf::Vector2f position, std::vector<std::string> collisionGroups){
+                sprite = new sge::Sprite();
+                sprite->setPosition(position);
+                
+                collisionShapes["global_bounds"] = new sge::CollisionShape(this);
+                collisionShapes["global_bounds"]->setSize(size);
+                collisionShapes["global_bounds"]->collisionGroups = collisionGroups;
+            }
+    };
+}
+
+#endif
+#ifndef STATIC_ENTITY_H
+#define STATIC_ENTITY_H
+
+namespace sge{
+    class StaticEntity : public sge::PlainEntity{
+        public:
+            StaticEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position, std::vector<std::string> collisionGroups)
+                : sge::PlainEntity(texture, textureRect, position){
+                    collisionShapes["global_bounds"] = new sge::CollisionShape(this);
+                    collisionShapes["global_bounds"]->collisionGroups = collisionGroups;
+                }
+    };
+}
+
+#endif
+#ifndef MOBILE_ENTITY_H
+#define MOBILE_ENTITY_H
+
+#include <SFML/Graphics.hpp>
+
+namespace sge{
+    class MobileEntity : public sge::StaticEntity{
+        public:
+            MobileEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position, std::vector<std::string> collisionGroups)
+                : sge::StaticEntity(texture, textureRect, position, collisionGroups){
+                    physicalObject = new PhysicalObject(sprite);
+                    physicalObject->createContinuousComputation("update_velocity", sge::updateVelocityBasedOnAcceleration());
+                    physicalObject->createContinuousComputation("update_position", sge::updatePositionBasedOnVelocity());
+                }
+    };
+}
+
+#endif
 
 #ifndef SCENE_H
 #define SCENE_H
@@ -1396,21 +1481,6 @@ void sge::ScriptedViewManager::update(float dt){
     }
 }
 
-#ifndef SPRITE_H
-#define SPRITE_H
-
-#include <SFML/Graphics.hpp>
-
-namespace sge{
-    class Sprite : public sge::StatefulComponent, public sf::Sprite{
-        public:
-            Sprite() : sf::Sprite(){};
-            Sprite(const sf::Texture& texture) : sf::Sprite(texture){};
-            Sprite(const sf::Texture& texture, const sf::IntRect& rectangle) : sf::Sprite(texture, rectangle){};
-    };
-}
-
-#endif
 
 void sge::SpriteManager::draw(sf::RenderWindow* window){
     for(auto [view, sprites] : m_components){

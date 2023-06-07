@@ -83,6 +83,28 @@ class CameraView : public sge::ScriptedView{
 };
 
 
+
+class GravityEntity : public sge::MobileEntity{
+    public :
+        GravityEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position, std::vector<std::string> collisionGroups)
+            : sge::MobileEntity(texture, textureRect, position, collisionGroups){
+                physicalObject->acceleration.y = .3; // Gravity
+        }
+};
+
+class PlayerEntity : public GravityEntity{
+    public:
+        PlayerEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position, std::vector<std::string> collisionGroups, sge::TextureSheet* animationTextureSheet)
+            : GravityEntity(texture, textureRect, position, collisionGroups){
+                animation = new sge::Animation(animationTextureSheet, sprite, 9);
+                animation->addTextureSequence("idle", std::vector<int>{9});
+                animation->addTextureSequence("runRight", std::vector<int>{33, 34, 35});
+                animation->addTextureSequence("runLeft", std::vector<int>{45, 46, 47});
+                animation->setCurrentTextureSequence("idle");
+            }
+};
+
+
 int main(){
     const float GRAVITY = .3;
 
@@ -106,28 +128,13 @@ int main(){
 
 
     // Player
-    sge::Entity* playerEntity = sge::buildMobileEntity(
+    PlayerEntity* playerEntity = new PlayerEntity(
         universe->assetsManager->getTextureSheet("knight")->getTexture(),
         universe->assetsManager->getTextureSheet("knight")->getTextureRect(9),
         sf::Vector2f(100, 50),
-        {"player"}
+        {"player"},
+        universe->assetsManager->getTextureSheet("knight")
     );
-
-    playerEntity->collisionShapes["globalBounds"]->setSize(sf::Vector2f(8, 4));
-    playerEntity->collisionShapes["globalBounds"]->offset = sf::Vector2f(0, 4);
-
-    playerEntity->physicalObject->acceleration.y = GRAVITY;
-
-    sge::Animation* playerAnimation = new sge::Animation(universe->assetsManager->getTextureSheet("knight"), playerEntity->sprite, 9);
-    playerAnimation->addTextureSequence("idle", std::vector<int>{9});
-    playerAnimation->addTextureSequence("runRight", std::vector<int>{33, 34, 35});
-    playerAnimation->addTextureSequence("runLeft", std::vector<int>{45, 46, 47});
-    playerAnimation->setCurrentTextureSequence("idle");
-
-    playerEntity->animation = playerAnimation;
-    
-
-
 
     sge::DebugEntity* playerDE = new sge::DebugEntity(playerEntity);
     playerDE->customCollisionShapeBorderSettings["globalBounds"] = sge::CollisionShapeBorderSettings{sf::Color::Red};
@@ -136,14 +143,6 @@ int main(){
     //     printf("%f, %f\n", playerEntity->getPosition().x, playerEntity->getPosition().y);
     // });
     //
-
-
-
-    CameraView* cameraView = new CameraView(playerEntity);
-
-    universe->entityManager->registerComponent(cameraView, playerEntity);
-    universe->debugManager->registerComponent(cameraView, playerDE);
-    universe->scriptedViewManager->registerComponent(cameraView);
 
 
 
@@ -159,15 +158,13 @@ int main(){
     const auto& boxes = layers[1]->getLayerAs<tmx::ObjectGroup>().getObjects();
     //
 
-
-
     // Tile layer
     std::vector<sge::Entity*> mapTileEntities;
 
     for(int i = 0; i < map.getTileCount().y; i++){
         for(int j = 0; j < map.getTileCount().x; j++){
             if(tiles[map.getTileCount().x*i+j].ID != 0){
-                mapTileEntities.push_back(sge::buildStaticEntity(
+                mapTileEntities.push_back(new sge::StaticEntity(
                     universe->assetsManager->getTextureSheet("picoTiles")->getTexture(),
                     universe->assetsManager->getTextureSheet("picoTiles")->getTextureRect(tiles[map.getTileCount().x*i+j].ID-1),
                     sf::Vector2f(j*map.getTileSize().x, i*map.getTileSize().y),
@@ -176,53 +173,47 @@ int main(){
             }
         }
     }
-
-    for(sge::Entity* entity : mapTileEntities){
-        universe->entityManager->registerComponent(cameraView, entity);
-    }
     //
-
-
 
     // Object layer
     auto& box = boxes[0];
 
-    sge::Entity* boxEntity = sge::buildMobileEntity(
+    GravityEntity* boxEntity = new GravityEntity(
         universe->assetsManager->getTextureSheet("picoTiles")->getTexture(),
         universe->assetsManager->getTextureSheet("picoTiles")->getTextureRect(box.getTileID()-1),
         sf::Vector2f(box.getPosition().x, box.getPosition().y),
         {"box"}
     );
 
-    boxEntity->physicalObject->acceleration.y = GRAVITY;
-    
-    universe->entityManager->registerComponent(cameraView, boxEntity);
-
-
     sge::DebugEntity* boxDE = new sge::DebugEntity(boxEntity);
     boxDE->customCollisionShapeBorderSettings["globalBounds"] = sge::CollisionShapeBorderSettings{sf::Color::Green};
-    universe->debugManager->registerComponent(cameraView, boxDE);
     //
-
-
-
     
+
+
+    CameraView* cameraView = new CameraView(playerEntity);
+
+
+
+    universe->scriptedViewManager->registerComponent(cameraView);
+
+    universe->entityManager->registerComponent(cameraView, playerEntity);
+    universe->debugManager->registerComponent(cameraView, playerDE);
+
+    universe->entityManager->registerComponent(cameraView, boxEntity);
+    universe->debugManager->registerComponent(cameraView, boxDE);
+
+    for(sge::Entity* entity : mapTileEntities){
+        universe->entityManager->registerComponent(cameraView, entity);
+    }
 
 
 
     // Collision management
     // * Notes:
     // ! The collision shape CAN NOT be the initiator AND the recepient of the AABB response
-    // ! To work properly, all AABB recipients with common initiator should be located in the SAME collision group
+    // ! To work properly, all AABB recipients with common initiator should be put together
 
-    // ? change collision pair to accept multiple groups, for convenience:
-    // ? e.g.
-    // ? createCollisionPair("name", vecInitiatorGroups{"g1name"}, vecRecipientGroups{"g2name", "g3name", "g4name"});
-    // ? then loop through all initiator and recipient groups respectively when checking collisions
-    // ?
-    // ? to remove the need of creating extra collision groups like "tiles+box"
-
-    // To work properly, all AABB shapes should be checked together
     universe->collisionManager->registerComponent(new AABBInteraction({"player"}, {"tiles", "box"}));
     universe->collisionManager->registerComponent(new AABBInteraction({"box"}, {"tiles"}));
     universe->collisionManager->registerComponent(new PushInteraction({"player"}, {"box"}, boxDE));
@@ -230,25 +221,22 @@ int main(){
 
 
     // Controllers and events
-    universe->controllerManager->registerComponent([playerEntity, playerAnimation, universe](sf::Event event){
+    universe->controllerManager->registerComponent([playerEntity](sf::Event event){
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::A)){
             playerEntity->physicalObject->velocity.x = -70;
-            playerAnimation->setCurrentTextureSequence("runLeft");
+            playerEntity->animation->setCurrentTextureSequence("runLeft");
         }
         else if(sf::Keyboard::isKeyPressed(sf::Keyboard::D)){
             playerEntity->physicalObject->velocity.x = 70;
-            playerAnimation->setCurrentTextureSequence("runRight");
+            playerEntity->animation->setCurrentTextureSequence("runRight");
         }
         else{
             playerEntity->physicalObject->velocity.x = 0;
-            playerAnimation->setCurrentTextureSequence("idle");
+            playerEntity->animation->setCurrentTextureSequence("idle");
         }
 
         if(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space){
             playerEntity->physicalObject->velocity.y = -120;
-        }
-        if(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::P){
-            universe->isPaused = !universe->isPaused;
         }
     });
     //

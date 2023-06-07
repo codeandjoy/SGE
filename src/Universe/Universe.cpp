@@ -68,11 +68,14 @@ void sge::Universe::loop(){
     m_deltaClock.restart();
 
     while(m_windowPtr->isOpen()){
+        // dt
         sf::Time deltaTime = m_deltaClock.restart();
         float dt = deltaTime.asSeconds();
         if(dt > dtCap) dt = dtCap;
+        //
 
 
+        // Event
         sf::Event event;
         while(m_windowPtr->pollEvent(event)){
             if(event.type == sf::Event::Closed) m_windowPtr->close();
@@ -80,23 +83,25 @@ void sge::Universe::loop(){
             controllerManager->processEvent(event);
             m_clickableShapeManager->processEvent(event);
         }
+        //
 
 
-        if(!isPaused){
-            m_physicsManager->update(dt);
-            m_collisionShapeManager->update(dt);
-            m_clickableShapeManager->update(dt);
-            m_spriteTextManager->update(dt);
-            m_stateManager->update(dt);
-            collisionManager->updateCollisions();
+        // Update
+        m_physicsManager->update(dt);
+        m_collisionShapeManager->update(dt);
+        m_clickableShapeManager->update(dt);
+        m_spriteTextManager->update(dt);
+        m_stateManager->update(dt);
+        collisionManager->updateCollisions();
 
-            m_animationManager->update(dt);
-            scriptedViewManager->update(dt);
+        m_animationManager->update(dt);
+        scriptedViewManager->update(dt);
 
-            drumSceneManager->alignScene(); // Scene can be reset only after all managers finished their updates to prevent segfaults in loops
-        }
+        drumSceneManager->alignScene(); // Scene can be reset only after all managers finished their updates to prevent segfaults in loops
+        //
+
         
-        
+        // Draw
         m_windowPtr->clear();
         
         m_spriteManager->draw(m_windowPtr);
@@ -104,5 +109,6 @@ void sge::Universe::loop(){
         if(debugManager) debugManager->draw(m_windowPtr);
 
         m_windowPtr->display();
+        //
     }
 }
