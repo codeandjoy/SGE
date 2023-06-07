@@ -78,11 +78,10 @@
 
 #include "./src/Logic/Entity/Entity.h"
 #include "./src/Logic/Entity/EntityManager.h"
-#include "./src/Logic/Entity/EntityBuilders.h"
-#include "./src/Logic/Entity/EntityTypes/PlainEntity.h"
-#include "./src/Logic/Entity/EntityTypes/VoidEntity.h"
-#include "./src/Logic/Entity/EntityTypes/StaticEntity.h"
-#include "./src/Logic/Entity/EntityTypes/MobileEntity.h"
+#include "./src/Logic/Entity/EntityBuilds/PlainEntity.h"
+#include "./src/Logic/Entity/EntityBuilds/VoidEntity.h"
+#include "./src/Logic/Entity/EntityBuilds/StaticEntity.h"
+#include "./src/Logic/Entity/EntityBuilds/MobileEntity.h"
 
 #include "./src/Logic/Scene/Scene.h"
 #include "./src/Logic/Scene/SceneManager.h"
