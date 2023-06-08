@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "map.tmx",
+    "activeFile": "test_map.tmx",
     "expandedProjectPaths": [
         "."
     ],
@@ -40,8 +40,8 @@
             "scale": 2,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 289.75,
-                "y": 222.25
+                "x": 289.25,
+                "y": 221.75
             }
         },
         "tileset.tsx": {
@@ -56,13 +56,14 @@
     "map.tileHeight": 16,
     "map.tileWidth": 16,
     "openFiles": [
-        "map.tmx"
+        "map.tmx",
+        "test_map.tmx"
     ],
     "project": "map.tiled-project",
     "recentFiles": [
+        "map.tmx",
         "test_map.tmx",
         "tileset.tsx",
-        "map.tmx",
         "map.tmj",
         "testMap.tsx"
     ],

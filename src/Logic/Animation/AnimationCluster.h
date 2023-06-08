@@ -20,7 +20,8 @@ namespace sge{
             
             void addTextureSequence(std::string name, TextureSequence* animationSequence);
             void setCurrentTextureSequence(std::string name);
-        
+            std::string getCurrentTextureSequence();
+                    
             void run();
 
         private:

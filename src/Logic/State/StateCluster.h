@@ -3,6 +3,7 @@
 
 #include <unordered_map>
 #include <functional>
+#include <vector>
 #include <string>
 
 #include "../../Component/StatefulComponent.h"
@@ -13,15 +14,17 @@ namespace sge{
 
     class StateCluster : public sge::StatefulComponent{
         public:
-            sge::State* getCurrentState();
-            std::string getCurrentStateName();
-            void setCurrentState(std::string name);
+            std::vector<sge::State*> getActiveStates();
+            std::vector<std::string> getActiveStateNames();
+            void activateState(std::string name);
+            void deactivateState(std::string name);
 
+            bool isStateActive(std::string name);
 
             std::unordered_map<std::string, sge::State*> states;
             
         private:
-            std::string m_currentState = "";
+            std::vector<std::string> m_activeStates;
     };
 }
 

@@ -27,6 +27,20 @@ class AABBInteraction : public sge::CollisionInteraction{
         }
 };
 
+class PlayerSurfaceInteraction : public sge::CollisionInteraction{
+    public:
+        PlayerSurfaceInteraction(std::vector<std::string> initiatorGroups, std::vector<std::string> recipientGroups) : sge::CollisionInteraction(initiatorGroups, recipientGroups){};
+
+        bool collisionDetectionAlgorithm(sge::CollisionShape* initiator, sge::CollisionShape* recipient) override{ return sge::boundingBox(initiator, recipient); }
+    
+        void startPhaseCollisionResponse(std::vector<sge::Collision> collisions) override{
+            sge::StateCluster* playerStateCluster = collisions[0].initiator->getOwnerEntity()->stateCluster;
+            
+            playerStateCluster->deactivateState("jump");
+            playerStateCluster->activateState("on_ground");
+        }
+};
+
 class PushInteraction : public sge::CollisionInteraction{
     public:
         PushInteraction(std::vector<std::string> initiatorGroups, std::vector<std::string> recipientGroups, sge::DebugEntity* boxDE) : sge::CollisionInteraction(initiatorGroups, recipientGroups), boxDE(boxDE){};
@@ -84,6 +98,72 @@ class CameraView : public sge::ScriptedView{
 
 
 
+class PlayerMovingRightState : public sge::State{
+    public:
+        PlayerMovingRightState(sge::Entity* playerEntity) : sge::State(playerEntity){};
+
+        void enterScript() override{
+            m_ownerEntityPtr->physicalObject->velocity.x = 100;
+        }
+
+        void updateScript(float dt) override{
+            if(m_ownerEntityPtr->stateCluster->isStateActive("on_ground")){
+                if(m_ownerEntityPtr->animationCluster->getCurrentTextureSequence() != "walking_right"){
+                    printf("r\n");
+                    m_ownerEntityPtr->animationCluster->setCurrentTextureSequence("walking_right");
+                }
+            }
+        }
+
+        void exitScript() override{
+            m_ownerEntityPtr->physicalObject->velocity.x = 0;
+        }
+};
+class PlayerMovingLeftState : public sge::State{
+    public:
+        PlayerMovingLeftState(sge::Entity* playerEntity) : sge::State(playerEntity){};
+
+        void enterScript() override{
+            m_ownerEntityPtr->physicalObject->velocity.x = -100;
+        }
+
+        void updateScript(float dt) override{
+            if(m_ownerEntityPtr->stateCluster->isStateActive("on_ground")){
+                if(m_ownerEntityPtr->animationCluster->getCurrentTextureSequence() != "walking_left"){
+                    m_ownerEntityPtr->animationCluster->setCurrentTextureSequence("walking_left");
+                }
+            }
+        }
+
+        void exitScript() override{
+            m_ownerEntityPtr->physicalObject->velocity.x = 0;
+        }
+};
+class PlayerJumpState : public sge::State{
+    public:
+        PlayerJumpState(sge::Entity* playerEntity) : sge::State(playerEntity){};
+
+        void enterScript() override{
+            // Lock double jump here if needed
+            m_ownerEntityPtr->physicalObject->velocity.y = -200;
+            m_ownerEntityPtr->animationCluster->setCurrentTextureSequence("in_air");
+        }
+};
+class PlayerOnGroundState : public sge::State{
+    public:
+        PlayerOnGroundState(sge::Entity* playerEntity) : sge::State(playerEntity){};
+
+        void updateScript(float dt) override{
+            if(!m_ownerEntityPtr->stateCluster->isStateActive("moving_right") &&
+               !m_ownerEntityPtr->stateCluster->isStateActive("moving_left")){
+                    
+                    m_ownerEntityPtr->animationCluster->setCurrentTextureSequence("idle");
+              }
+        }
+};
+
+
+
 class GravityEntity : public sge::MobileEntity{
     public :
         GravityEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position, std::vector<std::string> collisionGroups)
@@ -99,12 +179,20 @@ class PlayerEntity : public GravityEntity{
                 animationCluster = new sge::AnimationCluster(sprite);
                 animationCluster->animationDelayMilliseconds = 80;
                 animationCluster->addTextureSequence("idle", new sge::TextureSequence(std::vector<int>{260}, animationTextureSheet));
-                animationCluster->addTextureSequence("runRight", new sge::TextureSequence(std::vector<int>{262, 263, 264}, animationTextureSheet));
-                animationCluster->addTextureSequence("runLeft", new sge::TextureSequence(std::vector<int>{262, 263, 264}, animationTextureSheet, true));
+                animationCluster->addTextureSequence("in_air", new sge::TextureSequence(std::vector<int>{265}, animationTextureSheet));
+                animationCluster->addTextureSequence("walking_right", new sge::TextureSequence(std::vector<int>{262, 263, 264}, animationTextureSheet));
+                animationCluster->addTextureSequence("walking_left", new sge::TextureSequence(std::vector<int>{262, 263, 264}, animationTextureSheet, true));
                 animationCluster->setCurrentTextureSequence("idle");
 
                 collisionShapes["global_bounds"]->setSize(sf::Vector2f(16, 8));
                 collisionShapes["global_bounds"]->offset = sf::Vector2f(0, 8);
+
+                stateCluster = new sge::StateCluster();
+                stateCluster->states["on_ground"] = new PlayerOnGroundState(this);
+                stateCluster->states["jump"] = new PlayerJumpState(this);
+                stateCluster->states["moving_right"] = new PlayerMovingRightState(this);
+                stateCluster->states["moving_left"] = new PlayerMovingLeftState(this);
+                stateCluster->activateState("jump"); // jump because player is initially falling
             }
 };
 
@@ -115,22 +203,49 @@ class KeyboardController : public sge::Controller{
         KeyboardController(sge::Entity* playerEntity) : m_playerEntityPtr(playerEntity){}; 
 
         void script(sf::Event event) override{
-            if(sf::Keyboard::isKeyPressed(sf::Keyboard::A)){
-                m_playerEntityPtr->physicalObject->velocity.x = -100;
-                m_playerEntityPtr->animationCluster->setCurrentTextureSequence("runLeft");
+            if(event.type == sf::Event::KeyPressed){
+                if(event.key.code == sf::Keyboard::A){
+                    m_playerEntityPtr->stateCluster->deactivateState("moving_right");
+                    m_playerEntityPtr->stateCluster->activateState("moving_left");
+                }
+                else if(event.key.code == sf::Keyboard::D){
+                    m_playerEntityPtr->stateCluster->deactivateState("moving_left");
+                    m_playerEntityPtr->stateCluster->activateState("moving_right");
+                }
+
+                if(event.key.code == sf::Keyboard::Space){
+                    m_playerEntityPtr->stateCluster->deactivateState("on_ground");
+                    m_playerEntityPtr->stateCluster->activateState("jump");
+                    if(m_playerEntityPtr->stateCluster->isStateActive("jump")){
+                        m_playerEntityPtr->physicalObject->velocity.y = - 200; // ! infinite jump for testing
+                    }
+                }
             }
-            else if(sf::Keyboard::isKeyPressed(sf::Keyboard::D)){
-                m_playerEntityPtr->physicalObject->velocity.x = 100;
-                m_playerEntityPtr->animationCluster->setCurrentTextureSequence("runRight");
-            }
-            else{
-                m_playerEntityPtr->physicalObject->velocity.x = 0;
-                m_playerEntityPtr->animationCluster->setCurrentTextureSequence("idle");
+            if(event.type == sf::Event::KeyReleased){
+                if(event.key.code == sf::Keyboard::A){
+                    m_playerEntityPtr->stateCluster->deactivateState("moving_left");
+                }
+                if(event.key.code == sf::Keyboard::D){
+                    m_playerEntityPtr->stateCluster->deactivateState("moving_right");
+                }
             }
 
-            if(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space){
-                m_playerEntityPtr->physicalObject->velocity.y = -200;
-            }
+            // if(sf::Keyboard::isKeyPressed(sf::Keyboard::A)){
+            //     m_playerEntityPtr->physicalObject->velocity.x = -100;
+            //     m_playerEntityPtr->animationCluster->setCurrentTextureSequence("walking_left");
+            // }
+            // else if(sf::Keyboard::isKeyPressed(sf::Keyboard::D)){
+            //     m_playerEntityPtr->physicalObject->velocity.x = 100;
+            //     m_playerEntityPtr->animationCluster->setCurrentTextureSequence("walking_right");
+            // }
+            // else{
+            //     m_playerEntityPtr->physicalObject->velocity.x = 0;
+            //     m_playerEntityPtr->animationCluster->setCurrentTextureSequence("idle");
+            // }
+
+            // if(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space){
+            //     m_playerEntityPtr->physicalObject->velocity.y = -200;
+            // }
         }
 
     private:
@@ -243,6 +358,7 @@ int main(){
     // ! The collision shape CAN NOT be the initiator AND the recepient of the AABB response
     // ! To work properly, all AABB recipients with common initiator should be put together
     universe->collisionManager->registerComponent(new AABBInteraction({"player"}, {"tiles", "box"}));
+    universe->collisionManager->registerComponent(new PlayerSurfaceInteraction({"player"}, {"tiles", "box"}));
     universe->collisionManager->registerComponent(new AABBInteraction({"box"}, {"tiles"}));
     universe->collisionManager->registerComponent(new PushInteraction({"player"}, {"box"}, boxDE));
 

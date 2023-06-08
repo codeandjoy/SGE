@@ -11,6 +11,7 @@ void sge::AnimationCluster::setCurrentTextureSequence(std::string name){
 
     m_updateTexture();
 }
+std::string sge::AnimationCluster::getCurrentTextureSequence(){ return m_currentTextureSequence; }
 
 
 void sge::AnimationCluster::run(){

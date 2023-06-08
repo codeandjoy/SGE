@@ -2,6 +2,7 @@
 #define STATE_H
 
 #include <functional>
+#include <string>
 
 
 namespace sge{
@@ -10,11 +11,11 @@ namespace sge{
 
     class State{
         public:
-            State(Entity* ownerEntity);
+            State(Entity* ownerEntity) : m_ownerEntityPtr(ownerEntity){};
 
             virtual void enterScript(){}
             virtual void exitScript(){}
-            virtual void updateScript(float dt, sge::StateCluster* containerStateCluster){}
+            virtual void updateScript(float dt){}
 
         protected:
             Entity* m_ownerEntityPtr;

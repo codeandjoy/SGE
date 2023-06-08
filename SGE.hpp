@@ -854,7 +854,8 @@ namespace sge{
             
             void addTextureSequence(std::string name, TextureSequence* animationSequence);
             void setCurrentTextureSequence(std::string name);
-        
+            std::string getCurrentTextureSequence();
+                    
             void run();
 
         private:
@@ -895,6 +896,7 @@ namespace sge{
 #define STATE_H
 
 #include <functional>
+#include <string>
 
 namespace sge{
     class StateCluster;
@@ -902,11 +904,11 @@ namespace sge{
 
     class State{
         public:
-            State(Entity* ownerEntity);
+            State(Entity* ownerEntity) : m_ownerEntityPtr(ownerEntity){};
 
             virtual void enterScript(){}
             virtual void exitScript(){}
-            virtual void updateScript(float dt, sge::StateCluster* containerStateCluster){}
+            virtual void updateScript(float dt){}
 
         protected:
             Entity* m_ownerEntityPtr;
@@ -919,6 +921,7 @@ namespace sge{
 
 #include <unordered_map>
 #include <functional>
+#include <vector>
 #include <string>
 
 namespace sge{
@@ -926,14 +929,17 @@ namespace sge{
 
     class StateCluster : public sge::StatefulComponent{
         public:
-            sge::State* getCurrentState();
-            std::string getCurrentStateName();
-            void setCurrentState(std::string name);
+            std::vector<sge::State*> getActiveStates();
+            std::vector<std::string> getActiveStateNames();
+            void activateState(std::string name);
+            void deactivateState(std::string name);
+
+            bool isStateActive(std::string name);
 
             std::unordered_map<std::string, sge::State*> states;
             
         private:
-            std::string m_currentState = "";
+            std::vector<std::string> m_activeStates;
     };
 }
 
@@ -1829,6 +1835,7 @@ void sge::AnimationCluster::setCurrentTextureSequence(std::string name){
 
     m_updateTexture();
 }
+std::string sge::AnimationCluster::getCurrentTextureSequence(){ return m_currentTextureSequence; }
 
 void sge::AnimationCluster::run(){
     if(!m_textureSequences.size()){
@@ -1866,26 +1873,44 @@ sge::TextureSequence::TextureSequence(std::vector<int> textureSequence, sge::Tex
         sequenceRects.push_back(rect);
     }
 }
+#include <algorithm>
 
+std::vector<sge::State*> sge::StateCluster::getActiveStates(){
+    std::vector<sge::State*> activeStates;
 
-sge::State::State(Entity* ownerEntity){ m_ownerEntityPtr = ownerEntity; }
-
-
-sge::State* sge::StateCluster::getCurrentState(){ return states[m_currentState]; }
-std::string sge::StateCluster::getCurrentStateName(){ return m_currentState; }
-void sge::StateCluster::setCurrentState(std::string name){
-    if(m_currentState != ""){
-        states[m_currentState]->exitScript();
+    for(std::string activeStateName : m_activeStates){
+        activeStates.push_back(states[activeStateName]);
     }
-    states[name]->enterScript();
 
-    m_currentState = name;
+    return activeStates;
+}
+std::vector<std::string> sge::StateCluster::getActiveStateNames(){ return m_activeStates; }
+
+void sge::StateCluster::activateState(std::string name){
+    if(!isStateActive(name)){
+        states[name]->enterScript();
+        m_activeStates.push_back(name);
+    }
+}
+void sge::StateCluster::deactivateState(std::string name){
+    if(isStateActive(name)){
+        states[name]->exitScript();
+        m_activeStates.erase(std::remove(m_activeStates.begin(), m_activeStates.end(), name), m_activeStates.end());
+    }
+}
+
+bool sge::StateCluster::isStateActive(std::string name){
+    return std::count(m_activeStates.begin(), m_activeStates.end(), name);
 }
 #include <algorithm>
 
 void sge::StateManager::update(float dt){
     for(StateCluster* stateCluster : m_components){
-        if(stateCluster->isActive) stateCluster->getCurrentState()->updateScript(dt, stateCluster);
+        if(stateCluster->isActive){
+            for(sge::State* state : stateCluster->getActiveStates()){
+                state->updateScript(dt);
+            }
+        }
     }
 }
 
