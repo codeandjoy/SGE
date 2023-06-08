@@ -26,8 +26,8 @@
 
 
 // Debug
-#include "./src/Debug/DebugEntity/DebugEntity.h"
-#include "./src/Debug/DebugManager/DebugManager.h"
+#include "./src/Debug/DebugEntity.h"
+#include "./src/Debug/DebugManager.h"
 #include "./src/Debug/CollisionShapeBorder/CollisionShapeBorder.h"
 #include "./src/Debug/CollisionShapeBorder/CollisionShapeBorderSettings.h"
 //

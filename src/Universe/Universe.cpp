@@ -1,7 +1,7 @@
 #include "Universe.h"
 #include "../Assets/AssetsManager/AssetsManager.h"
 #include "../Controller/ControllerManager.h"
-#include "../Debug/DebugManager/DebugManager.h"
+#include "../Debug/DebugManager.h"
 #include "../View/ScriptedViewManager.h"
 
 #include "../Logic/Sprite/SpriteManager.h"

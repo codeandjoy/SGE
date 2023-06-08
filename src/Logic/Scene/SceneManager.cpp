@@ -2,7 +2,7 @@
 #include "Scene.h"
 #include "../Entity/EntityManager.h"
 #include "../Collision/CollisionManager.h"
-#include "../../Debug/DebugManager/DebugManager.h"
+#include "../../Debug/DebugManager.h"
 
 
 void sge::SceneManager::setupDebug(sge::DebugManager* debugManager){ m_debugManagerPtr = debugManager; }

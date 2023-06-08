@@ -1,6 +1,6 @@
 #include "Scene.h"
 #include "../Entity/Entity.h"
-#include "../../Debug/DebugEntity/DebugEntity.h"
+#include "../../Debug/DebugEntity.h"
 
 
 void sge::Scene::addEntity(sf::View* view, sge::Entity* entity){ m_entities[view].push_back(entity); }

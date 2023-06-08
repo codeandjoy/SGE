@@ -1,6 +1,6 @@
 #include "DebugManager.h"
-#include "../DebugEntity/DebugEntity.h"
-#include "../CollisionShapeBorder/CollisionShapeBorder.h"
+#include "DebugEntity.h"
+#include "./CollisionShapeBorder/CollisionShapeBorder.h"
 
 
 void sge::DebugManager::draw(sf::RenderWindow* window){

@@ -5,8 +5,8 @@
 #include <unordered_map>
 #include <vector>
 
-#include "../../Manager/StorageManagers/ViewManager.h" 
-#include "../../Manager/LoopSectionManagers/DrawManager.h" 
+#include "../Manager/StorageManagers/ViewManager.h" 
+#include "../Manager/LoopSectionManagers/DrawManager.h" 
 
 
 namespace sge{

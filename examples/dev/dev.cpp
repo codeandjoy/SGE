@@ -52,10 +52,10 @@ class PushInteraction : public sge::CollisionInteraction{
 
             for(sge::Collision collision : collisions){
                 if(collision.recipientImpactSide == sge::CollisionSide::right){
-                    collision.recipient->getOwnerEntity()->physicalObject->velocity.x = -10;
+                    collision.recipient->getOwnerEntity()->physicalObject->velocity.x = -30;
                 }
                 else if(collision.recipientImpactSide == sge::CollisionSide::left){
-                    collision.recipient->getOwnerEntity()->physicalObject->velocity.x = 10;
+                    collision.recipient->getOwnerEntity()->physicalObject->velocity.x = 30;
                 }
             }            
         }
@@ -229,23 +229,6 @@ class KeyboardController : public sge::Controller{
                     m_playerEntityPtr->stateCluster->deactivateState("moving_right");
                 }
             }
-
-            // if(sf::Keyboard::isKeyPressed(sf::Keyboard::A)){
-            //     m_playerEntityPtr->physicalObject->velocity.x = -100;
-            //     m_playerEntityPtr->animationCluster->setCurrentTextureSequence("walking_left");
-            // }
-            // else if(sf::Keyboard::isKeyPressed(sf::Keyboard::D)){
-            //     m_playerEntityPtr->physicalObject->velocity.x = 100;
-            //     m_playerEntityPtr->animationCluster->setCurrentTextureSequence("walking_right");
-            // }
-            // else{
-            //     m_playerEntityPtr->physicalObject->velocity.x = 0;
-            //     m_playerEntityPtr->animationCluster->setCurrentTextureSequence("idle");
-            // }
-
-            // if(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space){
-            //     m_playerEntityPtr->physicalObject->velocity.y = -200;
-            // }
         }
 
     private:
