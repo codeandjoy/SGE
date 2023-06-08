@@ -1,5 +1,5 @@
 #include "DebugEntity.h"
-#include "../Logic/Entity/Entity.h"
+#include "../../Logic/Entity/Entity.h"
 #include "./CollisionShapeBorder/CollisionShapeBorder.h"
 
 

@@ -11,19 +11,19 @@ namespace sge{
     class Scene;
     class EntityManager;
     class CollisionManager;
-    class DebugManager;
+    class DebugEntityManager;
 
     class SceneManager : public sge::LabelManager<sge::Scene*>{
         public:
             SceneManager(sge::EntityManager* entityManager): m_entityManagerPtr(entityManager){};
-            void setupDebug(sge::DebugManager* debugManager);
+            void setupDebug(sge::DebugEntityManager* debugEntityManager);
         
         protected:
             void m_registerSceneMembers(std::string label);
             void m_deregisterSceneMembers(std::string label);
 
             sge::EntityManager* m_entityManagerPtr = nullptr;
-            sge::DebugManager* m_debugManagerPtr = nullptr;
+            sge::DebugEntityManager* m_debugEntityManagerPtr = nullptr;
     };
 }
 

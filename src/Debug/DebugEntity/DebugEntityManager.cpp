@@ -1,9 +1,9 @@
-#include "DebugManager.h"
+#include "DebugEntityManager.h"
 #include "DebugEntity.h"
 #include "./CollisionShapeBorder/CollisionShapeBorder.h"
 
 
-void sge::DebugManager::draw(sf::RenderWindow* window){
+void sge::DebugEntityManager::draw(sf::RenderWindow* window){
     for(auto& [view, debugEntities]: m_components){
         window->setView(*view);
         

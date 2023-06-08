@@ -1,7 +1,7 @@
 #include "Universe.h"
 #include "../Assets/AssetsManager/AssetsManager.h"
 #include "../Controller/ControllerManager.h"
-#include "../Debug/DebugManager.h"
+#include "../Debug/DebugEntity/DebugEntityManager.h"
 #include "../Debug/DebugScreen/DebugScreenManager.h"
 #include "../View/ScriptedViewManager.h"
 
@@ -57,11 +57,11 @@ sge::Universe::Universe(sf::RenderWindow* window){
 
 
 void sge::Universe::setupDebugEntityManager(){
-    sge::DebugManager* debugManagerPtr = new sge::DebugManager();
-    debugManager = debugManagerPtr;
+    sge::DebugEntityManager* debugEntityManagerPtr = new sge::DebugEntityManager();
+    debugEntityManager = debugEntityManagerPtr;
 
-   drumSceneManager->setupDebug(debugManagerPtr);
-   layerSceneManager->setupDebug(debugManagerPtr);
+    drumSceneManager->setupDebug(debugEntityManagerPtr);
+    layerSceneManager->setupDebug(debugEntityManagerPtr);
 }
 void sge::Universe::setupDebugScreenManager(sf::View* debugScreenView, sf::Font* debugScreenFont, int fontSize = 20){
     debugScreenManager = new sge::DebugScreenManager(entityManager, debugScreenView, debugScreenFont, fontSize);
@@ -112,7 +112,7 @@ void sge::Universe::loop(){
         
         m_spriteManager->draw(m_windowPtr);
         m_spriteTextManager->draw(m_windowPtr);
-        if(debugManager) debugManager->draw(m_windowPtr);
+        if(debugEntityManager) debugEntityManager->draw(m_windowPtr);
 
         m_windowPtr->display();
         //

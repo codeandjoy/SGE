@@ -10,7 +10,7 @@ namespace sge{
     class AssetsManager;
     class ControllerManager;
     class ScriptedViewManager;
-    class DebugManager;
+    class DebugEntityManager;
     class DebugScreenManager;
 
     class SpriteManager;
@@ -39,9 +39,9 @@ namespace sge{
 
             sge::AssetsManager* assetsManager = nullptr;
             sge::ControllerManager* controllerManager = nullptr;
-            sge::DebugManager* debugManager = nullptr;
-            sge::DebugScreenManager* debugScreenManager = nullptr;
             sge::ScriptedViewManager* scriptedViewManager = nullptr;
+            sge::DebugEntityManager* debugEntityManager = nullptr;
+            sge::DebugScreenManager* debugScreenManager = nullptr;
 
             sge::CollisionManager* collisionManager = nullptr;
             sge::EntityManager* entityManager = nullptr;

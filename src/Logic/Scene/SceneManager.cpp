@@ -2,10 +2,10 @@
 #include "Scene.h"
 #include "../Entity/EntityManager.h"
 #include "../Collision/CollisionManager.h"
-#include "../../Debug/DebugManager.h"
+#include "../../Debug/DebugEntity/DebugEntityManager.h"
 
 
-void sge::SceneManager::setupDebug(sge::DebugManager* debugManager){ m_debugManagerPtr = debugManager; }
+void sge::SceneManager::setupDebug(sge::DebugEntityManager* debugEntityManager){ m_debugEntityManagerPtr = debugEntityManager; }
 
 
 void sge::SceneManager::m_registerSceneMembers(std::string label){
@@ -15,20 +15,20 @@ void sge::SceneManager::m_registerSceneMembers(std::string label){
         }
     }
 
-    if(m_debugManagerPtr){
+    if(m_debugEntityManagerPtr){
         for(auto& [view, debugEntities] : m_components[label]->getDebugEntitiesMap()){
             for(sge::DebugEntity* debugEntity : debugEntities){
-                m_debugManagerPtr->registerComponent(view, debugEntity);
+                m_debugEntityManagerPtr->registerComponent(view, debugEntity);
             }
         }
     }
 }
 
 void sge::SceneManager::m_deregisterSceneMembers(std::string label){
-    if(m_debugManagerPtr){
+    if(m_debugEntityManagerPtr){
         for(auto& [view, debugEntities] : m_components[label]->getDebugEntitiesMap()){
             for(sge::DebugEntity* debugEntity : debugEntities){
-                m_debugManagerPtr->deregisterComponent(view, debugEntity);
+                m_debugEntityManagerPtr->deregisterComponent(view, debugEntity);
             }
         }
     }

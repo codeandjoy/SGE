@@ -355,10 +355,10 @@ int main(){
     universe->scriptedViewManager->registerComponent(cameraView);
 
     universe->entityManager->registerComponent(cameraView, playerEntity);
-    universe->debugManager->registerComponent(cameraView, playerDE);
+    universe->debugEntityManager->registerComponent(cameraView, playerDE);
 
     universe->entityManager->registerComponent(cameraView, boxEntity);
-    universe->debugManager->registerComponent(cameraView, boxDE);
+    universe->debugEntityManager->registerComponent(cameraView, boxDE);
 
     for(sge::Entity* entity : mapTileEntities){
         universe->entityManager->registerComponent(cameraView, entity);

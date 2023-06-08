@@ -2,7 +2,7 @@
 #include "Scene.h"
 #include "../Entity/EntityManager.h"
 #include "../Collision/CollisionManager.h"
-#include "../../Debug/DebugManager.h"
+#include "../../Debug/DebugEntity/DebugEntityManager.h"
 
 
 void sge::DrumSceneManager::setCurrentScene(std::string name){ m_currentScene = name; }
