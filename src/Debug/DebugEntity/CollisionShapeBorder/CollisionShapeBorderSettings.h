@@ -7,7 +7,7 @@
 namespace sge{
     struct CollisionShapeBorderSettings{
         sf::Color color = sf::Color::Blue;
-        float thickness = .5;
+        float thickness = 1;
     };
 }
 
