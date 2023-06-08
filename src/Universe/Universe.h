@@ -11,6 +11,7 @@ namespace sge{
     class ControllerManager;
     class ScriptedViewManager;
     class DebugManager;
+    class DebugScreenManager;
 
     class SpriteManager;
     class PhysicsManager;
@@ -31,13 +32,15 @@ namespace sge{
 
             float dtCap = .15f;
 
-            void setupDebug();
+            void setupDebugEntityManager();
+            void setupDebugScreenManager(sf::View* debugScreenView, sf::Font* debugScreenFont, int fontSize);
             void loop();
 
 
             sge::AssetsManager* assetsManager = nullptr;
             sge::ControllerManager* controllerManager = nullptr;
             sge::DebugManager* debugManager = nullptr;
+            sge::DebugScreenManager* debugScreenManager = nullptr;
             sge::ScriptedViewManager* scriptedViewManager = nullptr;
 
             sge::CollisionManager* collisionManager = nullptr;

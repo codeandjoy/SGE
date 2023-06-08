@@ -2,6 +2,7 @@
 #include "../Assets/AssetsManager/AssetsManager.h"
 #include "../Controller/ControllerManager.h"
 #include "../Debug/DebugManager.h"
+#include "../Debug/DebugScreen/DebugScreenManager.h"
 #include "../View/ScriptedViewManager.h"
 
 #include "../Logic/Sprite/SpriteManager.h"
@@ -55,12 +56,15 @@ sge::Universe::Universe(sf::RenderWindow* window){
 
 
 
-void sge::Universe::setupDebug(){
+void sge::Universe::setupDebugEntityManager(){
     sge::DebugManager* debugManagerPtr = new sge::DebugManager();
     debugManager = debugManagerPtr;
 
    drumSceneManager->setupDebug(debugManagerPtr);
    layerSceneManager->setupDebug(debugManagerPtr);
+}
+void sge::Universe::setupDebugScreenManager(sf::View* debugScreenView, sf::Font* debugScreenFont, int fontSize = 20){
+    debugScreenManager = new sge::DebugScreenManager(entityManager, debugScreenView, debugScreenFont, fontSize);
 }
 
 
@@ -96,6 +100,8 @@ void sge::Universe::loop(){
 
         m_animationManager->update(dt);
         scriptedViewManager->update(dt);
+
+        debugScreenManager->updateDebugVariables();
 
         drumSceneManager->alignScene(); // Scene can be reset only after all managers finished their updates to prevent segfaults in loops
         //

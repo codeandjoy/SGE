@@ -243,15 +243,22 @@ int main(){
 
     sf::RenderWindow *window = new sf::RenderWindow(sf::VideoMode(1000, 600), "Test");
     window->setKeyRepeatEnabled(false); // For proper keyboard events handling (e.g. jumping)
+    sf::View v = window->getDefaultView();
+    sf::View* debugScreenView = &v;
 
     sge::Universe* universe = new sge::Universe(window);
-    universe->setupDebug();
+    universe->setupDebugEntityManager();
 
 
 
-    // Load all textures
+    // Load assets
     universe->assetsManager->loadTextureSheet(std::filesystem::current_path().string() + "/examples/dev/assets/tilemap.png", "tileset", sge::TextureSheetSizes{16, 16, 20, 20});
+    universe->assetsManager->loadFont(std::filesystem::current_path().string() + "/examples/dev/assets/m5x7.ttf", "m5x7");
     //
+
+
+
+    universe->setupDebugScreenManager(debugScreenView, universe->assetsManager->getFont("m5x7"), 30);
 
 
 
@@ -270,6 +277,28 @@ int main(){
     // playerDE->addExtraDebugFunction([playerEntity](auto _){
     //     printf("%f, %f\n", playerEntity->getPosition().x, playerEntity->getPosition().y);
     // });
+    
+    universe->debugScreenManager->addDebugVariable(
+        sf::Vector2f(30, 30),
+        new sge::DebugVariable{
+            [playerEntity](){
+                return
+                    "pos_x: " + std::to_string(playerEntity->sprite->getPosition().x) +
+                    "   pos_y: " + std::to_string(playerEntity->sprite->getPosition().y);
+            }
+        });
+    universe->debugScreenManager->addDebugVariable(
+        sf::Vector2f(30, 80),
+        new sge::DebugVariable{
+            [playerEntity](){
+                std::string activeStates = "";
+                for(std::string stateName : playerEntity->stateCluster->getActiveStateNames()){
+                    activeStates += " " + stateName;
+                }
+
+                return "active_states: " + activeStates;
+            }
+        });
     //
 
 

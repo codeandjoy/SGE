@@ -16,6 +16,7 @@ namespace sge{
     class ControllerManager;
     class ScriptedViewManager;
     class DebugManager;
+    class DebugScreenManager;
 
     class SpriteManager;
     class PhysicsManager;
@@ -36,12 +37,14 @@ namespace sge{
 
             float dtCap = .15f;
 
-            void setupDebug();
+            void setupDebugEntityManager();
+            void setupDebugScreenManager(sf::View* debugScreenView, sf::Font* debugScreenFont, int fontSize);
             void loop();
 
             sge::AssetsManager* assetsManager = nullptr;
             sge::ControllerManager* controllerManager = nullptr;
             sge::DebugManager* debugManager = nullptr;
+            sge::DebugScreenManager* debugScreenManager = nullptr;
             sge::ScriptedViewManager* scriptedViewManager = nullptr;
 
             sge::CollisionManager* collisionManager = nullptr;
@@ -1249,6 +1252,39 @@ namespace sge{
 #ifndef SGE_MAIN
 #define SGE_MAIN
 
+#ifndef DEBUG_SCREEN_MANAGER_H
+#define DEBUG_SCREEN_MANAGER_H
+
+#include <SFML/Graphics.hpp>
+#include <unordered_map> 
+
+namespace sge{
+    struct DebugVariable;
+    class Entity;
+    class EntityManager;
+
+    class DebugScreenManager{
+        public:
+            DebugScreenManager(sge::EntityManager* entityManager, sf::View* debugScreenView, sf::Font* debugScreenFont, int fontSize)
+                : m_entityManagerPtr(entityManager), m_view(debugScreenView), m_font(debugScreenFont), m_fontSize(fontSize){};
+
+            void addDebugVariable(sf::Vector2f position, sge::DebugVariable* debugVariable);
+            std::unordered_map<sge::DebugVariable*, sge::Entity*> getDebugVariables();
+
+            void updateDebugVariables();
+
+        private:
+            std::unordered_map<sge::DebugVariable*, sge::Entity*> m_debugVariables;
+
+            sf::View* m_view;
+            sf::Font* m_font;
+            int m_fontSize;
+            sge::EntityManager* m_entityManagerPtr;
+    };
+}
+
+#endif
+
 #ifndef DRUM_SCENE_MANAGER_H
 #define DRUM_SCENE_MANAGER_H
 
@@ -1332,12 +1368,15 @@ sge::Universe::Universe(sf::RenderWindow* window){
     layerSceneManager = LaSM;
 }
 
-void sge::Universe::setupDebug(){
+void sge::Universe::setupDebugEntityManager(){
     sge::DebugManager* debugManagerPtr = new sge::DebugManager();
     debugManager = debugManagerPtr;
 
    drumSceneManager->setupDebug(debugManagerPtr);
    layerSceneManager->setupDebug(debugManagerPtr);
+}
+void sge::Universe::setupDebugScreenManager(sf::View* debugScreenView, sf::Font* debugScreenFont, int fontSize = 20){
+    debugScreenManager = new sge::DebugScreenManager(entityManager, debugScreenView, debugScreenFont, fontSize);
 }
 
 void sge::Universe::loop(){
@@ -1370,6 +1409,8 @@ void sge::Universe::loop(){
 
         m_animationManager->update(dt);
         scriptedViewManager->update(dt);
+
+        debugScreenManager->updateDebugVariables();
 
         drumSceneManager->alignScene(); // Scene can be reset only after all managers finished their updates to prevent segfaults in loops
         //
@@ -2141,6 +2182,49 @@ void sge::SceneManager::m_deregisterSceneMembers(std::string label){
         for(sge::Entity* entity : entities){
             m_entityManagerPtr->deregisterComponent(view, entity);
         }
+    }
+}
+
+#ifndef DEBUG_VARIABLE_H
+#define DEBUG_VARIABLE_H
+
+#include <functional>
+#include <string>
+
+namespace sge{
+    class DebugVariable{
+        public:
+            std::function<std::string()> valueUpdateScript = [](){ return ""; };
+            std::string value = "";
+
+        friend class sge::DebugScreenManager;
+        protected:
+            void update(){ value = valueUpdateScript(); };
+    };
+}
+
+#endif
+
+void sge::DebugScreenManager::addDebugVariable(sf::Vector2f position, sge::DebugVariable* debugVariable){
+    sge::Entity* textEntity = new sge::Entity();
+    textEntity->sprite = new sge::Sprite();
+    textEntity->sprite->setPosition(position);
+
+    textEntity->spriteText = new sge::SpriteText(textEntity->sprite);
+    textEntity->spriteText->setCharacterSize(m_fontSize);
+    textEntity->spriteText->setFont(*m_font);
+    textEntity->spriteText->setString(debugVariable->value);
+
+    m_entityManagerPtr->registerComponent(m_view, textEntity);
+    m_debugVariables[debugVariable] = textEntity;
+}
+
+std::unordered_map<sge::DebugVariable*, sge::Entity*> sge::DebugScreenManager::getDebugVariables(){ return m_debugVariables; }
+
+void sge::DebugScreenManager::updateDebugVariables(){
+    for(auto& [debugVariable, textEntity] : m_debugVariables){
+        debugVariable->update();
+        textEntity->spriteText->setString(debugVariable->value);
     }
 }
 
