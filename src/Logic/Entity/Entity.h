@@ -7,7 +7,7 @@
 
 namespace sge{
     class Sprite;
-    class PhysicalObject;
+    class MotionUnit;
     class CollisionShape;
     class ClickableShape;
     class SpriteText;
@@ -17,7 +17,7 @@ namespace sge{
     class Entity : public sge::StatefulComponent{
         public:
             sge::Sprite* sprite = nullptr;
-            sge::PhysicalObject* physicalObject = nullptr;
+            sge::MotionUnit* motionUnit = nullptr;
             std::unordered_map<std::string, sge::CollisionShape*> collisionShapes; 
             sge::ClickableShape* clickableShape = nullptr;
             sge::SpriteText* spriteText = nullptr;

@@ -1,16 +1,16 @@
 #include "ComputationScripts.h"
-#include "PhysicalObject.h"
+#include "MotionUnit.h"
 
 
 
-std::function<void(sge::PhysicalObject*, float)> sge::updatePositionBasedOnVelocity(){
-    return [](sge::PhysicalObject* thisPhysicalObject, float dt){
+std::function<void(sge::MotionUnit*, float)> sge::updatePositionBasedOnVelocity(){
+    return [](sge::MotionUnit* thisPhysicalObject, float dt){
         thisPhysicalObject->getOwnerSprite()->setPosition(thisPhysicalObject->getOwnerSprite()->getPosition() + thisPhysicalObject->velocity * dt);
     };
 }
 
-std::function<void(sge::PhysicalObject*, float)> sge::updateVelocityBasedOnAcceleration(sf::Vector2f speedLimit){
-    return [speedLimit](sge::PhysicalObject* thisPhysicalObject, float dt){
+std::function<void(sge::MotionUnit*, float)> sge::updateVelocityBasedOnAcceleration(sf::Vector2f speedLimit){
+    return [speedLimit](sge::MotionUnit* thisPhysicalObject, float dt){
         if(abs(thisPhysicalObject->velocity.x) >= speedLimit.x){
             thisPhysicalObject->velocity.x = speedLimit.x;
         }

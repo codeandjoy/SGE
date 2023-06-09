@@ -6,7 +6,7 @@
 #include "../View/ScriptedViewManager.h"
 
 #include "../Logic/Sprite/SpriteManager.h"
-#include "../Logic/Physics/PhysicsManager.h"
+#include "../Logic/Physics/MotionUnitManager.h"
 #include "../Logic/CollisionShape/CollisionShapeManager.h"
 #include "../Logic/ClickableShape/ClickableShapeManager.h"
 #include "../Logic/SpriteText/SpriteTextManager.h"
@@ -26,14 +26,14 @@ sge::Universe::Universe(sf::RenderWindow* window){
 
     sge::ScriptedViewManager* VM = new sge::ScriptedViewManager();
     sge::SpriteManager* SpM = new sge::SpriteManager();
-    sge::PhysicsManager* PM = new sge::PhysicsManager();
+    sge::MotionUnitManager* MUM = new sge::MotionUnitManager();
     sge::CollisionShapeManager* CSM = new sge::CollisionShapeManager();
     sge::ClickableShapeManager* ClSM = new sge::ClickableShapeManager();
     sge::SpriteTextManager* STM = new SpriteTextManager();
     sge::AnimationManager* AnM = new sge::AnimationManager();
     sge::StateManager* StM = new sge::StateManager();
     sge::CollisionManager* CM = new sge::CollisionManager(CSM);
-    sge::EntityManager* EM = new sge::EntityManager(SpM, PM, CSM, ClSM, STM, AnM, StM);
+    sge::EntityManager* EM = new sge::EntityManager(SpM, MUM, CSM, ClSM, STM, AnM, StM);
     sge::DrumSceneManager* DrSM = new sge::DrumSceneManager(EM);
     sge::LayerSceneManager* LaSM = new sge::LayerSceneManager(EM);
 
@@ -42,7 +42,7 @@ sge::Universe::Universe(sf::RenderWindow* window){
     scriptedViewManager = VM;
 
     m_spriteManager = SpM;
-    m_physicsManager = PM;
+    m_motionUnitManager = MUM;
     m_collisionShapeManager = CSM;
     m_clickableShapeManager = ClSM;
     m_spriteTextManager = STM;
@@ -91,7 +91,7 @@ void sge::Universe::loop(){
 
 
         // Update
-        m_physicsManager->update(dt);
+        m_motionUnitManager->update(dt);
         m_collisionShapeManager->update(dt);
         m_clickableShapeManager->update(dt);
         m_spriteTextManager->update(dt);

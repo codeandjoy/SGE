@@ -1,5 +1,5 @@
-#ifndef PHYSICAL_OBJECT_H
-#define PHYSICAL_OBJECT_H
+#ifndef MOTION_UNIT_H
+#define MOTION_UNIT_H
 
 #include <SFML/Graphics.hpp>
 #include <string>
@@ -11,23 +11,23 @@
 
 
 namespace sge{
-    class PhysicalObject : public sge::StatefulComponent{
+    class MotionUnit : public sge::StatefulComponent{
         public:
-            PhysicalObject(sf::Sprite* ownerSprite) : m_ownerSpritePtr(ownerSprite){};
+            MotionUnit(sf::Sprite* ownerSprite) : m_ownerSpritePtr(ownerSprite){};
 
             sf::Sprite* getOwnerSprite();
 
             sf::Vector2f velocity = sf::Vector2f(0, 0);
             sf::Vector2f acceleration = sf::Vector2f(0, 0);
 
-            void addComputationScript(std::string name, std::function<void(sge::PhysicalObject*, float)> computation);
+            void addComputationScript(std::string name, std::function<void(sge::MotionUnit*, float)> computation);
 
             void update(float dt);
 
         private:
             sf::Sprite* m_ownerSpritePtr;
 
-            std::unordered_map<std::string, std::function<void(sge::PhysicalObject*, float)>> m_computationScripts;
+            std::unordered_map<std::string, std::function<void(sge::MotionUnit*, float)>> m_computationScripts;
             std::vector<std::string> m_computationScriptsOrder;
     };
 }

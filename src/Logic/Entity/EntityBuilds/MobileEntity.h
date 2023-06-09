@@ -4,7 +4,7 @@
 #include <SFML/Graphics.hpp>
 
 #include "StaticEntity.h"
-#include "../../Physics/PhysicalObject.h"
+#include "../../Physics/MotionUnit.h"
 #include "../../Physics/ComputationScripts.h"
 
 
@@ -13,9 +13,9 @@ namespace sge{
         public:
             MobileEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position, std::vector<std::string> collisionGroups)
                 : sge::StaticEntity(texture, textureRect, position, collisionGroups){
-                    physicalObject = new PhysicalObject(sprite);
-                    physicalObject->addComputationScript("update_velocity", sge::updateVelocityBasedOnAcceleration());
-                    physicalObject->addComputationScript("update_position", sge::updatePositionBasedOnVelocity());
+                    motionUnit = new MotionUnit(sprite);
+                    motionUnit->addComputationScript("update_velocity", sge::updateVelocityBasedOnAcceleration());
+                    motionUnit->addComputationScript("update_position", sge::updatePositionBasedOnVelocity());
                 }
     };
 }

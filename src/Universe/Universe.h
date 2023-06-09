@@ -14,7 +14,7 @@ namespace sge{
     class DebugScreenManager;
 
     class SpriteManager;
-    class PhysicsManager;
+    class MotionUnitManager;
     class CollisionShapeManager;
     class ClickableShapeManager;
     class SpriteTextManager;
@@ -55,7 +55,7 @@ namespace sge{
 
 
             sge::SpriteManager* m_spriteManager = nullptr;
-            sge::PhysicsManager* m_physicsManager = nullptr;
+            sge::MotionUnitManager* m_motionUnitManager = nullptr;
             sge::CollisionShapeManager* m_collisionShapeManager = nullptr;
             sge::AnimationManager* m_animationManager = nullptr;
             sge::StateManager* m_stateManager = nullptr;

@@ -19,7 +19,7 @@ namespace sge{
     class DebugScreenManager;
 
     class SpriteManager;
-    class PhysicsManager;
+    class MotionUnitManager;
     class CollisionShapeManager;
     class ClickableShapeManager;
     class SpriteTextManager;
@@ -58,7 +58,7 @@ namespace sge{
             sf::Clock m_deltaClock;
 
             sge::SpriteManager* m_spriteManager = nullptr;
-            sge::PhysicsManager* m_physicsManager = nullptr;
+            sge::MotionUnitManager* m_motionUnitManager = nullptr;
             sge::CollisionShapeManager* m_collisionShapeManager = nullptr;
             sge::AnimationManager* m_animationManager = nullptr;
             sge::StateManager* m_stateManager = nullptr;
@@ -521,16 +521,16 @@ namespace sge{
 
 #endif
 
-#ifndef PHYSICS_MANAGER_H
-#define PHYSICS_MANAGER_H
+#ifndef MOTION_UNIT_MANAGER_H
+#define MOTION_UNIT_MANAGER_H
 
 #include <vector>
 
 namespace sge{
-    class PhysicalObject;
+    class MotionUnit;
 
-    class PhysicsManager :
-        public sge::VectorManager<sge::PhysicalObject*>,
+    class MotionUnitManager :
+        public sge::VectorManager<sge::MotionUnit*>,
         public sge::UpdateManager{
 
         public:
@@ -539,8 +539,8 @@ namespace sge{
 }
 
 #endif
-#ifndef PHYSICAL_OBJECT_H
-#define PHYSICAL_OBJECT_H
+#ifndef MOTION_UNIT_H
+#define MOTION_UNIT_H
 
 #include <SFML/Graphics.hpp>
 #include <string>
@@ -549,23 +549,23 @@ namespace sge{
 #include <functional>
 
 namespace sge{
-    class PhysicalObject : public sge::StatefulComponent{
+    class MotionUnit : public sge::StatefulComponent{
         public:
-            PhysicalObject(sf::Sprite* ownerSprite) : m_ownerSpritePtr(ownerSprite){};
+            MotionUnit(sf::Sprite* ownerSprite) : m_ownerSpritePtr(ownerSprite){};
 
             sf::Sprite* getOwnerSprite();
 
             sf::Vector2f velocity = sf::Vector2f(0, 0);
             sf::Vector2f acceleration = sf::Vector2f(0, 0);
 
-            void addComputationScript(std::string name, std::function<void(sge::PhysicalObject*, float)> computation);
+            void addComputationScript(std::string name, std::function<void(sge::MotionUnit*, float)> computation);
 
             void update(float dt);
 
         private:
             sf::Sprite* m_ownerSpritePtr;
 
-            std::unordered_map<std::string, std::function<void(sge::PhysicalObject*, float)>> m_computationScripts;
+            std::unordered_map<std::string, std::function<void(sge::MotionUnit*, float)>> m_computationScripts;
             std::vector<std::string> m_computationScriptsOrder;
     };
 }
@@ -578,11 +578,11 @@ namespace sge{
 #include <functional>
 
 namespace sge{
-    class PhysicalObject;
+    class MotionUnit;
 
-    std::function<void(sge::PhysicalObject*, float)> updatePositionBasedOnVelocity();
+    std::function<void(sge::MotionUnit*, float)> updatePositionBasedOnVelocity();
 
-    std::function<void(sge::PhysicalObject*, float)> updateVelocityBasedOnAcceleration(sf::Vector2f speedLimit=sf::Vector2f(9999, 9999));
+    std::function<void(sge::MotionUnit*, float)> updateVelocityBasedOnAcceleration(sf::Vector2f speedLimit=sf::Vector2f(9999, 9999));
 }
 
 #endif
@@ -1025,7 +1025,7 @@ namespace sge{
 
 namespace sge{
     class Sprite;
-    class PhysicalObject;
+    class MotionUnit;
     class CollisionShape;
     class ClickableShape;
     class SpriteText;
@@ -1035,7 +1035,7 @@ namespace sge{
     class Entity : public sge::StatefulComponent{
         public:
             sge::Sprite* sprite = nullptr;
-            sge::PhysicalObject* physicalObject = nullptr;
+            sge::MotionUnit* motionUnit = nullptr;
             std::unordered_map<std::string, sge::CollisionShape*> collisionShapes; 
             sge::ClickableShape* clickableShape = nullptr;
             sge::SpriteText* spriteText = nullptr;
@@ -1066,7 +1066,7 @@ namespace sge{
 namespace sge{
     class Entity;
     class SpriteManager;
-    class PhysicsManager;
+    class MotionUnitManager;
     class CollisionShapeManager;
     class ClickableShapeManager;
     class SpriteTextManager;
@@ -1078,7 +1078,7 @@ namespace sge{
         public:
             EntityManager(
                 sge::SpriteManager* spriteManager,
-                sge::PhysicsManager* physicsManager,
+                sge::MotionUnitManager* motionUnitManager,
                 sge::CollisionShapeManager* collisionShapeManager,
                 sge::ClickableShapeManager* clickableShapeManager,
                 sge::SpriteTextManager* SpriteTextManager,
@@ -1099,7 +1099,7 @@ namespace sge{
             void m_deregisterEntityMembers(sf::View* view, sge::Entity* entity);
 
             sge::SpriteManager* m_spriteManagerPtr;
-            sge::PhysicsManager* m_physicsManagerPtr;
+            sge::MotionUnitManager* m_motionUnitManager;
             sge::CollisionShapeManager* m_collisionShapeManagerPtr;
             sge::ClickableShapeManager* m_clickableShapeManagerPtr;
             sge::SpriteTextManager* m_spriteTextManagerPtr;
@@ -1186,9 +1186,9 @@ namespace sge{
         public:
             MobileEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position, std::vector<std::string> collisionGroups)
                 : sge::StaticEntity(texture, textureRect, position, collisionGroups){
-                    physicalObject = new PhysicalObject(sprite);
-                    physicalObject->addComputationScript("update_velocity", sge::updateVelocityBasedOnAcceleration());
-                    physicalObject->addComputationScript("update_position", sge::updatePositionBasedOnVelocity());
+                    motionUnit = new MotionUnit(sprite);
+                    motionUnit->addComputationScript("update_velocity", sge::updateVelocityBasedOnAcceleration());
+                    motionUnit->addComputationScript("update_position", sge::updatePositionBasedOnVelocity());
                 }
     };
 }
@@ -1359,14 +1359,14 @@ sge::Universe::Universe(sf::RenderWindow* window){
 
     sge::ScriptedViewManager* VM = new sge::ScriptedViewManager();
     sge::SpriteManager* SpM = new sge::SpriteManager();
-    sge::PhysicsManager* PM = new sge::PhysicsManager();
+    sge::MotionUnitManager* MUM = new sge::MotionUnitManager();
     sge::CollisionShapeManager* CSM = new sge::CollisionShapeManager();
     sge::ClickableShapeManager* ClSM = new sge::ClickableShapeManager();
     sge::SpriteTextManager* STM = new SpriteTextManager();
     sge::AnimationManager* AnM = new sge::AnimationManager();
     sge::StateManager* StM = new sge::StateManager();
     sge::CollisionManager* CM = new sge::CollisionManager(CSM);
-    sge::EntityManager* EM = new sge::EntityManager(SpM, PM, CSM, ClSM, STM, AnM, StM);
+    sge::EntityManager* EM = new sge::EntityManager(SpM, MUM, CSM, ClSM, STM, AnM, StM);
     sge::DrumSceneManager* DrSM = new sge::DrumSceneManager(EM);
     sge::LayerSceneManager* LaSM = new sge::LayerSceneManager(EM);
 
@@ -1375,7 +1375,7 @@ sge::Universe::Universe(sf::RenderWindow* window){
     scriptedViewManager = VM;
 
     m_spriteManager = SpM;
-    m_physicsManager = PM;
+    m_motionUnitManager = MUM;
     m_collisionShapeManager = CSM;
     m_clickableShapeManager = ClSM;
     m_spriteTextManager = STM;
@@ -1419,7 +1419,7 @@ void sge::Universe::loop(){
         //
 
         // Update
-        m_physicsManager->update(dt);
+        m_motionUnitManager->update(dt);
         m_collisionShapeManager->update(dt);
         m_clickableShapeManager->update(dt);
         m_spriteTextManager->update(dt);
@@ -1608,35 +1608,35 @@ void sge::SpriteManager::draw(sf::RenderWindow* window){
 }
 
 
-void sge::PhysicsManager::update(float dt){
-    for(sge::PhysicalObject* physicalObject : m_components){
-        if(physicalObject->isActive) physicalObject->update(dt);
+void sge::MotionUnitManager::update(float dt){
+    for(sge::MotionUnit* motionUnit : m_components){
+        if(motionUnit->isActive) motionUnit->update(dt);
     }
 }
 
 
-sf::Sprite* sge::PhysicalObject::getOwnerSprite(){ return m_ownerSpritePtr; }
+sf::Sprite* sge::MotionUnit::getOwnerSprite(){ return m_ownerSpritePtr; }
 
-void sge::PhysicalObject::addComputationScript(std::string name, std::function<void(sge::PhysicalObject*, float)> computation){
+void sge::MotionUnit::addComputationScript(std::string name, std::function<void(sge::MotionUnit*, float)> computation){
     m_computationScripts[name] = computation;
     m_computationScriptsOrder.push_back(name);
 }
 
-void sge::PhysicalObject::update(float dt){
+void sge::MotionUnit::update(float dt){
     for(std::string computation : m_computationScriptsOrder){
         m_computationScripts[computation](this, dt);
     }
 };
 
 
-std::function<void(sge::PhysicalObject*, float)> sge::updatePositionBasedOnVelocity(){
-    return [](sge::PhysicalObject* thisPhysicalObject, float dt){
+std::function<void(sge::MotionUnit*, float)> sge::updatePositionBasedOnVelocity(){
+    return [](sge::MotionUnit* thisPhysicalObject, float dt){
         thisPhysicalObject->getOwnerSprite()->setPosition(thisPhysicalObject->getOwnerSprite()->getPosition() + thisPhysicalObject->velocity * dt);
     };
 }
 
-std::function<void(sge::PhysicalObject*, float)> sge::updateVelocityBasedOnAcceleration(sf::Vector2f speedLimit){
-    return [speedLimit](sge::PhysicalObject* thisPhysicalObject, float dt){
+std::function<void(sge::MotionUnit*, float)> sge::updateVelocityBasedOnAcceleration(sf::Vector2f speedLimit){
+    return [speedLimit](sge::MotionUnit* thisPhysicalObject, float dt){
         if(abs(thisPhysicalObject->velocity.x) >= speedLimit.x){
             thisPhysicalObject->velocity.x = speedLimit.x;
         }
@@ -1801,8 +1801,8 @@ void sge::resolveAABB(std::vector<sge::Collision> collisions){
     for(sge::Collision collision : collisions){
         sge::CollisionShape* initiatorCollisionShape = collision.initiator;
         sge::CollisionShape* recipientCollisionShape = collision.recipient;
-        sf::Sprite *initiatorSprite = collision.initiator->getOwnerEntity()->sprite;
-        sf::Sprite *recipientSprite = collision.recipient->getOwnerEntity()->sprite;
+        sge::Sprite *initiatorSprite = collision.initiator->getOwnerEntity()->sprite;
+        sge::Sprite *recipientSprite = collision.recipient->getOwnerEntity()->sprite;
         
         // Align initiator based on impact side
         if(collision.initiatorImpactSide == sge::CollisionSide::left){
@@ -1836,7 +1836,7 @@ void sge::resolveAABB(std::vector<sge::Collision> collisions){
 void sge::initiatorStandOnTopOfRecipient(std::vector<sge::Collision> collisions){
     for(sge::Collision collision : collisions){
         if(collision.initiatorImpactSide == sge::CollisionSide::bottom){
-            collision.initiator->getOwnerEntity()->physicalObject->velocity.y = 0;
+            collision.initiator->getOwnerEntity()->motionUnit->velocity.y = 0;
         }
     }
 }
@@ -1999,7 +1999,7 @@ void sge::StateManager::update(float dt){
 
 void sge::Entity::activateEntityParts(){
     sprite->activate();
-    if(physicalObject) physicalObject->activate();
+    if(motionUnit) motionUnit->activate();
     if(!collisionShapes.empty()){
         for(auto& [_, collisionShape] : collisionShapes) collisionShape->activate();
     }
@@ -2013,7 +2013,7 @@ void sge::Entity::activateEntityParts(){
 
 void sge::Entity::pauseEntityParts(){
     sprite->pause();
-    if(physicalObject) physicalObject->pause();
+    if(motionUnit) motionUnit->pause();
     if(!collisionShapes.empty()){
         for(auto& [_, collisionShape] : collisionShapes) collisionShape->pause();
     }
@@ -2027,7 +2027,7 @@ void sge::Entity::pauseEntityParts(){
 
 void sge::Entity::hideEntityParts(){
     sprite->hide();
-    if(physicalObject) physicalObject->hide();
+    if(motionUnit) motionUnit->hide();
     if(!collisionShapes.empty()){
         for(auto& [_, collisionShape] : collisionShapes) collisionShape->hide();
     }
@@ -2042,7 +2042,7 @@ void sge::Entity::hideEntityParts(){
 
 sge::EntityManager::EntityManager(
         sge::SpriteManager* spriteManager,
-        sge::PhysicsManager* physicsManager,
+        sge::MotionUnitManager* motionUnitManager,
         sge::CollisionShapeManager* collisionShapeManager,
         sge::ClickableShapeManager* clickableShapeManager,
         sge::SpriteTextManager* spriteTextManager,
@@ -2051,7 +2051,7 @@ sge::EntityManager::EntityManager(
     ){
 
     m_spriteManagerPtr = spriteManager;
-    m_physicsManagerPtr = physicsManager;
+    m_motionUnitManager = motionUnitManager;
     m_collisionShapeManagerPtr = collisionShapeManager;
     m_clickableShapeManagerPtr = clickableShapeManager;
     m_spriteTextManagerPtr = spriteTextManager;
@@ -2071,8 +2071,8 @@ void sge::EntityManager::deregisterComponent(sf::View* view, sge::Entity* entity
 void sge::EntityManager::m_registerEntityMembers(sf::View* view, sge::Entity* entity){
     m_spriteManagerPtr->registerComponent(view, entity->sprite);
 
-    if(entity->physicalObject){
-        m_physicsManagerPtr->registerComponent(entity->physicalObject);
+    if(entity->motionUnit){
+        m_motionUnitManager->registerComponent(entity->motionUnit);
     }
         
     if(entity->collisionShapes.size()){
@@ -2101,8 +2101,8 @@ void sge::EntityManager::m_registerEntityMembers(sf::View* view, sge::Entity* en
 void sge::EntityManager::m_deregisterEntityMembers(sf::View* view, sge::Entity* entity){
     m_spriteManagerPtr->deregisterComponent(view, entity->sprite);
 
-    if(entity->physicalObject){
-        m_physicsManagerPtr->deregisterComponent(entity->physicalObject);
+    if(entity->motionUnit){
+        m_motionUnitManager->deregisterComponent(entity->motionUnit);
     }
 
     if(entity->collisionShapes.size()){

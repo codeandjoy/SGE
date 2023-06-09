@@ -52,10 +52,10 @@ class PushInteraction : public sge::CollisionInteraction{
 
             for(sge::Collision collision : collisions){
                 if(collision.recipientImpactSide == sge::CollisionSide::right){
-                    collision.recipient->getOwnerEntity()->physicalObject->velocity.x = -30;
+                    collision.recipient->getOwnerEntity()->motionUnit->velocity.x = -30;
                 }
                 else if(collision.recipientImpactSide == sge::CollisionSide::left){
-                    collision.recipient->getOwnerEntity()->physicalObject->velocity.x = 30;
+                    collision.recipient->getOwnerEntity()->motionUnit->velocity.x = 30;
                 }
             }            
         }
@@ -64,7 +64,7 @@ class PushInteraction : public sge::CollisionInteraction{
             boxDE->customCollisionShapeBorderSettings["global_bounds"] = sge::CollisionShapeBorderSettings{sf::Color::Green};
         
             for(sge::Collision collision : collisions){
-                collision.recipient->getOwnerEntity()->physicalObject->velocity.x = 0;
+                collision.recipient->getOwnerEntity()->motionUnit->velocity.x = 0;
             }          
         }
     
@@ -103,7 +103,7 @@ class PlayerMovingRightState : public sge::State{
         PlayerMovingRightState(sge::Entity* playerEntity) : sge::State(playerEntity){};
 
         void enterScript() override{
-            m_ownerEntityPtr->physicalObject->velocity.x = 100;
+            m_ownerEntityPtr->motionUnit->velocity.x = 100;
         }
 
         void updateScript(float dt) override{
@@ -116,7 +116,7 @@ class PlayerMovingRightState : public sge::State{
         }
 
         void exitScript() override{
-            m_ownerEntityPtr->physicalObject->velocity.x = 0;
+            m_ownerEntityPtr->motionUnit->velocity.x = 0;
         }
 };
 class PlayerMovingLeftState : public sge::State{
@@ -124,7 +124,7 @@ class PlayerMovingLeftState : public sge::State{
         PlayerMovingLeftState(sge::Entity* playerEntity) : sge::State(playerEntity){};
 
         void enterScript() override{
-            m_ownerEntityPtr->physicalObject->velocity.x = -100;
+            m_ownerEntityPtr->motionUnit->velocity.x = -100;
         }
 
         void updateScript(float dt) override{
@@ -136,7 +136,7 @@ class PlayerMovingLeftState : public sge::State{
         }
 
         void exitScript() override{
-            m_ownerEntityPtr->physicalObject->velocity.x = 0;
+            m_ownerEntityPtr->motionUnit->velocity.x = 0;
         }
 };
 class PlayerJumpState : public sge::State{
@@ -145,7 +145,7 @@ class PlayerJumpState : public sge::State{
 
         void enterScript() override{
             // Lock double jump here if needed
-            m_ownerEntityPtr->physicalObject->velocity.y = -200;
+            m_ownerEntityPtr->motionUnit->velocity.y = -200;
             m_ownerEntityPtr->animationCluster->setCurrentTextureSequence("in_air");
         }
 };
@@ -168,7 +168,7 @@ class GravityEntity : public sge::MobileEntity{
     public :
         GravityEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position, std::vector<std::string> collisionGroups)
             : sge::MobileEntity(texture, textureRect, position, collisionGroups){
-                physicalObject->acceleration.y = .4; // Gravity
+                motionUnit->acceleration.y = .4; // Gravity
         }
 };
 
@@ -217,7 +217,7 @@ class KeyboardController : public sge::Controller{
                     m_playerEntityPtr->stateCluster->deactivateState("on_ground");
                     m_playerEntityPtr->stateCluster->activateState("jump");
                     if(m_playerEntityPtr->stateCluster->isStateActive("jump")){
-                        m_playerEntityPtr->physicalObject->velocity.y = - 200; // ! infinite jump for testing
+                        m_playerEntityPtr->motionUnit->velocity.y = - 200; // ! infinite jump for testing
                     }
                 }
             }

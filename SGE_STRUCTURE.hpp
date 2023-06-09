@@ -51,8 +51,8 @@
 // Logic
 #include "./src/Logic/Sprite/SpriteManager.h"
 
-#include "./src/Logic/Physics/PhysicsManager.h"
-#include "./src/Logic/Physics/PhysicalObject.h"
+#include "./src/Logic/Physics/MotionUnitManager.h"
+#include "./src/Logic/Physics/MotionUnit.h"
 #include "./src/Logic/Physics/ComputationScripts.h"
 
 #include "./src/Logic/Collision/CollisionManager.h"

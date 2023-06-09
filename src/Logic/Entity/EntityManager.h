@@ -11,7 +11,7 @@
 namespace sge{
     class Entity;
     class SpriteManager;
-    class PhysicsManager;
+    class MotionUnitManager;
     class CollisionShapeManager;
     class ClickableShapeManager;
     class SpriteTextManager;
@@ -24,7 +24,7 @@ namespace sge{
         public:
             EntityManager(
                 sge::SpriteManager* spriteManager,
-                sge::PhysicsManager* physicsManager,
+                sge::MotionUnitManager* motionUnitManager,
                 sge::CollisionShapeManager* collisionShapeManager,
                 sge::ClickableShapeManager* clickableShapeManager,
                 sge::SpriteTextManager* SpriteTextManager,
@@ -46,7 +46,7 @@ namespace sge{
             void m_deregisterEntityMembers(sf::View* view, sge::Entity* entity);
 
             sge::SpriteManager* m_spriteManagerPtr;
-            sge::PhysicsManager* m_physicsManagerPtr;
+            sge::MotionUnitManager* m_motionUnitManager;
             sge::CollisionShapeManager* m_collisionShapeManagerPtr;
             sge::ClickableShapeManager* m_clickableShapeManagerPtr;
             sge::SpriteTextManager* m_spriteTextManagerPtr;

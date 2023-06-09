@@ -3,15 +3,16 @@
 #include "CollisionSide.h"
 #include "../CollisionShape/CollisionShape.h"
 #include "../Entity/Entity.h"
-#include "../Physics/PhysicalObject.h"
+#include "../Sprite/Sprite.h"
+#include "../Physics/MotionUnit.h"
 
 
 void sge::resolveAABB(std::vector<sge::Collision> collisions){
     for(sge::Collision collision : collisions){
         sge::CollisionShape* initiatorCollisionShape = collision.initiator;
         sge::CollisionShape* recipientCollisionShape = collision.recipient;
-        sf::Sprite *initiatorSprite = collision.initiator->getOwnerEntity()->sprite;
-        sf::Sprite *recipientSprite = collision.recipient->getOwnerEntity()->sprite;
+        sge::Sprite *initiatorSprite = collision.initiator->getOwnerEntity()->sprite;
+        sge::Sprite *recipientSprite = collision.recipient->getOwnerEntity()->sprite;
         
         // Align initiator based on impact side
         if(collision.initiatorImpactSide == sge::CollisionSide::left){
@@ -45,7 +46,7 @@ void sge::resolveAABB(std::vector<sge::Collision> collisions){
 void sge::initiatorStandOnTopOfRecipient(std::vector<sge::Collision> collisions){
     for(sge::Collision collision : collisions){
         if(collision.initiatorImpactSide == sge::CollisionSide::bottom){
-            collision.initiator->getOwnerEntity()->physicalObject->velocity.y = 0;
+            collision.initiator->getOwnerEntity()->motionUnit->velocity.y = 0;
         }
     }
 }

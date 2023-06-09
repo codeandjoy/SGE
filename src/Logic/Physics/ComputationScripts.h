@@ -6,11 +6,11 @@
 
 
 namespace sge{
-    class PhysicalObject;
+    class MotionUnit;
 
-    std::function<void(sge::PhysicalObject*, float)> updatePositionBasedOnVelocity();
+    std::function<void(sge::MotionUnit*, float)> updatePositionBasedOnVelocity();
 
-    std::function<void(sge::PhysicalObject*, float)> updateVelocityBasedOnAcceleration(sf::Vector2f speedLimit=sf::Vector2f(9999, 9999));
+    std::function<void(sge::MotionUnit*, float)> updateVelocityBasedOnAcceleration(sf::Vector2f speedLimit=sf::Vector2f(9999, 9999));
 }
 
 

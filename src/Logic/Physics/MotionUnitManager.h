@@ -1,5 +1,5 @@
-#ifndef PHYSICS_MANAGER_H
-#define PHYSICS_MANAGER_H
+#ifndef MOTION_UNIT_MANAGER_H
+#define MOTION_UNIT_MANAGER_H
 
 #include <vector>
 
@@ -8,10 +8,10 @@
 
 
 namespace sge{
-    class PhysicalObject;
+    class MotionUnit;
 
-    class PhysicsManager :
-        public sge::VectorManager<sge::PhysicalObject*>,
+    class MotionUnitManager :
+        public sge::VectorManager<sge::MotionUnit*>,
         public sge::UpdateManager{
 
         public:

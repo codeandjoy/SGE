@@ -1,6 +1,6 @@
 #include "Entity.h"
 #include "../Sprite/Sprite.h"
-#include "../Physics/PhysicalObject.h"
+#include "../Physics/MotionUnit.h"
 #include "../CollisionShape/CollisionShape.h"
 #include "../ClickableShape/ClickableShape.h"
 #include "../SpriteText/SpriteText.h"
@@ -9,7 +9,7 @@
 
 void sge::Entity::activateEntityParts(){
     sprite->activate();
-    if(physicalObject) physicalObject->activate();
+    if(motionUnit) motionUnit->activate();
     if(!collisionShapes.empty()){
         for(auto& [_, collisionShape] : collisionShapes) collisionShape->activate();
     }
@@ -23,7 +23,7 @@ void sge::Entity::activateEntityParts(){
 
 void sge::Entity::pauseEntityParts(){
     sprite->pause();
-    if(physicalObject) physicalObject->pause();
+    if(motionUnit) motionUnit->pause();
     if(!collisionShapes.empty()){
         for(auto& [_, collisionShape] : collisionShapes) collisionShape->pause();
     }
@@ -37,7 +37,7 @@ void sge::Entity::pauseEntityParts(){
 
 void sge::Entity::hideEntityParts(){
     sprite->hide();
-    if(physicalObject) physicalObject->hide();
+    if(motionUnit) motionUnit->hide();
     if(!collisionShapes.empty()){
         for(auto& [_, collisionShape] : collisionShapes) collisionShape->hide();
     }

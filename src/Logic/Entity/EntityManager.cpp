@@ -1,7 +1,7 @@
 #include "EntityManager.h"
 #include "Entity.h"
 #include "../Sprite/SpriteManager.h"
-#include "../Physics/PhysicsManager.h"
+#include "../Physics/MotionUnitManager.h"
 #include "../CollisionShape/CollisionShapeManager.h"
 #include "../ClickableShape/ClickableShapeManager.h"
 #include "../SpriteText/SpriteTextManager.h"
@@ -12,7 +12,7 @@
 
 sge::EntityManager::EntityManager(
         sge::SpriteManager* spriteManager,
-        sge::PhysicsManager* physicsManager,
+        sge::MotionUnitManager* motionUnitManager,
         sge::CollisionShapeManager* collisionShapeManager,
         sge::ClickableShapeManager* clickableShapeManager,
         sge::SpriteTextManager* spriteTextManager,
@@ -21,7 +21,7 @@ sge::EntityManager::EntityManager(
     ){
 
     m_spriteManagerPtr = spriteManager;
-    m_physicsManagerPtr = physicsManager;
+    m_motionUnitManager = motionUnitManager;
     m_collisionShapeManagerPtr = collisionShapeManager;
     m_clickableShapeManagerPtr = clickableShapeManager;
     m_spriteTextManagerPtr = spriteTextManager;
@@ -45,8 +45,8 @@ void sge::EntityManager::deregisterComponent(sf::View* view, sge::Entity* entity
 void sge::EntityManager::m_registerEntityMembers(sf::View* view, sge::Entity* entity){
     m_spriteManagerPtr->registerComponent(view, entity->sprite);
 
-    if(entity->physicalObject){
-        m_physicsManagerPtr->registerComponent(entity->physicalObject);
+    if(entity->motionUnit){
+        m_motionUnitManager->registerComponent(entity->motionUnit);
     }
         
     if(entity->collisionShapes.size()){
@@ -75,8 +75,8 @@ void sge::EntityManager::m_registerEntityMembers(sf::View* view, sge::Entity* en
 void sge::EntityManager::m_deregisterEntityMembers(sf::View* view, sge::Entity* entity){
     m_spriteManagerPtr->deregisterComponent(view, entity->sprite);
 
-    if(entity->physicalObject){
-        m_physicsManagerPtr->deregisterComponent(entity->physicalObject);
+    if(entity->motionUnit){
+        m_motionUnitManager->deregisterComponent(entity->motionUnit);
     }
 
     if(entity->collisionShapes.size()){
