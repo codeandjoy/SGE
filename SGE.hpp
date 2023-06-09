@@ -551,7 +551,7 @@ namespace sge{
 namespace sge{
     class PhysicalObject : public sge::StatefulComponent{
         public:
-            PhysicalObject(sf::Sprite* ownerSprite);
+            PhysicalObject(sf::Sprite* ownerSprite) : m_ownerSpritePtr(ownerSprite){};
 
             sf::Sprite* getOwnerSprite();
 
@@ -1614,8 +1614,6 @@ void sge::PhysicsManager::update(float dt){
     }
 }
 
-
-sge::PhysicalObject::PhysicalObject(sf::Sprite* ownerSprite){ m_ownerSpritePtr = ownerSprite; }
 
 sf::Sprite* sge::PhysicalObject::getOwnerSprite(){ return m_ownerSpritePtr; }
 

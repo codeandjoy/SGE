@@ -13,7 +13,7 @@
 namespace sge{
     class PhysicalObject : public sge::StatefulComponent{
         public:
-            PhysicalObject(sf::Sprite* ownerSprite);
+            PhysicalObject(sf::Sprite* ownerSprite) : m_ownerSpritePtr(ownerSprite){};
 
             sf::Sprite* getOwnerSprite();
 
