@@ -1,5 +1,5 @@
-#ifndef COMPUTATIONS_H
-#define COMPUTATIONS_H
+#ifndef COMPUTATION_SCRIPTS_H
+#define COMPUTATION_SCRIPTS_H
 
 #include <SFML/Graphics.hpp>
 #include <functional>

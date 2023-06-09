@@ -558,21 +558,21 @@ namespace sge{
             sf::Vector2f velocity = sf::Vector2f(0, 0);
             sf::Vector2f acceleration = sf::Vector2f(0, 0);
 
-            void createContinuousComputation(std::string name, std::function<void(sge::PhysicalObject*, float)> computation);
+            void addComputationScript(std::string name, std::function<void(sge::PhysicalObject*, float)> computation);
 
             void update(float dt);
 
         private:
             sf::Sprite* m_ownerSpritePtr;
 
-            std::unordered_map<std::string, std::function<void(sge::PhysicalObject*, float)>> m_continuousComputations;
-            std::vector<std::string> m_continuousComputationOrder;
+            std::unordered_map<std::string, std::function<void(sge::PhysicalObject*, float)>> m_computationScripts;
+            std::vector<std::string> m_computationScriptsOrder;
     };
 }
 
 #endif
-#ifndef COMPUTATIONS_H
-#define COMPUTATIONS_H
+#ifndef COMPUTATION_SCRIPTS_H
+#define COMPUTATION_SCRIPTS_H
 
 #include <SFML/Graphics.hpp>
 #include <functional>
@@ -1187,8 +1187,8 @@ namespace sge{
             MobileEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position, std::vector<std::string> collisionGroups)
                 : sge::StaticEntity(texture, textureRect, position, collisionGroups){
                     physicalObject = new PhysicalObject(sprite);
-                    physicalObject->createContinuousComputation("update_velocity", sge::updateVelocityBasedOnAcceleration());
-                    physicalObject->createContinuousComputation("update_position", sge::updatePositionBasedOnVelocity());
+                    physicalObject->addComputationScript("update_velocity", sge::updateVelocityBasedOnAcceleration());
+                    physicalObject->addComputationScript("update_position", sge::updatePositionBasedOnVelocity());
                 }
     };
 }
@@ -1617,14 +1617,14 @@ void sge::PhysicsManager::update(float dt){
 
 sf::Sprite* sge::PhysicalObject::getOwnerSprite(){ return m_ownerSpritePtr; }
 
-void sge::PhysicalObject::createContinuousComputation(std::string name, std::function<void(sge::PhysicalObject*, float)> computation){
-    m_continuousComputations[name] = computation;
-    m_continuousComputationOrder.push_back(name);
+void sge::PhysicalObject::addComputationScript(std::string name, std::function<void(sge::PhysicalObject*, float)> computation){
+    m_computationScripts[name] = computation;
+    m_computationScriptsOrder.push_back(name);
 }
 
 void sge::PhysicalObject::update(float dt){
-    for(std::string computation : m_continuousComputationOrder){
-        m_continuousComputations[computation](this, dt);
+    for(std::string computation : m_computationScriptsOrder){
+        m_computationScripts[computation](this, dt);
     }
 };
 

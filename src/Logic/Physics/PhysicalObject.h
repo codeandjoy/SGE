@@ -20,15 +20,15 @@ namespace sge{
             sf::Vector2f velocity = sf::Vector2f(0, 0);
             sf::Vector2f acceleration = sf::Vector2f(0, 0);
 
-            void createContinuousComputation(std::string name, std::function<void(sge::PhysicalObject*, float)> computation);
+            void addComputationScript(std::string name, std::function<void(sge::PhysicalObject*, float)> computation);
 
             void update(float dt);
 
         private:
             sf::Sprite* m_ownerSpritePtr;
 
-            std::unordered_map<std::string, std::function<void(sge::PhysicalObject*, float)>> m_continuousComputations;
-            std::vector<std::string> m_continuousComputationOrder;
+            std::unordered_map<std::string, std::function<void(sge::PhysicalObject*, float)>> m_computationScripts;
+            std::vector<std::string> m_computationScriptsOrder;
     };
 }
 

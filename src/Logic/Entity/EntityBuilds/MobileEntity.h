@@ -5,7 +5,7 @@
 
 #include "StaticEntity.h"
 #include "../../Physics/PhysicalObject.h"
-#include "../../Physics/Computations.h"
+#include "../../Physics/ComputationScripts.h"
 
 
 namespace sge{
@@ -14,8 +14,8 @@ namespace sge{
             MobileEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position, std::vector<std::string> collisionGroups)
                 : sge::StaticEntity(texture, textureRect, position, collisionGroups){
                     physicalObject = new PhysicalObject(sprite);
-                    physicalObject->createContinuousComputation("update_velocity", sge::updateVelocityBasedOnAcceleration());
-                    physicalObject->createContinuousComputation("update_position", sge::updatePositionBasedOnVelocity());
+                    physicalObject->addComputationScript("update_velocity", sge::updateVelocityBasedOnAcceleration());
+                    physicalObject->addComputationScript("update_position", sge::updatePositionBasedOnVelocity());
                 }
     };
 }

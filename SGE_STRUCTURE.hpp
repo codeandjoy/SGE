@@ -53,7 +53,7 @@
 
 #include "./src/Logic/Physics/PhysicsManager.h"
 #include "./src/Logic/Physics/PhysicalObject.h"
-#include "./src/Logic/Physics/Computations.h"
+#include "./src/Logic/Physics/ComputationScripts.h"
 
 #include "./src/Logic/Collision/CollisionManager.h"
 #include "./src/Logic/Collision/CollisionInteraction.h"
