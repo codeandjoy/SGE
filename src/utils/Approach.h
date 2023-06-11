@@ -3,11 +3,12 @@
 
 
 namespace sge{
-    float approach(float goal, float current, float dt){
+    float approach(float goal, float step, float current){
         float diff = goal - current;
 
-        if(diff > dt) return current + dt;
-        if(diff < -dt) return current - dt;
+        if(step > abs(goal - current)) return goal;
+        if(diff > step) return current + step;
+        if(diff < -step) return current - step;
         return goal;
     }
 }

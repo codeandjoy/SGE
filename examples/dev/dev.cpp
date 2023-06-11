@@ -14,7 +14,7 @@ class AABBInteraction : public sge::CollisionInteraction{
         bool collisionDetectionAlgorithm(sge::CollisionShape* initiator, sge::CollisionShape* recipient) override{ return sge::boundingBox(initiator, recipient); }
     
         void startPhaseCollisionResponse(std::vector<sge::Collision> collisions) override{
-            printf("star_phase\n");            
+            // printf("star_phase\n");            
         }
 
         void continuousPhaseCollisionResponse(std::vector<sge::Collision> collisions) override{
@@ -23,7 +23,7 @@ class AABBInteraction : public sge::CollisionInteraction{
         }
 
         void endPhaseCollisionResponse(std::vector<sge::Collision> collisions) override{
-            printf("end_phase\n");            
+            // printf("end_phase\n");            
         }
 };
 
@@ -41,6 +41,36 @@ class PlayerSurfaceInteraction : public sge::CollisionInteraction{
         }
 };
 
+class BoxSurfaceInteraction : public sge::CollisionInteraction{
+    public:
+        BoxSurfaceInteraction(std::vector<std::string> initiatorGroups, std::vector<std::string> recipientGroups) : sge::CollisionInteraction(initiatorGroups, recipientGroups){};
+
+        bool collisionDetectionAlgorithm(sge::CollisionShape* initiator, sge::CollisionShape* recipient) override{ return sge::boundingBox(initiator, recipient); }
+    
+        void continuousPhaseCollisionResponse(std::vector<sge::Collision> collisions) override{
+            sge::MotionUnit* boxMotionUnit = collisions[0].initiator->getOwnerEntity()->motionUnit;
+
+            if(boxMotionUnit->velocity.x){
+                if(boxMotionUnit->velocity.x > 0){
+                    boxMotionUnit->contactForces["kinetic_friction"] = sf::Vector2f(-.2, 0);
+                }
+                else if(boxMotionUnit->velocity.x < 0){
+                    boxMotionUnit->contactForces["kinetic_friction"] = sf::Vector2f(.2, 0);
+                }
+            }
+            else if(!boxMotionUnit->velocity.x){
+                boxMotionUnit->contactForces.erase("kinetic_friction");
+                // static friction (irrelevant atm)
+            }
+        }
+
+        void endPhaseCollisionResponse(std::vector<sge::Collision> collisions) override{
+            sge::MotionUnit* boxMotionUnit = collisions[0].initiator->getOwnerEntity()->motionUnit;
+
+            boxMotionUnit->contactForces.erase("kinetic_friction");
+        }
+};
+
 class PushInteraction : public sge::CollisionInteraction{
     public:
         PushInteraction(std::vector<std::string> initiatorGroups, std::vector<std::string> recipientGroups, sge::DebugEntity* boxDE) : sge::CollisionInteraction(initiatorGroups, recipientGroups), boxDE(boxDE){};
@@ -48,24 +78,40 @@ class PushInteraction : public sge::CollisionInteraction{
         bool collisionDetectionAlgorithm(sge::CollisionShape* initiator, sge::CollisionShape* recipient) override{ return sge::boundingBox(initiator, recipient); }
     
         void startPhaseCollisionResponse(std::vector<sge::Collision> collisions) override{
+            printf("start\n");
+
             boxDE->customCollisionShapeBorderSettings["global_bounds"] = sge::CollisionShapeBorderSettings{sf::Color::Red};
 
             for(sge::Collision collision : collisions){
                 if(collision.recipientImpactSide == sge::CollisionSide::right){
-                    collision.recipient->getOwnerEntity()->motionUnit->velocity.x = -30;
+                    // collision.recipient->getOwnerEntity()->motionUnit->velocity.x = -30;
+                    collision.recipient->getOwnerEntity()->motionUnit->contactForces["push"] = sf::Vector2f(-.3, 0);
                 }
                 else if(collision.recipientImpactSide == sge::CollisionSide::left){
-                    collision.recipient->getOwnerEntity()->motionUnit->velocity.x = 30;
+                    collision.recipient->getOwnerEntity()->motionUnit->contactForces["push"] = sf::Vector2f(.3, 0);
                 }
-            }            
+
+                for(auto& [name, _] : collision.recipient->getOwnerEntity()->motionUnit->contactForces){
+                    printf("%s\n", name.c_str());
+                }        
+            }    
+
         }
 
         void endPhaseCollisionResponse(std::vector<sge::Collision> collisions) override{
+            printf("end\n");
+
             boxDE->customCollisionShapeBorderSettings["global_bounds"] = sge::CollisionShapeBorderSettings{sf::Color::Green};
         
             for(sge::Collision collision : collisions){
-                collision.recipient->getOwnerEntity()->motionUnit->velocity.x = 0;
+                collision.recipient->getOwnerEntity()->motionUnit->contactForces.erase("push");
+
+                for(auto& [name, _] : collision.recipient->getOwnerEntity()->motionUnit->contactForces){
+                    printf("endfoces:\n");
+                    printf("%s\n", name.c_str());
+                }
             }          
+
         }
     
     private:
@@ -109,7 +155,6 @@ class PlayerMovingRightState : public sge::State{
         void updateScript(float dt) override{
             if(m_ownerEntityPtr->stateCluster->isStateActive("on_ground")){
                 if(m_ownerEntityPtr->animationCluster->getCurrentTextureSequence() != "walking_right"){
-                    printf("r\n");
                     m_ownerEntityPtr->animationCluster->setCurrentTextureSequence("walking_right");
                 }
             }
@@ -168,7 +213,7 @@ class GravityEntity : public sge::MobileEntity{
     public :
         GravityEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position, std::vector<std::string> collisionGroups)
             : sge::MobileEntity(texture, textureRect, position, collisionGroups){
-                motionUnit->acceleration.y = .4; // Gravity
+                motionUnit->fieldForces["gravity"] = sf::Vector2f(0, .4);
         }
 };
 
@@ -279,16 +324,7 @@ int main(){
     // });
     
     universe->debugScreenManager->addDebugVariable(
-        sf::Vector2f(30, 30),
-        new sge::DebugVariable{
-            [playerEntity](){
-                return
-                    "pos_x: " + std::to_string(playerEntity->sprite->getPosition().x) +
-                    "   pos_y: " + std::to_string(playerEntity->sprite->getPosition().y);
-            }
-        });
-    universe->debugScreenManager->addDebugVariable(
-        sf::Vector2f(30, 80),
+        sf::Vector2f(30, 20),
         new sge::DebugVariable{
             [playerEntity](){
                 std::string activeStates = "";
@@ -298,7 +334,52 @@ int main(){
 
                 return "active_states: " + activeStates;
             }
-        });
+        }
+    );
+    universe->debugScreenManager->addDebugVariable(
+        sf::Vector2f(30, 60),
+        new sge::DebugVariable{
+            [playerEntity](){
+                return
+                    "pos_x: " + std::to_string(playerEntity->sprite->getPosition().x) +
+                    "   pos_y: " + std::to_string(playerEntity->sprite->getPosition().y);
+            }
+        }
+    );
+    universe->debugScreenManager->addDebugVariable(
+        sf::Vector2f(30, 100),
+        new sge::DebugVariable{
+            [playerEntity](){
+                std::string appliedForces = "";
+                for(auto& [forceName, forceValue] : playerEntity->motionUnit->contactForces){
+                    appliedForces += " " + forceName + " -> (" + std::to_string(forceValue.x) + ", " + std::to_string(forceValue.y) + ")";
+                }
+                for(auto& [forceName, forceValue] : playerEntity->motionUnit->fieldForces){
+                    appliedForces += " " + forceName + " -> (" + std::to_string(forceValue.x) + ", " + std::to_string(forceValue.y) + ")";
+                }
+                
+                return "forces: " + appliedForces;
+            }
+        }
+    );
+    universe->debugScreenManager->addDebugVariable(
+        sf::Vector2f(30, 140),
+        new sge::DebugVariable{
+            [playerEntity](){
+                return
+                    "vel: (" + std::to_string(playerEntity->motionUnit->velocity.x) + ", " + std::to_string(playerEntity->motionUnit->velocity.y) + ")";
+            }
+        }
+    );
+    universe->debugScreenManager->addDebugVariable(
+        sf::Vector2f(30, 180),
+        new sge::DebugVariable{
+            [playerEntity](){
+                return
+                    "acc: (" + std::to_string(playerEntity->motionUnit->acceleration.x) + ", " + std::to_string(playerEntity->motionUnit->acceleration.y) + ")";
+            }
+        }
+    );
     //
 
 
@@ -342,8 +423,50 @@ int main(){
         {"box"}
     );
 
+    boxEntity->motionUnit->addComputationScript("friction_force_computation", [](sge::MotionUnit* thisMotionUnit, float dt){
+        if(thisMotionUnit->contactForces.count("kinetic_friction")){
+            thisMotionUnit->velocity.x = sge::approach(0, abs(thisMotionUnit->contactForces["kinetic_friction"].x), thisMotionUnit->velocity.x);
+            thisMotionUnit->velocity.y = sge::approach(0, abs(thisMotionUnit->contactForces["kinetic_friction"].y), thisMotionUnit->velocity.y);
+        }
+    });
+
     sge::DebugEntity* boxDE = new sge::DebugEntity(boxEntity);
     boxDE->customCollisionShapeBorderSettings["global_bounds"] = sge::CollisionShapeBorderSettings{sf::Color::Green};
+
+    universe->debugScreenManager->addDebugVariable(
+        sf::Vector2f(500, 20),
+        new sge::DebugVariable{
+            [boxEntity](){
+                std::string appliedForces = "";
+                for(auto& [forceName, forceValue] : boxEntity->motionUnit->contactForces){
+                    appliedForces += " " + forceName + " -> (" + std::to_string(forceValue.x) + ", " + std::to_string(forceValue.y) + ")";
+                }
+                for(auto& [forceName, forceValue] : boxEntity->motionUnit->fieldForces){
+                    appliedForces += " " + forceName + " -> (" + std::to_string(forceValue.x) + ", " + std::to_string(forceValue.y) + ")";
+                }
+                
+                return "[box] forces: " + appliedForces;
+            }
+        }
+    );
+    universe->debugScreenManager->addDebugVariable(
+        sf::Vector2f(500, 60),
+        new sge::DebugVariable{
+            [boxEntity](){
+                return
+                    "[box] vel: (" + std::to_string(boxEntity->motionUnit->velocity.x) + ", " + std::to_string(boxEntity->motionUnit->velocity.y) + ")";
+            }
+        }
+    );
+    universe->debugScreenManager->addDebugVariable(
+        sf::Vector2f(500, 100),
+        new sge::DebugVariable{
+            [boxEntity](){
+                return
+                    "[box] acc: (" + std::to_string(boxEntity->motionUnit->acceleration.x) + ", " + std::to_string(boxEntity->motionUnit->acceleration.y) + ")";
+            }
+        }
+    );
     //
     
 
@@ -372,6 +495,7 @@ int main(){
     universe->collisionManager->registerComponent(new AABBInteraction({"player"}, {"tiles", "box"}));
     universe->collisionManager->registerComponent(new PlayerSurfaceInteraction({"player"}, {"tiles", "box"}));
     universe->collisionManager->registerComponent(new AABBInteraction({"box"}, {"tiles"}));
+    universe->collisionManager->registerComponent(new BoxSurfaceInteraction({"box"}, {"tiles"}));
     universe->collisionManager->registerComponent(new PushInteraction({"player"}, {"box"}, boxDE));
 
 

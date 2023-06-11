@@ -14,6 +14,7 @@ namespace sge{
             MobileEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position, std::vector<std::string> collisionGroups)
                 : sge::StaticEntity(texture, textureRect, position, collisionGroups){
                     motionUnit = new MotionUnit(sprite);
+                    motionUnit->addComputationScript("update_acceleration", sge::calculateAcceleration());
                     motionUnit->addComputationScript("update_velocity", sge::updateVelocityBasedOnAcceleration());
                     motionUnit->addComputationScript("update_position", sge::updatePositionBasedOnVelocity());
                 }

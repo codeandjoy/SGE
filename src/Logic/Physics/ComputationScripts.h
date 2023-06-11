@@ -11,6 +11,8 @@ namespace sge{
     std::function<void(sge::MotionUnit*, float)> updatePositionBasedOnVelocity();
 
     std::function<void(sge::MotionUnit*, float)> updateVelocityBasedOnAcceleration(sf::Vector2f speedLimit=sf::Vector2f(9999, 9999));
+
+    std::function<void(sge::MotionUnit*, float)> calculateAcceleration();
 }
 
 

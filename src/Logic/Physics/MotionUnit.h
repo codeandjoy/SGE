@@ -17,8 +17,15 @@ namespace sge{
 
             sf::Sprite* getOwnerSprite();
 
+
             sf::Vector2f velocity = sf::Vector2f(0, 0);
             sf::Vector2f acceleration = sf::Vector2f(0, 0);
+            std::unordered_map<std::string, sf::Vector2f> extraProperties;
+
+
+            std::unordered_map<std::string, sf::Vector2f> contactForces; // frictional forces, air resistance, tension, applied forces, normal forces, forces in springs
+            std::unordered_map<std::string, sf::Vector2f> fieldForces; // gravitational, electric, magnetic
+
 
             void addComputationScript(std::string name, std::function<void(sge::MotionUnit*, float)> computation);
 

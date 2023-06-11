@@ -557,6 +557,10 @@ namespace sge{
 
             sf::Vector2f velocity = sf::Vector2f(0, 0);
             sf::Vector2f acceleration = sf::Vector2f(0, 0);
+            std::unordered_map<std::string, sf::Vector2f> extraProperties;
+
+            std::unordered_map<std::string, sf::Vector2f> contactForces; // frictional forces, air resistance, tension, applied forces, normal forces, forces in springs
+            std::unordered_map<std::string, sf::Vector2f> fieldForces; // gravitational, electric, magnetic
 
             void addComputationScript(std::string name, std::function<void(sge::MotionUnit*, float)> computation);
 
@@ -583,6 +587,8 @@ namespace sge{
     std::function<void(sge::MotionUnit*, float)> updatePositionBasedOnVelocity();
 
     std::function<void(sge::MotionUnit*, float)> updateVelocityBasedOnAcceleration(sf::Vector2f speedLimit=sf::Vector2f(9999, 9999));
+
+    std::function<void(sge::MotionUnit*, float)> calculateAcceleration();
 }
 
 #endif
@@ -1187,6 +1193,7 @@ namespace sge{
             MobileEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position, std::vector<std::string> collisionGroups)
                 : sge::StaticEntity(texture, textureRect, position, collisionGroups){
                     motionUnit = new MotionUnit(sprite);
+                    motionUnit->addComputationScript("update_acceleration", sge::calculateAcceleration());
                     motionUnit->addComputationScript("update_velocity", sge::updateVelocityBasedOnAcceleration());
                     motionUnit->addComputationScript("update_position", sge::updatePositionBasedOnVelocity());
                 }
@@ -1274,11 +1281,12 @@ namespace sge{
 #define APPROACH_H
 
 namespace sge{
-    float approach(float goal, float current, float dt){
+    float approach(float goal, float step, float current){
         float diff = goal - current;
 
-        if(diff > dt) return current + dt;
-        if(diff < -dt) return current - dt;
+        if(step > abs(goal - current)) return goal;
+        if(diff > step) return current + step;
+        if(diff < -step) return current - step;
         return goal;
     }
 }
@@ -1630,26 +1638,29 @@ void sge::MotionUnit::update(float dt){
 
 
 std::function<void(sge::MotionUnit*, float)> sge::updatePositionBasedOnVelocity(){
-    return [](sge::MotionUnit* thisPhysicalObject, float dt){
-        thisPhysicalObject->getOwnerSprite()->setPosition(thisPhysicalObject->getOwnerSprite()->getPosition() + thisPhysicalObject->velocity * dt);
+    return [](sge::MotionUnit* thisMotionUnit, float dt){
+        thisMotionUnit->getOwnerSprite()->setPosition(thisMotionUnit->getOwnerSprite()->getPosition() + thisMotionUnit->velocity * dt);
     };
 }
 
 std::function<void(sge::MotionUnit*, float)> sge::updateVelocityBasedOnAcceleration(sf::Vector2f speedLimit){
-    return [speedLimit](sge::MotionUnit* thisPhysicalObject, float dt){
-        if(abs(thisPhysicalObject->velocity.x) >= speedLimit.x){
-            thisPhysicalObject->velocity.x = speedLimit.x;
+    return [speedLimit](sge::MotionUnit* thisMotionUnit, float dt){
+        thisMotionUnit->velocity.x = sge::approach(speedLimit.x, thisMotionUnit->acceleration.x*dt, thisMotionUnit->velocity.x);
+        thisMotionUnit->velocity.y = sge::approach(speedLimit.y, thisMotionUnit->acceleration.y*dt, thisMotionUnit->velocity.y);
+    };
+}
+
+std::function<void(sge::MotionUnit*, float)> sge::calculateAcceleration(){
+    return [](sge::MotionUnit* thisMotionUnit, float dt){
+        sf::Vector2f netForce = sf::Vector2f(0, 0);
+        for(auto& [_, force] : thisMotionUnit->contactForces){
+            netForce += force;
         }
-        else{
-            thisPhysicalObject->velocity.x += thisPhysicalObject->acceleration.x;
+        for(auto& [_, force] : thisMotionUnit->fieldForces){
+            netForce += force;
         }
 
-        if(abs(thisPhysicalObject->velocity.y) >= speedLimit.y){
-            thisPhysicalObject->velocity.y = speedLimit.y;
-        }
-        else{
-            thisPhysicalObject->velocity.y += thisPhysicalObject->acceleration.y;
-        }
+        thisMotionUnit->acceleration = netForce;
     };
 }
 #include <algorithm>
