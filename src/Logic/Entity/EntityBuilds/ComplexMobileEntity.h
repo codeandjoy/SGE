@@ -9,10 +9,10 @@
 
 
 namespace sge{
-    class ComplexMobileEntity : public sge::StaticEntity{
+    class ComplexMobileEntity : public sge::MobileEntity{
         public:
             ComplexMobileEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position, std::vector<std::string> collisionGroups)
-                : sge::StaticEntity(texture, textureRect, position, collisionGroups){
+                : sge::MobileEntity(texture, textureRect, position, collisionGroups){
                     motionUnit->addComputationScript("update_acceleration", sge::calculateAcceleration());
                     motionUnit->addComputationScript("update_velocity", sge::updateVelocityBasedOnAcceleration());
                     motionUnit->addComputationScript("update_position", sge::updatePositionBasedOnVelocity());

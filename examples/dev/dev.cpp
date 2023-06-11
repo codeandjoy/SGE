@@ -209,10 +209,10 @@ class PlayerOnGroundState : public sge::State{
 
 
 
-class GravityEntity : public sge::MobileEntity{
+class GravityEntity : public sge::ComplexMobileEntity{
     public :
         GravityEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position, std::vector<std::string> collisionGroups)
-            : sge::MobileEntity(texture, textureRect, position, collisionGroups){
+            : sge::ComplexMobileEntity(texture, textureRect, position, collisionGroups){
                 motionUnit->fieldForces["gravity"] = sf::Vector2f(0, .4);
         }
 };
