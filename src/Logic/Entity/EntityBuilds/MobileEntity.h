@@ -8,9 +8,9 @@
 
 
 namespace sge{
-    class ComplexMobileEntity : public sge::StaticEntity{
+    class MobileEntity : public sge::StaticEntity{
         public:
-            ComplexMobileEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position, std::vector<std::string> collisionGroups)
+            MobileEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position, std::vector<std::string> collisionGroups)
                 : sge::StaticEntity(texture, textureRect, position, collisionGroups){
                     motionUnit = new MotionUnit(sprite);
                 }

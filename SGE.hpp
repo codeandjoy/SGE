@@ -1193,6 +1193,38 @@ namespace sge{
             MobileEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position, std::vector<std::string> collisionGroups)
                 : sge::StaticEntity(texture, textureRect, position, collisionGroups){
                     motionUnit = new MotionUnit(sprite);
+                }
+    };
+}
+
+#endif
+#ifndef SIMPLE_MOBILE_ENTITY_H
+#define SIMPLE_MOBILE_ENTITY_H
+
+#include <SFML/Graphics.hpp>
+
+namespace sge{
+    class SimpleMobileEntity : public sge::StaticEntity{
+        public:
+            SimpleMobileEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position, std::vector<std::string> collisionGroups)
+                : sge::StaticEntity(texture, textureRect, position, collisionGroups){
+                    motionUnit->addComputationScript("update_velocity", sge::updateVelocityBasedOnAcceleration());
+                    motionUnit->addComputationScript("update_position", sge::updatePositionBasedOnVelocity());
+                }
+    };
+}
+
+#endif
+#ifndef COMPLEX_MOBILE_ENTITY_H
+#define COMPLEX_MOBILE_ENTITY_H
+
+#include <SFML/Graphics.hpp>
+
+namespace sge{
+    class ComplexMobileEntity : public sge::StaticEntity{
+        public:
+            ComplexMobileEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position, std::vector<std::string> collisionGroups)
+                : sge::StaticEntity(texture, textureRect, position, collisionGroups){
                     motionUnit->addComputationScript("update_acceleration", sge::calculateAcceleration());
                     motionUnit->addComputationScript("update_velocity", sge::updateVelocityBasedOnAcceleration());
                     motionUnit->addComputationScript("update_position", sge::updatePositionBasedOnVelocity());
@@ -1637,12 +1669,15 @@ void sge::MotionUnit::update(float dt){
 };
 
 
+// displacement = v * Δt
+// new position = old position + displacement
 std::function<void(sge::MotionUnit*, float)> sge::updatePositionBasedOnVelocity(){
     return [](sge::MotionUnit* thisMotionUnit, float dt){
         thisMotionUnit->getOwnerSprite()->setPosition(thisMotionUnit->getOwnerSprite()->getPosition() + thisMotionUnit->velocity * dt);
     };
 }
 
+// Δv = a / Δt
 std::function<void(sge::MotionUnit*, float)> sge::updateVelocityBasedOnAcceleration(sf::Vector2f speedLimit){
     return [speedLimit](sge::MotionUnit* thisMotionUnit, float dt){
         thisMotionUnit->velocity.x = sge::approach(speedLimit.x, thisMotionUnit->acceleration.x*dt, thisMotionUnit->velocity.x);
@@ -1650,6 +1685,7 @@ std::function<void(sge::MotionUnit*, float)> sge::updateVelocityBasedOnAccelerat
     };
 }
 
+// a = Σ contactForces + Σ fieldForces
 std::function<void(sge::MotionUnit*, float)> sge::calculateAcceleration(){
     return [](sge::MotionUnit* thisMotionUnit, float dt){
         sf::Vector2f netForce = sf::Vector2f(0, 0);

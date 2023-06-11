@@ -86,6 +86,8 @@
 #include "./src/Logic/Entity/EntityBuilds/VoidEntity.h"
 #include "./src/Logic/Entity/EntityBuilds/StaticEntity.h"
 #include "./src/Logic/Entity/EntityBuilds/MobileEntity.h"
+#include "./src/Logic/Entity/EntityBuilds/SimpleMobileEntity.h"
+#include "./src/Logic/Entity/EntityBuilds/ComplexMobileEntity.h"
 
 #include "./src/Logic/Scene/Scene.h"
 #include "./src/Logic/Scene/SceneManager.h"
