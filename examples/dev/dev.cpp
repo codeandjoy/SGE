@@ -52,10 +52,10 @@ class BoxSurfaceInteraction : public sge::CollisionInteraction{
 
             if(boxMotionUnit->velocity.x){
                 if(boxMotionUnit->velocity.x > 0){
-                    boxMotionUnit->contactForces["kinetic_friction"] = sf::Vector2f(-.2, 0);
+                    boxMotionUnit->contactForces["kinetic_friction"] = sf::Vector2f(-200, 0);
                 }
                 else if(boxMotionUnit->velocity.x < 0){
-                    boxMotionUnit->contactForces["kinetic_friction"] = sf::Vector2f(.2, 0);
+                    boxMotionUnit->contactForces["kinetic_friction"] = sf::Vector2f(200, 0);
                 }
             }
             else if(!boxMotionUnit->velocity.x){
@@ -85,10 +85,10 @@ class PushInteraction : public sge::CollisionInteraction{
             for(sge::Collision collision : collisions){
                 if(collision.recipientImpactSide == sge::CollisionSide::right){
                     // collision.recipient->getOwnerEntity()->motionUnit->velocity.x = -30;
-                    collision.recipient->getOwnerEntity()->motionUnit->contactForces["push"] = sf::Vector2f(-.3, 0);
+                    collision.recipient->getOwnerEntity()->motionUnit->contactForces["push"] = sf::Vector2f(-300, 0);
                 }
                 else if(collision.recipientImpactSide == sge::CollisionSide::left){
-                    collision.recipient->getOwnerEntity()->motionUnit->contactForces["push"] = sf::Vector2f(.3, 0);
+                    collision.recipient->getOwnerEntity()->motionUnit->contactForces["push"] = sf::Vector2f(300, 0);
                 }
 
                 for(auto& [name, _] : collision.recipient->getOwnerEntity()->motionUnit->contactForces){
@@ -213,7 +213,7 @@ class GravityEntity : public sge::ComplexMobileEntity{
     public :
         GravityEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position, std::vector<std::string> collisionGroups)
             : sge::ComplexMobileEntity(texture, textureRect, position, collisionGroups){
-                motionUnit->fieldForces["gravity"] = sf::Vector2f(0, .4);
+                motionUnit->fieldForces["gravity"] = sf::Vector2f(0, 1000); //.4
         }
 };
 
@@ -425,8 +425,8 @@ int main(){
 
     boxEntity->motionUnit->addComputationScript("friction_force_computation", [](sge::MotionUnit* thisMotionUnit, float dt){
         if(thisMotionUnit->contactForces.count("kinetic_friction")){
-            thisMotionUnit->velocity.x = sge::approach(0, abs(thisMotionUnit->contactForces["kinetic_friction"].x), thisMotionUnit->velocity.x);
-            thisMotionUnit->velocity.y = sge::approach(0, abs(thisMotionUnit->contactForces["kinetic_friction"].y), thisMotionUnit->velocity.y);
+            thisMotionUnit->velocity.x = sge::approach(0, abs(thisMotionUnit->contactForces["kinetic_friction"].x*dt), thisMotionUnit->velocity.x);
+            thisMotionUnit->velocity.y = sge::approach(0, abs(thisMotionUnit->contactForces["kinetic_friction"].y*dt), thisMotionUnit->velocity.y);
         }
     });
 
