@@ -5,8 +5,8 @@
 #include <vector>
 #include <SFML/Graphics.hpp>
 
-#include "../../Manager/StorageManagers/ViewManager.h"
-#include "../../Manager/LoopSectionManagers/DrawManager.h"
+#include "../../Structure/Manager/StorageManagers/ViewManager.h"
+#include "../../Structure/Manager/LoopSectionManagers/DrawManager.h"
 
 
 namespace sge{

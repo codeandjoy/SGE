@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include <string>
 
-#include "../../Manager/StorageManagers/LabelManager.h"
+#include "../../Structure/Manager/StorageManagers/LabelManager.h"
 
 
 namespace sge{

@@ -7,14 +7,14 @@
 #include "./src/Universe/Universe.h"
 
 // Manager
-#include "./src/Manager/StorageManagers/VectorManager.h"
-#include "./src/Manager/StorageManagers/ViewManager.h"
-#include "./src/Manager/StorageManagers/LabelManager.h"
+#include "./src/Structure/Manager/StorageManagers/VectorManager.h"
+#include "./src/Structure/Manager/StorageManagers/ViewManager.h"
+#include "./src/Structure/Manager/StorageManagers/LabelManager.h"
 //
 
 
 // Component
-#include "./src/Component/StatefulComponent.h"
+#include "./src/Structure/Component/StatefulComponent.h"
 //
 
 
@@ -49,6 +49,7 @@
 
 
 // Logic
+#include "./src/Logic/Sprite/Sprite.h"
 #include "./src/Logic/Sprite/SpriteManager.h"
 
 #include "./src/Logic/Physics/MotionUnitManager.h"

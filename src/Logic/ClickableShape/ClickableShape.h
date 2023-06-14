@@ -4,7 +4,7 @@
 #include <functional>
 #include <SFML/Graphics.hpp>
 #include "../../Logic/CollisionShape/CollisionShape.h"
-#include "../../Component/StatefulComponent.h"
+#include "../../Structure/Component/StatefulComponent.h"
 
 
 namespace sge{

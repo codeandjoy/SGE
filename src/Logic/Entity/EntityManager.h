@@ -5,7 +5,7 @@
 #include <vector>
 #include <SFML/Graphics.hpp>
 
-#include "../../Manager/StorageManagers/ViewManager.h"
+#include "../../Structure/Manager/StorageManagers/ViewManager.h"
 
 
 namespace sge{

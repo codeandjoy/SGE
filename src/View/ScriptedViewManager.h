@@ -5,8 +5,8 @@
 #include <vector>
 #include <string>
 
-#include "../Manager/StorageManagers/VectorManager.h"
-#include "../Manager/LoopSectionManagers/UpdateManager.h"
+#include "../Structure/Manager/StorageManagers/VectorManager.h"
+#include "../Structure/Manager/LoopSectionManagers/UpdateManager.h"
 
 
 namespace sge{

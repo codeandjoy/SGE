@@ -2,7 +2,7 @@
 #define ENTITY_H
 
 #include <unordered_map>
-#include "../../Component/StatefulComponent.h"
+#include "../../Structure/Component/StatefulComponent.h"
 
 
 namespace sge{

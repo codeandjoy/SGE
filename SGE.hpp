@@ -500,6 +500,21 @@ namespace sge{
 //
 
 // Logic
+#ifndef SPRITE_H
+#define SPRITE_H
+
+#include <SFML/Graphics.hpp>
+
+namespace sge{
+    class Sprite : public sge::StatefulComponent, public sf::Sprite{
+        public:
+            Sprite() : sf::Sprite(){};
+            Sprite(const sf::Texture& texture) : sf::Sprite(texture){};
+            Sprite(const sf::Texture& texture, const sf::IntRect& rectangle) : sf::Sprite(texture, rectangle){};
+    };
+}
+
+#endif
 #ifndef SPRITE_MANAGER_H
 #define SPRITE_MANAGER_H
 
@@ -1120,22 +1135,6 @@ namespace sge{
 
 #include <SFML/Graphics.hpp>
 
-#ifndef SPRITE_H
-#define SPRITE_H
-
-#include <SFML/Graphics.hpp>
-
-namespace sge{
-    class Sprite : public sge::StatefulComponent, public sf::Sprite{
-        public:
-            Sprite() : sf::Sprite(){};
-            Sprite(const sf::Texture& texture) : sf::Sprite(texture){};
-            Sprite(const sf::Texture& texture, const sf::IntRect& rectangle) : sf::Sprite(texture, rectangle){};
-    };
-}
-
-#endif
-
 namespace sge{
     class PlainEntity : public sge::Entity{
         public:
@@ -1735,13 +1734,25 @@ void sge::CollisionManager::updateCollisions(){
                 std::sort(pastCollisions.begin(), pastCollisions.end());
 
                 std::vector<sge::Collision> continuousPhaseCollisions;
-                std::set_intersection(pastCollisions.begin(),pastCollisions.end(), presentCollisions.begin(),presentCollisions.end(), std::back_inserter(continuousPhaseCollisions));
+                std::set_intersection(
+                    pastCollisions.begin(),pastCollisions.end(),
+                    presentCollisions.begin(),presentCollisions.end(),
+                    std::back_inserter(continuousPhaseCollisions)
+                );
 
                 std::vector<sge::Collision> startPhaseCollisions;
-                std::set_difference(presentCollisions.begin(),presentCollisions.end(), continuousPhaseCollisions.begin(),continuousPhaseCollisions.end(), std::back_inserter(startPhaseCollisions));
+                std::set_difference(
+                    presentCollisions.begin(),presentCollisions.end(),
+                    continuousPhaseCollisions.begin(),continuousPhaseCollisions.end(),
+                    std::back_inserter(startPhaseCollisions)
+                );
 
                 std::vector<sge::Collision> endPhaseCollisions;
-                std::set_difference(pastCollisions.begin(),pastCollisions.end(), continuousPhaseCollisions.begin(),continuousPhaseCollisions.end(), std::back_inserter(endPhaseCollisions));
+                std::set_difference(
+                    pastCollisions.begin(),pastCollisions.end(),
+                    continuousPhaseCollisions.begin(),continuousPhaseCollisions.end(),
+                    std::back_inserter(endPhaseCollisions)
+                );
                 //
 
                 // Run collision responses based on collision phase

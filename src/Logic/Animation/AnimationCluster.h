@@ -6,7 +6,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "../../Component/StatefulComponent.h"
+#include "../../Structure/Component/StatefulComponent.h"
 
 
 namespace sge{

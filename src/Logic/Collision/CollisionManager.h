@@ -6,7 +6,7 @@
 #include <unordered_map>
 #include <functional>
 
-#include "../../Manager/StorageManagers/VectorManager.h"
+#include "../../Structure/Manager/StorageManagers/VectorManager.h"
 
 
 namespace sge{

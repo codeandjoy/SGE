@@ -5,7 +5,7 @@
 #include <vector>
 #include <string>
 
-#include "../../Component/StatefulComponent.h"
+#include "../../Structure/Component/StatefulComponent.h"
 
 
 namespace sge{

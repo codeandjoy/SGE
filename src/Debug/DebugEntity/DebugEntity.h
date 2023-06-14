@@ -8,7 +8,7 @@
 #include <functional>
 
 #include "./CollisionShapeBorder/CollisionShapeBorderSettings.h"
-#include "../../Component/StatefulComponent.h"
+#include "../../Structure/Component/StatefulComponent.h"
 
 
 namespace sge{

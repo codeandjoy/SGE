@@ -2,7 +2,7 @@
 #define SPRITE_H
 
 #include <SFML/Graphics.hpp>
-#include "../../Component/StatefulComponent.h"
+#include "../../Structure/Component/StatefulComponent.h"
 
 
 namespace sge{
