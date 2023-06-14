@@ -297,8 +297,15 @@ int main(){
 
 
     // Load assets
-    universe->assetsManager->loadTextureSheet(std::filesystem::current_path().string() + "/examples/dev/assets/tilemap.png", "tileset", sge::TextureSheetSizes{16, 16, 20, 20});
-    universe->assetsManager->loadFont(std::filesystem::current_path().string() + "/examples/dev/assets/m5x7.ttf", "m5x7");
+    universe->assetsManager->loadTextureSheet(
+        std::filesystem::current_path().string() + "/examples/dev/assets/tilemap.png",
+        "tileset",
+        sge::TextureSheetSizes{16, 16, 20, 20}
+    );
+    universe->assetsManager->loadFont(
+        std::filesystem::current_path().string() + "/examples/dev/assets/m5x7.ttf",
+        "m5x7"
+    );
     //
 
 

@@ -44,13 +44,25 @@ void sge::CollisionManager::updateCollisions(){
 
 
                 std::vector<sge::Collision> continuousPhaseCollisions;
-                std::set_intersection(pastCollisions.begin(),pastCollisions.end(), presentCollisions.begin(),presentCollisions.end(), std::back_inserter(continuousPhaseCollisions));
+                std::set_intersection(
+                    pastCollisions.begin(),pastCollisions.end(),
+                    presentCollisions.begin(),presentCollisions.end(),
+                    std::back_inserter(continuousPhaseCollisions)
+                );
 
                 std::vector<sge::Collision> startPhaseCollisions;
-                std::set_difference(presentCollisions.begin(),presentCollisions.end(), continuousPhaseCollisions.begin(),continuousPhaseCollisions.end(), std::back_inserter(startPhaseCollisions));
+                std::set_difference(
+                    presentCollisions.begin(),presentCollisions.end(),
+                    continuousPhaseCollisions.begin(),continuousPhaseCollisions.end(),
+                    std::back_inserter(startPhaseCollisions)
+                );
 
                 std::vector<sge::Collision> endPhaseCollisions;
-                std::set_difference(pastCollisions.begin(),pastCollisions.end(), continuousPhaseCollisions.begin(),continuousPhaseCollisions.end(), std::back_inserter(endPhaseCollisions));
+                std::set_difference(
+                    pastCollisions.begin(),pastCollisions.end(),
+                    continuousPhaseCollisions.begin(),continuousPhaseCollisions.end(),
+                    std::back_inserter(endPhaseCollisions)
+                );
                 //
 
 
