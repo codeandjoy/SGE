@@ -1,0 +1,38 @@
+<mxfile host="Electron" modified="2023-06-14T07:57:15.293Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.3.7 Chrome/112.0.5615.204 Electron/24.5.0 Safari/537.36" etag="D1CFC8PGFezr0BcxsphG" version="21.3.7" type="device">
+  <diagram name="Page-1" id="bc7hq1MvycJlzJRAAdbg">
+    <mxGraphModel dx="1114" dy="1001" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="QkMLtE8Wo1dnLrAa1BhA-1" value="Assets" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="221.5" y="-110" width="438.5" height="230" as="geometry" />
+        </mxCell>
+        <mxCell id="QkMLtE8Wo1dnLrAa1BhA-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=diamondThin;endFill=0;" edge="1" parent="QkMLtE8Wo1dnLrAa1BhA-1" source="QkMLtE8Wo1dnLrAa1BhA-3" target="QkMLtE8Wo1dnLrAa1BhA-8">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="260.0000000000002" y="125.00000000000011" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="QkMLtE8Wo1dnLrAa1BhA-3" value="TextureSheet" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#0050ef;fontColor=#ffffff;strokeColor=#001DBC;" vertex="1" parent="QkMLtE8Wo1dnLrAa1BhA-1">
+          <mxGeometry x="41" y="60" width="140" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="QkMLtE8Wo1dnLrAa1BhA-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=diamondThin;endFill=0;" edge="1" parent="QkMLtE8Wo1dnLrAa1BhA-1" source="QkMLtE8Wo1dnLrAa1BhA-5" target="QkMLtE8Wo1dnLrAa1BhA-8">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="260.0000000000002" y="125.00000000000011" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="QkMLtE8Wo1dnLrAa1BhA-5" value="sf::Font" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#0050ef;fontColor=#ffffff;strokeColor=#001DBC;" vertex="1" parent="QkMLtE8Wo1dnLrAa1BhA-1">
+          <mxGeometry x="41.5" y="110" width="140" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="QkMLtE8Wo1dnLrAa1BhA-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=diamondThin;endFill=0;" edge="1" parent="QkMLtE8Wo1dnLrAa1BhA-1" source="QkMLtE8Wo1dnLrAa1BhA-7" target="QkMLtE8Wo1dnLrAa1BhA-8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="QkMLtE8Wo1dnLrAa1BhA-7" value="sf::Sound" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#0050ef;fontColor=#ffffff;strokeColor=#001DBC;" vertex="1" parent="QkMLtE8Wo1dnLrAa1BhA-1">
+          <mxGeometry x="41" y="160" width="140" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="QkMLtE8Wo1dnLrAa1BhA-8" value="AssetsManager" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;" vertex="1" parent="QkMLtE8Wo1dnLrAa1BhA-1">
+          <mxGeometry x="256" y="110" width="140" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
