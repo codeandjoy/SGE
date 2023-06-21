@@ -2,7 +2,16 @@
 
 ![Game engine structure](../../notes/Engine.drawio.png)
 
-Simple Game Engine implements architecture that can be called Component-Manager.
+As you can see in the above diagram, the engine is *logically* divided into 5 blocks:
+- **Assets** - for media resource management
+- **Controller** - for input device management and scripting
+- **View** - for view scripting
+- **Logic** - main engine logic
+- **Debug** - debug functionality
+
+<br>
+
+Simple Game Engine implements the Component-Manager architecture, where:
 
 <br>
 
@@ -22,9 +31,12 @@ This functionality allows to "pause" or "hide" objects and scenes with ease.
 
 The manager's purpose is to 'manage' (register, deregister, store) and process components.
 
-Some managers, for refactoring purposes and for logical purposes, are divided into certain types:
+Some managers, for refactoring purposes and for logical purposes, are divided into the following types:
 
 ![Manager types diagram](../../notes/Managers.drawio.png)
 
 This allows to clearly distinguish what each manager does and save a couple lines of implementation code.
 
+<br>
+
+Suggested next step: learn about [Universe](../Universe/README.md).

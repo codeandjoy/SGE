@@ -6,6 +6,22 @@
 
 It is redefined to inherit the `StatefulComponent` functionality.
 
+### Usage examples:
+
+Adding a `sge::Sprite` to `Entity`:
+
+```C++
+class PlainEntity : public sge::Entity{
+    public:
+        PlainEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position){
+            sprite = new sge::Sprite(*texture, textureRect);
+            sprite->setPosition(position);
+        }
+};
+```
+
+<br>
+
 # SpriteManager
 
 `SpriteManager` is a `ViewManager` and a `DrawManager`.

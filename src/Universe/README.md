@@ -1,6 +1,6 @@
 # Universe
 
-"Universe" is the main engine class that organizes all functionality in the main engine loop.
+`Universe` is the main engine class that organizes all functionality in the *main engine loop*.
 
 The order of processing in the main loop can be illustrated as follows:
 
@@ -14,7 +14,7 @@ To use the game engine you should initialize the `Universe` object which in turn
 
 `Universe` requires you to initialize and pass it the [sf::RenderWindow](https://www.sfml-dev.org/documentation/2.5.1/classsf_1_1RenderWindow.php).
 
-The global program sctructure would look like this:
+The minimal global program sctructure would look like this:
 
 ```C++
 int main(){
@@ -87,3 +87,7 @@ int main(){
 ```
 
 Obviously you can setup and use both debug managers at the same time.
+
+<br>
+
+Suggested next step: you can continue learning how this engine works by looking up READMEs in `/src/*` subdirectories or skip to usage examples in `/examples/*` subdirectories.

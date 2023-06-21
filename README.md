@@ -37,6 +37,8 @@ int main(){
 
 You can find in depth documentation in `/src/*` subdirectories and usage explanations in `/examples/*` subdirectories.
 
+Start with learning [structure and key concepts](./src/Structure/README.md) of the engine.
+
 <br>
 
 ## Contributing

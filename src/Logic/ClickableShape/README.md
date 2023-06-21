@@ -4,6 +4,13 @@
 
 `ClickableShape` defines the `action(...)` function that will be executed each engine loop iteration and can be used to write click handling code.
 
+### Usage examples:
+
+Adding `ClickableShape` to `Entity`:
+
+```C++
+```
+
 <br>
 
 # ClickableShapeManager

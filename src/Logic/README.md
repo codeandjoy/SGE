@@ -38,7 +38,7 @@ This concept gives the engine a lot of flexibility while keeping the structure s
 
 A `Scene` is basically a container for Entities. Using scenes you can group related entities (for example in levels or screens) and conveniently manage them together.
 
-Further descriptions are written in sub directories.
+Further descriptions are written in `./Scene`.
 
 <br>
 
@@ -46,7 +46,7 @@ Further descriptions are written in sub directories.
 
 To code physics using SGE you must use the `Entity` object that contains the `Sprite` and `MotionUnit`.
 
-`MotionUnit` contains certain physical properties that can be used in computation functions.
+`MotionUnit` contains physical properties that can be used in computation functions to simulate physics.
 
 <br>
 
@@ -67,4 +67,4 @@ The combination of collision interactions and `MotionUnit` calculations allow to
 <br>
 <br>
 
-In depth documentation about each "Logic" concept can be found in subdirectories.
+In depth documentation about each "Logic" concept can be found in `./*` subdirectories.
