@@ -101,7 +101,7 @@ void sge::Universe::loop(){
         m_animationManager->update(dt);
         scriptedViewManager->update(dt);
 
-        debugScreenManager->updateDebugVariables();
+        if(debugScreenManager) debugScreenManager->updateDebugVariables();
 
         drumSceneManager->alignScene(); // Scene can be reset only after all managers finished their updates to prevent segfaults in loops
         //

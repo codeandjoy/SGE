@@ -1,18 +1,26 @@
+#include <stdio.h>
 #include <filesystem>
-#include <tmxlite/Map.hpp>
-#include <tmxlite/TileLayer.hpp>
-#include <tmxlite/ObjectGroup.hpp>
+
+#include <SFML/Graphics.hpp>
 #include "../../SGE.hpp"
 
+#include "../_common/PlayerStates.h"
+#include "../_common/AABBInteraction.h"
+#include "../_common/PlayerSurfaceInteraction.h"
+#include "../_common/CameraView.h"
+#include "../_common/CustomEntities.h"
+#include "../_common/KeyboardController.h"
+#include "../_common/Map.h"
 
-class PlayerSurfaceInteraction : public sge::CollisionInteraction{
+
+class CollisionHighlightInteraction : public sge::CollisionInteraction{
     public:
-        PlayerSurfaceInteraction(
+        CollisionHighlightInteraction(
             std::vector<std::string> initiatorGroups,
             std::vector<std::string> recipientGroups,
-            std::vector<sge::DebugEntity*> surfaceDebugEntities)
+            std::vector<sge::DebugEntity*> mapTileDebugEntities)
                 : sge::CollisionInteraction(initiatorGroups, recipientGroups),
-                  m_surfaceDebugEntities(surfaceDebugEntities){};
+                  m_mapTileDebugEntities(mapTileDebugEntities){};
 
 
         bool collisionDetectionAlgorithm(sge::CollisionShape* initiator, sge::CollisionShape* recipient) override{ return sge::boundingBox(initiator, recipient); }
@@ -20,144 +28,121 @@ class PlayerSurfaceInteraction : public sge::CollisionInteraction{
 
         void startPhaseCollisionResponse(std::vector<sge::Collision> collisions) override{
             for(sge::Collision collision : collisions){
-                for(sge::DebugEntity* surfaceDebugEntitity : m_surfaceDebugEntities){
+                for(sge::DebugEntity* surfaceDebugEntitity : m_mapTileDebugEntities){
                     if(surfaceDebugEntitity->getRelatedEntity() == collision.recipient->getOwnerEntity()){
-                        surfaceDebugEntitity->customCollisionShapeBorderSettings["globalBounds"] = sge::CollisionShapeBorderSettings{sf::Color::Red};
+                        surfaceDebugEntitity->customCollisionShapeBorderSettings["global_bounds"] = sge::CollisionShapeBorderSettings{sf::Color::Red};
                     }
                 }
             }
         }
-        void continuousPhaseCollisionResponse(std::vector<sge::Collision> collisions) override{
-            sge::resolveAABB(collisions);
-            sge::initiatorStandOnTopOfRecipient(collisions);
-        }
+
         void endPhaseCollisionResponse(std::vector<sge::Collision> collisions) override{
             for(sge::Collision collision : collisions){
-                for(sge::DebugEntity* surfaceDebugEntitity : m_surfaceDebugEntities){
+                for(sge::DebugEntity* surfaceDebugEntitity : m_mapTileDebugEntities){
                     if(surfaceDebugEntitity->getRelatedEntity() == collision.recipient->getOwnerEntity()){
-                        surfaceDebugEntitity->customCollisionShapeBorderSettings["globalBounds"] = sge::CollisionShapeBorderSettings();
+                        surfaceDebugEntitity->customCollisionShapeBorderSettings["global_bounds"] = sge::CollisionShapeBorderSettings();
                     }
                 }
             }
         }
 
     private:
-        std::vector<sge::DebugEntity*> m_surfaceDebugEntities;
+        std::vector<sge::DebugEntity*> m_mapTileDebugEntities;
 };
 
 
 
 int main(){
-    sf::RenderWindow* window = new sf::RenderWindow(sf::VideoMode(1000, 600), "CollisionPhase");
-    window->setKeyRepeatEnabled(false);
-    sf::View* view = new sf::View(sf::Vector2f(100, 70), sf::Vector2f(250, 150));
+    printf(".▄▄ ·  ▄▄ • ▄▄▄ .\n▐█ ▀. ▐█ ▀ ▪▀▄.▀·\n▄▀▀▀█▄▄█ ▀█▄▐▀▀▪▄\n▐█▄▪▐█▐█▄▪▐█▐█▄▄▌\n ▀▀▀▀ ·▀▀▀▀  ▀▀▀ \n");
 
+
+
+    sf::RenderWindow *window = new sf::RenderWindow(sf::VideoMode(1000, 600), "Collision Phase");
+    window->setKeyRepeatEnabled(false); // For proper keyboard events handling (e.g. jumping)
+    
     sge::Universe* universe = new sge::Universe(window);
-    universe->setupDebug();
-    sge::AssetsManager* assetsManager = universe->assetsManager;
-    sge::EntityManager* entityManager = universe->entityManager;
-    sge::DebugManager* debugManager = universe->debugManager;
-    sge::CollisionManager* collisionManager = universe->collisionManager;
-    sge::ControllerManager* controllerManager = universe->controllerManager;
+    universe->setupDebugEntityManager();
 
 
 
-    assetsManager->loadTextureSheet(
-        std::filesystem::current_path().string() + "/examples/collision_phase/assets/pico_8_tiles.png",
-        "picoTiles",
-        sge::TextureSheetSizes{8, 8, 12, 12}
+    // Load assets
+    universe->assetsManager->loadTextureSheet(
+        std::filesystem::current_path().string() + "/examples/collision_phase/assets/tilemap.png",
+        "tileset",
+        sge::TextureSheetSizes{16, 16, 20, 20}
     );
-    assetsManager->loadTextureSheet(
-        std::filesystem::current_path().string() + "/examples/collision_phase/assets/pico_8_knight_sprite.png",
-        "knight",
-        sge::TextureSheetSizes{8, 8, 12, 12}
+    //
+
+
+
+    // Player
+    PlayerEntity* playerEntity = new PlayerEntity(
+        universe->assetsManager->getTextureSheet("tileset")->getTexture(),
+        universe->assetsManager->getTextureSheet("tileset")->getTextureRect(260),
+        sf::Vector2f(200, 100),
+        {"player"},
+        universe->assetsManager->getTextureSheet("tileset")
     );
 
+    sge::DebugEntity* playerDE = new sge::DebugEntity(playerEntity);
+    playerDE->customCollisionShapeBorderSettings["global_bounds"] = sge::CollisionShapeBorderSettings{sf::Color::Red};
+    //
 
 
-    tmx::Map map;
-    map.load(std::filesystem::current_path().string() + "/examples/collision_phase/assets/world.tmx");
-    const auto& layers = map.getLayers();
-    const auto& surface = layers[0]->getLayerAs<tmx::TileLayer>().getTiles();
 
-    std::vector<sge::Entity*> surfaceEntities;
+    // Map
+    std::vector<sge::Entity*> mapTileEntities;
 
-    for(int i = 0; i < map.getTileCount().y; i++){
-        for(int j = 0; j < map.getTileCount().x; j++){
-            if(surface[map.getTileCount().x*i+j].ID != 0){
-                surfaceEntities.push_back(sge::buildStaticEntity(
-                    assetsManager->getTextureSheet("picoTiles")->getTexture(),
-                    assetsManager->getTextureSheet("picoTiles")->getTextureRect(surface[map.getTileCount().x*i+j].ID-1),
-                    sf::Vector2f(j*map.getTileSize().x, i*map.getTileSize().y),
-                    {"surface"}
+    for(int i = 0; i < map::tileCountY; i++){
+        for(int j = 0; j < map::tileCountX; j++){
+            if(map::map_data[map::tileCountX*i+j] != 0){
+                mapTileEntities.push_back(new sge::StaticEntity(
+                    universe->assetsManager->getTextureSheet("tileset")->getTexture(),
+                    universe->assetsManager->getTextureSheet("tileset")->getTextureRect(map::map_data[map::tileCountX*i+j] - 1),
+                    sf::Vector2f(j*map::tileSizeX, i*map::tileSizeY),
+                    {"tiles"}
                 ));
             }
         }
     }
-
-    for(sge::Entity* entity : surfaceEntities) entityManager->registerComponent(view, entity);
     
-    std::vector<sge::DebugEntity*> surfaceDebugEntities;
-    for(sge::Entity* surfaceEntity : surfaceEntities){
-        sge::DebugEntity* surfaceDebugEntity = new sge::DebugEntity(surfaceEntity);
+    std::vector<sge::DebugEntity*> mapTileDebugEntities;
+    for(sge::Entity* surfaceEntity : mapTileEntities){
+        mapTileDebugEntities.push_back(new sge::DebugEntity(surfaceEntity));
+    }
+    //
 
-        surfaceDebugEntities.push_back(surfaceDebugEntity);
-        debugManager->registerComponent(view, surfaceDebugEntity);
+
+
+    CameraView* cameraView = new CameraView(playerEntity);
+
+
+
+    universe->scriptedViewManager->registerComponent(cameraView);
+
+    universe->entityManager->registerComponent(cameraView, playerEntity);
+    universe->debugEntityManager->registerComponent(cameraView, playerDE);
+
+    for(sge::Entity* tileEntity : mapTileEntities){
+        universe->entityManager->registerComponent(cameraView, tileEntity);
+    }
+    for(sge::DebugEntity* tileDebugEntity : mapTileDebugEntities){
+        universe->debugEntityManager->registerComponent(cameraView, tileDebugEntity);
     }
 
 
 
-    sge::Entity* playerEntity = sge::buildMobileEntity(
-        assetsManager->getTextureSheet("knight")->getTexture(),
-        assetsManager->getTextureSheet("knight")->getTextureRect(9),
-        sf::Vector2f(100,50),
-        {"player"}
-    );
-
-    playerEntity->physicalObject->acceleration.y = .3;
-
-    sge::Animation* playerAnimation = new sge::Animation(assetsManager->getTextureSheet("knight"), playerEntity->sprite, 9);
-    playerAnimation->addTextureSequence("idle", std::vector<int>{9});
-    playerAnimation->addTextureSequence("runRight", std::vector<int>{33, 34, 35});
-    playerAnimation->addTextureSequence("runLeft", std::vector<int>{45, 46, 47});
-    playerAnimation->setCurrentTextureSequence("idle");
-
-    playerEntity->animation = playerAnimation;
-
-    entityManager->registerComponent(view, playerEntity);
-
-    sge::DebugEntity* playerDebugEntity = new sge::DebugEntity(playerEntity);
-    playerDebugEntity->customCollisionShapeBorderSettings["globalBounds"] = sge::CollisionShapeBorderSettings{sf::Color::Red};
-
-    debugManager->registerComponent(view, playerDebugEntity);
+    universe->collisionManager->registerComponent(new AABBInteraction({"player"}, {"tiles"}));
+    universe->collisionManager->registerComponent(new PlayerSurfaceInteraction({"player"}, {"tiles"}));
+    universe->collisionManager->registerComponent(new CollisionHighlightInteraction({"player"}, {"tiles"}, mapTileDebugEntities));
 
 
 
-    collisionManager->registerComponent(new PlayerSurfaceInteraction({"player"}, {"surface"}, surfaceDebugEntities));
-
-
-
-    controllerManager->registerComponent([playerEntity](sf::Event event){
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::A)){
-            playerEntity->physicalObject->velocity.x = -70;
-            playerEntity->animation->setCurrentTextureSequence("runLeft");
-        }
-        else if(sf::Keyboard::isKeyPressed(sf::Keyboard::D)){
-            playerEntity->physicalObject->velocity.x = 70;
-            playerEntity->animation->setCurrentTextureSequence("runRight");
-        }
-        else{
-            playerEntity->physicalObject->velocity.x = 0;
-            playerEntity->animation->setCurrentTextureSequence("idle");
-        }
-
-        if(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space){
-            playerEntity->physicalObject->velocity.y = -120;
-        }
-    }); 
+    universe->controllerManager->registerComponent(new KeyboardController(playerEntity));
 
     
-    
+
+
     universe->loop();
     return 0;
 }
