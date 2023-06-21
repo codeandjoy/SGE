@@ -1,8 +1,6 @@
 #include <stdio.h>
 #include <filesystem>
 #include <SFML/Graphics.hpp>
-#include <tmxlite/Map.hpp>
-#include <tmxlite/TileLayer.hpp>
 
 #include "../../SGE.hpp"
 
@@ -14,7 +12,7 @@ class AABBInteraction : public sge::CollisionInteraction{
         bool collisionDetectionAlgorithm(sge::CollisionShape* initiator, sge::CollisionShape* recipient) override{ return sge::boundingBox(initiator, recipient); }
     
         void startPhaseCollisionResponse(std::vector<sge::Collision> collisions) override{
-            // printf("star_phase\n");            
+            printf("star_phase\n");            
         }
 
         void continuousPhaseCollisionResponse(std::vector<sge::Collision> collisions) override{
@@ -23,7 +21,7 @@ class AABBInteraction : public sge::CollisionInteraction{
         }
 
         void endPhaseCollisionResponse(std::vector<sge::Collision> collisions) override{
-            // printf("end_phase\n");            
+            printf("end_phase\n");            
         }
 };
 
@@ -78,8 +76,6 @@ class PushInteraction : public sge::CollisionInteraction{
         bool collisionDetectionAlgorithm(sge::CollisionShape* initiator, sge::CollisionShape* recipient) override{ return sge::boundingBox(initiator, recipient); }
     
         void startPhaseCollisionResponse(std::vector<sge::Collision> collisions) override{
-            printf("start\n");
-
             boxDE->customCollisionShapeBorderSettings["global_bounds"] = sge::CollisionShapeBorderSettings{sf::Color::Red};
 
             for(sge::Collision collision : collisions){
@@ -90,26 +86,15 @@ class PushInteraction : public sge::CollisionInteraction{
                 else if(collision.recipientImpactSide == sge::CollisionSide::left){
                     collision.recipient->getOwnerEntity()->motionUnit->contactForces["push"] = sf::Vector2f(300, 0);
                 }
-
-                for(auto& [name, _] : collision.recipient->getOwnerEntity()->motionUnit->contactForces){
-                    printf("%s\n", name.c_str());
-                }        
             }    
 
         }
 
         void endPhaseCollisionResponse(std::vector<sge::Collision> collisions) override{
-            printf("end\n");
-
             boxDE->customCollisionShapeBorderSettings["global_bounds"] = sge::CollisionShapeBorderSettings{sf::Color::Green};
         
             for(sge::Collision collision : collisions){
                 collision.recipient->getOwnerEntity()->motionUnit->contactForces.erase("push");
-
-                for(auto& [name, _] : collision.recipient->getOwnerEntity()->motionUnit->contactForces){
-                    printf("endfoces:\n");
-                    printf("%s\n", name.c_str());
-                }
             }          
 
         }
@@ -213,7 +198,7 @@ class GravityEntity : public sge::ComplexMobileEntity{
     public :
         GravityEntity(sf::Texture* texture, sf::IntRect textureRect, sf::Vector2f position, std::vector<std::string> collisionGroups)
             : sge::ComplexMobileEntity(texture, textureRect, position, collisionGroups){
-                motionUnit->fieldForces["gravity"] = sf::Vector2f(0, 1000); //.4
+                motionUnit->fieldForces["gravity"] = sf::Vector2f(0, 1000);
         }
 };
 
@@ -279,6 +264,55 @@ class KeyboardController : public sge::Controller{
     private:
         sge::Entity* m_playerEntityPtr;
 };
+
+class MapController : public sge::Controller{
+    public:
+        MapController(sge::Entity* boxEntity) : m_boxEntity(boxEntity){}; 
+
+        void script(sf::Event event) override{
+            if(event.type == sf::Event::KeyPressed){
+                if(event.key.code == sf::Keyboard::R){
+                    m_boxEntity->sprite->setPosition(sf::Vector2f(360, 160));
+                }
+            }
+        }
+
+    private:
+        sge::Entity* m_boxEntity;
+};
+
+
+
+namespace map{
+    std::vector<int> map_data = {
+        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,86,86,86,0,0,0,0,0,
+        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+        0,0,0,0,0,0,0,0,0,0,0,86,0,0,0,0,0,0,0,0,0,0,0,0,0,0,86,0,0,0,
+        0,0,0,0,0,0,0,0,0,0,0,0,0,88,89,90,0,0,0,0,259,0,0,0,0,0,0,0,0,0,
+        0,0,0,0,0,0,0,0,0,277,197,277,197,197,277,197,197,197,197,277,197,197,197,277,277,197,197,197,277,0,
+        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+    };
+
+    int tileCountX = 30;
+    int tileCountY = 20;
+    int tileSizeX = 16;
+    int tileSizeY = 16;
+}
+
 
 
 int main(){
@@ -391,42 +425,27 @@ int main(){
 
 
 
-    // Read map
-    tmx::Map map;
-    if(!map.load(std::filesystem::current_path().string() + "/examples/dev/assets/test_map.tmx")){
-        printf("Can't load map");
-        exit(1);
-    }
-
-    const auto& layers = map.getLayers();
-    const auto& tiles = layers[0]->getLayerAs<tmx::TileLayer>().getTiles();
-    const auto& boxes = layers[1]->getLayerAs<tmx::ObjectGroup>().getObjects();
-    //
-
-    // Tile layer
     std::vector<sge::Entity*> mapTileEntities;
 
-    for(int i = 0; i < map.getTileCount().y; i++){
-        for(int j = 0; j < map.getTileCount().x; j++){
-            if(tiles[map.getTileCount().x*i+j].ID != 0){
+    for(int i = 0; i < map::tileCountY; i++){
+        for(int j = 0; j < map::tileCountX; j++){
+            if(map::map_data[map::tileCountX*i+j] != 0){
                 mapTileEntities.push_back(new sge::StaticEntity(
                     universe->assetsManager->getTextureSheet("tileset")->getTexture(),
-                    universe->assetsManager->getTextureSheet("tileset")->getTextureRect(tiles[map.getTileCount().x*i+j].ID-1),
-                    sf::Vector2f(j*map.getTileSize().x, i*map.getTileSize().y),
+                    universe->assetsManager->getTextureSheet("tileset")->getTextureRect(map::map_data[map::tileCountX*i+j] - 1),
+                    sf::Vector2f(j*map::tileSizeX, i*map::tileSizeY),
                     {"tiles"}
                 ));
             }
         }
     }
-    //
 
-    // Object layer
-    auto& box = boxes[0];
+
 
     GravityEntity* boxEntity = new GravityEntity(
         universe->assetsManager->getTextureSheet("tileset")->getTexture(),
-        universe->assetsManager->getTextureSheet("tileset")->getTextureRect(box.getTileID()-1),
-        sf::Vector2f(box.getPosition().x, box.getPosition().y),
+        universe->assetsManager->getTextureSheet("tileset")->getTextureRect(27),
+        sf::Vector2f(360, 160),
         {"box"}
     );
 
@@ -474,7 +493,6 @@ int main(){
             }
         }
     );
-    //
     
 
 
@@ -497,7 +515,6 @@ int main(){
 
 
     // * Notes:
-    // ! The collision shape CAN NOT be the initiator AND the recepient of the AABB response
     // ! To work properly, all AABB recipients with common initiator should be put together
     universe->collisionManager->registerComponent(new AABBInteraction({"player"}, {"tiles", "box"}));
     universe->collisionManager->registerComponent(new PlayerSurfaceInteraction({"player"}, {"tiles", "box"}));
@@ -508,6 +525,7 @@ int main(){
 
 
     universe->controllerManager->registerComponent(new KeyboardController(playerEntity));
+    universe->controllerManager->registerComponent(new MapController(boxEntity));
 
 
 
