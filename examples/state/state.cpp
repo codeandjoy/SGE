@@ -12,10 +12,11 @@ class WalkingLeft : public sge::State{
             m_walkClock->restart();
         }
 
-        void updateScript(float dt, sge::StateCluster* containerStateCluster) override{
+        void updateScript(float dt) override{
             if(m_walkClock->getElapsedTime().asSeconds() >= 1){
                 m_walkClock->restart();
-                containerStateCluster->setCurrentState("walking_right");
+                m_ownerEntityPtr->stateCluster->deactivateState("walking_left");
+                m_ownerEntityPtr->stateCluster->activateState("walking_right");
             }
 
             sf::Vector2f currentPosition = m_ownerEntityPtr->sprite->getPosition();
@@ -34,10 +35,11 @@ class WalkingRight : public sge::State{
             m_walkClock->restart();
         }
 
-        void updateScript(float dt, sge::StateCluster* containerStateCluster) override{
+        void updateScript(float dt) override{
             if(m_walkClock->getElapsedTime().asSeconds() >= 1){
                 m_walkClock->restart();
-                containerStateCluster->setCurrentState("walking_left");
+                m_ownerEntityPtr->stateCluster->deactivateState("walking_right");
+                m_ownerEntityPtr->stateCluster->activateState("walking_left");
             }
 
             sf::Vector2f currentPosition = m_ownerEntityPtr->sprite->getPosition();
@@ -74,7 +76,7 @@ int main(){
     sge::StateCluster* entityStateCluster = new sge::StateCluster();
     entityStateCluster->states["walking_right"] = walkingRightEntityState;
     entityStateCluster->states["walking_left"] = walkingLeftEntityState;
-    entityStateCluster->setCurrentState("walking_left"); // Setting start state
+    entityStateCluster->activateState("walking_left"); // Setting start state
 
     entity->stateCluster = entityStateCluster;
 
