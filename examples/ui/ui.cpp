@@ -4,6 +4,48 @@
 #include "../../SGE.hpp"
 
 
+class OtherUIScreenEntity : public sge::Entity{
+    public:
+        OtherUIScreenEntity(sf::Font* font){
+            sprite = new sge::Sprite();
+            sprite->setPosition(424, 300);
+
+            spriteText = new sge::SpriteText(sprite);
+            spriteText->setFont(*font);
+            spriteText->setString("Other UI screen");
+            spriteText->setFillColor(sf::Color::White);
+            spriteText->setCharacterSize(30);
+        }
+};
+
+class ClickCountEntity : public sge::Entity{
+    public: 
+        ClickCountEntity(sf::Font* font){
+            sprite = new sge::Sprite();
+            sprite->setPosition(484, 40);
+
+            spriteText = new sge::SpriteText(sprite);
+            spriteText->setFont(*font);
+            spriteText->setString("0");
+            spriteText->setFillColor(sf::Color::White);
+            spriteText->setCharacterSize(100);
+        }
+};
+
+class ClickButtonEntity : public sge::Entity{
+    public:
+        ClickButtonEntity(sf::Texture* texture, sf::IntRect textureRect){
+            sprite = new sge::Sprite(); 
+            sprite->setScale(2,2);
+            sprite->setTexture(*texture);
+            sprite->setTextureRect(textureRect);
+            sprite->setPosition(468, 200);
+
+            clickableShape = new sge::ClickableShape(this);
+            // Action is setup outside, in main
+        }
+};
+
 int main(){
     sf::RenderWindow *window = new sf::RenderWindow(sf::VideoMode(1000, 600), "Test");
     sge::Universe* universe = new sge::Universe(window);
@@ -22,54 +64,32 @@ int main(){
 
 
 
-    sge::Scene* uiSceneText = new sge::Scene();
+    // Other UI screen
+    sge::Scene* otherUIScreenScene = new sge::Scene();
 
-    sge::Entity* uiEntityText = new sge::Entity();
-    uiEntityText->sprite = new sge::Sprite();
-    uiEntityText->sprite->setPosition(424, 300);
+    otherUIScreenScene->addEntity(view, new OtherUIScreenEntity(universe->assetsManager->getFont("m5x7")));
 
-    sge::SpriteText* uiAnotherSpriteText = new sge::SpriteText(uiEntityText->sprite);
-    uiAnotherSpriteText->setFont(*universe->assetsManager->getFont("m5x7"));
-    uiAnotherSpriteText->setString("Other UI screen");
-    uiAnotherSpriteText->setFillColor(sf::Color::White);
-    uiAnotherSpriteText->setCharacterSize(30);
-
-    uiEntityText->spriteText = uiAnotherSpriteText;
-
-    uiSceneText->addEntity(view, uiEntityText);
-
-    universe->layerSceneManager->registerComponent("text", uiSceneText);
-    uiSceneText->hideSceneParts();
+    universe->layerSceneManager->registerComponent("text", otherUIScreenScene);
+    otherUIScreenScene->hideSceneParts();
+    //
 
 
 
-    sge::Scene* uiSceneButton = new sge::Scene();
+    // Main UI screen
+    sge::Scene* mainUIScreenScene = new sge::Scene();
 
-    sge::Entity* uiEntityButtonText = new sge::Entity();
-    uiEntityButtonText->sprite = new sge::Sprite();
-    uiEntityButtonText->sprite->setPosition(484, 40);
-
-    sge::SpriteText* spriteText = new sge::SpriteText(uiEntityButtonText->sprite);
-    spriteText->setFont(*universe->assetsManager->getFont("m5x7"));
-    spriteText->setString(std::to_string(clickCount));
-    spriteText->setFillColor(sf::Color::White);
-    spriteText->setCharacterSize(100);
-
-    uiEntityButtonText->spriteText = spriteText;
-
-    uiSceneButton->addEntity(view, uiEntityButtonText);
+    ClickCountEntity* clickCountEntity = new ClickCountEntity(universe->assetsManager->getFont("m5x7"));
 
 
 
-    sge::Entity* uiEntityButton = new sge::Entity();
-    uiEntityButton->sprite = new sge::Sprite(); 
-    uiEntityButton->sprite->setScale(2,2);
-    uiEntityButton->sprite->setTexture(*universe->assetsManager->getTextureSheet("button")->getTexture());
-    uiEntityButton->sprite->setTextureRect(universe->assetsManager->getTextureSheet("button")->getTextureRect(0));
-    uiEntityButton->sprite->setPosition(468, 200);
 
-    sge::ClickableShape* clicakbleShape = new sge::ClickableShape(uiEntityButton);
-    clicakbleShape->action = [window, universe, &clickCount, uiEntityButtonText, uiSceneText](sge::ClickableShape* thisClickableShape, sf::Event event){
+
+    ClickButtonEntity* clickButtonEntity = new ClickButtonEntity(
+        universe->assetsManager->getTextureSheet("button")->getTexture(),
+        universe->assetsManager->getTextureSheet("button")->getTextureRect(0)
+    );
+    // Action is setup outside because of captures
+    clickButtonEntity->clickableShape->action = [window, universe, &clickCount, clickCountEntity, otherUIScreenScene](sge::ClickableShape* thisClickableShape, sf::Event event){
         if(sge::isMouseOverClickableShape(thisClickableShape, window)){
             printf("Mouse over Button\n");
         }
@@ -85,26 +105,27 @@ int main(){
             // Click count
             if(sge::isMouseOverClickableShape(thisClickableShape, window)){
                 clickCount++;
-                uiEntityButtonText->spriteText->setString(std::to_string(clickCount));
+                clickCountEntity->spriteText->setString(std::to_string(clickCount));
             }
             //
 
             // Toggle ui screen
-            if(uiSceneText->isActive){
-                uiSceneText->hideSceneParts();
+            if(otherUIScreenScene->isActive){
+                otherUIScreenScene->hideSceneParts();
             }
             else{
-                uiSceneText->activateSceneParts();
+                otherUIScreenScene->activateSceneParts();
             }
             //
         }
     };
 
-    uiEntityButton->clickableShape = clicakbleShape;
 
-    uiSceneButton->addEntity(view, uiEntityButton);
 
-    universe->layerSceneManager->registerComponent("button", uiSceneButton);
+    mainUIScreenScene->addEntity(view, clickCountEntity);
+    mainUIScreenScene->addEntity(view, clickButtonEntity);
+
+    universe->layerSceneManager->registerComponent("button", mainUIScreenScene);
 
 
 
