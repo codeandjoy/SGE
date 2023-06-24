@@ -1879,15 +1879,13 @@ void sge::CollisionShapeManager::update(float dt){
 
 void sge::resolveAABB(std::vector<sge::Collision> collisions){
     for(sge::Collision collision : collisions){
-        sge::CollisionShape* initiatorCollisionShape = collision.initiator;
-        sge::CollisionShape* recipientCollisionShape = collision.recipient;
         sge::Sprite *initiatorSprite = collision.initiator->getOwnerEntity()->sprite;
         sge::Sprite *recipientSprite = collision.recipient->getOwnerEntity()->sprite;
         
         // Align initiator based on impact side
         if(collision.initiatorImpactSide == sge::CollisionSide::left){
             initiatorSprite->setPosition(
-                recipientSprite->getPosition().x + recipientSprite->getGlobalBounds().width - collision.initiator->offset.x + collision.recipient->offset.x,
+                recipientSprite->getPosition().x + collision.recipient->getGlobalBounds().width - collision.initiator->offset.x + collision.recipient->offset.x,
                 initiatorSprite->getPosition().y
             );
         }
@@ -1900,7 +1898,7 @@ void sge::resolveAABB(std::vector<sge::Collision> collisions){
         else if(collision.initiatorImpactSide == sge::CollisionSide::top){
             initiatorSprite->setPosition(
                 initiatorSprite->getPosition().x,
-                recipientSprite->getPosition().y + recipientSprite->getGlobalBounds().height - collision.initiator->offset.y + collision.recipient->offset.y
+                recipientSprite->getPosition().y + collision.recipient->getGlobalBounds().height - collision.initiator->offset.y + collision.recipient->offset.y
             );
         }
         else if(collision.initiatorImpactSide == sge::CollisionSide::bottom){
