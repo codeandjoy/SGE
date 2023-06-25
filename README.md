@@ -1,4 +1,7 @@
-<img src="notes/logo/SGE_logo.svg" width="400">
+
+<p align="center">
+    <img src="notes/logo/SGE_logo.svg" width="500">
+</p>
 
 # Simple Game Engine
 

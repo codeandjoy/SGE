@@ -27,27 +27,25 @@ class CollisionHighlightInteraction : public sge::CollisionInteraction{
 
 
         void startPhaseCollisionResponse(std::vector<sge::Collision> collisions) override{
-            for(sge::Collision collision : collisions){
-                for(sge::DebugEntity* surfaceDebugEntitity : m_mapTileDebugEntities){
-                    if(surfaceDebugEntitity->getRelatedEntity() == collision.recipient->getOwnerEntity()){
-                        surfaceDebugEntitity->customCollisionShapeBorderSettings["global_bounds"] = sge::CollisionShapeBorderSettings{sf::Color::Red};
-                    }
-                }
-            }
+            m_changeBorderSettings(collisions, sge::CollisionShapeBorderSettings{sf::Color::Red});
         }
 
         void endPhaseCollisionResponse(std::vector<sge::Collision> collisions) override{
-            for(sge::Collision collision : collisions){
-                for(sge::DebugEntity* surfaceDebugEntitity : m_mapTileDebugEntities){
-                    if(surfaceDebugEntitity->getRelatedEntity() == collision.recipient->getOwnerEntity()){
-                        surfaceDebugEntitity->customCollisionShapeBorderSettings["global_bounds"] = sge::CollisionShapeBorderSettings();
-                    }
-                }
-            }
+            m_changeBorderSettings(collisions, sge::CollisionShapeBorderSettings()); // Blue is default
         }
 
     private:
         std::vector<sge::DebugEntity*> m_mapTileDebugEntities;
+
+        void m_changeBorderSettings(std::vector<sge::Collision> collisions, sge::CollisionShapeBorderSettings settings){
+            for(sge::Collision collision : collisions){
+                for(sge::DebugEntity* surfaceDebugEntitity : m_mapTileDebugEntities){
+                    if(surfaceDebugEntitity->getRelatedEntity() == collision.recipient->getOwnerEntity()){
+                        surfaceDebugEntitity->customCollisionShapeBorderSettings["global_bounds"] = settings;
+                    }
+                }
+            }
+        }
 };
 
 

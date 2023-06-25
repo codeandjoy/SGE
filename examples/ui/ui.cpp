@@ -80,10 +80,6 @@ int main(){
 
     ClickCountEntity* clickCountEntity = new ClickCountEntity(universe->assetsManager->getFont("m5x7"));
 
-
-
-
-
     ClickButtonEntity* clickButtonEntity = new ClickButtonEntity(
         universe->assetsManager->getTextureSheet("button")->getTexture(),
         universe->assetsManager->getTextureSheet("button")->getTextureRect(0)
@@ -126,6 +122,7 @@ int main(){
     mainUIScreenScene->addEntity(view, clickButtonEntity);
 
     universe->layerSceneManager->registerComponent("button", mainUIScreenScene);
+    //
 
 
 
