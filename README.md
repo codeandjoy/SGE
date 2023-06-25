@@ -1,3 +1,5 @@
+<img src="notes/logo/SGE_logo.svg" width="400">
+
 # Simple Game Engine
 
 A game engine written on top of [SFML](https://www.sfml-dev.org/) library.
