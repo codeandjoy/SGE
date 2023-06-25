@@ -2,6 +2,8 @@
 
 - Shows how to create `Scene`s and use `DrumSceneManager` in SGE.
 
+![Scenes example](../../notes/gifs/ScenesExample.gif)
+
 ## sge::Scene
 
 A scene in SGE is basically a collection of contextually related entities (for example in a game level or a UI screen).

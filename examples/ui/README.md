@@ -1,6 +1,8 @@
 # UI
 
-- shows how to create UI elements in SGE.
+- Shows how to create UI elements in SGE.
+
+![UI example](../../notes/gifs/UIExample.gif)
 
 <br>
 
